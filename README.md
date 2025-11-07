@@ -1,4 +1,3 @@
-
 ## Tentang Projek
 
 Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (RestAPI) dan ReactJS. Sudah include LMS dan Ujian Online.
