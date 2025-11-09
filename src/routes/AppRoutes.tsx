@@ -46,6 +46,7 @@ import CreateEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/C
 import EditEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/EditEkskul";
 import DaftarSiswaEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/DaftarSiswaEkskul";
 import DaftarSiswa from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/DaftarSiswa";
+import DataEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler";
 
 export default function AppRoutes() {
   return (
@@ -106,7 +107,7 @@ export default function AppRoutes() {
           }
         />
 
-        {/* ================= DATA SUPER ADMIN ================= */}
+        {/* ================= DATA DASHBOARD SUPER ADMIN ================= */}
         {/* Setting user super admin */}
         <Route
           path="/superadmin/settings"
@@ -365,6 +366,16 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DaftarSiswa />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= DATA DASHBOARD SISWA ================= */}
+        <Route
+          path="/siswa/ekstrakurikuler"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <DataEkstrakurikulerSiswa />
             </ProtectedRoute>
           }
         />

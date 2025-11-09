@@ -13,7 +13,7 @@ import api from "@/api/axios";
 import Swal from "sweetalert2";
 
 interface Peserta {
-  id_pivot: number;
+  id_pivot: number | null;
   id: number;
   nama_siswa: string;
   jurusan: string | null;
@@ -38,45 +38,46 @@ const DaftarSiswa = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 🔹 Ambil data ekskul berdasarkan ID dari URL
+  // 🔹 Ambil data ekskul + pivot (SUDAH DIPERBAIKI)
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/siswa-ekskul/${id}`);
 
-      if (res.data.status === "success") {
-        const selectedEkskul = res.data.data;
-
-        const data: SiswaEkskul = {
-          id: selectedEkskul.id,
-          nama_ekskul: selectedEkskul.nama_ekskul,
-          jumlah_peserta: selectedEkskul.jumlah_peserta || selectedEkskul.peserta?.length || 0,
-          peserta:
-            selectedEkskul.peserta?.map((p: any) => ({
-              id_pivot: p.id_pivot, // ✅ ambil id pivot dari backend
-              id: p.id,
-              nama_siswa: p.nama_siswa ?? "-",
-              jurusan: p.jurusan ?? "-",
-              kelas: p.kelas ?? "-",
-            })) || [],
-        };
-
-        setEkskul(data);
-        setFiltered(data.peserta);
-      } else {
+      // Ambil detail ekskul berdasarkan ID dari URL
+      const resEkskul = await api.get(`/ekstrakurikuler/${id}`);
+      if (resEkskul.data.status !== "success") {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: res.data.message || "Gagal memuat data ekstrakurikuler.",
+          text: resEkskul.data.message || "Gagal memuat data ekstrakurikuler.",
         });
+        return;
       }
+
+      const selectedEkskul = resEkskul.data.data;
+
+      // 🔸 Langsung mapping dari response backend (id_pivot sudah ada dari backend)
+      const pesertaData =
+        selectedEkskul?.peserta?.map((p: any) => ({
+          id_pivot: p.id_pivot ?? null, // 👈 Dari backend
+          id: p.id,
+          nama_siswa: p.nama_siswa ?? "-",
+          jurusan: p.jurusan ?? "-",
+          kelas: p.kelas ?? "-",
+        })) || [];
+
+      const formattedData: SiswaEkskul = {
+        id: selectedEkskul.id,
+        nama_ekskul: selectedEkskul.nama_ekstrakurikuler || selectedEkskul.nama_ekskul,
+        jumlah_peserta: pesertaData.length,
+        peserta: pesertaData,
+      };
+
+      setEkskul(formattedData);
+      setFiltered(pesertaData);
     } catch (error) {
       console.error("Gagal mengambil data siswa:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Terjadi kesalahan koneksi ke server.",
-      });
+      Swal.fire("Error", "Terjadi kesalahan koneksi ke server.", "error");
     } finally {
       setLoading(false);
     }
@@ -87,34 +88,47 @@ const DaftarSiswa = () => {
   }, [id]);
 
   // 🔹 Hapus siswa dari ekskul
-  const handleDelete = async (pivotId: number) => {
-    Swal.fire({
+  const handleDelete = async (pivotId: number | null) => {
+    const ekskulId = id ? Number(id) : null;
+
+    const confirm = await Swal.fire({
       title: "Yakin ingin menghapus?",
       text: "Siswa ini akan dihapus dari ekskul.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Ya, hapus",
       cancelButtonText: "Batal",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          setLoading(true);
-          const res = await api.delete(`/siswa-ekskul/${pivotId}`);
-
-          if (res.data.status === "success") {
-            Swal.fire("Berhasil", "Siswa telah dihapus dari ekskul", "success");
-            await fetchData();
-          } else {
-            Swal.fire("Gagal", res.data.message || "Gagal menghapus siswa", "error");
-          }
-        } catch (error) {
-          console.error(error);
-          Swal.fire("Error", "Terjadi kesalahan saat menghapus data", "error");
-        } finally {
-          setLoading(false);
-        }
-      }
     });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      setLoading(true);
+      let res;
+
+      if (pivotId) {
+        // versi admin/pembina
+        res = await api.delete(`/siswa-ekskul/${pivotId}`);
+      } else if (ekskulId) {
+        // fallback pakai versi siswa
+        res = await api.delete(`/siswa-ekskul/destroy-siswa/${ekskulId}`);
+      } else {
+        Swal.fire("Error", "ID tidak valid untuk penghapusan", "error");
+        return;
+      }
+
+      if (res.data.status === "success") {
+        Swal.fire("Berhasil", "Siswa telah dihapus dari ekskul", "success");
+        await fetchData();
+      } else {
+        Swal.fire("Gagal", res.data.message || "Gagal menghapus siswa", "error");
+      }
+    } catch (error: any) {
+      console.error("Error delete:", error.response || error);
+      Swal.fire("Error", "Terjadi kesalahan saat menghapus data", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 🔹 Daftar kelas unik
@@ -123,7 +137,7 @@ const DaftarSiswa = () => {
     return Array.from(new Set(allKelas));
   }, [ekskul]);
 
-  // 🔹 Filter dan search
+  // 🔹 Filter & Search
   useEffect(() => {
     if (!ekskul) return;
     let data = ekskul.peserta;
@@ -179,13 +193,11 @@ const DaftarSiswa = () => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Pilih Kelas</SelectLabel>
-                      {kelasList
-                        .filter((k) => k) // hilangkan null/undefined
-                        .map((kelas, i) => (
-                          <SelectItem key={i} value={String(kelas)}>
-                            {String(kelas)}
-                          </SelectItem>
-                        ))}
+                      {kelasList.map((kelas, i) => (
+                        <SelectItem key={i} value={String(kelas)}>
+                          {String(kelas)}
+                        </SelectItem>
+                      ))}
                     </SelectGroup>
                     <div className="px-2 py-1 border-t border-gray-200">
                       <Button
@@ -218,7 +230,7 @@ const DaftarSiswa = () => {
                       <TableHead className="font-semibold text-white">Nama Siswa</TableHead>
                       <TableHead className="font-semibold text-white">Jurusan</TableHead>
                       <TableHead className="font-semibold text-white">Kelas</TableHead>
-                      <TableHead className="font-semibold text-center text-white">Aksi</TableHead>
+                      <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

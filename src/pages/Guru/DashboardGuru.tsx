@@ -11,7 +11,13 @@ export const DashboardGuru = () => {
       <SidebarGuru isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       {/* Main Content */}
-      <main className="w-full transition-all duration-300 bg-background">
+      <main
+        className={`
+    w-full min-h-screen bg-background transition-all duration-300
+    ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}
+  `}
+      >
+        
         <PageTitle title="Dashboard Guru" />
 
         {/* konten */}
