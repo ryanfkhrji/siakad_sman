@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('ekskul_siswa_pivot', function (Blueprint $table) {
+            $table->id();
+
+            // ketika siswa di tabel siswa dihapus, maka yang mengandung id siswa tsb di pivot ini juga dihapus
+            $table->foreignId('siswa_id')->constrained()->onDelete('cascade');
+
+            // ketika ekskul di tabel ekskul dihapus, maka yang mengandung id ekskul tsb di pivot ini juga dihapus
+            $table->foreignId('ekstrakurikuler_id')->constrained()->onDelete('cascade');
+
+            $table->unique(['siswa_id', 'ekstrakurikuler_id']); // mencegah daftar ekskul yang sama > 1x
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('ekskul_siswa_pivot');
+    }
+};
