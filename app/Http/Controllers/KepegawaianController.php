@@ -246,7 +246,38 @@ class KepegawaianController extends Controller
         return ApiResponse::success($formatted, 'Detail pegawai berhasil diambil');
     }
 
-    // ! show pegawai untuk pegawai
+    // ✅ show diri sendiri
+    public function showDiriSendiri()
+    {
+        $pegawai = Auth::guard('kepegawaian')->user()->load('kelas', 'ekstrakurikulers');
+
+        if (!$pegawai) {
+            return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        $formatted = [
+            'id' => $pegawai->id ?? null,
+            'nama' => $pegawai->nama ?? null,
+            'email' => $pegawai->email ?? null,
+            'status' => $pegawai->status ?? null,
+            'nip' => $pegawai->nip ?? null,
+            'keterangan' => $pegawai->keterangan ?? null,
+            'role' => $pegawai->role ?? null,
+            'kelas' => [
+                'id' => $pegawai->kelas->id ?? null,
+                'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
+                'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
+            ],
+            'ekstrakurikuler' => [
+                'id' => $pegawai->ekstrakurikulers->id,
+                'nama_ekstrakurikuler' => $pegawai->ekstrakurikulers->nama_ekstrakurikuler,
+                'anggaran' => $pegawai->ekstrakurikulers->anggaran,
+                'status' => $pegawai->ekstrakurikulers->status,
+            ]
+        ];
+
+        return ApiResponse::success($formatted, 'Detail pegawai berhasil diambil');
+    }
 
     // ✅ Store = Register
 
@@ -330,7 +361,92 @@ class KepegawaianController extends Controller
         );
     }
 
-    // ! update pegawai untuk dirinya sendiri
+     // ✅ Update super admin oleh dirinya sendiri
+     public function updateDirinyaSendiri(Request $request)
+     {
+         $siswa = Auth::guard('kepegawaian')->user()->load('jurusan', 'kelas');
+ 
+         if (!$siswa) {
+             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+         }
+ 
+         $validated = $request->validate([
+             'nama' => 'sometimes|required|string',
+             'email' => [
+                 'sometimes',
+                 'required',
+                 Rule::unique('siswas')->ignore($siswa->id)
+             ],
+             'status' => 'sometimes',
+             'nip' => [
+                 'sometimes',
+                 'required',
+                 Rule::unique('siswas')->ignore($siswa->id)
+             ],
+             'role' => 'sometimes|required',
+        ], [
+            'nama.required' => 'Nama wajib diisi',
+            'email.required' => 'Email wajib diisi',
+            'email.unique' => 'Terdeteksi email ganda',
+            'nip.required' => 'NIP wajib diisi',
+            'nip.unique' => 'Terdeteksi NIP ganda',
+            'role.required' => 'Role wajib diisi',
+        ]);
+ 
+         // cek role super_admin dan kepsek agar tidak double
+         if (in_array($validated['role'], ['super_admin', 'kepsek'])) {
+            $existing = Kepegawaian::where('role', $validated['role'])->exists();
+
+            if ($existing) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Role {$validated['role']} sudah digunakan.",
+                ], 403);
+            }
+        }
+
+        // Cek apakah sedang digunakan sebagai wali_kelas
+        if ($pegawai->kelas()->exists() && $validated['role'] !== $pegawai->role) {
+            return ApiResponse::error('Role tidak bisa diubah karena pegawai masih menjadi wali kelas', [
+                'role' => ['Tidak bisa, pegawai ini masih berstatus sebagai wali kelas']
+            ], 422);
+        }
+        
+        $pegawai->update([
+            'nama' => $validated['nama'],
+            'email' => $validated['email'],
+            'status' => $request['status'],
+            'nip' => $validated['nip'],
+            'keterangan' => $request['keterangan'],
+            'role' => $validated['role'],
+        ]);
+
+        $pegawai->load('kelas','ekstrakurikulers');
+
+        return ApiResponse::success(
+            [
+                'id' => $pegawai->id ?? null,
+                'nama' => $pegawai->nama ?? null,
+                'email' => $pegawai->email ?? null,
+                'status' => $pegawai->status ?? null,
+                'nip' => $pegawai->nip ?? null,
+                'keterangan' => $pegawai->keterangan ?? null,
+                'role' => $pegawai->role ?? null,
+                'kelas' => [
+                    'id' => $pegawai->kelas->id ?? null,
+                    'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
+                    'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
+                ],
+                'ekstrakurikuler' => [
+                    'id' => $pegawai->ekstrakurikulers->id ?? null,
+                    'nama_ekstrakurikuler' => $pegawai->ekstrakurikulers->nama_ekstrakurikuler ?? null,
+                    'anggaran' => $pegawai->ekstrakurikulers->anggaran ?? null,
+                    'status' => $pegawai->ekstrakurikulers->status ?? null,
+                ]
+            ],
+            'Pegawai berhasil diperbarui'
+        );
+     }
 
     // ✅ destroy pegawai untuk super admin
     public function destroy($id)
@@ -386,6 +502,49 @@ class KepegawaianController extends Controller
         // (Opsional) Hapus semua token lama agar user harus login ulang
         $pegawai->tokens()->delete();
 
+        return ApiResponse::success(null, 'Password berhasil diperbarui. Silakan login kembali.');
+    }
+
+
+
+    // ✅ Lupa password pegawai oleh diri sendiri
+    public function ubahPassDiri(Request $request)
+    {        
+        // Validasi input
+        $validated = $request->validate([
+            'email' => 'required|exists:kepegawaians,email',
+            'password_lama' => 'required|string|min:5',                    
+            'password_baru' => 'required|string|min:5|different:password_lama|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
+            'konfirmasi_password' => 'required|same:password_baru',
+        ], [
+            'email.required' => 'Email wajib diisi',
+            'email.exists' => 'Email tidak ditemukan',
+            'password_lama.required' => 'Password lama wajib diisi',
+            'password_baru.required' => 'Password baru wajib diisi',
+            'password_baru.different' => 'Password baru tidak boleh sama dengan password lama',
+            'password_baru.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
+            'konfirmasi_password.same' => 'Konfirmasi password tidak cocok',
+        ]);
+
+        // Ambil data pegawai
+        $pegawai = Auth::guard('kepegawaian')->user();
+
+        if ($pegawai->email !== $request->email) {
+            return response()->json(['error' => 'Email tidak cocok'], 403);
+        }
+
+        // Cek password lama
+        if (!Hash::check($validated['password_lama'], $pegawai->password)) {
+            return ApiResponse::error('Password lama salah', 401);
+        }
+
+        // Hash password baru
+        $pegawai->password = Hash::make($validated['password_baru']);
+        $pegawai->save();
+
+        // (Opsional) Hapus semua token lama agar user harus login ulang
+        $pegawai->tokens()->delete();
+        
         return ApiResponse::success(null, 'Password berhasil diperbarui. Silakan login kembali.');
     }
 

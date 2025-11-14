@@ -13,33 +13,38 @@ use Illuminate\Validation\Rule;
 
 class EkskulSiswaPivotController extends Controller
 {
-    // ✅ get all menggunakan EkstrakurikulerController::@index
-    // public function index()
-    // {
-    //     $ekskul = Ekstrakurikuler::with(['peserta.siswa.jurusan', 'peserta.siswa.kelas'])->get();
+    // ✅ get all ekskul sendiri
+    public function getAllEkskulSendiri()
+    {
+        $siswa = Auth::guard('siswa')->user();
 
-    //     $formatted = $ekskul->map(function ($item) {
-    //         return [
-    //             'id' => $item->id,
-    //             'nama_ekskul' => $item->nama_ekstrakurikuler,
-    //             'jumlah_peserta' => $item->peserta->count(),
-    //             'peserta' => $item->peserta->map(function ($pivot) {
-    //                 $siswa = $pivot->siswa;
-    //                 return [
-    //                     'id' => $siswa->id,
-    //                     'nama_siswa' => $siswa->nama,
-    //                     'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-    //                     'kelas' => $siswa->kelas->nama_kelas ?? null,
-    //                 ];
-    //             }),
-    //         ];
-    //     });
+        $ekskul = EkskulSiswaPivot::with([
+                'siswa',
+                'ekstrakurikuler.pengajar', // tambahkan relasi pengajar dari pivot
+                'ekstrakurikuler.siswas'
+            ])
+            ->where('siswa_id', $siswa->id)
+            ->get();
 
-    //     return ApiResponse::success($formatted, 'Daftar ekstrakurikuler dan pesertanya berhasil diambil');
-    // }
+        $hasil = $ekskul->map(function ($item) {
+            return [
+                'pivot_id'      => $item->id,
+                'nama_ekskul'   => $item->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                'nama_pengajar' => optional($item->ekstrakurikuler->pengajar)->nama, // ambil dari pivot
+                'jumlah_siswa'  => $item->ekstrakurikuler->siswas->count() ?? 0,
+            ];
+        });
 
-    // show nya menggunakan EkstrakurikulerController::@show
+        return response()->json([
+            'status'       => 'success',
+            'nama'         => $siswa->nama,
+            'total_ekskul' => $hasil->count(),
+            'data'         => $hasil
+        ]);
+    }
 
+
+    // ✅ mendaftarkan siswa oleh super admin
     public function store(Request $request)
     {
         try {
@@ -89,7 +94,7 @@ class EkskulSiswaPivotController extends Controller
 
     // ! tidak ada update
 
-    // destroy buat pegawai/pembina
+    // ✅ destroy buat pegawai/pembina oleh super admim
     public function destroy($id)
     {
         $pivot = EkskulSiswaPivot::find($id);
@@ -102,6 +107,7 @@ class EkskulSiswaPivotController extends Controller
     }
 
 
+    // ✅ siswa daftar sendiri
     public function storeSiswa($id)
     {
 
@@ -135,7 +141,7 @@ class EkskulSiswaPivotController extends Controller
     }
 
 
-    // destroy buat siswa (diri sendiri)
+    // ✅ destroy buat siswa (diri sendiri)
     /**
      * Delete:
        * 1. id -> login (2)

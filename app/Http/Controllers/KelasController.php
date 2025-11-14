@@ -74,11 +74,10 @@ class KelasController extends Controller
     public function showKelasSendiri()
     {
         $siswa = Auth::guard('siswa')->user();
-        dd($siswa);
 
         $kelas = Kelas::with('siswa.jurusan', 'wali')
             ->withCount('siswa')
-            ->find($siswa->id);
+            ->find($siswa->kelas_id);
 
         if (!$kelas) {
             return ApiResponse::error('Kelas tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
@@ -94,15 +93,6 @@ class KelasController extends Controller
                     'nama' => $kelas->wali->nama ?? null,
                     'role' => $kelas->wali->role ?? null,
                 ],
-                'siswa' => $kelas->siswa->map(function ($siswa) {
-                    return [
-                        'id' => $siswa->id,
-                        'nama_siswa' => $siswa->nama,
-                        'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-                        'kelas' => $siswa->kelas->nama_kelas ?? null,
-                    ];
-                }),
-                
             ];
 
         return ApiResponse::success($formatted, 'Detail kelas berhasil diambil');

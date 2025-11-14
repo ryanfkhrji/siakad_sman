@@ -33,13 +33,9 @@ return [
     |
     */
 
+    'guard' => null,
     // 'guard' => ['web'],
     // 'guard' => ['web', 'siswa', 'kepegawaian'],
-    'guard' => [
-        'web',
-        'siswa',
-        'kepegawaian',
-    ],
 
     /*
     |--------------------------------------------------------------------------

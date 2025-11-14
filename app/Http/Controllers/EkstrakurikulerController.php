@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 
 class EkstrakurikulerController extends Controller
 {
+    // ✅ get all ekskul
     public function index()
     {
         $ekskul = Ekstrakurikuler::with('siswas.pengajar')->withCount('siswas')->get();
@@ -39,6 +40,7 @@ class EkstrakurikulerController extends Controller
         return ApiResponse::success($formatted, 'Daftar Ekstrakurikuler berhasil diambil');
     }
 
+    // ✅ show detail ekskul untuk pegawai
     public function show($id)
     {
         $ekskul = Ekstrakurikuler::with('siswas.pengajar')
@@ -69,8 +71,9 @@ class EkstrakurikulerController extends Controller
         ];
 
         return ApiResponse::success($formatted, 'Detail ekstrakurikuler berhasil diambil');
-    }
+    }    
 
+    // ✅ store ekskul untuk pegawai
     public function store(Request $request)
     {
         try {
@@ -111,7 +114,8 @@ class EkstrakurikulerController extends Controller
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);
         }
     }
-
+    
+    // ✅ update ekskul untuk pegawai
     public function update(Request $request, $id)
     {
         $ekskul = Ekstrakurikuler::find($id);
@@ -164,6 +168,7 @@ class EkstrakurikulerController extends Controller
         );
     }
 
+    // ✅ delete ekskul untuk pegawai
     public function destroy($id)
     {
         $ekskul = Ekstrakurikuler::find($id);

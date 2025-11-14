@@ -33,47 +33,62 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // ?                                        PEGAWAI
 // ? ===================================================================================== ?
 // ✅ register pegawai
-Route::post('/register/kepegawaian', [KepegawaianController::class, 'registerKepegawaian']);
+Route::post('/kepegawaian/register', [KepegawaianController::class, 'registerKepegawaian']);
 
 // ✅login pegawai
-Route::post('/login/kepegawaian', [KepegawaianController::class, 'loginKepegawaian']);
+Route::post('/kepegawaian/login', [KepegawaianController::class, 'loginKepegawaian']);
 
 Route::middleware('auth:kepegawaian')->group(function () {
 
-    // ✅ logout pegawai
-    Route::post('/logout/kepegawaian', [KepegawaianController::class, 'logoutKepegawaian']);
+    // ✅ Super admin
+    Route::post('/kepegawaian/ubah-password/spa', [KepegawaianController::class, 'ubahPassword']);
 
-    // ✅ ubah password pegawai oleh super admin
-    Route::post('/ubah-password-pegawai', [KepegawaianController::class, 'ubahPassword']);
+    // ! ubah password super admin oleh dirinya sendiri (tinggal sebug)
+    Route::put('/spa/ubah-password/diri', [KepegawianController::class, 'ubahPassDiri']);
 
-    // ! ubah password pegawai oleh dirinya sendiri
+    // ✅ ubah password siswa oleh super admin
+    Route::post('/siswa/ubah-password/spa', [SiswaController::class, 'ubahPassword']);
+    
+    // ! ubah password pegawai oleh dirinya sendiri (tinggal debug)
+    Route::put('/pegawai/ubah-password/diri', [KepegawianController::class, 'ubahPassDiri']);
 
-    // ✅ ubah password siswa untuk super admin
-    Route::post('/ubah-password-siswa', [SiswaController::class, 'ubahPassword']);
+    // ✅ CRUD Super Admin
+    Route::apiResource('spa/kepegawaian', KepegawaianController::class)->except(['store']);
 
-    // ✅ CRUD Kepegawaian oleh Super Admin
-    Route::apiResource('kepegawaian', KepegawaianController::class)->except(['store']);
+    // ! Super Admin Show Diri Sendiri (tinggal debug)
+    Route::get('/spa/show/diri', [KepegawaianController::class, 'showDiriSendiri']);    
 
-    // ! update kepegawaian oleh dirinya sendiri
+    // ! Pegawai Show Diri Sendiri (tinggal debug)
+    Route::get('/pegawai/show/diri', [KepegawaianController::class, 'showDiriSendiri']);    
 
-    // ✅ CRUD Jurusan oleh Super Admin
-    Route::apiResource('jurusan', JurusanController::class)->except(['index']);
+     // ! Super admin Update diri sendiri (tinggal debug)
+     Route::put('/spa/update/diri', [KepegawaianController::class, 'updateDirinyaSendiri']);
+     
+     // ! Pegawai Update diri sendiri (tinggal debug)
+     Route::put('/pegawai/update/diri', [KepegawaianController::class, 'updateDirinyaSendiri']);
+     
+     // ✅ Logout pegawai dan SPA
+    Route::post('/kepegawaian/logout', [KepegawaianController::class, 'logoutKepegawaian']);
 
-    // ✅ CRUD Kelas oleh super admin
-    Route::apiResource('kelas', KelasController::class);
+    // ✅ CRUD Super Admin
+    Route::apiResource('spa/jurusan', JurusanController::class);
+
+    // ✅ CRUD Super admin
+    Route::apiResource('spa/kelas', KelasController::class);
+
+    // ✅ CRUD Super Admin
+    Route::apiResource('spa/siswa', SiswaController::class)->except(['store']);
 
     // ! CRUD Kelas oleh pegawai
     
-    // ✅ CRUD Ekstrakurikuler Oleh Super Admin
-    Route::apiResource('ekstrakurikuler', EkstrakurikulerController::class);
+    // ✅ CRUD Super Admin
+    Route::apiResource('spa/ekstrakurikuler', EkstrakurikulerController::class);
 
     // ! CRUD ekstrakurikuler oleh pegawai
     
-    // ✅ CRUD Siswa Oleh  Super Admin
-    Route::apiResource('siswa', SiswaController::class)->except(['store']);
     
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
-    Route::apiResource('siswa-ekskul', EkskulSiswaPivotController::class)->except(['index','show','update']);
+    Route::apiResource('spa/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
     
     // ! CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh pegawai
 
@@ -100,45 +115,52 @@ Route::get('/kelas-register', [KelasController::class, 'index']);
 
 // ✅ lupa password untuk dirinya sendiri
 // ! tinggal di debug
-Route::post('/lupa-password-pegawai', [KepegawaianController::class, 'sendResetLink']);
+Route::post('/kepegawaian/lupa-password', [KepegawaianController::class, 'sendResetLink']);
 
 // ✅ lupa password siswa
 // ! belum di debug
-Route::post('/lupa-password-siswa', [SiswaController::class, 'sendResetLink']);
+Route::post('/siswa/lupa-password', [SiswaController::class, 'sendResetLink']);
 
 // ? ===================================================================================== ?
 // ?                                        SISWA
 // ? ===================================================================================== ?
 
 // ✅ register siswa
-Route::post('/register/siswa', [SiswaController::class, 'registerSiswa']);
+Route::post('/siswa/register', [SiswaController::class, 'registerSiswa']);
 
 // ✅ login siswa
-Route::post('/login/siswa', [SiswaController::class, 'loginSiswa']);
+Route::post('/siswa/login', [SiswaController::class, 'loginSiswa']);
 
 Route::middleware('auth:siswa')->group(function () {
 
     // ✅ ubah password siswa untuk dirinya sendiri
-    Route::put('/ubah-password-siswa/diri', [SiswaController::class, 'ubahPassDiri']);
+    Route::put('/siswa/ubah-password/diri', [SiswaController::class, 'ubahPassDiri']);
 
     // ✅ show dirinya sendiri
-    Route::get('/show-siswa/diri', [SiswaController::class, 'showDiriSendiri']);    
+    Route::get('/siswa/show/diri', [SiswaController::class, 'showDiriSendiri']);    
 
     // ✅ update siswa oleh diri sendiri
-    Route::put('update-siswa/diri', [SiswaController::class, 'updateDirinyaSendiri']);
+    Route::put('/siswa/update/diri', [SiswaController::class, 'updateDirinyaSendiri']);
 
     // ✅ logout siswa
-    Route::post('/logout/siswa', [SiswaController::class, 'logoutSiswa']);
+    Route::post('/siswa/logout', [SiswaController::class, 'logoutSiswa']);
 
-    // ! get kelas sendiri
-    Route::get('kelas/diri', [KelasController::class, 'showKelasSendiri']);
-
+    // ✅ get kelas sendiri
+    Route::get('/siswa/kelas/diri', [KelasController::class, 'showKelasSendiri']);
+    
     // ✅ get all ekskul untuk siswa
-    Route::apiResource('ekstrakurikuler-siswa', EkstrakurikulerController::class)->only(['index', 'show']);
+    Route::apiResource('/siswa/ekstrakurikuler/all', EkstrakurikulerController::class)->only(['index', 'show']);
+
+    // ✅ get all ekskul yang diikuti
+    Route::get('/siswa/ekstrakurikuler/diri/diikuti', [EkskulSiswaPivotController::class, 'getAllEkskulSendiri']);
 
     // ✅ siswa mendaftarkan diri sendiri ke ekskul
-    Route::post('/siswa-daftar-ekskul/{id}', [EkskulSiswaPivotController::class, 'storeSiswa']);
+    Route::post('/siswa/ekstrakurikuler/daftar/{id}', [EkskulSiswaPivotController::class, 'storeSiswa']);
 
     // ✅ siswa hapus diri sendiri dari ekskul
-    Route::delete('/siswa-keluar-ekskul/{id}', [EkskulSiswaPivotController::class, 'destroySiswa']);
+    Route::delete('/siswa/ekstrakurikuler/keluar/{id}', [EkskulSiswaPivotController::class, 'destroySiswa']);
+
 });
+
+
+// ! TERAKHIR KEPEGAWAIAN UPDATE DIRI SENDIRI, SEKARANG DEBUG ATAU KELAS

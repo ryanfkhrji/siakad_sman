@@ -27,7 +27,7 @@ class EkskulSiswaPivot extends Model
 
     public function pengajar()
     {
-        return $this->belongsTo(Kepegawaian::class, 'pengajar_id');
+        return $this->belongsTo(Kepegawaian::class, 'pengajar_id', 'id');
     }
 
 }
