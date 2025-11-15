@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 
 class EkskulSiswaPivotController extends Controller
 {
-    // ✅ get all ekskul sendiri
+    // ✅ get all ekskul sendiri (siswa)
     public function getAllEkskulSendiri()
     {
         $siswa = Auth::guard('siswa')->user();
@@ -31,7 +31,15 @@ class EkskulSiswaPivotController extends Controller
                 'pivot_id'      => $item->id,
                 'nama_ekskul'   => $item->ekstrakurikuler->nama_ekstrakurikuler ?? null,
                 'nama_pengajar' => optional($item->ekstrakurikuler->pengajar)->nama, // ambil dari pivot
-                'jumlah_siswa'  => $item->ekstrakurikuler->siswas->count() ?? 0,
+                'jumlah_peserta'  => $item->ekstrakurikuler->siswas->count() ?? 0,
+                'peserta' => $item->ekstrakurikuler->siswas->map(function ($sis) {
+                    return [
+                        'id' => $sis->id,
+                        'nama_siswa' => $sis->nama,
+                        'jurusan' => $sis->jurusan->nama_jurusan ?? null,
+                        'kelas' => $sis->kelas->nama_kelas ?? null,
+                    ];
+                }), 
             ];
         });
 

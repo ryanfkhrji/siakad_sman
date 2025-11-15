@@ -70,7 +70,7 @@ class KelasController extends Controller
         return ApiResponse::success($formatted, 'Detail kelas berhasil diambil');
     }
 
-    // ✅ show kelas sendiri oleh siswa dan pegawai
+    // ✅ show kelas sendiri oleh siswa
     public function showKelasSendiri()
     {
         $siswa = Auth::guard('siswa')->user();
@@ -94,6 +94,47 @@ class KelasController extends Controller
                     'role' => $kelas->wali->role ?? null,
                 ],
             ];
+
+        return ApiResponse::success($formatted, 'Detail kelas berhasil diambil');
+    }
+
+    // ✅ show kelas sendiri oleh pegawai
+    public function showKelasPegawai()
+    {
+        $pegawai = Auth::guard('kepegawaian')->user();
+
+        $kelas = Kelas::with('siswa.jurusan', 'wali')
+            ->withCount('siswa')
+            ->where('wali_kelas', $pegawai->id)
+            ->first();
+
+        if (!$kelas) {
+            return ApiResponse::error('Kelas tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        $formatted = [
+            'id' => $kelas->id,
+            'nama_kelas' => $kelas->nama_kelas,
+            'jam_masuk' => $kelas->jam_masuk,
+            'jumlah_siswa' => $kelas->siswa_count,
+            'wali' => [
+                'id' => $kelas->wali->id ?? null,
+                'nama' => $kelas->wali->nama ?? null,
+                'role' => $kelas->wali->role ?? null,
+            ],
+            'anggota' => $kelas->siswa->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'nisn' => $s->nisn,
+                    'nama' => $s->nama,
+                    'email' => $s->email,
+                    'nis' => $s->nis,
+                    'nama_jurusan' => $s->jurusan->nama_jurusan ?? null,
+                    'nama_ekstrakurikuler' => $s->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
+                    'status' => $s->status,
+                ];
+            }),
+        ];        
 
         return ApiResponse::success($formatted, 'Detail kelas berhasil diambil');
     }
@@ -190,6 +231,61 @@ class KelasController extends Controller
                 'nama_kelas' => $kelas->nama_kelas,
                 'jam_masuk' => $kelas->jam_masuk,
                 'wali_kelas' => $kelas->wali_kelas,
+            ], 'Kelas berhasil diperbarui');
+    }
+
+    // ✅ update kelas pegawai oleh diri sendiri
+    public function updateKelasPegawai(Request $request)
+    {
+        
+        $pegawai = Auth::guard('kepegawaian')->user();
+
+        $kelas = Kelas::with('wali')
+            ->where('wali_kelas', $pegawai->id)
+            ->first();
+
+        if (!$kelas) {
+            return ApiResponse::error('Kelas tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        $validated = $request->validate([
+            'nama_kelas' => [
+                'sometimes',
+                'required',
+                Rule::unique('kelas')->ignore($pegawai->id) // Periksa semua unik kecuali yang sedang diedit
+            ],
+            'jam_masuk' => 'sometimes|required',
+            'wali_kelas' => [
+                'sometimes',
+                'required',
+                'exists:kepegawaians,id',
+                Rule::unique('kelas')->ignore($pegawai->id) // 1 guru cuma bisa jadi 1 wali kelas
+            ],
+        ],[
+            'nama_kelas.required' => 'Nama kelas wajib diisi',
+            'nama_kelas.unique' => 'Nama kelas sudah ada',
+            'jam_masuk.required' => 'Jam masuk wajib diisi',
+            'wali_kelas.exists' => 'Wali kelas tidak ditemukan',
+            'wali_kelas.unique' => 'Tidak bisa, guru ini sudah menjadi wali kelas',
+        ]);
+
+        if (isset($validated['wali_kelas'])) {
+            $wali = Kepegawaian::find($validated['wali_kelas']);
+            if (!$wali || $wali->role !== 'guru') {
+                return ApiResponse::error('Wali kelas tidak ditemukan atau bukan guru', [
+                    'wali_kelas' => ['Wali kelas tidak ditemukan']
+                ], 422);
+            }
+        }
+
+        $kelas->update($validated);
+        
+        return ApiResponse::success(
+            [
+                'id' => $kelas->id,
+                'nama_kelas' => $kelas->nama_kelas,
+                'jam_masuk' => $kelas->jam_masuk,
+                'wali_kelas' => $kelas->wali->nama,
             ], 'Kelas berhasil diperbarui');
     }
 

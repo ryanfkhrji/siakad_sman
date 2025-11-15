@@ -69,9 +69,9 @@ class Kepegawaian extends Authenticatable
     }
 
     
-    public function ekstrakurikulers()
+    public function ekstrakurikuler()
     {
-        return $this->hasMany(Ekstrakurikuler::class, 'pengajar_id');
+        return $this->hasOne(Ekstrakurikuler::class, 'pengajar_id');
     }
 
     

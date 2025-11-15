@@ -246,14 +246,15 @@ class KepegawaianController extends Controller
         return ApiResponse::success($formatted, 'Detail pegawai berhasil diambil');
     }
 
-    // ✅ show diri sendiri
+    // ✅ show diri sendiri (pegawai)
     public function showDiriSendiri()
     {
-        $pegawai = Auth::guard('kepegawaian')->user()->load('kelas', 'ekstrakurikulers');
+        $pegawai = Auth::guard('kepegawaian')->user()->load('kelas', 'ekstrakurikuler');
 
         if (!$pegawai) {
             return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
+
 
         $formatted = [
             'id' => $pegawai->id ?? null,
@@ -262,17 +263,16 @@ class KepegawaianController extends Controller
             'status' => $pegawai->status ?? null,
             'nip' => $pegawai->nip ?? null,
             'keterangan' => $pegawai->keterangan ?? null,
-            'role' => $pegawai->role ?? null,
             'kelas' => [
                 'id' => $pegawai->kelas->id ?? null,
                 'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
                 'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
             ],
             'ekstrakurikuler' => [
-                'id' => $pegawai->ekstrakurikulers->id,
-                'nama_ekstrakurikuler' => $pegawai->ekstrakurikulers->nama_ekstrakurikuler,
-                'anggaran' => $pegawai->ekstrakurikulers->anggaran,
-                'status' => $pegawai->ekstrakurikulers->status,
+                'id' => $pegawai->ekstrakurikuler->id ?? null,
+                'nama_ekstrakurikuler' => $pegawai->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                'anggaran' => $pegawai->ekstrakurikuler->anggaran ?? null,
+                'status' => $pegawai->ekstrakurikuler->status ?? null,
             ]
         ];
 
@@ -364,10 +364,10 @@ class KepegawaianController extends Controller
      // ✅ Update super admin oleh dirinya sendiri
      public function updateDirinyaSendiri(Request $request)
      {
-         $siswa = Auth::guard('kepegawaian')->user()->load('jurusan', 'kelas');
+         $pegawai = Auth::guard('kepegawaian')->user();
  
-         if (!$siswa) {
-             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+         if (!$pegawai) {
+             return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
          }
  
          $validated = $request->validate([
@@ -375,15 +375,20 @@ class KepegawaianController extends Controller
              'email' => [
                  'sometimes',
                  'required',
-                 Rule::unique('siswas')->ignore($siswa->id)
+                 Rule::unique('kepegawaians')->ignore($pegawai->id)
              ],
              'status' => 'sometimes',
              'nip' => [
                  'sometimes',
                  'required',
-                 Rule::unique('siswas')->ignore($siswa->id)
+                 Rule::unique('kepegawaians')->ignore($pegawai->id)
              ],
-             'role' => 'sometimes|required',
+             'keterangan' => 'sometimes',
+             'role' => [
+                 'sometimes',
+                 'required',
+                //  Rule::unique('kepegawaians')->ignore($pegawai->id)
+             ],
         ], [
             'nama.required' => 'Nama wajib diisi',
             'email.required' => 'Email wajib diisi',
@@ -392,16 +397,35 @@ class KepegawaianController extends Controller
             'nip.unique' => 'Terdeteksi NIP ganda',
             'role.required' => 'Role wajib diisi',
         ]);
- 
-         // cek role super_admin dan kepsek agar tidak double
-         if (in_array($validated['role'], ['super_admin', 'kepsek'])) {
-            $existing = Kepegawaian::where('role', $validated['role'])->exists();
 
-            if ($existing) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => "Role {$validated['role']} sudah digunakan.",
-                ], 403);
+        // ROLE AWAL
+        $roleAwal = $pegawai->role;
+
+        // ROLE BARU
+        $roleBaru = $validated['role'] ?? $pegawai->role;
+
+        // 1. Jika role awal super_admin atau kepsek → tidak boleh diubah
+        if (in_array($roleAwal, ['super_admin', 'kepsek'])) {
+
+            if ($roleBaru !== $roleAwal) {
+                return ApiResponse::error('Role tidak dapat diubah', [
+                    'role' => ['Pegawai dengan role ini tidak boleh mengubah role']
+                ], 422);
+            }
+        }
+
+        // 2. Jika role awal bukan super_admin/kepsek → cek agar tidak double
+        if (!in_array($roleAwal, ['super_admin', 'kepsek'])) {
+            if (in_array($roleBaru, ['super_admin', 'kepsek'])) {
+                $existing = Kepegawaian::where('role', $roleBaru)
+                    ->where('id', '!=', $pegawai->id)
+                    ->exists();
+
+                if ($existing) {
+                    return ApiResponse::error("Role {$roleBaru} sudah digunakan", [
+                        'role' => ["Role {$roleBaru} tidak boleh lebih dari satu"]
+                    ], 403);
+                }
             }
         }
 
@@ -415,13 +439,13 @@ class KepegawaianController extends Controller
         $pegawai->update([
             'nama' => $validated['nama'],
             'email' => $validated['email'],
-            'status' => $request['status'],
+            'status' => $validated['status'],
             'nip' => $validated['nip'],
-            'keterangan' => $request['keterangan'],
+            'keterangan' => $validated['keterangan'],
             'role' => $validated['role'],
         ]);
 
-        $pegawai->load('kelas','ekstrakurikulers');
+        $pegawai->load('kelas','ekstrakurikuler');
 
         return ApiResponse::success(
             [
@@ -438,10 +462,10 @@ class KepegawaianController extends Controller
                     'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
                 ],
                 'ekstrakurikuler' => [
-                    'id' => $pegawai->ekstrakurikulers->id ?? null,
-                    'nama_ekstrakurikuler' => $pegawai->ekstrakurikulers->nama_ekstrakurikuler ?? null,
-                    'anggaran' => $pegawai->ekstrakurikulers->anggaran ?? null,
-                    'status' => $pegawai->ekstrakurikulers->status ?? null,
+                    'id' => $pegawai->ekstrakurikuler->id ?? null,
+                    'nama_ekstrakurikuler' => $pegawai->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                    'anggaran' => $pegawai->ekstrakurikuler->anggaran ?? null,
+                    'status' => $pegawai->ekstrakurikuler->status ?? null,
                 ]
             ],
             'Pegawai berhasil diperbarui'

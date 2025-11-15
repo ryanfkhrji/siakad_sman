@@ -41,6 +41,41 @@ class EkstrakurikulerController extends Controller
     }
 
     // ✅ show detail ekskul untuk pegawai
+    public function showEkskulSendiri()
+    {
+        $pegawai = Auth::guard('kepegawaian')->user();
+
+        $ekskul = Ekstrakurikuler::with(['siswas','peserta'])
+            ->where('pengajar_id', $pegawai->id)
+            ->withCount('siswas')
+            ->first();
+
+        if (!$ekskul) {
+            return ApiResponse::error('Ekstrakurikuler tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        $formatted = [
+            'id' => $ekskul->id,
+            'nama_ekstrakurikuler' => $ekskul->nama_ekstrakurikuler,
+            'jumlah_peserta' => $ekskul->siswas_count,
+            'anggaran' => $ekskul->anggaran,
+            'status' => $ekskul->status,
+            'peserta' => $ekskul->siswas->map(function ($siswa) {
+                return [
+                    'id_pivot' => $siswa->pivot->id,
+                    'id' => $siswa->id,
+                    'nama_siswa' => $siswa->nama,
+                    'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
+                    'kelas' => $siswa->kelas->nama_kelas ?? null,
+                ];
+            }),
+
+        ];
+
+        return ApiResponse::success($formatted, 'Detail ekstrakurikuler berhasil diambil');
+    }    
+
+    // ✅ show detail ekskul untuk pegawai
     public function show($id)
     {
         $ekskul = Ekstrakurikuler::with('siswas.pengajar')
