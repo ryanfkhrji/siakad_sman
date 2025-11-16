@@ -32,14 +32,20 @@ export function DialogDetailSiswa({ siswa }: DialogDetailSiswaProps) {
           <Separator />
 
           <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">NIS</span>
+            <span>{siswa.nis ?? "-"}</span>
+          </div>
+          <Separator />
+
+          <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Nama Lengkap</span>
             <span>{siswa.nama ?? "-"}</span>
           </div>
           <Separator />
 
           <div className="flex justify-between">
-            <span className="font-semibold text-gray-700">NIS</span>
-            <span>{siswa.nis ?? "-"}</span>
+            <span className="font-semibold text-gray-700">Email</span>
+            <span>{siswa.email ?? "-"}</span>
           </div>
           <Separator />
 
@@ -57,13 +63,19 @@ export function DialogDetailSiswa({ siswa }: DialogDetailSiswaProps) {
 
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Kelas</span>
-            <span>{siswa.kelas?.nama_kelas ?? "-"}</span>
+            <span>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.nama_kelas ?? "-"}</span>
           </div>
           <Separator />
 
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Walikelas</span>
-            <span>{siswa.kelas?.wali_kelas?.nama ?? "-"}</span>
+            <span>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.wali_kelas?.nama ?? "-"}</span>
+          </div>
+          <Separator />
+
+          <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">Ekstrakurikuler</span>
+            <span>{siswa.nama_ekstrakurikuler ?? "-"}</span>
           </div>
           <Separator />
 

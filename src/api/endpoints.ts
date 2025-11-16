@@ -1,16 +1,16 @@
 export const endpoints = {
   siswa: {
-    login: "/login/siswa",
-    register: "/register/siswa",
+    login: "siswa/login",
+    register: "/siswa/register",
   },
   kepegawaian: {
-    login: "/login/kepegawaian",
-    register: "/register/kepegawaian",
+    login: "/kepegawaian/login",
+    register: "/kepegawaian/register",
   },
   kelas: {
-    index: "/kelas", // endpoint untuk GET semua kelas
+    index: "/spa/kelas", // endpoint untuk GET semua kelas
   },
   jurusan: {
-    index: "/jurusan", // endpoint untuk GET semua jurusan
+    index: "/spa/jurusan", // endpoint untuk GET semua jurusan
   },
 };

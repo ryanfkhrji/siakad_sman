@@ -29,7 +29,7 @@ const UserSiswa = () => {
     const fecthData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/siswa");
+        const res = await api.get("/spa/siswa");
         if (res.data.status === "success") {
           const userSiswa = res.data.data.filter((s: Siswa) => s.role === "siswa");
           setSiswa(userSiswa);
@@ -91,7 +91,7 @@ const UserSiswa = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/siswa/${id}`);
+      const res = await api.delete(`/spa/siswa/${id}`);
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload
@@ -205,8 +205,10 @@ const UserSiswa = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="w-[60px] text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
                       <TableHead className="font-semibold text-white">NISN</TableHead>
+                      <TableHead className="font-semibold text-white">NIS</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
+                      <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
                       <TableHead className="font-semibold text-white">Role</TableHead>
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
@@ -218,8 +220,10 @@ const UserSiswa = () => {
                       paginatedSiswa.map((siswa, index) => (
                         <TableRow key={siswa.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{siswa.nama}</TableCell>
                           <TableCell>{siswa.nisn}</TableCell>
+                          <TableCell>{siswa.nis}</TableCell>
+                          <TableCell>{siswa.nama}</TableCell>
+                          <TableCell>{siswa.email}</TableCell>
                           <TableCell>{siswa.status}</TableCell>
                           <TableCell>{siswa.role}</TableCell>
                           <TableCell className="flex gap-1 justify-center">

@@ -10,7 +10,8 @@ export interface Pegawai {
   id: number;
   nama: string;
   status?: string;
-  nip?: string;
+  nip: string;
+  email: string;
   keterangan?: string;
   role: string;
   kelas?: Kelas | null;
@@ -20,8 +21,9 @@ export interface Siswa {
   id: number;
   nisn: string;
   nama: string;
+  email: string;
   nis: string;
-  kelas?: Kelas | null;
+  kelas: Kelas | string | null;
   status: string;
   nama_jurusan?: string | null;
   nama_ekstrakurikuler?: string | null;

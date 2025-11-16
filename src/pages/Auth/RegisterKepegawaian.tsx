@@ -39,6 +39,7 @@ export default function RegisterKepegawaian() {
       const payload = {
         nama: data.nama,
         nip: data.nip,
+        email: data.email,
         keterangan: data.keterangan || null,
         status: data.status || null,
         password: data.password,
@@ -84,6 +85,13 @@ export default function RegisterKepegawaian() {
             Swal.fire({
               title: "NIP Sudah Terdaftar",
               text: resData.errors.nip[0],
+              icon: "warning",
+              confirmButtonColor: "#EAB308",
+            });
+          } else if (resData.errors.email?.[0]?.toLowerCase().includes("sudah terdaftar") || resData.errors.email?.[0]?.toLowerCase().includes("sudah digunakan")) {
+            Swal.fire({
+              title: "Email Sudah Terdaftar",
+              text: resData.errors.email[0],
               icon: "warning",
               confirmButtonColor: "#EAB308",
             });
@@ -148,15 +156,45 @@ export default function RegisterKepegawaian() {
           <div className="mb-6">
             <label htmlFor="nip" className="block font-semibold text-foreground">
               NIP
-              <input {...register("nip")} type="text" name="nip" placeholder="cth: 123456789098765432" className="border p-2 w-full mt-2 rounded" />
+              <input
+                {...register("nip")}
+                type="text"
+                name="nip"
+                inputMode="numeric"
+                maxLength={50}
+                placeholder="cth: 123456789098765432"
+                className="border p-2 w-full mt-2 rounded"
+                autoComplete="off"
+                onKeyPress={(e) => {
+                  // ✅ Hanya izinkan angka
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                onPaste={(e) => {
+                  // ✅ Cegah paste non-numeric
+                  const pasteData = e.clipboardData.getData("text");
+                  if (!/^[0-9]+$/.test(pasteData)) {
+                    e.preventDefault();
+                  }
+                }}
+              />
               {errors.nip && <p className="text-red-500 text-sm">{errors.nip.message}</p>}
+            </label>
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="email" className="block font-semibold text-foreground">
+              Email
+              <input {...register("email")} type="text" name="email" placeholder="cth: example@gmail.com" className="border p-2 w-full mt-2 rounded" />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </label>
           </div>
 
           <div className="mb-6">
             <label htmlFor="status" className="block font-semibold text-foreground">
               Status
-              <input {...register("status")} type="text" name="status" placeholder="cth: PNS" className="border p-2 w-full mt-2 rounded" />
+              <input {...register("status")} type="text" name="status" placeholder="cth: Aktif" className="border p-2 w-full mt-2 rounded" />
               {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
             </label>
           </div>
@@ -164,7 +202,7 @@ export default function RegisterKepegawaian() {
           <div className="mb-6">
             <label htmlFor="keterangan" className="block font-semibold text-foreground">
               Keterangan
-              <input {...register("keterangan")} type="text" name="keterangan" placeholder="cth: Honorer" className="border p-2 w-full mt-2 rounded" />
+              <input {...register("keterangan")} type="text" name="keterangan" placeholder="cth: Guru, Staff, dll" className="border p-2 w-full mt-2 rounded" />
               {errors.keterangan && <p className="text-red-500 text-sm">{errors.keterangan.message}</p>}
             </label>
           </div>
@@ -187,7 +225,7 @@ export default function RegisterKepegawaian() {
           <div className="mb-6 relative">
             <label htmlFor="password" className="block font-semibold text-foreground">
               Password
-              <input type={showPass ? "text" : "password"} {...register("password")} placeholder="*********" name="password" className="border p-2 w-full mt-2 rounded" />
+              <input type={showPass ? "text" : "password"} {...register("password")} placeholder="*********" name="password" className="border p-2 w-full mt-2 rounded" autoComplete="current-password" />
             </label>
             <FontAwesomeIcon icon={showPass ? faEye : faEyeSlash} className="absolute top-11 right-3 text-muted-foreground cursor-pointer" onClick={() => setShowPass(!showPass)} />
             {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
@@ -196,7 +234,7 @@ export default function RegisterKepegawaian() {
           <div className="mb-6 relative">
             <label htmlFor="confirmPassword" className="block font-semibold text-foreground">
               Konfirmasi Password
-              <input type={showPass ? "text" : "password"} {...register("confirmPassword")} placeholder="*********" name="confirmPassword" className="border p-2 w-full mt-2 rounded" />
+              <input type={showPass ? "text" : "password"} {...register("confirmPassword")} placeholder="*********" name="confirmPassword" className="border p-2 w-full mt-2 rounded" autoComplete="confirm-password" />
             </label>
             <FontAwesomeIcon icon={showPass ? faEye : faEyeSlash} className="absolute top-11 right-3 text-muted-foreground cursor-pointer" onClick={() => setShowPass(!showPass)} />
             {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}

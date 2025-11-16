@@ -33,19 +33,21 @@ const EditStaff = () => {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
 
   // 🔹 Ambil data guru & kelas
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const resStaff = await api.get<ApiResponse<Pegawai>>(`/kepegawaian/${id}`);
+        const resStaff = await api.get<ApiResponse<Pegawai>>(`/spa/kepegawaian/${id}`);
 
         if (resStaff.data.status === "success") {
           const dataStaff = resStaff.data.data;
           setStaff(dataStaff);
-          setNama(dataStaff.nama);
           setNip(dataStaff.nip ?? "");
+          setNama(dataStaff.nama);
+          setEmail(dataStaff.email ?? "");
           setStatus(dataStaff.status ?? "");
           setKeterangan(dataStaff.keterangan ?? "");
           setRole(dataStaff.role);
@@ -69,9 +71,10 @@ const EditStaff = () => {
 
     try {
       setIsLoading(true);
-      const res = await api.put<ApiResponse<null>>(`/kepegawaian/${staff.id}`, {
+      const res = await api.put<ApiResponse<null>>(`/spa/kepegawaian/${staff.id}`, {
         nama,
         nip,
+        email,
         status,
         keterangan,
         role,
@@ -118,16 +121,22 @@ const EditStaff = () => {
           ) : (
             <div className="bg-white rounded shadow p-5">
               <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* NIP */}
+                <div>
+                  <label className="block font-semibold text-foreground">NIP</label>
+                  <input type="text" value={nip} onChange={(e) => setNip(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan NIP" required />
+                </div>
+
                 {/* Nama Staff */}
                 <div>
                   <label className="block font-semibold text-foreground">Nama Staff</label>
                   <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
                 </div>
 
-                {/* NIP */}
+                {/* Email */}
                 <div>
-                  <label className="block font-semibold text-foreground">NIP</label>
-                  <input type="text" value={nip} onChange={(e) => setNip(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan NIP" required />
+                  <label className="block font-semibold text-foreground">Email</label>
+                  <input type="text" value={email} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
                 </div>
 
                 {/* Status */}

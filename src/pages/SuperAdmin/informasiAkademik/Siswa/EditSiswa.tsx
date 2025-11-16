@@ -38,6 +38,7 @@ const EditSiswa = () => {
   const [jurusanId, setJurusanId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [namaEkskul, setNamaEkskul] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
   const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +49,7 @@ const EditSiswa = () => {
       try {
         setLoading(true);
         // Memastikan endpoint API yang dipanggil sudah benar
-        const [resSiswa, resKelas, resJurusan] = await Promise.all([api.get<ApiResponse<Siswa>>(`/siswa/${id}`), api.get<ApiResponse<Kelas[]>>(`/kelas`), api.get<ApiResponse<Jurusan[]>>(`/jurusan`)]);
+        const [resSiswa, resKelas, resJurusan] = await Promise.all([api.get<ApiResponse<Siswa>>(`/spa/siswa/${id}`), api.get<ApiResponse<Kelas[]>>(`/spa/kelas`), api.get<ApiResponse<Jurusan[]>>(`/spa/jurusan`)]);
 
         if (resSiswa.data.status === "success") {
           const dataSiswa = resSiswa.data.data;
@@ -56,10 +57,16 @@ const EditSiswa = () => {
           setNisn(dataSiswa.nisn);
           setNis(dataSiswa.nis);
           setNama(dataSiswa.nama);
+          setEmail(dataSiswa.email ?? "");
           setStatus(dataSiswa.status ?? "");
           setRole(dataSiswa.role ?? "");
           setNamaEkskul(dataSiswa.nama_ekstrakurikuler ?? "-");
-          setKelasId(dataSiswa.kelas?.id?.toString() ?? "");
+          // ✅ Fix: Type guard untuk kelas
+          if (typeof dataSiswa.kelas === "object" && dataSiswa.kelas?.id) {
+            setKelasId(dataSiswa.kelas.id.toString());
+          } else {
+            setKelasId("");
+          }
           if (resJurusan.data.status === "success") {
             const dataJurusan = resJurusan.data.data;
             setJurusanList(dataJurusan);
@@ -95,13 +102,14 @@ const EditSiswa = () => {
         nisn,
         nis,
         nama,
+        email,
         status,
         role: role || "siswa",
         kelas_id: Number(kelasId),
         jurusan_id: jurusanId ? Number(jurusanId) : null,
       };
 
-      const res = await api.put<ApiResponse<null>>(`/siswa/${siswa.id}`, payload);
+      const res = await api.put<ApiResponse<null>>(`/spa/siswa/${siswa.id}`, payload);
 
       if (res.data.status === "success") {
         Swal.fire("Berhasil", "Data siswa berhasil diperbarui", "success").then(() => {
@@ -191,6 +199,12 @@ const EditSiswa = () => {
                 <div>
                   <label className="block font-semibold text-foreground">Nama Lengkap</label>
                   <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" required />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block font-semibold text-foreground">Email</label>
+                  <input type="email" value={email} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" required />
                 </div>
 
                 {/* Jurusan (select) */}

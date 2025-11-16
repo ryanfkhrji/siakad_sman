@@ -26,13 +26,20 @@ export function DialogDetailTu({ tu }: DialogDetailTuProps) {
         {/* Konten Detail */}
         <div className="grid gap-3 py-2 text-sm">
           <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">NIP</span>
+            <span>{tu.nip ?? "-"}</span>
+          </div>
+          <Separator />
+
+          <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Nama Lengkap</span>
             <span>{tu.nama}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
-            <span className="font-semibold text-gray-700">NIP</span>
-            <span>{tu.nip ?? "-"}</span>
+            <span className="font-semibold text-gray-700">Email</span>
+            <span>{tu.email}</span>
           </div>
           <Separator />
           {/* <div className="flex justify-between">
@@ -50,11 +57,13 @@ export function DialogDetailTu({ tu }: DialogDetailTuProps) {
             <span>{tu.status ?? "-"}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Keterangan</span>
             <span>{tu.keterangan ?? "-"}</span>
           </div>
           <Separator />
+          
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Role</span>
             <span>{tu.role ?? "-"}</span>

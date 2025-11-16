@@ -17,7 +17,7 @@ export function DialogDetailJurusan({ jurusanId }: DialogDetailJurusanProps) {
   const handleOpen = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/jurusan/${jurusanId}`);
+      const res = await api.get(`/spa/jurusan/${jurusanId}`);
       const result = res.data;
       setJurusan(result.data);
     } catch (error) {
@@ -80,7 +80,7 @@ export function DialogDetailJurusan({ jurusanId }: DialogDetailJurusanProps) {
                         <tr key={s.id} className="border-b hover:bg-gray-50">
                           <td className="p-1">{s.nisn}</td>
                           <td className="p-1">{s.nama}</td>
-                          <td className="p-1">{s.kelas?.nama_kelas}</td>
+                          <td className="p-1">{typeof s.kelas === "string" ? s.kelas : s.kelas?.nama_kelas || "-"}</td>
                           <td className="p-1 capitalize">{s.status}</td>
                         </tr>
                       ))}

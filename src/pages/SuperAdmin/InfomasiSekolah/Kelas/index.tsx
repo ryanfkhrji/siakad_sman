@@ -27,7 +27,7 @@ const DataKelas = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/kelas");
+        const res = await api.get("/spa/kelas");
         if (res.data.status === "success") {
           const kelasData: Kelas[] = res.data.data;
           setDataKelas(kelasData);
@@ -80,7 +80,7 @@ const DataKelas = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/kelas/${id}`);
+      const res = await api.delete(`/spa/kelas/${id}`);
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload

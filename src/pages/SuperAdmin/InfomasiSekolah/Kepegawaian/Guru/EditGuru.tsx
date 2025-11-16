@@ -33,19 +33,21 @@ const EditGuru = () => {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
 
   // 🔹 Ambil data guru & kelas
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [resGuru, resKelas] = await Promise.all([api.get<ApiResponse<Pegawai>>(`/kepegawaian/${id}`), api.get<ApiResponse<Kelas[]>>(`/kelas`)]);
+        const [resGuru, resKelas] = await Promise.all([api.get<ApiResponse<Pegawai>>(`/spa/kepegawaian/${id}`), api.get<ApiResponse<Kelas[]>>(`/spa/kelas`)]);
 
         if (resGuru.data.status === "success") {
           const dataGuru = resGuru.data.data;
           setGuru(dataGuru);
-          setNama(dataGuru.nama);
           setNip(dataGuru.nip ?? "");
+          setNama(dataGuru.nama);
+          setEmail(dataGuru.email ?? "");
           setSelectedKelasId(dataGuru.kelas?.id?.toString() ?? "");
           const jamFormatted = dataGuru.kelas?.jam_masuk?.replace(".", ":") ?? "";
           setSelectedJamMasuk(jamFormatted);
@@ -85,9 +87,10 @@ const EditGuru = () => {
 
     try {
       setIsLoading(true);
-      const res = await api.put<ApiResponse<null>>(`/kepegawaian/${guru.id}`, {
+      const res = await api.put<ApiResponse<null>>(`/spa/kepegawaian/${guru.id}`, {
         nama,
         nip,
+        email,
         kelas_id: Number(selectedKelasId),
         status,
         keterangan,
@@ -169,16 +172,22 @@ const EditGuru = () => {
           ) : (
             <div className="bg-white rounded shadow p-5">
               <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* NIP */}
+                <div>
+                  <label className="block font-semibold text-foreground">NIP</label>
+                  <input type="text" value={nip} onChange={(e) => setNip(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan NIP" required />
+                </div>
+
                 {/* Nama Guru */}
                 <div>
                   <label className="block font-semibold text-foreground">Nama Guru</label>
                   <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
                 </div>
 
-                {/* NIP */}
+                {/* Email */}
                 <div>
-                  <label className="block font-semibold text-foreground">NIP</label>
-                  <input type="text" value={nip} onChange={(e) => setNip(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan NIP" required />
+                  <label className="block font-semibold text-foreground">Email</label>
+                  <input type="text" value={email} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
                 </div>
 
                 {/* Kelas */}

@@ -41,7 +41,7 @@ const EditUserTu = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get<ApiResponse<Pegawai>>(`/kepegawaian/${id}`);
+        const res = await api.get<ApiResponse<Pegawai>>(`/spa/kepegawaian/${id}`);
 
         if (res.data.status === "success") {
           setPegawai(res.data.data);
@@ -83,12 +83,13 @@ const EditUserTu = () => {
     try {
       const payload = {
         nip: pegawai.nip,
+        email: pegawai.email,
         password_lama: passwordLama,
         password_baru: passwordBaru,
         konfirmasi_password: confirmPassword,
       };
 
-      const res = await api.post("/ubah-password-pegawai", payload);
+      const res = await api.post("/spa/ubah-password/kepegawaian", payload);
 
       if (res.data?.status === "success") {
         await Swal.fire("Berhasil", res.data.message || "Password berhasil diperbarui", "success");
@@ -154,6 +155,12 @@ const EditUserTu = () => {
                   <div>
                     <label className="block font-semibold text-foreground">Nama Lengkap</label>
                     <input type="text" value={pegawai.nama} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100" disabled />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block font-semibold text-foreground">Email</label>
+                    <input type="text" value={pegawai.email} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100" disabled />
                   </div>
 
                   {/* Status */}

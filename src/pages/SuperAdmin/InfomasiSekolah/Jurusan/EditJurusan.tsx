@@ -32,7 +32,7 @@ const EditJurusan = () => {
       try {
         setIsLoading(true);
 
-        const res = await api.get(`/jurusan/${id}`);
+        const res = await api.get(`/spa/jurusan/${id}`);
         if (res.data.status !== "success") {
           Swal.fire({
             icon: "error",
@@ -75,7 +75,7 @@ const EditJurusan = () => {
         nama_jurusan: formData.nama_jurusan,
       };
 
-      const res = await api.put(`/jurusan/${id}`, payload);
+      const res = await api.put(`/spa/jurusan/${id}`, payload);
 
       if (res.data.status === "success") {
         Swal.fire("Berhasil", res.data.message, "success").then(() => {

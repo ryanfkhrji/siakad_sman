@@ -29,7 +29,7 @@ const DataSiswa = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/siswa");
+        const res = await api.get("/spa/siswa");
         if (res.data.status === "success") {
           const siswaOnly = res.data.data.filter((p: Siswa) => p.role === "siswa");
           setDataSiswa(siswaOnly);
@@ -55,7 +55,12 @@ const DataSiswa = () => {
     let filtered = dataSiswa;
 
     if (selectedJenjang) {
-      filtered = filtered.filter((siswa) => siswa.kelas?.nama_kelas?.includes(selectedJenjang));
+      filtered = filtered.filter((siswa) => {
+        if (typeof siswa.kelas === "string") {
+          return siswa.kelas.includes(selectedJenjang);
+        }
+        return siswa.kelas?.nama_kelas?.includes(selectedJenjang);
+      });
     }
 
     if (searchTerm.trim() !== "") {
@@ -94,7 +99,7 @@ const DataSiswa = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/siswa/${id}`);
+      const res = await api.delete(`/spa/siswa/${id}`);
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload
@@ -209,8 +214,9 @@ const DataSiswa = () => {
                     <TableRow>
                       <TableHead className="w-[60px] text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">NISN</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
                       <TableHead className="font-semibold text-white">NIS</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
+                      <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Jurusan</TableHead>
                       <TableHead className="font-semibold text-white">Kelas</TableHead>
                       <TableHead className="font-semibold text-white">Wali Kelas</TableHead>
@@ -227,11 +233,12 @@ const DataSiswa = () => {
                         <TableRow key={siswa.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{siswa.nisn ?? "-"}</TableCell>
-                          <TableCell>{siswa.nama ?? "-"}</TableCell>
                           <TableCell>{siswa.nis ?? "-"}</TableCell>
+                          <TableCell>{siswa.nama ?? "-"}</TableCell>
+                          <TableCell>{siswa.email ?? "-"}</TableCell>
                           <TableCell>{siswa.nama_jurusan ?? "-"}</TableCell>
-                          <TableCell>{siswa.kelas?.nama_kelas ?? "-"}</TableCell>
-                          <TableCell>{siswa.kelas?.wali_kelas?.nama ?? "-"}</TableCell>
+                          <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.nama_kelas ?? "-"}</TableCell>
+                          <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.wali_kelas?.nama ?? "-"}</TableCell>
                           <TableCell>{siswa.nama_ekstrakurikuler ?? "-"}</TableCell>
                           <TableCell>{siswa.status ?? "-"}</TableCell>
                           {/* <TableCell>{siswa.role ?? "-"}</TableCell> */}

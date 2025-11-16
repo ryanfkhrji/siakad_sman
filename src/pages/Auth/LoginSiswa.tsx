@@ -48,7 +48,7 @@ export default function LoginSiswa() {
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
-      await login("/login/siswa", data);
+      await login("siswa/login", data);
       const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
       await Swal.fire({
@@ -109,10 +109,10 @@ export default function LoginSiswa() {
           <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Login Siswa</h2>
 
           <div className="mb-6">
-            <label htmlFor="nisn" className="block font-semibold text-foreground">
-              NISN
-              <input {...register("nisn")} type="text" placeholder="cth: 1234567890" className="border p-2 w-full mt-2 rounded" autoComplete="username" autoFocus />
-              {errors.nisn && <p className="text-red-500 text-sm">{errors.nisn.message}</p>}
+            <label htmlFor="email" className="block font-semibold text-foreground">
+              Email
+              <input {...register("email")} type="text" placeholder="cth: example@gmail.com" className="border p-2 w-full mt-2 rounded" autoComplete="username" autoFocus />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </label>
           </div>
 
@@ -123,6 +123,13 @@ export default function LoginSiswa() {
             </label>
             <FontAwesomeIcon icon={showPass ? faEye : faEyeSlash} className="absolute top-11 right-3 text-muted-foreground cursor-pointer" onClick={() => setShowPass(!showPass)} />
             {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+          </div>
+
+          {/* Tombol Lupa Password */}
+          <div className="mt-3 mb-3 text-end">
+            <Link to="/lupa-password" className="text-sm text-primary font-semibold">
+              Lupa Password?
+            </Link>
           </div>
 
           <Button className="text-white w-full mt-3 text-base font-semibold" disabled={loading} size={"lg"}>

@@ -24,7 +24,7 @@ const DataJurusan = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/jurusan");
+        const res = await api.get("/spa/jurusan");
         if (res.data.status === "success") {
           setDataJurusan(res.data.data);
         }
@@ -64,7 +64,7 @@ const DataJurusan = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/jurusan/${id}`);
+      const res = await api.delete(`/spa/jurusan/${id}`);
 
       if (res.data.status === "success") {
         setDataJurusan((prev) => prev.filter((j) => j.id !== id));

@@ -30,7 +30,7 @@ const CreateJurusan = () => {
     setLoading(true);
 
     try {
-      const res = await api.post("/jurusan", formData);
+      const res = await api.post("/spa/jurusan", formData);
 
       if (res.data.status === "success") {
         Swal.fire({

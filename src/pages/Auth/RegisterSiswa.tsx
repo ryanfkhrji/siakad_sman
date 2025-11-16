@@ -68,6 +68,7 @@ export default function RegisterSiswa() {
 
       const payload = {
         nama: data.nama,
+        email: data.email,
         nisn: data.nisn,
         nis: data.nis,
         kelas_id: Number(data.kelas),
@@ -111,6 +112,7 @@ export default function RegisterSiswa() {
           // Tangkap error spesifik dari backend Laravel
           const nisnError = errorsObj?.nisn?.[0];
           const nisError = errorsObj?.nis?.[0];
+          const emailError = errorsObj?.email?.[0];
 
           // ✅ Jika ada error NISN & NIS sekaligus
           if (nisnError && nisError) {
@@ -135,6 +137,16 @@ export default function RegisterSiswa() {
             Swal.fire({
               title: "Validasi Gagal",
               text: nisError,
+              icon: "warning",
+              confirmButtonColor: "#EAB308",
+            });
+          }
+
+          // email sudah terdaftar
+          else if (emailError) {
+            Swal.fire({
+              title: "Validasi Gagal",
+              text: emailError,
               icon: "warning",
               confirmButtonColor: "#EAB308",
             });
@@ -205,17 +217,29 @@ export default function RegisterSiswa() {
           <div className="mb-6">
             <label className="block font-semibold text-foreground">
               NISN
-              <input {...register("nisn")} type="text" placeholder="cth: 20214350000008" className="border p-2 w-full mt-2 rounded" autoComplete="off" />
+              <input
+                {...register("nisn")}
+                type="text"
+                inputMode="numeric"
+                maxLength={50}
+                placeholder="cth: 20214350000008"
+                onKeyPress={(e) => {
+                  // ✅ Hanya izinkan angka
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                onPaste={(e) => {
+                  // ✅ Cegah paste non-numeric
+                  const pasteData = e.clipboardData.getData("text");
+                  if (!/^[0-9]+$/.test(pasteData)) {
+                    e.preventDefault();
+                  }
+                }}
+                className="border p-2 w-full mt-2 rounded"
+                autoComplete="off"
+              />
               {errors.nisn && <p className="text-red-500 text-sm">{errors.nisn.message}</p>}
-            </label>
-          </div>
-
-          {/* Nama */}
-          <div className="mb-6">
-            <label className="block font-semibold text-foreground">
-              Nama Lengkap
-              <input {...register("nama")} type="text" placeholder="cth: Siswa Keempat" className="border p-2 w-full mt-2 rounded" autoComplete="name" />
-              {errors.nama && <p className="text-red-500 text-sm">{errors.nama.message}</p>}
             </label>
           </div>
 
@@ -223,8 +247,47 @@ export default function RegisterSiswa() {
           <div className="mb-6">
             <label className="block font-semibold text-foreground">
               NIS
-              <input {...register("nis")} type="text" placeholder="cth: 20214350000008" className="border p-2 w-full mt-2 rounded" autoComplete="username" />
+              <input
+                {...register("nis")}
+                type="text"
+                inputMode="numeric"
+                maxLength={50}
+                placeholder="cth: 20214350000008"
+                onKeyPress={(e) => {
+                  // ✅ Hanya izinkan angka
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                onPaste={(e) => {
+                  // ✅ Cegah paste non-numeric
+                  const pasteData = e.clipboardData.getData("text");
+                  if (!/^[0-9]+$/.test(pasteData)) {
+                    e.preventDefault();
+                  }
+                }}
+                className="border p-2 w-full mt-2 rounded"
+                autoComplete="username"
+              />
               {errors.nis && <p className="text-red-500 text-sm">{errors.nis.message}</p>}
+            </label>
+          </div>
+
+          {/* Nama */}
+          <div className="mb-6">
+            <label className="block font-semibold text-foreground">
+              Nama Lengkap
+              <input {...register("nama")} type="text" placeholder="cth: John Doe" className="border p-2 w-full mt-2 rounded" autoComplete="name" />
+              {errors.nama && <p className="text-red-500 text-sm">{errors.nama.message}</p>}
+            </label>
+          </div>
+
+          {/* Email */}
+          <div className="mb-6">
+            <label htmlFor="email" className="block font-semibold text-foreground">
+              Email
+              <input {...register("email")} type="text" name="email" placeholder="cth: example@gmail.com" className="border p-2 w-full mt-2 rounded" />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </label>
           </div>
 

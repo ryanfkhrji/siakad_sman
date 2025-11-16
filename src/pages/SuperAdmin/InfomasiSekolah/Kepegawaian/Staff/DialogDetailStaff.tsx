@@ -26,13 +26,20 @@ export function DialogDetailStaff({ staff }: DialogDetailStaffProps) {
         {/* Konten Detail */}
         <div className="grid gap-3 py-2 text-sm">
           <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">NIP</span>
+            <span>{staff.nip ?? "-"}</span>
+          </div>
+          <Separator />
+
+          <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Nama Lengkap</span>
             <span>{staff.nama}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
-            <span className="font-semibold text-gray-700">NIP</span>
-            <span>{staff.nip ?? "-"}</span>
+            <span className="font-semibold text-gray-700">Email</span>
+            <span>{staff.email}</span>
           </div>
           <Separator />
           {/* <div className="flex justify-between">
@@ -50,11 +57,13 @@ export function DialogDetailStaff({ staff }: DialogDetailStaffProps) {
             <span>{staff.status ?? "-"}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Keterangan</span>
             <span>{staff.keterangan ?? "-"}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Role</span>
             <span>{staff.role ?? "-"}</span>

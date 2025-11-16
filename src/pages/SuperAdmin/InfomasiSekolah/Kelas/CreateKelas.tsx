@@ -38,7 +38,7 @@ const CreateKelas = () => {
   useEffect(() => {
     const fetchGuru = async () => {
       try {
-        const res = await api.get("/kepegawaian");
+        const res = await api.get("/spa/kepegawaian");
         if (res.data.status === "success") {
           const guruOnly = res.data.data.filter((p: Pegawai) => p.role === "guru" && (!p.kelas || !p.kelas?.jam_masuk));
           setGuruList(guruOnly);
@@ -92,7 +92,7 @@ const CreateKelas = () => {
     }
 
     try {
-      const res = await api.post("/kelas", formData);
+      const res = await api.post("/spa/kelas", formData);
 
       if (res.data.status === "success") {
         Swal.fire({

@@ -41,7 +41,7 @@ const EditUserSiswa = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get<ApiResponse<Siswa>>(`/siswa/${id}`);
+        const res = await api.get<ApiResponse<Siswa>>(`/spa/siswa/${id}`);
 
         if (res.data.status === "success") {
           setSiswa(res.data.data);
@@ -83,12 +83,13 @@ const EditUserSiswa = () => {
     try {
       const payload = {
         nisn: siswa.nisn,
+        email: siswa.email,
         password_lama: passwordLama,
         password_baru: passwordBaru,
         konfirmasi_password: confirmPassword,
       };
 
-      const res = await api.post("/ubah-password-siswa", payload);
+      const res = await api.post("/spa/ubah-password/siswa", payload);
 
       if (res.data?.status === "success") {
         await Swal.fire("Berhasil", res.data.message || "Password berhasil diperbarui", "success");
@@ -150,10 +151,22 @@ const EditUserSiswa = () => {
                     <input type="text" value={siswa.nisn} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100" />
                   </div>
 
+                  {/* NIS */}
+                  <div>
+                    <label className="block font-semibold text-foreground">NIS</label>
+                    <input type="text" value={siswa.nis} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100" />
+                  </div>
+
                   {/* Nama */}
                   <div>
                     <label className="block font-semibold text-foreground">Nama Lengkap</label>
                     <input type="text" value={siswa.nama} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100" disabled />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block font-semibold text-foreground">Email</label>
+                    <input type="text" value={siswa.email} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100" disabled />
                   </div>
 
                   {/* Status */}

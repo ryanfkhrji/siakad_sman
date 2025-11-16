@@ -27,6 +27,8 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
 
   // 🔍 Deteksi apakah route milik siswa (berdasarkan path)
   const isSiswaRoute = location.pathname.startsWith("/siswa");
+  const isOnLoginSiswa = location.pathname.startsWith("/login-siswa");
+  const isOnLoginKepegawaian = location.pathname.startsWith("/login-kepegawaian");
 
   // 🚫 Jika user belum login
   if (!token || !isAuthenticated) {
@@ -34,16 +36,26 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
     return <Navigate to={loginPath} replace state={{ from: location }} />;
   }
 
-  // 🔁 Jika user sudah login tapi buka halaman login, arahkan ke dashboard sesuai role
+  // 🔁 Jika user sudah login tapi buka halaman login, redirect ke dashboard sesuai role
   if (isAuthenticated && user) {
-    const isOnLoginSiswa = location.pathname.startsWith("/login-siswa");
-    const isOnLoginKepegawaian = location.pathname.startsWith("/login-kepegawaian");
-
+    // Jika siswa mengakses login siswa → redirect ke dashboard siswa
     if (isOnLoginSiswa && user.role === "siswa") {
       return <Navigate to="/siswa/dashboard" replace />;
     }
+
+    // Jika bukan siswa (admin/guru/dll) mengakses login siswa → redirect ke dashboard mereka
+    if (isOnLoginSiswa && user.role !== "siswa") {
+      return <Navigate to="/unauthorized" replace />;
+    }
+
+    // Jika non-siswa mengakses login kepegawaian → redirect ke dashboard mereka
     if (isOnLoginKepegawaian && user.role !== "siswa") {
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/unauthorized" replace />;
+    }
+
+    // Jika siswa mengakses login kepegawaian → redirect ke dashboard siswa
+    if (isOnLoginKepegawaian && user.role === "siswa") {
+      return <Navigate to="/unauthorized" replace />;
     }
   }
 

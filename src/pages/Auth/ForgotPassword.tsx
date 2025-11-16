@@ -6,6 +6,8 @@ import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/PageTitle";
 import { AxiosError } from "axios";
+import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Email tidak valid").nonempty("Email wajib diisi"),
@@ -14,6 +16,7 @@ const forgotPasswordSchema = z.object({
 type FormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -24,7 +27,9 @@ export default function ForgotPassword() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const res = await api.post("/forgot-password", data);
+      setLoading(true);
+
+      const res = await api.post("/kepegawaian/lupa-password", data);
       Swal.fire({
         title: "Berhasil!",
         text: res.data.message || "Link reset password telah dikirim ke email Anda.",
@@ -35,7 +40,7 @@ export default function ForgotPassword() {
 
       let message = "Terjadi kesalahan. Pastikan email terdaftar.";
 
-      if(err instanceof AxiosError) {
+      if (err instanceof AxiosError) {
         message = err.response?.data?.message || message;
       } else if (err instanceof Error) {
         message = err.message;
@@ -46,6 +51,8 @@ export default function ForgotPassword() {
         text: message,
         icon: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,10 +64,20 @@ export default function ForgotPassword() {
           <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Lupa Password</h2>
           <label className="block mb-4 font-semibold text-foreground">
             Masukkan Email Terdaftar
-            <input {...register("email")} type="email" placeholder="cth: nama@sekolah.sch.id" className="border p-2 w-full mt-2 rounded" />
+            <input {...register("email")} type="email" placeholder="cth: example@gmail.com" className="border p-2 w-full mt-2 rounded" />
             {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </label>
-          <Button className="text-white w-full mt-3 text-base font-semibold">Kirim Link Reset</Button>
+          <Button className="text-white w-full mt-3 text-base font-semibold" disabled={loading} size={"lg"}>
+            {loading ? "Mengirim..." : "Kirim Link Reset Password"}
+          </Button>
+
+          <div className="mt-3 text-center">
+            <Link to="/login-kepegawaian">
+              <Button variant={"outline"} size={"lg"} className="w-full text-base font-semibold">
+                Kembali Ke Login
+              </Button>
+            </Link>
+          </div>
         </form>
       </div>
     </>

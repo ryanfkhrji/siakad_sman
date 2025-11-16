@@ -29,7 +29,7 @@ const DataStaff = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/kepegawaian");
+        const res = await api.get("/spa/kepegawaian");
         if (res.data.status === "success") {
           const staffOnly = res.data.data.filter((p: Pegawai) => p.role === "staff");
           setDataStaff(staffOnly);
@@ -89,7 +89,7 @@ const DataStaff = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/kepegawaian/${id}`);
+      const res = await api.delete(`/spa/kepegawaian/${id}`);
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload
@@ -203,8 +203,9 @@ const DataStaff = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="w-[60px] text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
                       <TableHead className="font-semibold text-white">NIP</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
+                      <TableHead className="font-semibold text-white">Email</TableHead>
                       {/* <TableHead className="font-semibold text-white">Nama Kelas</TableHead>
                       <TableHead className="font-semibold text-white">Jam Masuk</TableHead> */}
                       <TableHead className="font-semibold text-white">Status</TableHead>
@@ -219,8 +220,9 @@ const DataStaff = () => {
                       paginatedStaff.map((staff, index) => (
                         <TableRow key={staff.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{staff.nama}</TableCell>
                           <TableCell>{staff.nip}</TableCell>
+                          <TableCell>{staff.nama}</TableCell>
+                          <TableCell>{staff.email}</TableCell>
                           {/* <TableCell>{staff.kelas?.nama_kelas ?? "-"}</TableCell>
                           <TableCell>{staff.kelas?.jam_masuk ?? "-"}</TableCell> */}
                           <TableCell>{staff.status}</TableCell>

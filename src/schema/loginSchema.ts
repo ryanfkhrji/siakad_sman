@@ -1,9 +1,11 @@
 import { z } from "zod";
 
 export const loginSiswaSchema = z.object({
-  nisn: z.string().trim().min(5, "NISN wajib diisi").max(10, "NISN maksimal 10 karakter"),
+  // nisn: z.string().trim().min(5, "NISN wajib diisi").max(10, "NISN maksimal 10 karakter"),
+  email: z.string().trim().min(1, "Email wajib diisi"),
   password: z
     .string()
+    .min(1, "Password wajib diisi")
     .min(5, "Password minimal 5 karakter")
     .max(8, "Password maksimal 8 karakter")
     .regex(/[A-Z]/, "Password harus mengandung minimal 1 huruf kapital")
@@ -13,9 +15,11 @@ export const loginSiswaSchema = z.object({
 });
 
 export const loginKepegawaianSchema = z.object({
-  nip: z.string().min(5, "NIP wajib diisi").max(18, "NIP maksimal 18 karakter"),
+  // nip: z.string().min(5, "NIP wajib diisi").max(18, "NIP maksimal 18 karakter"),
+  email: z.string().trim().min(1, "Email wajib diisi"),
   password: z
     .string()
+    .min(1, "Password wajib diisi")
     .min(5, "Password minimal 5 karakter")
     .max(8, "Password maksimal 8 karakter")
     .regex(/[A-Z]/, "Password harus mengandung minimal 1 huruf kapital")

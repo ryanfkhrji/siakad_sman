@@ -100,7 +100,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
     try {
       if (token && user?.role) {
-        const endpoint = user.role === "siswa" ? "/logout/siswa" : "/logout/kepegawaian";
+        const endpoint = user.role === "siswa" ? "/siswa/logout" : "kepegawaian/logout";
 
         await api.post(
           endpoint,

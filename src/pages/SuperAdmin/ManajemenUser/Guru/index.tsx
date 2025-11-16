@@ -29,7 +29,7 @@ const UserGuru = () => {
     const fecthData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/kepegawaian");
+        const res = await api.get("/spa/kepegawaian");
         if (res.data.status === "success") {
           const userPegawai = res.data.data.filter((p: Pegawai) => p.role === "guru");
           setPegawai(userPegawai);
@@ -91,7 +91,7 @@ const UserGuru = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/kepegawaian/${id}`);
+      const res = await api.delete(`/spa/kepegawaian/${id}`);
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload
@@ -205,8 +205,9 @@ const UserGuru = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="w-[60px] text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
                       <TableHead className="font-semibold text-white">NIP</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
+                      <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
                       <TableHead className="font-semibold text-white">Role</TableHead>
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
@@ -218,8 +219,9 @@ const UserGuru = () => {
                       paginatedPegawai.map((pegawai, index) => (
                         <TableRow key={pegawai.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{pegawai.nama}</TableCell>
                           <TableCell>{pegawai.nip}</TableCell>
+                          <TableCell>{pegawai.nama}</TableCell>
+                          <TableCell>{pegawai.email}</TableCell>
                           <TableCell>{pegawai.status}</TableCell>
                           <TableCell>{pegawai.role}</TableCell>
                           <TableCell className="flex gap-1 justify-center">

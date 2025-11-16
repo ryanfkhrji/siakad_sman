@@ -29,7 +29,7 @@ const DataGuru = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/kepegawaian");
+        const res = await api.get("/spa/kepegawaian");
         if (res.data.status === "success") {
           const guruOnly = res.data.data.filter((p: Pegawai) => p.role === "guru");
           setDataGuru(guruOnly);
@@ -89,7 +89,7 @@ const DataGuru = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/kepegawaian/${id}`);
+      const res = await api.delete(`/spa/kepegawaian/${id}`);
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload
@@ -203,8 +203,9 @@ const DataGuru = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="w-[60px] text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
                       <TableHead className="font-semibold text-white">NIP</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
+                      <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Nama Kelas</TableHead>
                       <TableHead className="font-semibold text-white">Jam Masuk</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
@@ -219,8 +220,9 @@ const DataGuru = () => {
                       paginatedGuru.map((guru, index) => (
                         <TableRow key={guru.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{guru.nama}</TableCell>
                           <TableCell>{guru.nip}</TableCell>
+                          <TableCell>{guru.nama}</TableCell>
+                          <TableCell>{guru.email}</TableCell>
                           <TableCell>{guru.kelas?.nama_kelas ?? "-"}</TableCell>
                           <TableCell>{guru.kelas?.jam_masuk ?? "-"}</TableCell>
                           <TableCell>{guru.status}</TableCell>

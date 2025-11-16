@@ -26,13 +26,20 @@ export function DialogDetailKepsek({ kepsek }: DialogDetailKepsekProps) {
         {/* Konten Detail */}
         <div className="grid gap-3 py-2 text-sm">
           <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">NIP</span>
+            <span>{kepsek.nip ?? "-"}</span>
+          </div>
+          <Separator />
+
+          <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Nama Lengkap</span>
             <span>{kepsek.nama}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
-            <span className="font-semibold text-gray-700">NIP</span>
-            <span>{kepsek.nip ?? "-"}</span>
+            <span className="font-semibold text-gray-700">Email</span>
+            <span>{kepsek.email}</span>
           </div>
           <Separator />
           {/* <div className="flex justify-between">
@@ -50,11 +57,13 @@ export function DialogDetailKepsek({ kepsek }: DialogDetailKepsekProps) {
             <span>{kepsek.status ?? "-"}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Keterangan</span>
             <span>{kepsek.keterangan ?? "-"}</span>
           </div>
           <Separator />
+
           <div className="flex justify-between">
             <span className="font-semibold text-gray-700">Role</span>
             <span>{kepsek.role ?? "-"}</span>

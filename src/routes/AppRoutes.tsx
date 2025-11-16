@@ -47,6 +47,8 @@ import EditEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/Edi
 import DaftarSiswaEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/DaftarSiswaEkskul";
 import DaftarSiswa from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/DaftarSiswa";
 import DataEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler";
+import ForgotPassword from "@/pages/Auth/ForgotPassword";
+import ResetPassword from "@/pages/Auth/ResetPassword";
 
 export default function AppRoutes() {
   return (
@@ -60,6 +62,10 @@ export default function AppRoutes() {
         <Route path="/login-siswa" element={<LoginSiswa />} />
         <Route path="/register-kepegawaian" element={<RegisterKepegawaian />} />
         <Route path="/register-siswa" element={<RegisterSiswa />} />
+
+        {/* ================= AUTH LUPA PASSWORD ================= */}
+        <Route path="/lupa-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* ================= DASHBOARD PER ROLE ================= */}
         <Route

@@ -67,7 +67,7 @@ export default function LoginKepegawaian() {
     try {
       setLoading(true);
 
-      await login("/login/kepegawaian", data);
+      await login("/kepegawaian/login", data);
 
       const storedUser = JSON.parse(localStorage.getItem("user")!);
 
@@ -109,7 +109,7 @@ export default function LoginKepegawaian() {
           // 🔑 Login gagal karena kredensial salah
           await Swal.fire({
             title: "Login Gagal",
-            text: resData.message || "NIP atau password salah. Silakan coba lagi.",
+            text: resData.message || "Email atau password salah. Silakan coba lagi.",
             icon: "error",
             confirmButtonColor: "#DC2626",
           });
@@ -173,12 +173,12 @@ export default function LoginKepegawaian() {
 
           <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Login Kepegawaian</h2>
 
-          {/* Input NIP */}
+          {/* Input Email */}
           <div className="mb-6">
-            <label htmlFor="nip" className="block font-semibold text-foreground">
-              NIP
-              <input {...register("nip")} type="text" placeholder="cth: 123456789098765432" className="border p-2 w-full mt-2 rounded" autoComplete="username" autoFocus />
-              {errors.nip && <p className="text-red-500 text-sm">{errors.nip.message}</p>}
+            <label htmlFor="email" className="block font-semibold text-foreground">
+              Email
+              <input {...register("email")} type="text" placeholder="cth: example@gmail.com" className="border p-2 w-full mt-2 rounded" autoComplete="username" autoFocus />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </label>
           </div>
 
@@ -193,11 +193,11 @@ export default function LoginKepegawaian() {
           </div>
 
           {/* Tombol Lupa Password */}
-          {/* <div className="mt-3 mb-3 text-end">
-            <Link to="/forgot-password" className="text-sm text-primary font-semibold">
+          <div className="mt-3 mb-3 text-end">
+            <Link to="/lupa-password" className="text-sm text-primary font-semibold">
               Lupa Password?
             </Link>
-          </div> */}
+          </div>
 
           {/* Tombol Login */}
           <Button className="text-white w-full mt-3 text-base font-semibold" disabled={loading} size={"lg"}>

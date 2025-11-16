@@ -36,7 +36,7 @@ const EditKelas = () => {
       try {
         setIsLoading(true);
 
-        const res = await api.get(`/kelas/${id}`);
+        const res = await api.get(`/spa/kelas/${id}`);
         if (res.data.status !== "success") {
           Swal.fire({
             icon: "error",
@@ -148,7 +148,7 @@ const EditKelas = () => {
         jam_masuk: formData.jam_masuk,
       };
 
-      const res = await api.put(`/kelas/${id}`, payload);
+      const res = await api.put(`/spa/kelas/${id}`, payload);
 
       if (res.data.status === "success") {
         Swal.fire("Berhasil", res.data.message, "success").then(() => {
