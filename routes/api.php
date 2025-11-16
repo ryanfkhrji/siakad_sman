@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KepegawaianController;
 use App\Http\Controllers\JurusanController;
+use App\Http\Controllers\MataPelajaranController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
@@ -47,30 +48,32 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ Ubah password pegawai oleh super admin
     Route::post('/spa/ubah-password/kepegawaian', [KepegawaianController::class, 'ubahPassword']);
 
-    // ✅ ubah password siswa oleh super admin
+    // ✅ Ubah password siswa oleh super admin
     Route::post('/spa/ubah-password/siswa', [SiswaController::class, 'ubahPassword']);
     
-    // ✅ CRUD Super Admin
+    // ✅ CRUD Kepegawaian
     Route::apiResource('/spa/kepegawaian', KepegawaianController::class)->except(['store']);
 
     // ✅ Super Admin Show Diri Sendiri
     Route::get('/spa/show/diri', [KepegawaianController::class, 'showDiriSendiri']);    
 
-    // ✅ Super admin Update diri sendiri (tinggal debug)
+    // ✅ Super admin Update diri sendiri
     Route::put('/spa/update/diri', [KepegawaianController::class, 'updateDirinyaSendiri']);
 
-    // ✅ CRUD Super Admin
+    // ✅ CRUD Jurusan
     Route::apiResource('/spa/jurusan', JurusanController::class);
 
-    // ✅ CRUD Super admin
+    // ! super admin set kelas dan pengajarnya (bukan wali kelas), satu guru bisa ngajar di banyak kelas
+    // ! CRUD mata pelajaran
+    Route::apiResource('/spa/mata-pelajaran', MataPelajaranController::class);
+
+    // ✅ CRUD Kelas
     Route::apiResource('/spa/kelas', KelasController::class);
 
-    // ! super admin set kelas dan pengajarnya (bukan wali kelas), satu guru bisa ngajar di banyak kelas
-
-    // ✅ CRUD Super Admin
+    // ✅ CRUD Siswa
     Route::apiResource('/spa/siswa', SiswaController::class)->except(['store']);
     
-    // ✅ CRUD Super Admin
+    // ✅ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
 
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin

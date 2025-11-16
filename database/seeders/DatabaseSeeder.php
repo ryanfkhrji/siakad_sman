@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
+use App\Models\MataPelajaran;
 use App\Models\Kelas;
 use App\Models\Ekstrakurikuler;
 use App\Models\Siswa;
@@ -95,6 +96,22 @@ class DatabaseSeeder extends Seeder
         Jurusan::insert([
             ['nama_jurusan' => 'IPA'],
             ['nama_jurusan' => 'IPS'],
+        ]);
+
+        // Seed Mata Pelajaran
+        MataPelajaran::insert([
+            [
+                'nama_pelajaran' => 'IPA',
+                'status' => 'jurusan'
+            ],
+            [
+                'nama_pelajaran' => 'Bahasa Indonesia',
+                'status' => 'wajib'
+            ],
+            [
+                'nama_pelajaran' => 'Bahasa Sunda',
+                'status' => 'pilihan'
+            ],
         ]);
 
         // Seed Kelas

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\Kepegawaian;
-use App\Models\Kelas;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use App\Helpers\ApiResponse;
+use Illuminate\Http\Request;
+use App\Models\MataPelajaran;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password; // Mengimpor facade Password untuk fitur reset password
 
 class SiswaController extends Controller
