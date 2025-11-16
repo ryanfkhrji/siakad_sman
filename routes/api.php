@@ -45,10 +45,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::put('/spa/ubah-password/diri', [KepegawaianController::class, 'ubahPassDiri']);
     
     // ✅ Ubah password pegawai oleh super admin
-    Route::post('/kepegawaian/ubah-password/spa', [KepegawaianController::class, 'ubahPassword']);
+    Route::post('/spa/ubah-password/kepegawaian', [KepegawaianController::class, 'ubahPassword']);
 
     // ✅ ubah password siswa oleh super admin
-    Route::post('/siswa/ubah-password/spa', [SiswaController::class, 'ubahPassword']);
+    Route::post('/spa/ubah-password/siswa', [SiswaController::class, 'ubahPassword']);
     
     // ✅ CRUD Super Admin
     Route::apiResource('/spa/kepegawaian', KepegawaianController::class)->except(['store']);
