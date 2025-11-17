@@ -10,6 +10,7 @@ use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use App\Models\Kelas;
+use App\Models\JadwalPelajaran;
 use App\Models\Ekstrakurikuler;
 use App\Models\Siswa;
 use App\Models\EkskulSiswaPivot;
@@ -126,6 +127,27 @@ class DatabaseSeeder extends Seeder
                 'jam_masuk' => '07:00',
                 'wali_kelas' => 6,
             ],
+        ]);
+
+        JadwalPelajaran::insert([
+            [
+                'mata_pelajaran_id' => 1,
+                'hari' => 'Senin',
+                'guru_id' => 5,
+                'kelas_id' => 1,
+                'jam_pelajaran' => '07:30',
+                'ruangan' => 'Lab Komputer',
+                'link_opsional' => 'www.youtube.com'
+            ],
+            [
+                'mata_pelajaran_id' => 2,
+                'hari' => 'Selasa',
+                'guru_id' => 6,
+                'kelas_id' => 2,
+                'jam_pelajaran' => '07:30',
+                'ruangan' => '7.5.6',
+                'link_opsional' => ''
+            ]
         ]);
 
         // Seed Ekstrakurikuler

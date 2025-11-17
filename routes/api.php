@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KepegawaianController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\MataPelajaranController;
+use App\Http\Controllers\JadwalPelajaranController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
@@ -63,9 +64,11 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD Jurusan
     Route::apiResource('/spa/jurusan', JurusanController::class);
 
-    // ! super admin set kelas dan pengajarnya (bukan wali kelas), satu guru bisa ngajar di banyak kelas
-    // ! CRUD mata pelajaran
+    // ✅ CRUD mata pelajaran
     Route::apiResource('/spa/mata-pelajaran', MataPelajaranController::class);
+
+    // ✅ CRUD jadwal pelajaran
+    Route::apiResource('/spa/jadwal-pelajaran', JadwalPelajaranController::class);
 
     // ✅ CRUD Kelas
     Route::apiResource('/spa/kelas', KelasController::class);
@@ -103,6 +106,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅ Update kelas sendiri
     Route::put('/pegawai/kelas/update/diri', [KelasController::class, 'updateKelasPegawai']);
+
+    
+    // ! mata pelajaran
+    // ! jadwal pelajaran
     
     // ✅ Read siswa oleh pegawai
     Route::apiResource('/pegawai/siswa', SiswaController::class)->only(['index', 'show']);
