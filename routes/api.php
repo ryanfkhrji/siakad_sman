@@ -140,8 +140,14 @@ Route::get('/jurusan-register', [JurusanController::class, 'index']);
 Route::get('/kelas-register', [KelasController::class, 'index']);
 
 // ✅ lupa password untuk dirinya sendiri
-// ! tinggal di debug
-Route::post('/kepegawaian/lupa-password', [KepegawaianController::class, 'sendResetLink']);
+// ? 1. Button lupa password + send link via email
+Route::post('/lupa-password', [KepegawaianController::class, 'sendResetLink'])->name('password.email');
+
+// ? 2. Tampilkan form reset password
+Route::get('/reset-password/{token}', [KepegawaianController::class, 'showResetForm'])->name('password.reset');
+
+// ? 3. Proses reset password
+Route::post('/reset-password', [KepegawaianController::class, 'resetPassword'])->name('password.update');
 
 // ✅ lupa password siswa
 // ! belum di debug

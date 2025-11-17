@@ -573,23 +573,101 @@ class KepegawaianController extends Controller
     }
 
     // ✅ Lupa password untuk pegawai
+    // ? Button forgot ppassword + send reset link email 
     public function sendResetLink(Request $request)
     {
-        // Validasi input: pastikan email diisi dan ada di tabel kepegawaians
+        // 1. Validasi email wajib ada dan harus terdaftar
         $request->validate([
             'email' => 'required|email|exists:kepegawaians,email'
+        ], [
+            'email.exists' => 'Email tidak terdaftar dalam sistem.'
         ]);
 
-        // Kirim link reset password menggunakan broker 'kepegawaian'
-        // Broker akan membuat token, menyimpan ke tabel password_reset_tokens, dan mengirim email ke pengguna
+        // 2. Kirim link reset password via email menggunakan broker "kepegawaian"
+        //    Broker akan otomatis:
+        //    - generate token
+        //    - simpan hash token ke tabel password_reset_tokens
+        //    - mengirim email berisi link reset
         $status = Password::broker('kepegawaian')->sendResetLink(
-            ['email' => $request->email] // Data yang digunakan untuk mencari pengguna dan mengirim link
+            $request->only('email')
         );
 
-        // Cek apakah pengiriman berhasil, lalu kirim respons JSON sesuai hasilnya
-        return $status === Password::RESET_LINK_SENT
-            ? response()->json(['message' => 'Link reset dikirim']) // Jika berhasil
-            : response()->json(['message' => 'Gagal mengirim link'], 500); // Jika gagal
+        // 3. Jika email berhasil dikirim
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Link reset password telah dikirim ke email Anda.'
+            ], 200);
+        }
+
+        // 4. Jika gagal (biasanya karena server email)
+        return response()->json([
+            'status'  => false,
+            'message' => 'Gagal mengirim link reset password. Coba lagi nanti.'
+        ], 500);
+    }
+
+
+
+    // ? Tampilkan form untuk reset password
+    public function showResetForm(Request $request, $token)
+    {
+        return response()->json([
+            'token' => $token,
+            'email' => $request->email
+        ]);
+    }
+
+    // ? Proses reset password
+    public function resetPassword(Request $request)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'token'    => 'required',                                // token wajib yang dikirim ke email
+            'email'    => 'required|email|exists:kepegawaians,email', // email valid & terdaftar
+            'password' => 'required|min:6|confirmed',                 // password & konfirmasi wajib sama
+            // password_confirmation tidak perlu disini tapi wajib di body
+        ]);
+
+        // Jika validasi gagal, respon error rapi
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors(),  // daftar error lengkap
+            ], 422);
+        }
+
+        // Proses reset password menggunakan broker
+        $status = Password::broker('kepegawaian')->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+
+            // Jika token dan email cocok
+            function ($user) use ($request) {
+                $user->password = bcrypt($request->password);
+                $user->save();
+            }
+        );
+
+        // Jika password berhasil direset
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Password berhasil direset',
+                'data'    => [
+                    'email' => $request->email
+                ]
+            ]);
+        }
+
+        // Jika token salah, email salah, atau token kedaluwarsa
+        return response()->json([
+            'status'  => false,
+            'message' => 'Gagal mereset password',
+            'errors'  => [
+                'token' => ['Token tidak valid atau kadaluarsa']
+            ]
+        ], 400);
     }
 
 }
