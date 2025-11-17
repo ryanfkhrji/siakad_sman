@@ -21,6 +21,16 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // kelanjutan dari KepegawaianController::@redirectToFrontendForm
+        /**
+         * Arahkan ke backend dulu untuk ambil token dan email, baru kemudian ke frontend
+         */
+        ResetPassword::createUrlUsing(function ($notifiable, $token) {
+            $email = urlencode($notifiable->email);
+        
+            // arahkan ke backend, bukan frontend
+            return "http://localhost:8000/api/reset-password/{$token}?email={$email}";
+        });
+        
     }
 }

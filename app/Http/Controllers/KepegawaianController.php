@@ -609,13 +609,34 @@ class KepegawaianController extends Controller
 
 
 
-    // ? Tampilkan form untuk reset password
-    public function showResetForm(Request $request, $token)
+    // ? Tampilkan form react untuk reset password
+    public function redirectToFrontendForm(Request $request, $token)
     {
-        return response()->json([
-            'token' => $token,
-            'email' => $request->email
-        ]);
+        // Ambil email dari query param
+        $email = $request->query('email');
+
+        // Jika tidak ada email → error
+        if (!$email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email tidak ditemukan dalam permintaan.'
+            ], 400);
+        }
+
+        // sebelum diarahkan ke react, ubah dulu di AuthServiceProvider.php
+
+        // URL React (ubah sesuai domain kamu)
+        $frontendUrl = "http://localhost:5173/reset-password";
+
+        // Redirect ke frontend sambil membawa token & email di params
+        return redirect()->away($frontendUrl . "?token={$token}&email={$email}");
+
+        /**
+         * Front end bisa ambil dari param denga cara berikut, lalu jadikan hidden untuk dikirim ke route Post::reset-password
+         * const [params] = useSearchParams();
+         * const token = params.get("token");
+         * const email = params.get("email");
+         */
     }
 
     // ? Proses reset password
