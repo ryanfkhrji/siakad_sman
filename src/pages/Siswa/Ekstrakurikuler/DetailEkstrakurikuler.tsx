@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import PageTitle from "@/components/PageTitle";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { SearchIcon, Loader2Icon, ArrowLeft, ClipboardListIcon, ArrowLeftCircle } from "lucide-react";
@@ -11,6 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Input } from "@/components/ui/input";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
+import { SidebarSiswa } from "@/components/SidebarSiswa";
 
 interface Peserta {
   id_pivot: number | null;
@@ -207,7 +207,7 @@ const DetailEkstrakurikulerSiswa = () => {
 
   return (
     <SidebarProvider>
-      <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <SidebarSiswa isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main
         className={`

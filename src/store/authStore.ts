@@ -94,13 +94,43 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   // 🔹 LOGOUT
+  // logout: async (navigate) => {
+  //   const token = localStorage.getItem("token");
+  //   const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  //   try {
+  //     if (token && user?.role) {
+  //       const endpoint = user.role === "siswa" ? "/siswa/logout" : "kepegawaian/logout";
+
+  //       await api.post(
+  //         endpoint,
+  //         {},
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.warn("Logout gagal di server (mungkin token sudah tidak valid)", err);
+  //   } finally {
+  //     localStorage.clear();
+  //     delete api.defaults.headers.common["Authorization"];
+
+  //     const redirectPath = user?.role && ["guru", "staff", "tu", "kepsek", "super_admin"].includes(user.role) ? "/login-kepegawaian" : "/login-siswa";
+
+  //     navigate(redirectPath, { replace: true });
+  //     set({ user: null, token: null, isAuthenticated: false });
+  //   }
+  // },
+
   logout: async (navigate) => {
     const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const storedRole = storedUser.role; // SIMPAN ROLE DISINI
 
     try {
-      if (token && user?.role) {
-        const endpoint = user.role === "siswa" ? "/siswa/logout" : "kepegawaian/logout";
+      if (token && storedRole) {
+        const endpoint = storedRole === "siswa" ? "/siswa/logout" : "/kepegawaian/logout";
 
         await api.post(
           endpoint,
@@ -111,14 +141,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
         );
       }
     } catch (err) {
-      console.warn("Logout gagal di server (mungkin token sudah tidak valid)", err);
+      console.warn("Logout gagal di server", err);
     } finally {
       localStorage.clear();
       delete api.defaults.headers.common["Authorization"];
 
-      const redirectPath = user?.role && ["guru", "staff", "tu", "kepsek", "super_admin"].includes(user.role) ? "/login-kepegawaian" : "/login-siswa";
+      const redirectPath = storedRole === "siswa" ? "/login-siswa" : "/login-kepegawaian";
 
       navigate(redirectPath, { replace: true });
+
       set({ user: null, token: null, isAuthenticated: false });
     }
   },

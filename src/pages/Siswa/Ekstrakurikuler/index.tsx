@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import PageTitle from "@/components/PageTitle";
-import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { SearchIcon, Loader2Icon, InfoIcon } from "lucide-react";
@@ -13,6 +12,7 @@ import type { Ekskul } from "@/types";
 import Swal from "sweetalert2";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SidebarSiswa } from "@/components/SidebarSiswa";
 
 const DataEkstrakurikulerSiswa = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -39,7 +39,7 @@ const DataEkstrakurikulerSiswa = () => {
           setDataEkskul(resAll.data.data);
           setFilteredEkskul(resAll.data.data); // Default: tampilkan semua
         }
-        
+
         if (resDiikuti.data.status === "success") {
           const normalized = resDiikuti.data.data.map((item: any) => {
             // COCOKKAN dengan data ALL ekskul supaya dapat ID ekskul asli
@@ -94,7 +94,7 @@ const DataEkstrakurikulerSiswa = () => {
 
   return (
     <SidebarProvider>
-      <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <SidebarSiswa isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main
         className={`

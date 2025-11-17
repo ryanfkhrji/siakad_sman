@@ -305,13 +305,31 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                   </SidebarMenuItem>
 
                   {/* Pengaturan */}
+                  {!isCollapsed && <SidebarGroupLabel className="text-xs uppercase text-muted-foreground mt-1">Data Pengaturan</SidebarGroupLabel>}
+                  {/* Data PSB Online */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton onClick={() => toggleDropdown("pengaturan")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                      <span className="flex items-center gap-2">
                         <Settings className="h-4 w-4" />
-                        {!isCollapsed && <span>Pengaturan</span>}
-                      </Link>
+                        {!isCollapsed && "Pengaturan"}
+                      </span>
+                      {!isCollapsed && <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === "pengaturan" && "rotate-180")} />}
                     </SidebarMenuButton>
+
+                    {!isCollapsed && openDropdown === "pengaturan" && (
+                      <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                        {[
+                          { to: "/superadmin/settings/profile", label: "Ubah Profile" },
+                          { to: "/superadmin/settings-profile/ubah-password", label: "Ubah Password" },
+                        ].map((item) => (
+                          <SidebarMenuSubItem key={item.to}>
+                            <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes(item.to) && "bg-primary text-white font-medium")}>
+                              <Link to={item.to}>{item.label}</Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    )}
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>

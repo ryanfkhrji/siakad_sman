@@ -40,7 +40,7 @@ import UserTu from "@/pages/SuperAdmin/ManajemenUser/Tu";
 import EditUserTu from "@/pages/SuperAdmin/ManajemenUser/Tu/EditUserTu";
 import UserStaff from "@/pages/SuperAdmin/ManajemenUser/Staff";
 import EditUserStaff from "@/pages/SuperAdmin/ManajemenUser/Staff/EditUserStaff";
-import SettingUserSuperAdmin from "@/pages/SuperAdmin/SettingUserSuperAdmin";
+import SettingUserSuperAdmin from "@/pages/SuperAdmin/SettingsProfile/SettingUserSuperAdmin";
 import DataEkstrakurikuler from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler";
 import CreateEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/CreateEkskul";
 import EditEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/EditEkskul";
@@ -109,7 +109,7 @@ export default function AppRoutes() {
         {/* ================= DATA DASHBOARD SUPER ADMIN ================= */}
         {/* Setting user super admin */}
         <Route
-          path="/superadmin/settings"
+          path="/superadmin/settings-profile/ubah-password"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <SettingUserSuperAdmin />
@@ -203,6 +203,7 @@ export default function AppRoutes() {
           }
         />
         {/* Data User Ortu */}
+
         {/* INFORMASI SEKOLAH */}
         {/* Data Guru */}
         <Route

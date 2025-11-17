@@ -8,9 +8,9 @@ export const endpoints = {
     register: "/kepegawaian/register",
   },
   kelas: {
-    index: "/spa/kelas", // endpoint untuk GET semua kelas
+    index: "/kelas-register", // endpoint untuk GET semua kelas
   },
   jurusan: {
-    index: "/spa/jurusan", // endpoint untuk GET semua jurusan
+    index: "/jurusan-register", // endpoint untuk GET semua jurusan
   },
 };
