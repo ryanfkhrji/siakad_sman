@@ -204,7 +204,7 @@ const EditSiswa = () => {
                 {/* Email */}
                 <div>
                   <label className="block font-semibold text-foreground">Email</label>
-                  <input type="email" value={email} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" required />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="border p-2 w-full mt-2 rounded" required />
                 </div>
 
                 {/* Jurusan (select) */}

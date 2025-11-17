@@ -49,6 +49,7 @@ import DaftarSiswa from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/Da
 import DataEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler";
 import ForgotPassword from "@/pages/Auth/ForgotPassword";
 import ResetPassword from "@/pages/Auth/ResetPassword";
+import DetailEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler/DetailEkstrakurikuler";
 
 export default function AppRoutes() {
   return (
@@ -56,17 +57,14 @@ export default function AppRoutes() {
       <Routes>
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/login-kepegawaian" replace />} />
-
         {/* ================= AUTH ================= */}
         <Route path="/login-kepegawaian" element={<LoginKepegawaian />} />
         <Route path="/login-siswa" element={<LoginSiswa />} />
         <Route path="/register-kepegawaian" element={<RegisterKepegawaian />} />
         <Route path="/register-siswa" element={<RegisterSiswa />} />
-
         {/* ================= AUTH LUPA PASSWORD ================= */}
         <Route path="/lupa-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-
         {/* ================= DASHBOARD PER ROLE ================= */}
         <Route
           path="/superadmin/dashboard"
@@ -76,7 +74,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/kepsek/dashboard"
           element={
@@ -85,7 +82,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/guru/dashboard"
           element={
@@ -94,7 +90,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/staff/dashboard"
           element={
@@ -103,7 +98,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/siswa/dashboard"
           element={
@@ -112,7 +106,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* ================= DATA DASHBOARD SUPER ADMIN ================= */}
         {/* Setting user super admin */}
         <Route
@@ -123,7 +116,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* USER MANAJEMEN */}
         {/* Data User Siswa */}
         <Route
@@ -142,7 +134,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data User Guru */}
         <Route
           path="/superadmin/manajemen-user/guru"
@@ -160,7 +151,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data User Kepsek */}
         <Route
           path="/superadmin/manajemen-user/kepsek"
@@ -178,7 +168,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data User Tu */}
         <Route
           path="/superadmin/manajemen-user/tu"
@@ -196,7 +185,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data User Staff */}
         <Route
           path="/superadmin/manajemen-user/staff"
@@ -214,9 +202,7 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data User Ortu */}
-
         {/* INFORMASI SEKOLAH */}
         {/* Data Guru */}
         <Route
@@ -235,7 +221,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data Staff */}
         <Route
           path="/superadmin/informasi-sekolah/kepegawaian/staff"
@@ -245,7 +230,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-sekolah/kepegawaian/staff/edit/:id"
           element={
@@ -254,7 +238,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data Kelas */}
         <Route
           path="/superadmin/informasi-sekolah/kelas"
@@ -264,7 +247,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-sekolah/kelas/create"
           element={
@@ -273,7 +255,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-sekolah/kelas/edit/:id"
           element={
@@ -282,7 +263,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data Jurusan */}
         <Route
           path="/superadmin/informasi-sekolah/jurusan"
@@ -292,7 +272,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-sekolah/jurusan/create"
           element={
@@ -309,7 +288,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* INFORMASI AKADEMIK */}
         {/* Data Siswa */}
         <Route
@@ -320,7 +298,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/siswa/edit/:id"
           element={
@@ -329,7 +306,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Data Ekstrakurikuler */}
         <Route
           path="/superadmin/informasi-akademik/ekstrakurikuler"
@@ -339,7 +315,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/ekstrakurikuler/create"
           element={
@@ -348,7 +323,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/ekstrakurikuler/edit/:id"
           element={
@@ -357,7 +331,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/ekstrakurikuler/create-siswa/:id"
           element={
@@ -366,7 +339,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/ekstrakurikuler/daftar-siswa/:id"
           element={
@@ -375,13 +347,22 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* ================= DATA DASHBOARD SISWA ================= */}
+        {/* Data Ekstrakurikuler */}
         <Route
           path="/siswa/ekstrakurikuler"
           element={
             <ProtectedRoute roles={["siswa"]}>
               <DataEkstrakurikulerSiswa />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/siswa/ekstrakurikuler/detail-ekstrakurikuler/:id"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <DetailEkstrakurikulerSiswa />
             </ProtectedRoute>
           }
         />

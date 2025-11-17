@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon, SearchIcon, Loader2Icon, ArrowLeft } from "lucide-react";
+import { SearchIcon, Loader2Icon, ArrowLeft, ClipboardListIcon, ArrowLeftCircle } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -24,10 +24,11 @@ interface SiswaEkskul {
   id: number;
   nama_ekskul: string;
   jumlah_peserta: number;
+  nama_pengajar: string | null;
   peserta: Peserta[];
 }
 
-const DaftarSiswa = () => {
+const DetailEkstrakurikulerSiswa = () => {
   const { id } = useParams();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,22 @@ const DaftarSiswa = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentSiswaId, setCurrentSiswaId] = useState<number | null>(null);
+
+  // Ambil ID siswa dari localStorage saat component mount
+  useEffect(() => {
+    const userData = localStorage.getItem("user"); // sesuaikan key-nya
+    if (userData) {
+      const user = JSON.parse(userData);
+      setCurrentSiswaId(user.id); // atau user.id_siswa, sesuaikan dengan struktur data
+    }
+  }, []);
+
+  // Cek apakah siswa yang login sudah terdaftar di ekskul ini
+  const isRegistered = useMemo(() => {
+    if (!ekskul || !currentSiswaId) return false;
+    return ekskul.peserta.some((p) => p.id === currentSiswaId);
+  }, [ekskul, currentSiswaId]);
 
   // 🔹 Ambil data ekskul + pivot (SUDAH DIPERBAIKI)
   const fetchData = async () => {
@@ -44,7 +61,7 @@ const DaftarSiswa = () => {
       setLoading(true);
 
       // Ambil detail ekskul berdasarkan ID dari URL
-      const resEkskul = await api.get(`/spa/ekstrakurikuler/${id}`);
+      const resEkskul = await api.get(`/siswa/ekstrakurikuler/all/${id}`);
       if (resEkskul.data.status !== "success") {
         Swal.fire({
           icon: "error",
@@ -70,6 +87,7 @@ const DaftarSiswa = () => {
         id: selectedEkskul.id,
         nama_ekskul: selectedEkskul.nama_ekstrakurikuler || selectedEkskul.nama_ekskul,
         jumlah_peserta: pesertaData.length,
+        nama_pengajar: selectedEkskul.nama_pengajar || null,
         peserta: pesertaData,
       };
 
@@ -83,53 +101,81 @@ const DaftarSiswa = () => {
     }
   };
 
+  const handleDaftar = async () => {
+    try {
+      const result = await Swal.fire({
+        title: "Konfirmasi Pendaftaran",
+        text: `Apakah Anda yakin ingin mendaftar ke ekstrakurikuler ${ekskul?.nama_ekskul}?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#4F46E5",
+        confirmButtonText: "Ya, daftar!",
+        cancelButtonText: "Batal",
+      });
+
+      if (result.isConfirmed) {
+        const res = await api.post(`/siswa/ekstrakurikuler/daftar/${id}`);
+
+        if (res.data.status === "success") {
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil!",
+            text: res.data.message || "Anda berhasil terdaftar di ekstrakurikuler ini",
+          });
+
+          // Refresh data setelah daftar
+          fetchData();
+        }
+      }
+    } catch (error: any) {
+      console.error("Gagal mendaftar:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Mendaftar",
+        text: error.response?.data?.message || "Terjadi kesalahan saat mendaftar",
+      });
+    }
+  };
+
+  const handleKeluar = async () => {
+    try {
+      const result = await Swal.fire({
+        title: "Konfirmasi Keluar",
+        text: `Apakah Anda yakin ingin keluar dari ekstrakurikuler ${ekskul?.nama_ekskul}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4F46E5",
+        confirmButtonText: "Ya, keluar!",
+        cancelButtonText: "Batal",
+      });
+
+      if (result.isConfirmed) {
+        const res = await api.delete(`/siswa/ekstrakurikuler/keluar/${id}`);
+
+        if (res.data.status === "success") {
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil!",
+            text: res.data.message || "Anda berhasil keluar dari ekstrakurikuler ini",
+          });
+
+          // Refresh data setelah keluar
+          fetchData();
+        }
+      }
+    } catch (error: any) {
+      console.error("Gagal keluar:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Keluar",
+        text: error.response?.data?.message || "Terjadi kesalahan saat keluar",
+      });
+    }
+  };
+
   useEffect(() => {
     if (id) fetchData();
   }, [id]);
-
-  // 🔹 Hapus siswa dari ekskul
-  const handleDelete = async (pivotId: number | null) => {
-    const ekskulId = id ? Number(id) : null;
-
-    const confirm = await Swal.fire({
-      title: "Yakin ingin menghapus?",
-      text: "Siswa ini akan dihapus dari ekskul.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Ya, hapus",
-      cancelButtonText: "Batal",
-    });
-
-    if (!confirm.isConfirmed) return;
-
-    try {
-      setLoading(true);
-      let res;
-
-      if (pivotId) {
-        // versi admin/pembina
-        res = await api.delete(`/spa/siswa/ekskul/${pivotId}`);
-      } else if (ekskulId) {
-        // fallback pakai versi siswa
-        res = await api.delete(`/spa/siswa/ekskul/destroy-siswa/${ekskulId}`);
-      } else {
-        Swal.fire("Error", "ID tidak valid untuk penghapusan", "error");
-        return;
-      }
-
-      if (res.data.status === "success") {
-        Swal.fire("Berhasil", "Siswa telah dihapus dari ekskul", "success");
-        await fetchData();
-      } else {
-        Swal.fire("Gagal", res.data.message || "Gagal menghapus siswa", "error");
-      }
-    } catch (error: any) {
-      console.error("Error delete:", error.response || error);
-      Swal.fire("Error", "Terjadi kesalahan saat menghapus data", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 🔹 Daftar kelas unik
   const kelasList = useMemo(() => {
@@ -163,19 +209,45 @@ const DaftarSiswa = () => {
     <SidebarProvider>
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}`}>
-        <PageTitle title="Daftar Siswa Ekstrakurikuler" />
-
+      <main
+        className={`
+        w-full min-h-screen bg-background transition-all duration-300
+        ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}
+      `}
+      >
+        <PageTitle title="Detail Data Ekstrakurikuler" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-2">Ekstrakurikuler {ekskul?.nama_ekskul ?? "Memuat..."}</h1>
-          <p className="text-gray-600 mb-6">Jumlah Peserta: {ekskul?.jumlah_peserta ?? 0}</p>
+          <h1 className="text-3xl font-bold mb-6">Detail Data Ekstrakurikuler</h1>
 
-          <Link to="/superadmin/informasi-akademik/ekstrakurikuler">
-            <Button className="mb-6">
-              <ArrowLeft size={16} />
-              Kembali
-            </Button>
-          </Link>
+          <h1 className="text-xl font-bold mb-2 text-primary">Ekstrakurikuler {ekskul?.nama_ekskul ?? "Memuat..."}</h1>
+          <p className="text-gray-600 mb-2">Jumlah Peserta: {ekskul?.jumlah_peserta ?? 0}</p>
+          <p className="text-gray-600 mb-6">Pembina: {ekskul?.nama_pengajar ?? "-"}</p>
+
+          <div className="mb-6 flex gap-3">
+            {/* Tombol Daftar - muncul jika BELUM terdaftar */}
+            {!isRegistered && (
+              <Button onClick={handleDaftar}>
+                <ClipboardListIcon size={16} />
+                Daftar Ekstrakurikuler
+              </Button>
+            )}
+
+            {/* Tombol Keluar - muncul jika SUDAH terdaftar */}
+            {isRegistered && (
+              <Button onClick={handleKeluar} className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
+                <ArrowLeftCircle size={16} />
+                Keluar dari Ekstrakurikuler
+              </Button>
+            )}
+
+            {/* Tombol Kembali - selalu muncul */}
+            <Link to="/siswa/ekstrakurikuler">
+              <Button variant="outline">
+                <ArrowLeft size={16} />
+                Kembali
+              </Button>
+            </Link>
+          </div>
 
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-600">
@@ -230,7 +302,6 @@ const DaftarSiswa = () => {
                       <TableHead className="font-semibold text-white">Nama Siswa</TableHead>
                       <TableHead className="font-semibold text-white">Jurusan</TableHead>
                       <TableHead className="font-semibold text-white">Kelas</TableHead>
-                      <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -241,11 +312,6 @@ const DaftarSiswa = () => {
                           <TableCell>{siswa.nama_siswa}</TableCell>
                           <TableCell>{siswa.jurusan}</TableCell>
                           <TableCell>{siswa.kelas}</TableCell>
-                          <TableCell className="flex gap-1 justify-center">
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.id_pivot)}>
-                              <Trash2Icon size={16} />
-                            </Button>
-                          </TableCell>
                         </TableRow>
                       ))
                     ) : (
@@ -304,4 +370,4 @@ const DaftarSiswa = () => {
   );
 };
 
-export default DaftarSiswa;
+export default DetailEkstrakurikulerSiswa;

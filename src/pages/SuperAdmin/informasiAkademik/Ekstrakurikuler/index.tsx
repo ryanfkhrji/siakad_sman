@@ -26,7 +26,7 @@ const DataEkstrakurikuler = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/ekstrakurikuler");
+        const res = await api.get("/spa/ekstrakurikuler");
         if (res.data.status === "success") {
           setDataEkskul(res.data.data);
           setFilteredEkskul(res.data.data);
@@ -73,7 +73,7 @@ const DataEkstrakurikuler = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/ekstrakurikuler/${id}`);
+      const res = await api.delete(`/spa/ekstrakurikuler/${id}`);
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload

@@ -42,7 +42,7 @@ const EditEkskul = () => {
         setIsLoading(true);
 
         // Ambil data pegawai, ekskul, dan detail ekskul
-        const [resPegawai, resEkskul, resDetail] = await Promise.all([api.get("/kepegawaian"), api.get("/ekstrakurikuler"), api.get(`/ekstrakurikuler/${id}`)]);
+        const [resPegawai, resEkskul, resDetail] = await Promise.all([api.get("/spa/kepegawaian"), api.get("/spa/ekstrakurikuler"), api.get(`/spa/ekstrakurikuler/${id}`)]);
 
         if (resPegawai.data.status === "success" && resEkskul.data.status === "success" && resDetail.data.status === "success") {
           const semuaPegawai = resPegawai.data.data;
@@ -126,10 +126,16 @@ const EditEkskul = () => {
         status: formData.status,
       };
 
-      const res = await api.put(`/ekstrakurikuler/${id}`, payload);
+      const res = await api.put(`/spa/ekstrakurikuler/${id}`, payload);
 
       if (res.data.status === "success") {
-        Swal.fire("Berhasil", res.data.message, "success").then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: res.data.message || "Ekstrakurikuler berhasil diperbarui.",
+          showConfirmButton: false,
+          timer: 1800,
+        }).then(() => {
           navigate("/superadmin/informasi-akademik/ekstrakurikuler");
         });
       } else if (res.data.errors) {

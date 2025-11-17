@@ -39,7 +39,7 @@ const CreateEkskul = () => {
       try {
         setLoading(true);
 
-        const [resPegawai, resEkskul] = await Promise.all([api.get("/kepegawaian"), api.get("/ekstrakurikuler")]);
+        const [resPegawai, resEkskul] = await Promise.all([api.get("/spa/kepegawaian"), api.get("/spa/ekstrakurikuler")]);
 
         if (resPegawai.data.status === "success" && resEkskul.data.status === "success") {
           const semuaPegawai: Pegawai[] = resPegawai.data.data;
@@ -95,7 +95,7 @@ const CreateEkskul = () => {
     }
 
     try {
-      const res = await api.post("/ekstrakurikuler", {
+      const res = await api.post("/spa/ekstrakurikuler", {
         nama_ekstrakurikuler: formData.nama_ekstrakurikuler.trim(),
         pengajar_id: Number(formData.pengajar_id),
         anggaran: Number(formData.anggaran),

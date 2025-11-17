@@ -31,7 +31,7 @@ export default function DaftarSiswaEkskul() {
     const fetchEkskul = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/ekstrakurikuler/${id}`);
+        const res = await api.get(`/spa/ekstrakurikuler/${id}`);
         if (res.data.status === "success") {
           setEkskul(res.data.data);
         }
@@ -48,7 +48,7 @@ export default function DaftarSiswaEkskul() {
   useEffect(() => {
     const fetchSiswa = async () => {
       try {
-        const res = await api.get("/siswa");
+        const res = await api.get("/spa/siswa");
         if (res.data.status === "success") {
           const siswaOnly = res.data.data.filter((item: Siswa) => item.role === "siswa");
           setSiswaList(siswaOnly);
@@ -73,7 +73,7 @@ export default function DaftarSiswaEkskul() {
     }
 
     try {
-      const res = await api.post("/siswa-ekskul", {
+      const res = await api.post("/spa/siswa/ekskul", {
         siswa_id: Number(selectedSiswa),
         ekstrakurikuler_id: Number(id),
       });
@@ -137,7 +137,7 @@ export default function DaftarSiswaEkskul() {
                       {siswaList.length > 0 ? (
                         siswaList.map((s) => (
                           <SelectItem key={s.id} value={String(s.id)}>
-                            {s.nama} — {s.kelas?.nama_kelas ?? "-"}
+                            {s.nama} — {typeof s.kelas === "string" ? s.kelas : s.kelas?.nama_kelas ?? "-"}
                           </SelectItem>
                         ))
                       ) : (
