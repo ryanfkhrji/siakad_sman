@@ -14,7 +14,7 @@ class JadwalPelajaran extends Model
     public function mataPelajaran()
     {
         return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
-    }
+    }    
 
     public function guru()
     {

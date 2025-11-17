@@ -97,6 +97,90 @@ class KepegawaianController extends Controller
         }
     }
 
+    // ✅ store pegawai
+    public function store(Request $request)
+    {
+        try {
+            // Validasi input
+            $validated = $request->validate([
+                'nama' => 'required|string',
+                'email' => ['required', 'unique:kepegawaians,email', 'email'],
+                'nip' => ['required', 'digits_between:5,50', 'unique:kepegawaians,nip', 'regex:/^[0-9]+$/'],
+                'password' => [
+                    'required',
+                    'string',
+                    'min:5',
+                    'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'
+                ],
+                'role' => [
+                    'string',
+                    'required',
+                    'in:super_admin,kepsek,guru,tu,staff',
+                ]
+            ], [
+                'email.required' => 'Email wajib diisi.',
+                'email.unique' => 'Email sudah terdaftar.',
+                'email.email' => 'Email tidak valid.',
+                'nip.regex' => 'NIP hanya boleh berisi angka.',
+                'nip.unique' => 'NIP sudah terdaftar.',
+                'password.min' => 'Password minimal 5 karakter.',
+                'password.confirmed' => 'Konfirmasi password tidak cocok.',
+                'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
+            ]);
+
+            // cek role super_admin dan kepsek agar tidak double
+            if (in_array($validated['role'], ['super_admin', 'kepsek'])) {
+                $existing = Kepegawaian::where('role', $validated['role'])->exists();
+
+                if ($existing) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Role {$validated['role']} sudah digunakan.",
+                    ], 403);
+                }
+            }
+
+            // Simpan baru
+            $kepegawaian = Kepegawaian::create([
+                'nama' => $validated['nama'],
+                'email' => $validated['email'],
+                'status' => $request['status'],
+                'nip' => $validated['nip'],
+                'keterangan' => $request['keterangan'],
+                'password' => Hash::make($validated['password']),
+                'role' => $validated['role'],
+            ]);
+
+            // Response sukses
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Registrasi Kepegawaian berhasil, silakan login',
+                'data' => [
+                    'id' => $kepegawaian->id,
+                    'nama' => $kepegawaian->nama,
+                    'email' => $kepegawaian->email,
+                    'status' => $kepegawaian->status,
+                    'nip' => $kepegawaian->nip,
+                    'keterangan' => $kepegawaian->keterangan,
+                    'role' => $kepegawaian->role,
+                ]
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat registrasi',
+                'errors' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // ✅ login pegawai
     public function loginKepegawaian(Request $request)
     {
@@ -606,8 +690,6 @@ class KepegawaianController extends Controller
             'message' => 'Gagal mengirim link reset password. Coba lagi nanti.'
         ], 500);
     }
-
-
 
     // ? Tampilkan form react untuk reset password
     public function redirectToFrontendForm(Request $request, $token)

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\JadwalPelajaran;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class JadwalPelajaranController extends Controller
 {
@@ -98,6 +99,37 @@ class JadwalPelajaranController extends Controller
         ];
 
         return ApiResponse::success($formatted, 'Detail jadwal pelajaran berhasil diambil');
+    }
+
+    // ✅ show jadwal sendiri
+    public function showAllJadwalSendiri()
+    {
+        $pegawai = Auth::guard('kepegawaian')->user();
+
+        $jadwal = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas'])
+            ->where('guru_id', $pegawai->id)
+            ->get(); // pakai get kalau guru punya banyak jadwal
+
+        if ($jadwal->isEmpty()) {
+            return ApiResponse::error('Jadwal pelajaran tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        $formatted = [
+            'nama' => $pegawai->nama,
+            'jadwal' => $jadwal->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran,
+                    'hari' => $item->hari,
+                    'kelas' => $item->kelas->nama_kelas,
+                    'jam_pelajaran' => $item->jam_pelajaran,
+                    'ruangan' => $item->ruangan,
+                    'link_opsional' => $item->link_opsional,
+                ];
+            }),
+        ];
+
+        return ApiResponse::success($formatted, 'Jadwal pelajaran berhasil diambil');
     }
 
     /**

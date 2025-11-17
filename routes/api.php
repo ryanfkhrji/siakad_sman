@@ -53,7 +53,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::post('/spa/ubah-password/siswa', [SiswaController::class, 'ubahPassword']);
     
     // ✅ CRUD Kepegawaian
-    Route::apiResource('/spa/kepegawaian', KepegawaianController::class)->except(['store']);
+    Route::apiResource('/spa/kepegawaian', KepegawaianController::class);
 
     // ✅ Super Admin Show Diri Sendiri
     Route::get('/spa/show/diri', [KepegawaianController::class, 'showDiriSendiri']);    
@@ -74,7 +74,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/spa/kelas', KelasController::class);
 
     // ✅ CRUD Siswa
-    Route::apiResource('/spa/siswa', SiswaController::class)->except(['store']);
+    Route::apiResource('/spa/siswa', SiswaController::class);
     
     // ✅ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
@@ -107,9 +107,11 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ Update kelas sendiri
     Route::put('/pegawai/kelas/update/diri', [KelasController::class, 'updateKelasPegawai']);
 
+    // ✅ Get all jadwal pelajaran sendiri
+    Route::get('/pegawai/jadwal-pelajaran/all/diri', [JadwalPelajaranController::class, 'showAllJadwalSendiri']);
     
-    // ! mata pelajaran
-    // ! jadwal pelajaran
+    // ✅ Get detail jadwal pelajaran sendiri
+    Route::apiResource('/pegawai/jadwal-pelajaran/show/diri', JadwalPelajaranController::class)->only('show');
     
     // ✅ Read siswa oleh pegawai
     Route::apiResource('/pegawai/siswa', SiswaController::class)->only(['index', 'show']);
@@ -148,10 +150,6 @@ Route::get('/reset-password/{token}', [KepegawaianController::class, 'redirectTo
 
 // ? 3. Proses reset password
 Route::post('/reset-password', [KepegawaianController::class, 'resetPassword'])->name('password.update');
-
-// ✅ lupa password siswa
-// ! belum di debug
-Route::post('/siswa/lupa-password', [SiswaController::class, 'sendResetLink']);
 
 // ? ===================================================================================== ?
 // ?                                        SISWA

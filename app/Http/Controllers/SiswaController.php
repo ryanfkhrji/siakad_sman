@@ -108,6 +108,98 @@ class SiswaController extends Controller
         }
     }
 
+    public function store(Request $request)
+    {
+        try {
+            // Validasi input
+            $validated = $request->validate([
+                'nisn' => ['required', 'digits_between:5,50', 'unique:siswas,nisn'],
+                'nama' => 'required|string',
+                'email' => 'required|email|unique:siswas,email',
+                'nis' => ['required', 'digits_between:5,50', 'unique:siswas,nis'],
+                'jurusan_id' => ['required', 'exists:jurusans,id'],
+                'kelas_id' => ['required', 'exists:kelas,id'],
+                'password' => [
+                    'required',
+                    'string',
+                    'min:5',
+                    'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'
+                ],
+            ], [
+                'nisn.unique' => 'NISN sudah terdaftar.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Email tidak valid.',
+                'email.unique' => 'Email sudah terdaftar.',
+                'nis.unique' => 'NIS sudah terdaftar.',
+                'jurusan_id.exists' => 'Jurusan tidak ada.',
+                'kelas_id.exists' => 'Kelas tidak ada.',
+                'password.min' => 'Password minimal 5 karakter.',
+                'password.confirmed' => 'Konfirmasi password tidak cocok.',
+                'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
+            ]);
+
+            // Simpan baru
+            $siswa = Siswa::create([
+                'nisn' => $validated['nisn'],
+                'nama' => $validated['nama'],
+                'email' => $validated['email'],
+                'nis' => $validated['nis'],
+                'jurusan_id' => $validated['jurusan_id'],
+                'kelas_id' => $validated['kelas_id'],
+                'status' => $request['status'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'siswa',
+            ]);
+
+            $siswa->load(['kelas.wali', 'jurusan', 'ekstrakurikulers']);
+
+            // Response sukses
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Registrasi siswa berhasil, silakan login',
+                'data' => [
+                    'id' => $siswa->id,
+                    'nisn' => $siswa->nisn,
+                    'nama' => $siswa->nama,
+                    'email' => $siswa->email,
+                    'nis' => $siswa->nis,
+                    'jurusan_id' => $siswa->jurusan_id,
+                    'kelas_id' => $siswa->kelas_id,
+                    'status' => $siswa->status,
+                    'role' => $siswa->role,
+                    'kelas' => [
+                        'id' => $siswa->kelas->id,
+                        'nama_kelas' => $siswa->kelas->nama_kelas,
+                        'jam_masuk' => $siswa->kelas->jam_masuk,
+                        'wali_kelas' => $siswa->kelas->wali_kelas,
+                    ],
+                    'wali_kelas' => [
+                        'id' => $siswa->kelas->wali->id ?? null,
+                        'nama' => $siswa->kelas->wali->nama ?? null,
+                        'email' => $siswa->kelas->wali->email ?? null,
+                        'status' => $siswa->kelas->wali->status ?? null,
+                        'nip' => $siswa->kelas->wali->nip ?? null,
+                        'keterangan' => $siswa->kelas->wali->keterangan ?? null,
+                        'role' => $siswa->kelas->wali->role ?? null,
+                    ]
+                ]
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat registrasi',
+                'errors' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // ✅ login siswa
     public function loginSiswa(Request $request)
     {
