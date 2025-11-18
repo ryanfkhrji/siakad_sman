@@ -267,7 +267,7 @@ export default function RegisterSiswa() {
                   }
                 }}
                 className="border p-2 w-full mt-2 rounded"
-                autoComplete="username"
+                autoComplete="off"
               />
               {errors.nis && <p className="text-red-500 text-sm">{errors.nis.message}</p>}
             </label>

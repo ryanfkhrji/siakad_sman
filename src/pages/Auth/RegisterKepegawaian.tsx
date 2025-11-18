@@ -146,14 +146,6 @@ export default function RegisterKepegawaian() {
           <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Register Kepegawaian</h2>
 
           <div className="mb-6">
-            <label htmlFor="nama" className="block font-semibold text-foreground">
-              Nama Lengkap
-              <input {...register("nama")} type="text" name="nama" placeholder="cth: John Doe" className="border p-2 w-full mt-2 rounded" />
-              {errors.nama && <p className="text-red-500 text-sm">{errors.nama.message}</p>}
-            </label>
-          </div>
-
-          <div className="mb-6">
             <label htmlFor="nip" className="block font-semibold text-foreground">
               NIP
               <input
@@ -180,6 +172,14 @@ export default function RegisterKepegawaian() {
                 }}
               />
               {errors.nip && <p className="text-red-500 text-sm">{errors.nip.message}</p>}
+            </label>
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="nama" className="block font-semibold text-foreground">
+              Nama Lengkap
+              <input {...register("nama")} type="text" name="nama" placeholder="cth: John Doe" className="border p-2 w-full mt-2 rounded" />
+              {errors.nama && <p className="text-red-500 text-sm">{errors.nama.message}</p>}
             </label>
           </div>
 

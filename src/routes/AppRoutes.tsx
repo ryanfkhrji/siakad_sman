@@ -52,6 +52,7 @@ import ResetPassword from "@/pages/Auth/ResetPassword";
 import DetailEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler/DetailEkstrakurikuler";
 import EditProfileSuperAdmin from "@/pages/SuperAdmin/SettingsProfile/EditProfileSuperAdmin";
 import CreateKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/CreateKepegawaian";
+import CreateSiswa from "@/pages/SuperAdmin/informasiAkademik/Siswa/CreateSiswa";
 
 export default function AppRoutes() {
   return (
@@ -320,6 +321,16 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/superadmin/informasi-akademik/siswa/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateSiswa />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/superadmin/informasi-akademik/siswa/edit/:id"
           element={

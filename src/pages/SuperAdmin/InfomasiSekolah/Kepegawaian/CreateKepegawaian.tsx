@@ -121,21 +121,43 @@ const CreateKepegawaian = () => {
 
           <div className="bg-white rounded shadow p-5">
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit(onSubmit)}>
+              {/* NIP */}
+              <div>
+                <label className="block font-semibold">
+                  NIP
+                  <input
+                    {...register("nip")}
+                    type="text"
+                    name="nip"
+                    inputMode="numeric"
+                    maxLength={50}
+                    placeholder="cth: 123456789098765432"
+                    className="border p-2 w-full mt-2 rounded"
+                    autoComplete="off"
+                    onKeyPress={(e) => {
+                      // ✅ Hanya izinkan angka
+                      if (!/[0-9]/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onPaste={(e) => {
+                      // ✅ Cegah paste non-numeric
+                      const pasteData = e.clipboardData.getData("text");
+                      if (!/^[0-9]+$/.test(pasteData)) {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                  {errors.nip && <p className="text-red-500 text-sm">{errors.nip.message}</p>}
+                </label>
+              </div>
+
               {/* Nama */}
               <div>
                 <label className="block font-semibold">
                   Nama Lengkap
                   <input {...register("nama")} className="border p-2 w-full mt-2 rounded" placeholder="cth: John Doe" />
                   {errors.nama && <p className="text-red-500 text-sm">{errors.nama.message}</p>}
-                </label>
-              </div>
-
-              {/* NIP */}
-              <div>
-                <label className="block font-semibold">
-                  NIP
-                  <input {...register("nip")} className="border p-2 w-full mt-2 rounded" placeholder="cth: 1234567890" />
-                  {errors.nip && <p className="text-red-500 text-sm">{errors.nip.message}</p>}
                 </label>
               </div>
 

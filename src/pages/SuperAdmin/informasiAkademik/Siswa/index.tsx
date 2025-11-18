@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { PenBoxIcon, Trash2Icon, SearchIcon, Loader2Icon } from "lucide-react";
+import { PenBoxIcon, Trash2Icon, SearchIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -165,12 +165,12 @@ const DataSiswa = () => {
             <>
               {/* Toolbar: Tambah + Filter + Search */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-                {/* <Link to="/superadmin/informasi-sekolah/kepegawaian/guru/create" className="w-full md:w-auto">
+                <Link to="/superadmin/informasi-akademik/siswa/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full md:w-auto">
                     <PlusIcon size={18} />
-                    Tambah Guru
+                    Tambah Siswa
                   </Button>
-                </Link> */}
+                </Link>
 
                 {/* Filter Jenjang */}
                 <Select value={selectedJenjang ?? ""} onValueChange={(value) => setSelectedJenjang(value)}>
