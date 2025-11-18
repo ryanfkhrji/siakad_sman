@@ -156,7 +156,7 @@ const EditGuru = () => {
       <main
         className={`
           w-full min-h-screen bg-background transition-all duration-300
-          ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}
+          ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}
         `}
       >
         <PageTitle title="Edit Guru" />
@@ -187,7 +187,7 @@ const EditGuru = () => {
                 {/* Email */}
                 <div>
                   <label className="block font-semibold text-foreground">Email</label>
-                  <input type="text" value={email} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
+                  <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
                 </div>
 
                 {/* Kelas */}

@@ -114,7 +114,7 @@ export default function DaftarSiswaEkskul() {
     <SidebarProvider>
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}`}>
+      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
         <PageTitle title="Daftar Siswa ke Ekstrakurikuler" />
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
@@ -156,7 +156,7 @@ export default function DaftarSiswaEkskul() {
                   {isLoading ? "Menyimpan..." : "Simpan"}
                 </Button>
 
-                <Link to="/superadmin/informasi-akademik/daftar-siswa-ekstrakurikuler">
+                <Link to="/superadmin/informasi-akademik/ekstrakurikuler">
                   <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
                     <CircleXIcon size={18} />
                     Batal

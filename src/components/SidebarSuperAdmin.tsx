@@ -39,7 +39,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
       <div
         className={cn(
           "fixed top-0 left-0 h-screen border-r bg-white backdrop-blur-sm transition-all duration-300 z-50 flex flex-col",
-          isCollapsed ? "w-16" : "w-[280px]",
+          isCollapsed ? "w-16" : "w-[300px]",
           "md:translate-x-0",
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
@@ -165,8 +165,17 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                           </SidebarMenuSubButton>
 
                           {/* Submenu dalam Data Kepegawaian */}
-                          {openSubDropdown === "kepegawaian" && (
+                          {!isCollapsed && openSubDropdown === "kepegawaian" && (
                             <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/kepegawaian/create") && "bg-primary text-white font-medium")}
+                                >
+                                  <Link to="/superadmin/informasi-sekolah/kepegawaian/create">Tambah Kepegawaian</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
                               <SidebarMenuSubItem>
                                 <SidebarMenuSubButton
                                   asChild
@@ -211,31 +220,107 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
 
                   {/* Data Akademik */}
                   {!isCollapsed && <SidebarGroupLabel className="text-xs uppercase text-muted-foreground mt-1">Data Akademik</SidebarGroupLabel>}
-                  {/* Informasi Akademik */}
+
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={() => toggleDropdown("informasi-akademik")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                    {/* Tombol dropdown utama */}
+                    <SidebarMenuButton onClick={() => toggleDropdown("data-akademik")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
                       <span className="flex items-center gap-2">
                         <GraduationCap className="h-4 w-4" />
-                        {!isCollapsed && "Informasi Akademik"}
+                        {!isCollapsed && "Data Akademik"}
                       </span>
-                      {!isCollapsed && <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === "informasi-akademik" && "rotate-180")} />}
+
+                      {!isCollapsed && <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === "data-akademik" && "rotate-180")} />}
                     </SidebarMenuButton>
 
-                    {!isCollapsed && openDropdown === "informasi-akademik" && (
+                    {/* SUBMENU LEVEL 1 */}
+                    {!isCollapsed && openDropdown === "data-akademik" && (
                       <SidebarMenuSub className="ml-4 mt-1 space-y-1">
-                        {[
-                          { to: "/superadmin/siswa", label: "Data Akademik" },
-                          { to: "/superadmin/guru", label: "Data kebutuhan siswa (LMS)" },
-                          { to: "/superadmin/informasi-akademik/siswa", label: "Data Siswa" },
-                          { to: "/superadmin/informasi-akademik/ekstrakurikuler", label: "Data Ekstrakurikuler" },
-                          { to: "/superadmin/prestasi", label: "Data Prestasi" },
-                        ].map((item) => (
-                          <SidebarMenuSubItem key={item.to}>
-                            <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes(item.to) && "bg-primary text-white font-medium")}>
-                              <Link to={item.to}>{item.label}</Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
+                        {/* SUBMENU NESTED — Data Akademik */}
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton onClick={() => toggleSubDropdown("akademik")} className="hover:bg-primary rounded-md px-3 py-1.5 text-sm justify-between w-full">
+                            <span>Data Akademik</span>
+                            <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "akademik" && "rotate-180")} />
+                          </SidebarMenuSubButton>
+
+                          {/* SUBMENU LEVEL 2 */}
+                          {!isCollapsed && openSubDropdown === "akademik" && (
+                            <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/informasi-akademik/mata-pelajaran">Mata Pelajaran</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/informasi-akademik/jadwal-pelajaran">Jadwal Pelajaran</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/informasi-akademik/kelas">Kelas</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/informasi-akademik/kompetensi-dasar">Kompetensi Dasar</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/informasi-akademik/penilaian">Penilaian</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            </SidebarMenuSub>
+                          )}
+                        </SidebarMenuSubItem>
+
+                        {/* SUBMENU NESTED — LMS       */}
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton onClick={() => toggleSubDropdown("lms")} className="hover:bg-primary rounded-md px-3 py-1.5 text-sm justify-between w-full">
+                            <span>Data LMS</span>
+                            <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "lms" && "rotate-180")} />
+                          </SidebarMenuSubButton>
+
+                          {/* SUBMENU LEVEL 2 */}
+                          {!isCollapsed && openSubDropdown === "lms" && (
+                            <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/lms/mapel">Data Mapel LMS</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/lms/tugas">Data Tugas LMS</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                                  <Link to="/superadmin/lms/modul">Data Modul LMS</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            </SidebarMenuSub>
+                          )}
+                        </SidebarMenuSubItem>
+
+                        {/* SUBMENU BIASA */}
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                            <Link to="/superadmin/informasi-akademik/siswa">Data Siswa</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                            <Link to="/superadmin/informasi-akademik/ekstrakurikuler">Data Ekstrakurikuler</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                     )}
                   </SidebarMenuItem>
@@ -319,7 +404,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                     {!isCollapsed && openDropdown === "pengaturan" && (
                       <SidebarMenuSub className="ml-4 mt-1 space-y-1">
                         {[
-                          { to: "/superadmin/settings/profile", label: "Ubah Profile" },
+                          { to: "/superadmin/settings-profile/ubah-profile", label: "Ubah Profile" },
                           { to: "/superadmin/settings-profile/ubah-password", label: "Ubah Password" },
                         ].map((item) => (
                           <SidebarMenuSubItem key={item.to}>

@@ -122,7 +122,7 @@ const DataEkstrakurikuler = () => {
       <main
         className={`
         w-full min-h-screen bg-background transition-all duration-300
-        ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}
+        ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}
       `}
       >
         <PageTitle title="Data Ekstrakurikuler" />

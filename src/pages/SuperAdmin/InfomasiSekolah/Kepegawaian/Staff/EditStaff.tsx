@@ -136,7 +136,7 @@ const EditStaff = () => {
                 {/* Email */}
                 <div>
                   <label className="block font-semibold text-foreground">Email</label>
-                  <input type="text" value={email} onChange={(e) => setNama(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
+                  <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} className="border p-2 w-full mt-2 rounded" placeholder="Masukkan nama lengkap" required />
                 </div>
 
                 {/* Status */}

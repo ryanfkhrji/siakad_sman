@@ -37,7 +37,8 @@ const CreateJurusan = () => {
           icon: "success",
           title: "Berhasil!",
           text: "Data jurusan berhasil ditambahkan.",
-          showConfirmButton: true,
+          showConfirmButton: false,
+          timer: 1800,
         });
         navigate("/superadmin/informasi-sekolah/jurusan");
       } else if (res.data.status === "error" && res.data.errors) {
@@ -66,7 +67,7 @@ const CreateJurusan = () => {
 
       <main
         className={`w-full min-h-screen bg-background transition-all duration-300
-        ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}`}
+        ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}
       >
         <PageTitle title="Tambah Jurusan" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">

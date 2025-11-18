@@ -50,6 +50,8 @@ import DataEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler";
 import ForgotPassword from "@/pages/Auth/ForgotPassword";
 import ResetPassword from "@/pages/Auth/ResetPassword";
 import DetailEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler/DetailEkstrakurikuler";
+import EditProfileSuperAdmin from "@/pages/SuperAdmin/SettingsProfile/EditProfileSuperAdmin";
+import CreateKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/CreateKepegawaian";
 
 export default function AppRoutes() {
   return (
@@ -113,6 +115,15 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <SettingUserSuperAdmin />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/superadmin/settings-profile/ubah-profile"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditProfileSuperAdmin />
             </ProtectedRoute>
           }
         />
@@ -214,6 +225,16 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/superadmin/informasi-sekolah/kepegawaian/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateKepegawaian />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/superadmin/informasi-sekolah/kepegawaian/guru/edit/:id"
           element={
