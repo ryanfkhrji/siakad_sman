@@ -344,17 +344,17 @@ class SiswaController extends Controller
                         'role' => $item->kelas->wali->role ?? null,
                     ]
                 ],
-                'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
+                'jadwal_pelajaran' => $item->jadwalPelajarans->map(function ($items) {
                     return [
-                        'id' => $item->id,
-                        'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                        'status' => $item->mataPelajaran->status ?? null,
-                        'hari' => $item->hari ?? null,
-                        'guru' => $item->guru->nama ?? null,
-                        'kelas' => $item->kelas->nama_kelas ?? null,
-                        'jam_pelajaran' => $item->jam_pelajaran ?? null,
-                        'ruangan' => $item->ruangan ?? null,
-                        'link_opsional' => $item->link_opsional ?? null,
+                        'id' => $items->id,
+                        'mata_pelajaran' => $items->mataPelajaran->nama_pelajaran ?? null,
+                        'status' => $items->mataPelajaran->status ?? null,
+                        'hari' => $items->hari ?? null,
+                        'guru' => $items->guru->nama ?? null,
+                        'kelas' => $items->kelas->nama_kelas ?? null,
+                        'jam_pelajaran' => $items->jam_pelajaran ?? null,
+                        'ruangan' => $items->ruangan ?? null,
+                        'link_opsional' => $items->link_opsional ?? null,
                     ];
                 }), 
             ];
