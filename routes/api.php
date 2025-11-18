@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // ✅ register pegawai
 Route::post('/kepegawaian/register', [KepegawaianController::class, 'registerKepegawaian']);
 
-// ✅login pegawai
+// ! ✅login pegawai kasih jadwal pelajaran pada response
 Route::post('/kepegawaian/login', [KepegawaianController::class, 'loginKepegawaian']);
 
 Route::middleware('auth:kepegawaian')->group(function () {
@@ -162,7 +162,7 @@ Route::post('/reset-password', [KepegawaianController::class, 'resetPassword'])-
 // ✅ register siswa
 Route::post('/siswa/register', [SiswaController::class, 'registerSiswa']);
 
-// ✅ login siswa
+// ! ✅ login siswa kasih jadwal pelajaran pada response
 Route::post('/siswa/login', [SiswaController::class, 'loginSiswa']);
 
 Route::middleware('auth:siswa')->group(function () {
@@ -181,7 +181,13 @@ Route::middleware('auth:siswa')->group(function () {
 
     // ✅ get kelas sendiri
     Route::get('/siswa/kelas/diri', [KelasController::class, 'showKelasSendiri']);
+
+    // ✅ Get all jadwal pelajaran sendiri
+    Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
     
+    // ✅ Get detail jadwal pelajaran sendiri
+    Route::apiResource('/siswa/jadwal-pelajaran/show/diri', SiswaJadwalPelajaranController::class)->only('show');
+
     // ✅ get all ekskul untuk siswa
     Route::apiResource('/siswa/ekstrakurikuler/all', EkstrakurikulerController::class)->only(['index', 'show']);
 

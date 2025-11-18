@@ -129,7 +129,7 @@ class JadwalPelajaranController extends Controller
         return ApiResponse::success($formatted, 'Detail jadwal pelajaran berhasil diambil');
     }
 
-    // ✅ show jadwal sendiri
+    // ✅ show jadwal sendiri untuk pegawai
     public function showAllJadwalSendiri()
     {
         $pegawai = Auth::guard('kepegawaian')->user();
@@ -158,7 +158,7 @@ class JadwalPelajaranController extends Controller
         ];
 
         return ApiResponse::success($formatted, 'Jadwal pelajaran berhasil diambil');
-    }
+    }    
 
     /**
      * Update the specified resource in storage.
