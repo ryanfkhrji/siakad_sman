@@ -296,7 +296,6 @@ class KepegawaianController extends Controller
                     'id' => $item->kelas->id ?? null,
                     'nama_kelas' => $item->kelas->nama_kelas ?? null,
                     'jam_masuk' => $item->kelas->jam_masuk ?? null,
-                    // 'wali_kelas' => $item->kelas->wali_kelas ?? null,
                 ],
             ];
         });
@@ -307,7 +306,7 @@ class KepegawaianController extends Controller
     // ✅ show pegawai untuk super admin
     public function show($id)
     {
-        $pegawai = Kepegawaian::with('kelas')->find($id);
+        $pegawai = Kepegawaian::with('kelas', 'ekstrakurikuler', 'jadwalPelajarans.mataPelajaran')->find($id);
         if (!$pegawai) {
             return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
@@ -324,7 +323,26 @@ class KepegawaianController extends Controller
                 'id' => $pegawai->kelas->id ?? null,
                 'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
                 'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
-            ]
+            ],
+            'ekstrakurikuler' => [
+                'id' => $pegawai->ekstrakurikuler->id ?? null,
+                'nama_ekstrakurikuler' => $pegawai->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                'anggaran' => $pegawai->ekstrakurikuler->anggaran ?? null,
+                'status' => $pegawai->ekstrakurikuler->status ?? null,
+            ],
+            'jadwal_pelajaran' => $pegawai->jadwalPelajarans->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                    'status' => $item->mataPelajaran->status ?? null,
+                    'hari' => $item->hari ?? null,
+                    'guru' => $item->guru->nama ?? null,
+                    'kelas' => $item->kelas->nama_kelas ?? null,
+                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                    'ruangan' => $item->ruangan ?? null,
+                    'link_opsional' => $item->link_opsional ?? null,
+                ];
+            }),  
         ];
 
         return ApiResponse::success($formatted, 'Detail pegawai berhasil diambil');
@@ -333,12 +351,11 @@ class KepegawaianController extends Controller
     // ✅ show diri sendiri (pegawai)
     public function showDiriSendiri()
     {
-        $pegawai = Auth::guard('kepegawaian')->user()->load('kelas', 'ekstrakurikuler');
+        $pegawai = Auth::guard('kepegawaian')->user()->load('kelas', 'ekstrakurikuler', 'jadwalPelajarans.mataPelajaran');
 
         if (!$pegawai) {
             return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
-
 
         $formatted = [
             'id' => $pegawai->id ?? null,
@@ -347,6 +364,7 @@ class KepegawaianController extends Controller
             'status' => $pegawai->status ?? null,
             'nip' => $pegawai->nip ?? null,
             'keterangan' => $pegawai->keterangan ?? null,
+            'role' => $pegawai->role ?? null,
             'kelas' => [
                 'id' => $pegawai->kelas->id ?? null,
                 'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
@@ -357,7 +375,20 @@ class KepegawaianController extends Controller
                 'nama_ekstrakurikuler' => $pegawai->ekstrakurikuler->nama_ekstrakurikuler ?? null,
                 'anggaran' => $pegawai->ekstrakurikuler->anggaran ?? null,
                 'status' => $pegawai->ekstrakurikuler->status ?? null,
-            ]
+            ],
+            'jadwal_pelajaran' => $pegawai->jadwalPelajarans->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                    'status' => $item->mataPelajaran->status ?? null,
+                    'hari' => $item->hari ?? null,
+                    'guru' => $item->guru->nama ?? null,
+                    'kelas' => $item->kelas->nama_kelas ?? null,
+                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                    'ruangan' => $item->ruangan ?? null,
+                    'link_opsional' => $item->link_opsional ?? null,
+                ];
+            }),  
         ];
 
         return ApiResponse::success($formatted, 'Detail pegawai berhasil diambil');

@@ -76,4 +76,17 @@ class Siswa extends Authenticatable
     {
         return $this->belongsTo(Kepegawaian::class, 'pengajar_id');
     }
+
+    // 1 jadwal bisa diambil banyak siswa
+    public function jadwalPelajarans()
+    {
+        return $this->belongsToMany(
+            JadwalPelajaran::class,
+            'siswa_jadwal_pelajaran',
+            'siswa_id',
+            'jadwal_pelajaran_id'
+        )
+        ->using(SiswaJadwalPelajaran::class) // custom pivot model
+        ->withTimestamps();
+    }
 }

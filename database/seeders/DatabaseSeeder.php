@@ -13,6 +13,7 @@ use App\Models\Kelas;
 use App\Models\JadwalPelajaran;
 use App\Models\Ekstrakurikuler;
 use App\Models\Siswa;
+use App\Models\SiswaJadwalPelajaran;
 use App\Models\EkskulSiswaPivot;
 
 class DatabaseSeeder extends Seeder
@@ -148,7 +149,7 @@ class DatabaseSeeder extends Seeder
                 'ruangan' => '7.5.6',
                 'link_opsional' => ''
             ]
-        ]);
+        ]);        
 
         // Seed Ekstrakurikuler
         Ekstrakurikuler::insert([
@@ -199,6 +200,18 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'siswa',
                 'remember_token' => Str::random(10),
+            ],
+        ]);
+
+        // siswa mengambil jadwal
+        SiswaJadwalPelajaran::insert([
+            [
+                'siswa_id' => 1, // Andi
+                'jadwal_pelajaran_id' => 2 // B.Indonesia
+            ],
+            [
+                'siswa_id' => 2, // Rina
+                'jadwal_pelajaran_id' => 1 // IPA
             ],
         ]);
 

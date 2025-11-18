@@ -74,7 +74,7 @@ class Kepegawaian extends Authenticatable
         return $this->hasOne(Ekstrakurikuler::class, 'pengajar_id');
     }
 
-    public function mataPelajarans()
+    public function jadwalPelajarans()
     {
         return $this->hasMany(JadwalPelajaran::class, 'guru_id'); 
     }

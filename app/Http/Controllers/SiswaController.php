@@ -317,7 +317,7 @@ class SiswaController extends Controller
     // ✅ get all siswa untuk pegawai
     public function index()
     {
-        $siswa = Siswa::with('kelas.wali', 'ekstrakurikulers', 'jurusan')->get();
+        $siswa = Siswa::with('kelas.wali', 'ekstrakurikulers', 'jurusan', 'jadwalPelajarans.mataPelajaran')->get();
 
         $formatted = $siswa->map(function ($item) {
             return [
@@ -344,6 +344,19 @@ class SiswaController extends Controller
                         'role' => $item->kelas->wali->role ?? null,
                     ]
                 ],
+                'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                        'status' => $item->mataPelajaran->status ?? null,
+                        'hari' => $item->hari ?? null,
+                        'guru' => $item->guru->nama ?? null,
+                        'kelas' => $item->kelas->nama_kelas ?? null,
+                        'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                        'ruangan' => $item->ruangan ?? null,
+                        'link_opsional' => $item->link_opsional ?? null,
+                    ];
+                }), 
             ];
         });
 
@@ -353,7 +366,7 @@ class SiswaController extends Controller
     // ✅ show siswa untuk pegawai
     public function show($id)
     {
-        $siswa = Siswa::with('kelas.wali', 'jurusan', 'ekstrakurikulers')->find($id);
+        $siswa = Siswa::with('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($id);
         if (!$siswa) {
             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
@@ -381,7 +394,20 @@ class SiswaController extends Controller
                 'nip' => $siswa->kelas->wali->nip ?? null,
                 'keterangan' => $siswa->kelas->wali->keterangan ?? null,
                 'role' => $siswa->kelas->wali->role ?? null,
-            ]
+            ],
+            'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                    'status' => $item->mataPelajaran->status ?? null,
+                    'hari' => $item->hari ?? null,
+                    'guru' => $item->guru->nama ?? null,
+                    'kelas' => $item->kelas->nama_kelas ?? null,
+                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                    'ruangan' => $item->ruangan ?? null,
+                    'link_opsional' => $item->link_opsional ?? null,
+                ];
+            }),  
         ];
 
         return ApiResponse::success($formatted, 'Detail siswa berhasil diambil');
@@ -390,7 +416,7 @@ class SiswaController extends Controller
     // ✅ show diri siswa sendiri
     public function showDiriSendiri()
     {
-        $siswa = Auth::guard('siswa')->user()->load('kelas.wali', 'jurusan', 'ekstrakurikulers');
+        $siswa = Auth::guard('siswa')->user()->load('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran');
 
         if (!$siswa) {
             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
@@ -419,7 +445,20 @@ class SiswaController extends Controller
                 'nip' => $siswa->kelas->wali->nip ?? null,
                 'keterangan' => $siswa->kelas->wali->keterangan ?? null,
                 'role' => $siswa->kelas->wali->role ?? null,
-            ]
+            ],
+            'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                    'status' => $item->mataPelajaran->status ?? null,
+                    'hari' => $item->hari ?? null,
+                    'guru' => $item->guru->nama ?? null,
+                    'kelas' => $item->kelas->nama_kelas ?? null,
+                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                    'ruangan' => $item->ruangan ?? null,
+                    'link_opsional' => $item->link_opsional ?? null,
+                ];
+            }),  
         ];
 
         return ApiResponse::success($formatted, 'Detail siswa berhasil diambil');
