@@ -37,6 +37,13 @@ export interface Jurusan {
   siswa: Siswa[];
 }
 
+export interface MataPelajaran {
+  id: number;
+  nama_pelajaran: string;
+  status: string;
+  jurusan: Jurusan | null;
+}
+
 export interface Ekskul {
   id: number;
   nama_ekstrakurikuler: string;

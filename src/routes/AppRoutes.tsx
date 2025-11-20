@@ -53,6 +53,9 @@ import DetailEkstrakurikulerSiswa from "@/pages/Siswa/Ekstrakurikuler/DetailEkst
 import EditProfileSuperAdmin from "@/pages/SuperAdmin/SettingsProfile/EditProfileSuperAdmin";
 import CreateKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/CreateKepegawaian";
 import CreateSiswa from "@/pages/SuperAdmin/informasiAkademik/Siswa/CreateSiswa";
+import DataMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran";
+import CreateMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran/CreateMapel";
+import EditMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran/EditMapel";
 
 export default function AppRoutes() {
   return (
@@ -380,6 +383,34 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* Data Mata Pelajaran */}
+        <Route
+          path="/superadmin/informasi-akademik/mata-pelajaran"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataMataPelajaran />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/superadmin/informasi-akademik/mata-pelajaran/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateMataPelajaran />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/superadmin/informasi-akademik/mata-pelajaran/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditMataPelajaran />
+            </ProtectedRoute>
+          }
+        />
+
         {/* ================= DATA DASHBOARD SISWA ================= */}
         {/* Data Ekstrakurikuler */}
         <Route
