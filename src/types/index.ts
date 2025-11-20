@@ -41,7 +41,25 @@ export interface MataPelajaran {
   id: number;
   nama_pelajaran: string;
   status: string;
-  jurusan: Jurusan | null;
+}
+
+export interface JadwalPelajaran {
+  id: number;
+  mata_pelajaran: string;
+  hari: string;
+  guru: Pegawai[] | string;
+  kelas: Kelas[] | string;
+  jam_pelajaran: string;
+  ruangan: string;
+  link_opsional: string | null;
+  peserta: [
+    {
+      id: number;
+      nama_siswa: string;
+      jurusan: string;
+      kelas: string | Kelas | null;
+    }
+  ];
 }
 
 export interface Ekskul {

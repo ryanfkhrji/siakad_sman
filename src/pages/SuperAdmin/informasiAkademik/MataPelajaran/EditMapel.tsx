@@ -188,7 +188,7 @@ const EditMataPelajaran = () => {
               <div className="flex gap-2">
                 <Button type="submit" disabled={loading} className="bg-primary flex items-center gap-2">
                   <FilePlus size={18} />
-                  {loading ? "Memperbarui..." : "Perbarui"}
+                  {loading ? "Menyimpan..." : "Simpan Perubahan"}
                 </Button>
 
                 <Link to="/superadmin/informasi-akademik/mata-pelajaran">

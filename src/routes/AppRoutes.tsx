@@ -56,6 +56,9 @@ import CreateSiswa from "@/pages/SuperAdmin/informasiAkademik/Siswa/CreateSiswa"
 import DataMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran";
 import CreateMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran/CreateMapel";
 import EditMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran/EditMapel";
+import DataJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran";
+import CreateJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran/CreateJadwalPelajaran";
+import EditJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran/EditJadwalPelajaran";
 
 export default function AppRoutes() {
   return (
@@ -392,7 +395,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/mata-pelajaran/create"
           element={
@@ -401,12 +403,36 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/mata-pelajaran/edit/:id"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditMataPelajaran />
+            </ProtectedRoute>
+          }
+        />
+        {/* Data Jadwal Pelajaran */}
+        <Route
+          path="/superadmin/informasi-akademik/jadwal-pelajaran"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataJadwalPelajaran />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/jadwal-pelajaran/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateJadwalPelajaran />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/jadwal-pelajaran/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditJadwalPelajaran />
             </ProtectedRoute>
           }
         />
