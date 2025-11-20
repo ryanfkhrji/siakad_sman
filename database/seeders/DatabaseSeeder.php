@@ -11,6 +11,8 @@ use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use App\Models\Kelas;
 use App\Models\JadwalPelajaran;
+use App\Models\Kurikulum;
+use App\Models\KompetensiDasar;
 use App\Models\Ekstrakurikuler;
 use App\Models\Siswa;
 use App\Models\SiswaJadwalPelajaran;
@@ -113,6 +115,67 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_pelajaran' => 'Bahasa Sunda',
                 'status' => 'pilihan'
+            ],
+        ]);
+
+        // Seed Kurikulum
+        Kurikulum::insert([
+            [
+                'nama_kurikulum' => 'Kurikulum Tingkat Satuan Pendidikan (KTSP)',
+                'tahun_berlaku' => 2006,
+                'status' => 'tidak aktif',
+                'deskripsi' => '
+                - Sekolah Bebas Menentukan Kurikulum
+                - Ada Standar Kompetensi (SK) dan Kompetensi Dasar (KD)'
+            ],
+            [
+                'nama_kurikulum' => 'Kurikulum 2013',
+                'tahun_berlaku' => 2013,
+                'status' => 'tidak aktif',
+                'deskripsi' => '
+                - Ada Kompetensi Inti (KI) dan Kompetensi Dasar (KD)
+                    1. KI 1: Sikap Spriritual
+                    2. KI 2: Sikap Sosial
+                    3. KI 3: Pengetahuan
+                    4. KI 4: Keterampilan
+                - Banyak Penilaian Formatif
+                - Buku Tematik untuk SD
+                - SMA Terbagi Menjadi:
+                    1. Mata Pelajaran Wajib
+                    2. Peminatan'
+            ],
+            [
+                'nama_kurikulum' => 'Kurikulum Merdeka',
+                'tahun_berlaku' => 2022,
+                'status' => 'aktif',
+                'deskripsi' => '
+                - Tidak ada lagi KI & KD, diganti Capaian Pembelajaran (CP)
+                - Lebih fleksibel
+                - Terdapat Projek Penguatan Profil Pelajar Pancasila (P5)
+                - Mata Pelajaran Informatika Menjadi Wajib
+                - SMA Kembali ke Umum Tanpa Jurusan (IPA/IPS dihapus)'
+            ],
+        ]);
+
+        // Seed Kompetensi Dasar
+        KompetensiDasar::insert([
+            [
+                'mata_pelajaran_id' => 1, // IPA
+                'judul_kompetensi_dasar' => 'Memahami Tumbuhan Alam',
+                'deskripsi' => 'Belajar biologi pohon mangga',
+                'kurikulum_id' => 3
+            ],
+            [
+                'mata_pelajaran_id' => 2, // Bahasa Indonesia
+                'judul_kompetensi_dasar' => 'Menulis Sesuai KBBI',
+                'deskripsi' => 'Belajar menulis sesuai KBBI',
+                'kurikulum_id' => 1
+            ],
+            [
+                'mata_pelajaran_id' => 2, // Bahasa Sunda
+                'judul_kompetensi_dasar' => 'Cerita Kabayan',
+                'deskripsi' => 'Mengenal tokoh Kabayan',
+                'kurikulum_id' => 3
             ],
         ]);
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\MataPelajaranController;
 use App\Http\Controllers\JadwalPelajaranController;
 use App\Http\Controllers\SiswaJadwalPelajaranController;
+use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
@@ -73,6 +74,12 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ✅ CRUD siswa mengambil jadwal pelajaran
     Route::apiResource('/spa/siswa/jadwal-pelajaran', SiswaJadwalPelajaranController::class);
+
+    // ✅ kurikulum
+    Route::apiResource('/spa/kurikulum', KurikulumController::class);
+
+    // ! CRUD kompetensi dasar
+    Route::apiResource('/spa/kompetensi-dasar', SiswaJadwalPelajaranController::class);
 
     // ✅ CRUD Kelas
     Route::apiResource('/spa/kelas', KelasController::class);
