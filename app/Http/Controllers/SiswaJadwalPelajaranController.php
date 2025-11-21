@@ -135,7 +135,7 @@ class SiswaJadwalPelajaranController extends Controller
             'jadwal_pelajaran' => [
                     'id' => $jadwal->id,
                     'mata_pelajaran' => $jadwal->jadwal->mataPelajaran->nama_pelajaran ?? null,
-                    'jam_pelajaran' => $jadwal->jadwal->hari ?? null,
+                    'hari' => $jadwal->jadwal->hari ?? null,
                     'guru' => $jadwal->jadwal->guru->nama ?? null,
                     'kelas' => $jadwal->jadwal->kelas->nama_kelas ?? null,
                     'jam_pelajaran' => $jadwal->jadwal->jam_pelajaran ?? null,
