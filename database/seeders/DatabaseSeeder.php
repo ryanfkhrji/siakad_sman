@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\Gedung;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
@@ -25,12 +26,31 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        // Seed Gedung
+        Gedung::insert([
+            [
+                'foto_gedung' => 'gedung1.jpg',
+                'kode_gedung' => 'GD_01',
+                'nama_gedung' => 'Gedung Pratama',
+                'jumlah_lantai' => 3,
+                'luas_bangunan' => '24 Meter Persegi',
+                'tahun_dibangun' => 2019,
+                'kondisi' => 'Baik',
+                'lokasi' => 'Jl. Ampit Raya',
+                'Keterangan' => 'Silakan isi sendiri'
+            ],
+            [
+                'foto_gedung' => 'gedung2.jpg',
+                'kode_gedung' => 'GD_02',
+                'nama_gedung' => 'Gedung Secondary',
+                'jumlah_lantai' => 2,
+                'luas_bangunan' => '17 Meter Persegi',
+                'tahun_dibangun' => 2024,
+                'kondisi' => 'Rusak Ringan',
+                'lokasi' => 'Jl. Raya',
+                'Keterangan' => 'Silakan isi sendiri'
+            ],
+        ]);
 
         // Seed Kepegawaian
         Kepegawaian::insert([
