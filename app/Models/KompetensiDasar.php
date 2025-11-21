@@ -15,4 +15,9 @@ class KompetensiDasar extends Model
     {
         return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
     }
+    
+    public function mataPelajaran()
+    {
+        return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
+    }
 }
