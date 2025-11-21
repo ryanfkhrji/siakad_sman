@@ -146,53 +146,6 @@ class SiswaJadwalPelajaranController extends Controller
         return ApiResponse::success($formatted, 'Detail jadwal berhasil diambil');
     }
 
-    // public function show($id)
-    // {
-    //     $siswa = Siswa::with('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($id);
-    //     if (!$siswa) {
-    //         return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
-    //     }
-
-    //     $formatted = [
-    //         'id' => $siswa->id,
-    //         'nisn' => $siswa->nisn,
-    //         'nama' => $siswa->nama,
-    //         'email' => $siswa->email,
-    //         'nis' => $siswa->nis,
-    //         'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-    //         'nama_ekstrakurikuler' => $siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
-    //         'status' => $siswa->status,
-    //         'role' => $siswa->role,
-    //         'kelas' => [
-    //             'id' => $siswa->kelas->id ?? null,
-    //             'nama_kelas' => $siswa->kelas->nama_kelas ?? null,
-    //             'jam_masuk' => $siswa->kelas->jam_masuk ?? null,
-    //             'wali_kelas' => [
-    //                 'id' => $siswa->kelas->wali->id ?? null,
-    //                 'nama' => $siswa->kelas->wali->nama ?? null,
-    //                 'email' => $siswa->kelas->wali->email ?? null,
-    //                 'status' => $siswa->kelas->wali->status ?? null,
-    //                 'nip' => $siswa->kelas->wali->nip ?? null,
-    //                 'keterangan' => $siswa->kelas->wali->keterangan ?? null,
-    //                 'role' => $siswa->kelas->wali->role ?? null,
-    //             ],
-    //         ],            
-    //         'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
-    //             return [
-    //                 'id' => $item->id,
-    //                 'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran,
-    //                 'guru' => $item->guru->nama ?? null,
-    //                 'kelas' => $item->kelas->nama_kelas ?? null,
-    //                 'jam_pelajaran' => $item->jam_pelajaran ?? null,
-    //                 'ruangan' => $item->ruangan ?? null,
-    //                 'link_opsional' => $item->link_opsional ?? null,
-    //             ];
-    //         }),  
-    //     ];
-
-    //     return ApiResponse::success($formatted, 'Detail siswa berhasil diambil');
-    // }
-
     // ✅ show jadwal sendiri untuk siswa
     public function showAllJadwalSendiri()
     {
@@ -260,17 +213,6 @@ class SiswaJadwalPelajaranController extends Controller
             'jadwal_pelajaran_id.required' => 'Jadwal pelajaran wajib diisi',
             'jadwal_pelajaran_id.exists' => 'Jadwal pelajaran tidak ditemukan',
         ]);
-
-       // tidak boleh dobel pelajaran yang sama
-       $existing = SiswaJadwalPelajaran::where('siswa_id', $pivot->siswa_id)
-       ->where('jadwal_pelajaran_id', $validated['jadwal_pelajaran_id'])
-       ->first();
-
-        if ($existing) {
-            return ApiResponse::error('Siswa sudah terdaftar di pelajaran ini', [
-                'jadwal_pelajaran_id' => ['Siswa sudah terdaftar di pelajaran ini']
-            ], 422);
-        }
 
        // Update hanya jadwal_pelajaran_id, siswa_id tidak boleh diubah
         $pivot->update([
