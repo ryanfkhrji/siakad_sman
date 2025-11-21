@@ -59,6 +59,13 @@ import EditMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajara
 import DataJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran";
 import CreateJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran/CreateJadwalPelajaran";
 import EditJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran/EditJadwalPelajaran";
+import CreateJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/CreateJadwalPelajaranSiswa";
+import EditJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/EditJadwalPelajaranSiswa";
+import DataJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa";
+import DetailJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/DialogDetailJadwalPelajaranSiswa";
+import DataKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum";
+import CreateKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum/CreateKurikulum";
+import EditKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum/EditKurikulum";
 
 export default function AppRoutes() {
   return (
@@ -317,6 +324,32 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* Data Kurikulum */}
+        <Route
+          path="/superadmin/informasi-sekolah/kurikulum"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataKurikulum />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/kurikulum/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateKurikulum />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/kurikulum/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditKurikulum />
+            </ProtectedRoute>
+          }
+        />
+
         {/* INFORMASI AKADEMIK */}
         {/* Data Siswa */}
         <Route
@@ -413,7 +446,7 @@ export default function AppRoutes() {
         />
         {/* Data Jadwal Pelajaran */}
         <Route
-          path="/superadmin/informasi-akademik/jadwal-pelajaran"
+          path="/superadmin/informasi-akademik/jadwal-pelajaran-guru"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DataJadwalPelajaran />
@@ -421,7 +454,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-akademik/jadwal-pelajaran/create"
+          path="/superadmin/informasi-akademik/jadwal-pelajaran-guru/create"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <CreateJadwalPelajaran />
@@ -429,10 +462,43 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-akademik/jadwal-pelajaran/edit/:id"
+          path="/superadmin/informasi-akademik/jadwal-pelajaran-guru/edit/:id"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditJadwalPelajaran />
+            </ProtectedRoute>
+          }
+        />
+        {/* Data Jadwal Pelajaran Siswa */}
+        <Route
+          path="/superadmin/informasi-akademik/jadwal-pelajaran-siswa"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataJadwalPelajaranSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/jadwal-pelajaran-siswa/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateJadwalPelajaranSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/jadwal-pelajaran-siswa/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditJadwalPelajaranSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/jadwal-pelajaran-siswa/detail/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DetailJadwalPelajaranSiswa />{" "}
             </ProtectedRoute>
           }
         />

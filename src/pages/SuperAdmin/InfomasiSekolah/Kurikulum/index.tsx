@@ -7,14 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { JadwalPelajaran, Kelas, Pegawai } from "@/types";
+import type { Kurikulum } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
-import { DialogDetailSiswaJadwalPelajaran } from "./DialogDetailSiswaJadwalPelajaran";
 
-const DataJadwalPelajaran = () => {
+const DataKurikulum = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [dataJadwal, setDataJadwal] = useState<JadwalPelajaran[]>([]);
+  const [datakurikulum, setDataKurikulum] = useState<Kurikulum[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -24,12 +23,12 @@ const DataJadwalPelajaran = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/spa/jadwal-pelajaran");
+        const res = await api.get("/spa/kurikulum");
         if (res.data.status === "success") {
-          setDataJadwal(res.data.data);
+          setDataKurikulum(res.data.data);
         }
       } catch (error) {
-        console.error("Gagal mengambil data jadwal pelajaran:", error);
+        console.error("Gagal mengambil data kurikulum:", error);
       } finally {
         setLoading(false);
       }
@@ -38,30 +37,12 @@ const DataJadwalPelajaran = () => {
     fetchData();
   }, []);
 
-  // Helper function untuk format nama guru
-  const formatGuru = (guru: Pegawai[] | string): string => {
-    if (typeof guru === "string") return guru;
-    if (Array.isArray(guru) && guru.length > 0) {
-      return guru.map((g) => g.nama).join(", ");
-    }
-    return "-";
-  };
-
-  // Helper function untuk format nama kelas
-  const formatKelas = (kelas: Kelas[] | string): string => {
-    if (typeof kelas === "string") return kelas;
-    if (Array.isArray(kelas) && kelas.length > 0) {
-      return kelas.map((k) => k.nama_kelas).join(", ");
-    }
-    return "-";
-  };
-
   // Pagination logic
-  const totalPages = Math.ceil(dataJadwal.length / rowsPerPage);
+  const totalPages = Math.ceil(datakurikulum.length / rowsPerPage);
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
-    return dataJadwal.slice(start, start + rowsPerPage);
-  }, [dataJadwal, currentPage, rowsPerPage]);
+    return datakurikulum.slice(start, start + rowsPerPage);
+  }, [datakurikulum, currentPage, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -70,7 +51,7 @@ const DataJadwalPelajaran = () => {
   const handleDelete = async (id: number) => {
     const result = await Swal.fire({
       title: "Yakin ingin menghapus?",
-      text: "Data jadwal pelajaran yang dihapus tidak dapat dikembalikan.",
+      text: "Data kurikulum yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#4F46E5",
@@ -82,15 +63,15 @@ const DataJadwalPelajaran = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/spa/jadwal-pelajaran/${id}`);
+      const res = await api.delete(`/spa/mata-pelajaran/${id}`);
 
       if (res.data.status === "success") {
-        setDataJadwal((prev) => prev.filter((j) => j.id !== id));
+        setDataKurikulum((prev) => prev.filter((j) => j.id !== id));
 
         Swal.fire({
           icon: "success",
           title: "Berhasil!",
-          text: "Data jadwal pelajaran berhasil dihapus.",
+          text: "Data kurikulum berhasil dihapus.",
           showConfirmButton: false,
           timer: 1800,
         });
@@ -98,7 +79,7 @@ const DataJadwalPelajaran = () => {
         Swal.fire({
           icon: "error",
           title: "Gagal menghapus!",
-          text: res.data.message || "Terjadi kesalahan saat menghapus jadwal pelajaran.",
+          text: res.data.message || "Terjadi kesalahan saat menghapus kurikulum.",
         });
       }
     } catch (err: any) {
@@ -106,7 +87,7 @@ const DataJadwalPelajaran = () => {
         Swal.fire({
           icon: "error",
           title: "Gagal menghapus!",
-          text: err.response.data.message || "Jadwal pelajaran tidak ditemukan.",
+          text: err.response.data.message || "Kurikulum tidak ditemukan.",
         });
       } else {
         Swal.fire({
@@ -115,7 +96,7 @@ const DataJadwalPelajaran = () => {
           text: "Terjadi kesalahan koneksi ke server.",
         });
       }
-      console.error("Gagal menghapus jadwal pelajaran:", err);
+      console.error("Gagal menghapus kurikulum:", err);
     } finally {
       setLoading(false);
     }
@@ -126,9 +107,9 @@ const DataJadwalPelajaran = () => {
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Data Jadwal Pelajaran Guru" />
+        <PageTitle title="Data Kurikulum" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Data Jadwal Pelajaran Guru</h1>
+          <h1 className="text-3xl font-bold mb-6">Data Kurikulum</h1>
 
           {/* Loading State */}
           {loading ? (
@@ -140,10 +121,10 @@ const DataJadwalPelajaran = () => {
             <>
               {/* Tombol Tambah */}
               <div className="mb-6 flex justify-between items-center w-full">
-                <Link to="/superadmin/informasi-akademik/jadwal-pelajaran-guru/create" className="w-full md:w-auto">
+                <Link to="/superadmin/informasi-sekolah/kurikulum/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
                     <PlusIcon size={18} />
-                    Tambah Jadwal Pelajaran
+                    Tambah Kurikulum
                   </Button>
                 </Link>
               </div>
@@ -154,40 +135,32 @@ const DataJadwalPelajaran = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Mata Pelajaran</TableHead>
-                      <TableHead className="font-semibold text-white">Hari</TableHead>
-                      <TableHead className="font-semibold text-white">Guru</TableHead>
-                      <TableHead className="font-semibold text-white">Kelas</TableHead>
-                      <TableHead className="font-semibold text-white">Jam Pelajaran</TableHead>
-                      <TableHead className="font-semibold text-white">Ruangan</TableHead>
-                      <TableHead className="font-semibold text-white">Link Pembelajaran</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Kurikulum</TableHead>
+                      <TableHead className="font-semibold text-white">Tahun Berlaku</TableHead>
+                      <TableHead className="font-semibold text-white">Status</TableHead>
+                      <TableHead className="font-semibold text-white">Deskripsi</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
                     {paginated.length > 0 ? (
-                      paginated.map((jadwal, index) => (
-                        <TableRow key={jadwal.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                      paginated.map((kurikulum, index) => (
+                        <TableRow key={kurikulum.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{jadwal.mata_pelajaran}</TableCell>
-                          <TableCell>{jadwal.hari}</TableCell>
-                          <TableCell>{formatGuru(jadwal.guru)}</TableCell>
-                          <TableCell>{formatKelas(jadwal.kelas)}</TableCell>
-                          <TableCell>{jadwal.jam_pelajaran}</TableCell>
-                          <TableCell>{jadwal.ruangan}</TableCell>
-                          <TableCell>{jadwal.link_opsional || "-"}</TableCell>
+                          <TableCell>{kurikulum.nama_kurikulum}</TableCell>
+                          <TableCell>{kurikulum.tahun_berlaku}</TableCell>
+                          <TableCell>{kurikulum.status}</TableCell>
+                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{kurikulum.deskripsi || "-"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
-                            {/* daftar siswa */}
-                            <DialogDetailSiswaJadwalPelajaran jadwalId={jadwal.id} />
 
-                            <Link to={`/superadmin/informasi-akademik/jadwal-pelajaran-guru/edit/${jadwal.id}`}>
+                            <Link to={`/superadmin/informasi-sekolah/kurikulum/edit/${kurikulum.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(jadwal.id)}>
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(kurikulum.id)}>
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>
@@ -195,8 +168,8 @@ const DataJadwalPelajaran = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center text-gray-500 py-4">
-                          Tidak ada data jadwal pelajaran yang ditemukan
+                        <TableCell colSpan={4} className="text-center text-gray-500 py-4">
+                          Tidak ada data kurikulum yang ditemukan
                         </TableCell>
                       </TableRow>
                     )}
@@ -245,4 +218,4 @@ const DataJadwalPelajaran = () => {
   );
 };
 
-export default DataJadwalPelajaran;
+export default DataKurikulum;

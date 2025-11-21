@@ -41,9 +41,6 @@ const EditJadwalPelajaran = () => {
   // simpan guru id terpisah untuk tampilan readonly
   const [guruIdReadOnly, setGuruIdReadOnly] = useState<string>("");
 
-  // mapel harus diubah, simpan old id untuk validasi unik
-  const [oldMatpelId, setOldMatpelId] = useState<string>("");
-
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,8 +89,6 @@ const EditJadwalPelajaran = () => {
 
           // map id — API bisa mengembalikan id langsung atau nama, handle keduanya
           const matpelId = d.mata_pelajaran_id ? String(d.mata_pelajaran_id) : matpelData.find((m) => m.nama_pelajaran === d.mata_pelajaran)?.id?.toString() ?? "";
-
-          setOldMatpelId(matpelId); // setelah matpelId ditemukan
 
           const guruId = d.guru_id ? String(d.guru_id) : guruData.find((g) => g.nama === d.guru)?.id?.toString() ?? "";
 
@@ -166,7 +161,7 @@ const EditJadwalPelajaran = () => {
           showConfirmButton: false,
           timer: 1800,
         });
-        navigate("/superadmin/informasi-akademik/jadwal-pelajaran");
+        navigate("/superadmin/informasi-akademik/jadwal-pelajaran-guru");
       } else {
         setErrors(res.data.errors || {});
       }
@@ -188,10 +183,10 @@ const EditJadwalPelajaran = () => {
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Edit Jadwal Pelajaran" />
+        <PageTitle title="Edit Jadwal Pelajaran Guru" />
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Edit Jadwal Pelajaran</h1>
+          <h1 className="text-3xl font-bold mb-6">Edit Jadwal Pelajaran Guru</h1>
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-600">
@@ -201,13 +196,6 @@ const EditJadwalPelajaran = () => {
           ) : (
             <div className="bg-white rounded shadow p-5">
               <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
-                {/* PERINGATAN WAJIB BEDAKAN MATPEL */}
-                {oldMatpelId && (
-                  <div className="p-3 mb-3 rounded bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm">
-                    ⚠️ <strong>Peringatan:</strong> Saat mengedit, mata pelajaran harus berbeda dari yang sebelumnya dibuat.
-                  </div>
-                )}
-
                 {/* MATA PELAJARAN */}
                 <div>
                   <label className="block font-semibold">Mata Pelajaran</label>
@@ -306,7 +294,7 @@ const EditJadwalPelajaran = () => {
                     {loading ? "Menyimpan..." : "Simpan Perubahan"}
                   </Button>
 
-                  <Link to="/superadmin/informasi-akademik/jadwal-pelajaran">
+                  <Link to="/superadmin/informasi-akademik/jadwal-pelajaran-guru">
                     <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
                       <CircleXIcon size={18} />
                       Batal

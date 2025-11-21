@@ -141,7 +141,7 @@ const CreateJadwalPelajaran = () => {
           showConfirmButton: false,
           timer: 1800,
         });
-        navigate("/superadmin/informasi-akademik/jadwal-pelajaran");
+        navigate("/superadmin/informasi-akademik/jadwal-pelajaran-guru");
       } else if (res.data.status === "error" && res.data.errors) {
         setErrors(res.data.errors);
       } else {
@@ -173,9 +173,9 @@ const CreateJadwalPelajaran = () => {
         className={`w-full min-h-screen bg-background transition-all duration-300
         ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}
       >
-        <PageTitle title="Tambah Jadwal Pelajaran" />
+        <PageTitle title="Tambah Jadwal Pelajaran Guru" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Tambah Jadwal Pelajaran</h1>
+          <h1 className="text-3xl font-bold mb-6">Tambah Jadwal Pelajaran Guru</h1>
 
           <div className="bg-white rounded shadow p-5">
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
@@ -323,7 +323,7 @@ const CreateJadwalPelajaran = () => {
                   <FilePlus size={18} />
                   {loading ? "Menyimpan..." : "Simpan"}
                 </Button>
-                <Link to="/superadmin/informasi-akademik/jadwal-pelajaran">
+                <Link to="/superadmin/informasi-akademik/jadwal-pelajaran-guru">
                   <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
                     <CircleXIcon size={18} />
                     Batal

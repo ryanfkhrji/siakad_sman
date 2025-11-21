@@ -62,6 +62,20 @@ export interface JadwalPelajaran {
   ];
 }
 
+export interface JadwalPelajaranSiswa {
+  id: number;
+  nisn: string;
+  nama: string;
+  email: string;
+  nis: string;
+  nama_jurusan?: string | null;
+  nama_ekstrakurikuler?: string | null;
+  status: string;
+  role: string;
+  kelas: Kelas | null;
+  jadwal_pelajaran: JadwalPelajaran | null;
+}
+
 export interface Ekskul {
   id: number;
   nama_ekstrakurikuler: string;
@@ -70,4 +84,12 @@ export interface Ekskul {
   status: string;
   jumlah_peserta: number;
   peserta: Siswa[];
+}
+
+export interface Kurikulum {
+  id: number;
+  nama_kurikulum: string;
+  tahun_berlaku: string;
+  status: string;
+  deskripsi: string;
 }

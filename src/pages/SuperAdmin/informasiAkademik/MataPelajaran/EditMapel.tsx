@@ -8,6 +8,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FormErrors {
   nama_pelajaran: string;
@@ -170,16 +171,22 @@ const EditMataPelajaran = () => {
 
               {/* Status */}
               <div className="mb-6">
-                <label htmlFor="status" className="block font-semibold text-foreground">
-                  Status
-                </label>
+                <label className="block font-semibold text-foreground">Status</label>
 
-                <select name="status" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="border p-2 w-full mt-2 rounded bg-white">
-                  <option value="">-- Pilih Status --</option>
-                  <option value="wajib">Wajib</option>
-                  <option value="pilihan">Pilihan</option>
-                  <option value="jurusan">Jurusan</option>
-                </select>
+                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                  <SelectTrigger className="w-full mt-2">
+                    <SelectValue placeholder="Pilih Status" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Pilih Status</SelectLabel>
+                      <SelectItem value="wajib">Wajib</SelectItem>
+                      <SelectItem value="pilihan">Pilihan</SelectItem>
+                      <SelectItem value="jurusan">Jurusan</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
 
                 {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
               </div>

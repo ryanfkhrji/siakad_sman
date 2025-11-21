@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ListIcon, Loader2 } from "lucide-react";
+import { EyeIcon, Loader2 } from "lucide-react";
 import type { Jurusan } from "@/types";
 import api from "@/api/axios";
 
@@ -31,7 +31,7 @@ export function DialogDetailJurusan({ jurusanId }: DialogDetailJurusanProps) {
     <Dialog onOpenChange={(open) => open && handleOpen()}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <ListIcon size={16} /> Lihat Daftar Siswa
+          <EyeIcon size={16} />
         </Button>
       </DialogTrigger>
 

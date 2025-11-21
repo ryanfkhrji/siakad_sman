@@ -135,7 +135,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
 
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/guru") && "bg-primary text-white font-medium")}>
-                            <Link to="/superadmin/guru">Data Kurikulum</Link>
+                            <Link to="/superadmin/informasi-sekolah/kurikulum">Data Kurikulum</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 
@@ -238,7 +238,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                         {/* SUBMENU NESTED — Data Akademik */}
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton onClick={() => toggleSubDropdown("akademik")} className="hover:bg-primary rounded-md px-3 py-1.5 text-sm justify-between w-full">
-                            <span>Data Akademik</span>
+                            <span>Manajemen Akademik</span>
                             <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "akademik" && "rotate-180")} />
                           </SidebarMenuSubButton>
 
@@ -253,13 +253,13 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
 
                               <SidebarMenuSubItem>
                                 <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
-                                  <Link to="/superadmin/informasi-akademik/jadwal-pelajaran">Jadwal Pelajaran</Link>
+                                  <Link to="/superadmin/informasi-akademik/jadwal-pelajaran-guru">Jadwal (Guru)</Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
 
                               <SidebarMenuSubItem>
                                 <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
-                                  <Link to="/superadmin/informasi-akademik/kelas">Kelas</Link>
+                                  <Link to="/superadmin/informasi-akademik/jadwal-pelajaran-siswa">Jadwal (Siswa)</Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
 
