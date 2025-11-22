@@ -4,13 +4,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
 import type { JadwalPelajaran, Kelas, Pegawai } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { DialogDetailSiswaJadwalPelajaran } from "./DialogDetailSiswaJadwalPelajaran";
+import { Input } from "@/components/ui/input";
 
 const DataJadwalPelajaran = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -18,6 +19,8 @@ const DataJadwalPelajaran = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState<JadwalPelajaran[]>([]);
 
   // Ambil data dari backend
   useEffect(() => {
@@ -38,6 +41,17 @@ const DataJadwalPelajaran = () => {
     fetchData();
   }, []);
 
+  // Search filtering
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredData(dataJadwal);
+    } else {
+      const lower = searchTerm.toLowerCase();
+      setFilteredData(dataJadwal.filter((item) => item.mata_pelajaran.toLowerCase().includes(lower) || item.hari.toLowerCase().includes(lower) || item.ruangan.toLowerCase().includes(lower)));
+    }
+    setCurrentPage(1);
+  }, [searchTerm, dataJadwal]);
+
   // Helper function untuk format nama guru
   const formatGuru = (guru: Pegawai[] | string): string => {
     if (typeof guru === "string") return guru;
@@ -57,11 +71,11 @@ const DataJadwalPelajaran = () => {
   };
 
   // Pagination logic
-  const totalPages = Math.ceil(dataJadwal.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
-    return dataJadwal.slice(start, start + rowsPerPage);
-  }, [dataJadwal, currentPage, rowsPerPage]);
+    return filteredData.slice(start, start + rowsPerPage);
+  }, [filteredData, currentPage, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -139,13 +153,18 @@ const DataJadwalPelajaran = () => {
           ) : (
             <>
               {/* Tombol Tambah */}
-              <div className="mb-6 flex justify-between items-center w-full">
+              <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                 <Link to="/superadmin/informasi-akademik/jadwal-pelajaran-guru/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
                     <PlusIcon size={18} />
                     Tambah Jadwal Pelajaran
                   </Button>
                 </Link>
+
+                <div className="relative w-full md:w-1/3">
+                  <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
+                  <Input type="text" placeholder="Cari jadwal pelajaran..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                </div>
               </div>
 
               {/* Tabel Data */}

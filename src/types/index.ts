@@ -93,3 +93,11 @@ export interface Kurikulum {
   status: string;
   deskripsi: string;
 }
+
+export interface KompetensiDasar {
+  id: number;
+  mata_pelajaran_id: string;
+  judul_kompetensi_dasar: string;
+  deskripsi: string;
+  kurikulum_id: string;
+}

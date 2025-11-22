@@ -66,6 +66,9 @@ import DetailJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/Jad
 import DataKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum";
 import CreateKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum/CreateKurikulum";
 import EditKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum/EditKurikulum";
+import DataKompetensiDasar from "@/pages/SuperAdmin/informasiAkademik/KompetensiDasar";
+import CreateKompetensiDasar from "@/pages/SuperAdmin/informasiAkademik/KompetensiDasar/CreateKompetensiDasar";
+import EditKompetensiDasar from "@/pages/SuperAdmin/informasiAkademik/KompetensiDasar/EditKompetensiDasar";
 
 export default function AppRoutes() {
   return (
@@ -360,7 +363,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/siswa/create"
           element={
@@ -369,7 +371,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-akademik/siswa/edit/:id"
           element={
@@ -499,6 +500,31 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DetailJadwalPelajaranSiswa />{" "}
+            </ProtectedRoute>
+          }
+        />
+        {/* Data Kompetensi Dasar */}
+        <Route
+          path="/superadmin/informasi-akademik/kompetensi-dasar"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataKompetensiDasar />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/kompetensi-dasar/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateKompetensiDasar />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/kompetensi-dasar/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditKompetensiDasar />
             </ProtectedRoute>
           }
         />

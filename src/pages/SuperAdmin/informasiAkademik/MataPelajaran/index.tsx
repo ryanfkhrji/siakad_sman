@@ -4,12 +4,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
 import type { MataPelajaran } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
+import { Input } from "@/components/ui/input";
 
 const DataMataPelajaran = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -17,6 +18,8 @@ const DataMataPelajaran = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState<MataPelajaran[]>([]);
 
   // Ambil data dari backend
   useEffect(() => {
@@ -37,12 +40,23 @@ const DataMataPelajaran = () => {
     fetchData();
   }, []);
 
+  // Search filtering
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredData(datamapel);
+    } else {
+      const lower = searchTerm.toLowerCase();
+      setFilteredData(datamapel.filter((item) => item.nama_pelajaran.toLowerCase().includes(lower)));
+    }
+    setCurrentPage(1);
+  }, [searchTerm, datamapel]);
+
   // Pagination logic
-  const totalPages = Math.ceil(datamapel.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
-    return datamapel.slice(start, start + rowsPerPage);
-  }, [datamapel, currentPage, rowsPerPage]);
+    return filteredData.slice(start, start + rowsPerPage);
+  }, [filteredData, currentPage, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -120,13 +134,18 @@ const DataMataPelajaran = () => {
           ) : (
             <>
               {/* Tombol Tambah */}
-              <div className="mb-6 flex justify-between items-center w-full">
+              <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                 <Link to="/superadmin/informasi-akademik/mata-pelajaran/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
                     <PlusIcon size={18} />
                     Tambah Mata Pelajaran
                   </Button>
                 </Link>
+
+                <div className="relative w-full md:w-1/3">
+                  <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
+                  <Input type="text" placeholder="Cari mata pelajaran..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                </div>
               </div>
 
               {/* Tabel Data */}
