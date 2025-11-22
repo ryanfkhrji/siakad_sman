@@ -95,56 +95,49 @@ class SiswaJadwalPelajaranController extends Controller
      */
     public function show($id)
     {
-        $jadwal = SiswaJadwalPelajaran::with([
-            'siswa.kelas.wali',
-            'siswa.jurusan',
-            'siswa.ekstrakurikulers',
-            'jadwal.mataPelajaran',
-            'jadwal.guru',
-            'jadwal.kelas'
-        ])->find($id);
-
-        if (!$jadwal) {
-            return ApiResponse::error('Jadwal tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        $siswa = Siswa::with('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($id);
+        if (!$siswa) {
+            return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
         $formatted = [
-            'id' => $jadwal->id,
-            'nisn' => $jadwal->siswa->nisn,
-            'nama' => $jadwal->siswa->nama,
-            'email' => $jadwal->siswa->email,
-            'nis' => $jadwal->siswa->nis,
-            'nama_jurusan' => $jadwal->siswa->jurusan->nama_jurusan ?? null,
-            'nama_ekstrakurikuler' => $jadwal->siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
-            'status' => $jadwal->siswa->status,
-            'role' => $jadwal->siswa->role,
+            'id' => $siswa->id,
+            'nisn' => $siswa->nisn,
+            'nama' => $siswa->nama,
+            'email' => $siswa->email,
+            'nis' => $siswa->nis,
+            'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
+            'nama_ekstrakurikuler' => $siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
+            'status' => $siswa->status,
+            'role' => $siswa->role,
             'kelas' => [
-                'id' => $jadwal->siswa->kelas->id ?? null,
-                'nama_kelas' => $jadwal->siswa->kelas->nama_kelas ?? null,
-                'jam_masuk' => $jadwal->siswa->kelas->jam_masuk ?? null,
+                'id' => $siswa->kelas->id ?? null,
+                'nama_kelas' => $siswa->kelas->nama_kelas ?? null,
+                'jam_masuk' => $siswa->kelas->jam_masuk ?? null,
                 'wali_kelas' => [
-                    'id' => $jadwal->siswa->kelas->wali->id ?? null,
-                    'nama' => $jadwal->siswa->kelas->wali->nama ?? null,
-                    'email' => $jadwal->siswa->kelas->wali->email ?? null,
-                    'status' => $jadwal->siswa->kelas->wali->status ?? null,
-                    'nip' => $jadwal->siswa->kelas->wali->nip ?? null,
-                    'keterangan' => $jadwal->siswa->kelas->wali->keterangan ?? null,
-                    'role' => $jadwal->siswa->kelas->wali->role ?? null,
+                    'id' => $siswa->kelas->wali->id ?? null,
+                    'nama' => $siswa->kelas->wali->nama ?? null,
+                    'email' => $siswa->kelas->wali->email ?? null,
+                    'status' => $siswa->kelas->wali->status ?? null,
+                    'nip' => $siswa->kelas->wali->nip ?? null,
+                    'keterangan' => $siswa->kelas->wali->keterangan ?? null,
+                    'role' => $siswa->kelas->wali->role ?? null,
                 ],
             ],            
-            'jadwal_pelajaran' => [
-                    'id' => $jadwal->id,
-                    'mata_pelajaran' => $jadwal->jadwal->mataPelajaran->nama_pelajaran ?? null,
-                    'hari' => $jadwal->jadwal->hari ?? null,
-                    'guru' => $jadwal->jadwal->guru->nama ?? null,
-                    'kelas' => $jadwal->jadwal->kelas->nama_kelas ?? null,
-                    'jam_pelajaran' => $jadwal->jadwal->jam_pelajaran ?? null,
-                    'ruangan' => $jadwal->jadwal->ruangan ?? null,
-                    'link_opsional' => $jadwal->jadwal->link_opsional ?? null,
-            ]
+            'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran,
+                    'guru' => $item->guru->nama ?? null,
+                    'kelas' => $item->kelas->nama_kelas ?? null,
+                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                    'ruangan' => $item->ruangan ?? null,
+                    'link_opsional' => $item->link_opsional ?? null,
+                ];
+            }),  
         ];
 
-        return ApiResponse::success($formatted, 'Detail jadwal berhasil diambil');
+        return ApiResponse::success($formatted, 'Semua jadwal siswa berhasil diambil');
     }
 
     // ✅ show jadwal sendiri untuk siswa
