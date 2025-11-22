@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { PenBoxIcon, Trash2Icon, SearchIcon, Loader2Icon, PlusIcon, EyeIcon } from "lucide-react";
+import { SearchIcon, Loader2Icon, PlusIcon, EyeIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -77,63 +77,63 @@ const DataJadwalPelajaranSiswa = () => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  const handleDelete = async (id: number) => {
-    // Konfirmasi hapus
-    const result = await Swal.fire({
-      title: "Yakin ingin menghapus?",
-      text: "Data siswa yang dihapus tidak dapat dikembalikan.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#4F46E5",
-      confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Batal",
-    });
+  // const handleDelete = async (id: number) => {
+  //   // Konfirmasi hapus
+  //   const result = await Swal.fire({
+  //     title: "Yakin ingin menghapus?",
+  //     text: "Data siswa yang dihapus tidak dapat dikembalikan.",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#4F46E5",
+  //     confirmButtonText: "Ya, hapus!",
+  //     cancelButtonText: "Batal",
+  //   });
 
-    if (!result.isConfirmed) return;
+  //   if (!result.isConfirmed) return;
 
-    try {
-      setLoading(true);
-      const res = await api.delete(`/spa/siswa/jadwal-pelajaran/${id}`);
+  //   try {
+  //     setLoading(true);
+  //     const res = await api.delete(`/spa/siswa/jadwal-pelajaran/${id}`);
 
-      if (res.data.status === "success") {
-        // Hapus dari state agar tabel langsung update tanpa reload
-        setDataSiswa((prev) => prev.filter((siswa) => siswa.id !== id));
-        setFilteredSiswa((prev) => prev.filter((siswa) => siswa.id !== id));
+  //     if (res.data.status === "success") {
+  //       // Hapus dari state agar tabel langsung update tanpa reload
+  //       setDataSiswa((prev) => prev.filter((siswa) => siswa.id !== id));
+  //       setFilteredSiswa((prev) => prev.filter((siswa) => siswa.id !== id));
 
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: "Data siswa berhasil dihapus.",
-          showConfirmButton: false,
-          timer: 1800,
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal menghapus!",
-          text: res.data.message || "Terjadi kesalahan saat menghapus siswa.",
-        });
-      }
-    } catch (err: any) {
-      // Tangani respons error dari backend
-      if (err.response?.data?.status === "error") {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal menghapus!",
-          text: err.response.data.message || "Siswa tidak ditemukan.",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Koneksi gagal!",
-          text: "Terjadi kesalahan koneksi ke server.",
-        });
-      }
-      console.error("Gagal menghapus siswa:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "Berhasil!",
+  //         text: "Data siswa berhasil dihapus.",
+  //         showConfirmButton: false,
+  //         timer: 1800,
+  //       });
+  //     } else {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Gagal menghapus!",
+  //         text: res.data.message || "Terjadi kesalahan saat menghapus siswa.",
+  //       });
+  //     }
+  //   } catch (err: any) {
+  //     // Tangani respons error dari backend
+  //     if (err.response?.data?.status === "error") {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Gagal menghapus!",
+  //         text: err.response.data.message || "Siswa tidak ditemukan.",
+  //       });
+  //     } else {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Koneksi gagal!",
+  //         text: "Terjadi kesalahan koneksi ke server.",
+  //       });
+  //     }
+  //     console.error("Gagal menghapus siswa:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <SidebarProvider>
@@ -234,11 +234,11 @@ const DataJadwalPelajaranSiswa = () => {
                             {/* Tombol Detail */}
                             <Link to={`/superadmin/informasi-akademik/jadwal-pelajaran-siswa/detail/${siswa.id}`}>
                               <Button variant="outline" size="sm">
-                                <EyeIcon size={16} />
+                                <EyeIcon size={16} /> Lihat Detail Jadwal
                               </Button>
                             </Link>
 
-                            <Link to={`/superadmin/informasi-akademik/jadwal-pelajaran-siswa/edit/${siswa.id}`}>
+                            {/* <Link to={`/superadmin/informasi-akademik/jadwal-pelajaran-siswa/edit/${siswa.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
@@ -246,7 +246,7 @@ const DataJadwalPelajaranSiswa = () => {
 
                             <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.id)}>
                               <Trash2Icon size={16} />
-                            </Button>
+                            </Button> */}
                           </TableCell>
                         </TableRow>
                       ))

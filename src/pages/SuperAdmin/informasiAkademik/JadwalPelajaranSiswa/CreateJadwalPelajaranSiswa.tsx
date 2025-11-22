@@ -249,7 +249,7 @@ const CreateJadwalPelajaranSiswa = () => {
                 {/* Pilih Jadwal Pelajaran */}
                 <div className="mb-6">
                   <label htmlFor="jadwal_pelajaran_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Pilih Jadwal Pelajaran <span className="text-red-500">*</span>
+                    Pilih Jadwal Pelajaran
                   </label>
                   <Select
                     value={jadwalPelajaranId?.toString()}

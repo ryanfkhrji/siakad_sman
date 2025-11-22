@@ -3,7 +3,7 @@ import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/pages/Footer";
-import { CircleXIcon, Save } from "lucide-react";
+import { CircleXIcon, Loader2Icon, Save } from "lucide-react";
 import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -259,11 +259,9 @@ const EditKompetensiDasar = () => {
           <PageTitle title="Edit Kompetensi Dasar" />
 
           <div className="mx-auto p-4 sm:px-6 lg:px-8">
-            <div className="flex justify-center items-center h-64">
-              <div className="text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <p className="mt-2 text-muted-foreground">Memuat data...</p>
-              </div>
+            <div className="flex flex-col items-center justify-center h-64">
+              <Loader2Icon className="animate-spin mb-3" size={32} />
+              <p className="text-gray-600">Memuat data...</p>
             </div>
           </div>
 
@@ -283,8 +281,8 @@ const EditKompetensiDasar = () => {
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Edit Kompetensi Dasar</h1>
 
-          <div className="bg-white rounded shadow p-5 max-w-lg">
-            <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="bg-white rounded shadow p-5">
+            <form className="space-y-6  max-w-lg" onSubmit={handleSubmit}>
               {/* Mata Pelajaran */}
               <div>
                 <label className="block font-semibold">Mata Pelajaran</label>

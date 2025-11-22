@@ -488,7 +488,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-akademik/jadwal-pelajaran-siswa/edit/:id"
+          path="//superadmin/informasi-akademik/jadwal-pelajaran-siswa/edit/:siswaId/:pivotId"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditJadwalPelajaranSiswa />

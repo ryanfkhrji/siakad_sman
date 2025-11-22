@@ -227,8 +227,8 @@ const CreateKompetensiDasar = () => {
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Tambah Kompetensi Dasar</h1>
 
-          <div className="bg-white rounded shadow p-5 max-w-lg">
-            <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="bg-white rounded shadow p-5">
+            <form className="space-y-6  max-w-lg" onSubmit={handleSubmit}>
               {/* Mata Pelajaran */}
               <div>
                 <label className="block font-semibold">Mata Pelajaran</label>
