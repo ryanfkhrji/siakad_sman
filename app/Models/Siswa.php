@@ -87,6 +87,7 @@ class Siswa extends Authenticatable
             'jadwal_pelajaran_id'
         )
         ->using(SiswaJadwalPelajaran::class) // custom pivot model
+        ->withPivot('id')
         ->withTimestamps();
     }
 }

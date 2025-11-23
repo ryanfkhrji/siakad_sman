@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Kelas;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use App\Helpers\ApiResponse;
 use App\Models\Kepegawaian;
+use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 
 class KelasController extends Controller

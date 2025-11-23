@@ -127,9 +127,11 @@ class SiswaJadwalPelajaranController extends Controller
             'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
                 return [
                     'id' => $item->id,
+                    'pivot_id' => $item->pivot->id,
                     'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran,
                     'guru' => $item->guru->nama ?? null,
                     'kelas' => $item->kelas->nama_kelas ?? null,
+                    'hari' => $item->hari ?? null,
                     'jam_pelajaran' => $item->jam_pelajaran ?? null,
                     'ruangan' => $item->ruangan ?? null,
                     'link_opsional' => $item->link_opsional ?? null,
