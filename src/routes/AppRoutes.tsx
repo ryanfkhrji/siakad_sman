@@ -74,6 +74,8 @@ import CreateGedung from "@/pages/SuperAdmin/InfomasiSekolah/Gedung/CreateGedung
 import EditGedung from "@/pages/SuperAdmin/InfomasiSekolah/Gedung/EditGedung";
 import DetailKelas from "@/pages/Siswa/Kelas";
 import JadwalPelajaranSiswa from "@/pages/Siswa/JadwalPelajaran";
+import EditPasswordSiswa from "@/pages/Siswa/SettingProfile/EditPasswordSiswa";
+import EditProfileSiswa from "@/pages/Siswa/SettingProfile/EditProfileSiswa";
 
 export default function AppRoutes() {
   return (
@@ -603,6 +605,24 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["siswa"]}>
               <DetailJadwalPelajaranSiswa />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Setting User */}
+        <Route
+          path="/siswa/settings-profile/ubah-password"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <EditPasswordSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/siswa/settings-profile/ubah-profile"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <EditProfileSiswa />
             </ProtectedRoute>
           }
         />

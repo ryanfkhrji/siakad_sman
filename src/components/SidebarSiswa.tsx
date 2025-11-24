@@ -84,8 +84,8 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
 
                   {/* Data Akademik */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary text-white font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/siswa/data-akademik") && "bg-primary text-white font-medium")}>
+                      <Link to="/siswa/data-akademik" className="flex items-center gap-2">
                         <GraduationCap className="h-4 w-4" />
                         {!isCollapsed && <span>Data Akademik</span>}
                       </Link>
@@ -121,8 +121,8 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
 
                   {/* Data Absensi */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary text-white font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/siswa/data-absensi") && "bg-primary text-white font-medium")}>
+                      <Link to="/siswa/data-absensi" className="flex items-center gap-2">
                         <CalendarCheck className="h-4 w-4" />
                         {!isCollapsed && <span>Data Absensi</span>}
                       </Link>
@@ -151,8 +151,8 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
 
                   {/* e-rapot */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary text-white font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/siswa/e-report") && "bg-primary text-white font-medium")}>
+                      <Link to="/siswa/e-report" className="flex items-center gap-2">
                         <FileBarChart className="h-4 w-4" />
                         {!isCollapsed && <span>E-Rapot</span>}
                       </Link>
@@ -182,8 +182,8 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
                     {!isCollapsed && openDropdown === "pengaturan" && (
                       <SidebarMenuSub className="ml-4 mt-1 space-y-1">
                         {[
-                          { to: "/superadmin/settings-profile/ubah-profile", label: "Ubah Profile" },
-                          { to: "/superadmin/settings-profile/ubah-password", label: "Ubah Password" },
+                          { to: "/siswa/settings-profile/ubah-profile", label: "Ubah Profile" },
+                          { to: "/siswa/settings-profile/ubah-password", label: "Ubah Password" },
                         ].map((item) => (
                           <SidebarMenuSubItem key={item.to}>
                             <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes(item.to) && "bg-primary text-white font-medium")}>
