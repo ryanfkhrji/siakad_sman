@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\IdentitasSekolah;
 use App\Models\Gedung;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
@@ -26,6 +27,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed Identitas Sekolah
+        IdentitasSekolah::insert([
+            'npsn' => 'SMA/001/2020',
+            'nama_sekolah' => 'SMA Negeri',
+            'status_sekolah' => 'Negeri',
+            'jenjang' => 'SMA',
+            'alamat' => 'Jl. Raya Bogor',
+            'desa_kelurahan' => 'Abadijaya',
+            'kecamatan' => 'Sukmajaya',
+            'kabupaten_kota' => 'Bogor',
+            'provinsi' => 'Jawa Barat',
+            'kode_pos' => '16417',
+            'email' => 'smanegeri@gmail.com',
+            'no_telepon' => '021 112 5567 82',
+            'kepala_sekolah' => 'Winton Almundarinsa',
+            'nip_kepala_sekolah' => '202143500065',
+            'visi' => 'Menciptakan generasi yang unggul dan sejahtera',
+            'misi' => 'Mencerdaskan bangsa melalui pendidikan',
+            'logo' => 'public/logo/sma.png'
+        ]);
+
         // Seed Gedung
         Gedung::insert([
             [

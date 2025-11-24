@@ -178,8 +178,9 @@ class SiswaJadwalPelajaranController extends Controller
             ],            
             'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
                 return [
-                    'id' => $item->id,
-                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran,
+                    'id' => $item->id ?? null,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                    'hari' => $item->hari ?? null,
                     'guru' => $item->guru->nama ?? null,
                     'kelas' => $item->kelas->nama_kelas ?? null,
                     'jam_pelajaran' => $item->jam_pelajaran ?? null,

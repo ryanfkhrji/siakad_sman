@@ -41,7 +41,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // ✅ register pegawai
 Route::post('/kepegawaian/register', [KepegawaianController::class, 'registerKepegawaian']);
 
-// ! ✅login pegawai kasih jadwal pelajaran pada response
+// ✅ login pegawai
 Route::post('/kepegawaian/login', [KepegawaianController::class, 'loginKepegawaian']);
 
 Route::middleware('auth:kepegawaian')->group(function () {
@@ -98,9 +98,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
 
-    // ! CRUD Penerimaan Siswa Baru Oleh  Super Admin (Tinggal debug import excel dan zip)
-    // ! coba export excel dibalik, id 2 dan 1, cek excelnya kebalik juga apa engga
-    Route::apiResource('psb', PsbController::class);
+    // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
+    Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
+    Route::apiResource('psb', PsbController::class)->except('destroy');
+
     Route::get('/export-data-psb', [PsbController::class, 'exportExcel']);
     Route::get('/export-berkas-zip', [PsbController::class, 'exportBerkasZip']);
     Route::post('/import-data-psb', [PsbController::class, 'importExcel']);
@@ -149,6 +150,9 @@ Route::middleware('auth:kepegawaian')->group(function () {
 // ✅ membersihkan cache oleh super admin
 Route::get('/cache-cleaner', [CacheCleanerController::class, 'triggerCacheCleanup']);
 
+// ! CRUD identitas sekolah oleh super admin (tinggal debug)
+Route::apiResource('/spa/identitas-sekolah', IdentitasSekolahController::class)->except('show');
+
 // ✅ untuk menampilkan berkas / foto yang private
 Route::get('/tampil-berkas/{jenis}/{filename}', [PsbController::class, 'tampilkanBerkas'])->name('berkas.view');
 
@@ -175,7 +179,7 @@ Route::post('/reset-password', [KepegawaianController::class, 'resetPassword'])-
 // ✅ register siswa
 Route::post('/siswa/register', [SiswaController::class, 'registerSiswa']);
 
-// ! ✅ login siswa kasih jadwal pelajaran pada response
+// ✅ login siswa
 Route::post('/siswa/login', [SiswaController::class, 'loginSiswa']);
 
 Route::middleware('auth:siswa')->group(function () {

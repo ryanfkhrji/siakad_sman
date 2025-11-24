@@ -644,8 +644,6 @@ class KepegawaianController extends Controller
         return ApiResponse::success(null, 'Password berhasil diperbarui. Silakan login kembali.');
     }
 
-
-
     // ✅ Lupa password pegawai oleh diri sendiri
     public function ubahPassDiri(Request $request)
     {        

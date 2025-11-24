@@ -545,15 +545,108 @@ class PsbController extends Controller
         ], 'Peserta berhasil diperbarui');
     }
 
-    public function destroy($id)
+    // public function destroy($id)
+    // {
+    //     $psb = Psb::find($id);
+
+    //     if (!$psb) {
+    //         return ApiResponse::error('Peserta tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+    //     }
+
+    //     // Daftar kolom yang menyimpan file
+    //     $fileColumns = [
+    //         'foto_siswa',
+    //         'berkas_raport',
+    //         'suket_pindah',
+    //         'berkas_kartu_keluarga',
+    //         'berkas_akta_lahir',
+    //     ];
+
+    //     foreach ($fileColumns as $field) {
+    //         $filePath = $psb->$field;
+    //         if (!$filePath) continue;
+
+    //         // Tentukan disk berdasarkan prefix
+    //         if (str_starts_with($filePath, 'public/')) {
+    //             $disk = 'public';
+    //             $relativePath = substr($filePath, strlen('public/'));
+    //         } elseif (str_starts_with($filePath, 'private/')) {
+    //             $disk = 'private';
+    //             $relativePath = substr($filePath, strlen('private/'));
+    //         } else {
+    //             // Jika tidak ada prefix, skip
+    //             continue;
+    //         }
+
+    //         // Hapus file jika ada
+    //         if (Storage::disk($disk)->exists($relativePath)) {
+    //             Storage::disk($disk)->delete($relativePath);
+    //         }
+    //     }
+
+    //     // Hapus record dari database
+    //     $psb->delete();
+
+    //     return ApiResponse::success(null, 'Peserta berhasil dihapus');
+    // }
+
+    // ✅ Hapus bannyak sekaligus
+    public function destroyMultiple(Request $request, $id = null)
     {
-        $psb = Psb::find($id);
-
-        if (!$psb) {
-            return ApiResponse::error('Peserta tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        /*
+        * PRIORITAS PENGAMBILAN IDS:
+        * 1. id[] dari query param
+        * 2. id dari body JSON
+        * 3. id dari path parameter
+        */
+    
+        // 1. id[] dari query param
+        $ids = $request->query('id');
+    
+        // 2. Kalau query param kosong → cek body
+        if (!$ids) {
+            $ids = $request->input('id');
         }
-
-        // Daftar kolom yang menyimpan file
+    
+        // 3. Kalau body kosong → cek path
+        if (!$ids && $id !== null) {
+            $ids = [$id];
+        }
+    
+        if (!$ids) {
+            return ApiResponse::error('Not found', ['id' => 'Peserta tidak ditemukan']);
+        }
+    
+        // Normalisasi: harus array
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+    
+        // Bersihkan nilai kosong/null
+        $ids = array_filter($ids);
+    
+        if (empty($ids)) {
+            return ApiResponse::error('ID tidak valid', ['id' => ['Minimal 1 ID harus ada']], 422);
+        }
+    
+        // pengecekan id yang tidak ditemukan
+        $validIds = Psb::whereIn('id', $ids)->pluck('id')->toArray();
+    
+        // Cari ID yang tidak ada di database
+        $missingIds = array_diff($ids, $validIds);
+    
+        if (count($missingIds) > 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Beberapa ID tidak ditemukan',
+                'missing_ids' => array_values($missingIds),
+            ], 404);
+        }
+    
+        // Ambil data lengkap PSB setelah dipastikan semua valid
+        $psbs = Psb::whereIn('id', $ids)->get();
+    
+        // Kolom file yang akan dihapus
         $fileColumns = [
             'foto_siswa',
             'berkas_raport',
@@ -561,35 +654,34 @@ class PsbController extends Controller
             'berkas_kartu_keluarga',
             'berkas_akta_lahir',
         ];
-
-        foreach ($fileColumns as $field) {
-            $filePath = $psb->$field;
-            if (!$filePath) continue;
-
-            // Tentukan disk berdasarkan prefix
-            if (str_starts_with($filePath, 'public/')) {
-                $disk = 'public';
-                $relativePath = substr($filePath, strlen('public/'));
-            } elseif (str_starts_with($filePath, 'private/')) {
-                $disk = 'private';
-                $relativePath = substr($filePath, strlen('private/'));
-            } else {
-                // Jika tidak ada prefix, skip
-                continue;
-            }
-
-            // Hapus file jika ada
-            if (Storage::disk($disk)->exists($relativePath)) {
-                Storage::disk($disk)->delete($relativePath);
+    
+        foreach ($psbs as $psb) {
+            foreach ($fileColumns as $field) {
+                $filePath = $psb->$field;
+                if (!$filePath) continue;
+    
+                if (str_starts_with($filePath, 'public/')) {
+                    $disk = 'public';
+                    $relativePath = substr($filePath, 7);
+                } elseif (str_starts_with($filePath, 'private/')) {
+                    $disk = 'private';
+                    $relativePath = substr($filePath, 8);
+                } else {
+                    continue;
+                }
+    
+                if (Storage::disk($disk)->exists($relativePath)) {
+                    Storage::disk($disk)->delete($relativePath);
+                }
             }
         }
-
-        // Hapus record dari database
-        $psb->delete();
-
+    
+        // Hapus dari database
+        Psb::whereIn('id', $ids)->delete();
+    
         return ApiResponse::success(null, 'Peserta berhasil dihapus');
     }
-
+    
     /** 
      * ✅ Export data menggunakan app/Exports/PsbExport.php
      * php artisan make:export PsbExport --model=Psb
