@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('foto_gedung')->nullable();
             $table->string('kode_gedung')->unique();
-            $table->string('nama_gedung');
+            $table->string('nama_gedung')->unique();
             $table->integer('jumlah_lantai')->nullable();
             $table->string('luas_bangunan')->nullable(); // m2
             $table->year('tahun_dibangun')->nullable();
