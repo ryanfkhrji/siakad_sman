@@ -3,7 +3,7 @@ import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/pages/Footer";
-import { CircleXIcon, FilePlus } from "lucide-react";
+import { ArrowLeft, CircleXIcon, FilePlus } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -225,6 +225,14 @@ const CreateSiswa = () => {
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Tambah Siswa</h1>
+
+          {/* Tombol Kembali - selalu muncul */}
+          <Link to="/superadmin/informasi-akademik/siswa">
+            <Button variant="outline" className="mb-6">
+              <ArrowLeft size={16} />
+              Kembali
+            </Button>
+          </Link>
 
           <div className="bg-white rounded shadow p-5">
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit(onSubmit)}>

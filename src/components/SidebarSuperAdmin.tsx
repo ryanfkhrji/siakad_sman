@@ -147,7 +147,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
 
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/guru") && "bg-primary text-white font-medium")}>
-                            <Link to="/superadmin/guru">Data Gedung</Link>
+                            <Link to="/superadmin/informasi-sekolah/gedung">Data Gedung</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 
@@ -391,7 +391,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
 
                   {/* Pengaturan */}
                   {!isCollapsed && <SidebarGroupLabel className="text-xs uppercase text-muted-foreground mt-1">Data Pengaturan</SidebarGroupLabel>}
-                  {/* Data PSB Online */}
+                  {/* Data Pengaturan */}
                   <SidebarMenuItem>
                     <SidebarMenuButton onClick={() => toggleDropdown("pengaturan")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
                       <span className="flex items-center gap-2">

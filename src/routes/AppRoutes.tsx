@@ -69,6 +69,11 @@ import EditKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum/EditKuri
 import DataKompetensiDasar from "@/pages/SuperAdmin/informasiAkademik/KompetensiDasar";
 import CreateKompetensiDasar from "@/pages/SuperAdmin/informasiAkademik/KompetensiDasar/CreateKompetensiDasar";
 import EditKompetensiDasar from "@/pages/SuperAdmin/informasiAkademik/KompetensiDasar/EditKompetensiDasar";
+import DataGedung from "@/pages/SuperAdmin/InfomasiSekolah/Gedung";
+import CreateGedung from "@/pages/SuperAdmin/InfomasiSekolah/Gedung/CreateGedung";
+import EditGedung from "@/pages/SuperAdmin/InfomasiSekolah/Gedung/EditGedung";
+import DetailKelas from "@/pages/Siswa/Kelas";
+import JadwalPelajaranSiswa from "@/pages/Siswa/JadwalPelajaran";
 
 export default function AppRoutes() {
   return (
@@ -352,6 +357,31 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* Data Gedung */}
+        <Route
+          path="/superadmin/informasi-sekolah/gedung"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataGedung />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/gedung/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateGedung />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/gedung/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditGedung />
+            </ProtectedRoute>
+          }
+        />
 
         {/* INFORMASI AKADEMIK */}
         {/* Data Siswa */}
@@ -545,6 +575,34 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["siswa"]}>
               <DetailEkstrakurikulerSiswa />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Detail Kelas */}
+        <Route
+          path="/siswa/detail-kelas"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <DetailKelas />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Jadwal Pelajaran Siswa */}
+        <Route
+          path="/siswa/jadwal-pelajaran"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <JadwalPelajaranSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/siswa/jadwal-pelajaran/detail/:id"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <DetailJadwalPelajaranSiswa />
             </ProtectedRoute>
           }
         />

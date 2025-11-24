@@ -101,3 +101,27 @@ export interface KompetensiDasar {
   deskripsi: string;
   kurikulum_id: string;
 }
+
+export interface Gedung {
+  id: number;
+  foto_gedung: string | null;
+  kode_gedung: string;
+  nama_gedung: string;
+  jumlah_lantai: number;
+  luas_bangunan: string;
+  tahun_dibangun: string;
+  kondisi: string;
+  keterangan: string;
+}
+
+export interface DetailKelasSiswa {
+  id: number;
+  nama_kelas: string;
+  jam_masuk: string;
+  jumlah_siswa: number;
+  wali: {
+    id: number;
+    nama: string;
+    role: string;
+  }
+}

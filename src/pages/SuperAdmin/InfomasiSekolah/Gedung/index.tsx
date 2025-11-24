@@ -7,31 +7,32 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { Kurikulum } from "@/types";
+import type { Gedung } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
+import { DialogDetailGedung } from "./DialogDetailGedung";
 
-const DataKurikulum = () => {
+const DataGedung = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [datakurikulum, setDataKurikulum] = useState<Kurikulum[]>([]);
+  const [dataGedung, setDataGedung] = useState<Gedung[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<Kurikulum[]>([]);
+  const [filteredData, setFilteredData] = useState<Gedung[]>([]);
 
   // Ambil data dari backend
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/spa/kurikulum");
+        const res = await api.get("/spa/gedung");
         if (res.data.status === "success") {
-          setDataKurikulum(res.data.data);
+          setDataGedung(res.data.data);
         }
-      } catch (error) {
-        console.error("Gagal mengambil data kurikulum:", error);
+      } catch (error: any) {
+        console.error("Gagal mengambil data gedung:", error);
       } finally {
         setLoading(false);
       }
@@ -43,13 +44,13 @@ const DataKurikulum = () => {
   // Search filtering
   useEffect(() => {
     if (searchTerm.trim() === "") {
-      setFilteredData(datakurikulum);
+      setFilteredData(dataGedung);
     } else {
       const lower = searchTerm.toLowerCase();
-      setFilteredData(datakurikulum.filter((item) => item.nama_kurikulum.toLowerCase().includes(lower)));
+      setFilteredData(dataGedung.filter((item) => item.nama_gedung.toLowerCase().includes(lower) || item.kode_gedung.toLowerCase().includes(lower)));
     }
     setCurrentPage(1);
-  }, [searchTerm, datakurikulum]);
+  }, [searchTerm, dataGedung]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -65,7 +66,7 @@ const DataKurikulum = () => {
   const handleDelete = async (id: number) => {
     const result = await Swal.fire({
       title: "Yakin ingin menghapus?",
-      text: "Data kurikulum yang dihapus tidak dapat dikembalikan.",
+      text: "Data gedung yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#4F46E5",
@@ -77,15 +78,15 @@ const DataKurikulum = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/spa/kurikulum/${id}`);
+      const res = await api.delete(`/spa/gedung/${id}`);
 
       if (res.data.status === "success") {
-        setDataKurikulum((prev) => prev.filter((j) => j.id !== id));
+        setDataGedung((prev) => prev.filter((j) => j.id !== id));
 
         Swal.fire({
           icon: "success",
           title: "Berhasil!",
-          text: "Data kurikulum berhasil dihapus.",
+          text: "Data gedung berhasil dihapus.",
           showConfirmButton: false,
           timer: 1800,
         });
@@ -93,7 +94,7 @@ const DataKurikulum = () => {
         Swal.fire({
           icon: "error",
           title: "Gagal menghapus!",
-          text: res.data.message || "Terjadi kesalahan saat menghapus kurikulum.",
+          text: res.data.message || "Terjadi kesalahan saat menghapus gedung.",
         });
       }
     } catch (err: any) {
@@ -101,7 +102,7 @@ const DataKurikulum = () => {
         Swal.fire({
           icon: "error",
           title: "Gagal menghapus!",
-          text: err.response.data.message || "Kurikulum tidak ditemukan.",
+          text: err.response.data.message || "Gedung tidak ditemukan.",
         });
       } else {
         Swal.fire({
@@ -110,7 +111,7 @@ const DataKurikulum = () => {
           text: "Terjadi kesalahan koneksi ke server.",
         });
       }
-      console.error("Gagal menghapus kurikulum:", err);
+      console.error("Gagal menghapus gedung:", err);
     } finally {
       setLoading(false);
     }
@@ -121,9 +122,9 @@ const DataKurikulum = () => {
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Data Kurikulum" />
+        <PageTitle title="Data Gedung" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Data Kurikulum</h1>
+          <h1 className="text-3xl font-bold mb-6">Data Gedung</h1>
 
           {/* Loading State */}
           {loading ? (
@@ -135,16 +136,16 @@ const DataKurikulum = () => {
             <>
               {/* Tombol Tambah */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-                <Link to="/superadmin/informasi-sekolah/kurikulum/create" className="w-full md:w-auto">
+                <Link to="/superadmin/informasi-sekolah/gedung/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
                     <PlusIcon size={18} />
-                    Tambah Kurikulum
+                    Tambah Gedung
                   </Button>
                 </Link>
 
                 <div className="relative w-full md:w-1/3">
                   <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari kurikulum..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  <Input type="text" placeholder="Cari gedung..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
                 </div>
               </div>
 
@@ -154,31 +155,58 @@ const DataKurikulum = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Kurikulum</TableHead>
-                      <TableHead className="font-semibold text-white">Tahun Berlaku</TableHead>
-                      <TableHead className="font-semibold text-white">Status</TableHead>
-                      <TableHead className="font-semibold text-white">Deskripsi</TableHead>
+                      <TableHead className="font-semibold text-white">Foto Gedung</TableHead>
+                      <TableHead className="font-semibold text-white">Kode Gedung</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Gedung</TableHead>
+                      <TableHead className="font-semibold text-white">Jumlah Lantai</TableHead>
+                      <TableHead className="font-semibold text-white">Luas Bangunan</TableHead>
+                      <TableHead className="font-semibold text-white">Tahun Dibangun</TableHead>
+                      <TableHead className="font-semibold text-white">Kondisi</TableHead>
+                      <TableHead className="font-semibold text-white">Keterangan</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
                     {paginated.length > 0 ? (
-                      paginated.map((kurikulum, index) => (
-                        <TableRow key={kurikulum.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                      paginated.map((gedung, index) => (
+                        <TableRow key={gedung.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{kurikulum.nama_kurikulum}</TableCell>
-                          <TableCell>{kurikulum.tahun_berlaku}</TableCell>
-                          <TableCell>{kurikulum.status}</TableCell>
-                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{kurikulum.deskripsi || "-"}</TableCell>
+                          <TableCell>
+                            {gedung.foto_gedung ? (
+                              <img
+                                src={gedung.foto_gedung}
+                                alt={gedung.nama_gedung}
+                                className="w-16 h-16 object-cover rounded border border-gray-200"
+                                onError={(e) => {
+                                  const target = e.currentTarget;
+                                  target.onerror = null;
+                                  target.src =
+                                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64"%3E%3Crect fill="%23e5e7eb" width="64" height="64"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="10"%3ENo Image%3C/text%3E%3C/svg%3E';
+                                }}
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                            )}
+                          </TableCell>
+                          <TableCell>{gedung.kode_gedung}</TableCell>
+                          <TableCell>{gedung.nama_gedung}</TableCell>
+                          <TableCell>{gedung.jumlah_lantai || "-"}</TableCell>
+                          <TableCell>{gedung.luas_bangunan || "-"}</TableCell>
+                          <TableCell>{gedung.tahun_dibangun || "-"}</TableCell>
+                          <TableCell>{gedung.kondisi || "-"}</TableCell>
+                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{gedung.keterangan || "-"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
-                            <Link to={`/superadmin/informasi-sekolah/kurikulum/edit/${kurikulum.id}`}>
+                            {/* Tombol Detail */}
+                            <DialogDetailGedung gedungId={gedung.id} />
+
+                            <Link to={`/superadmin/informasi-sekolah/gedung/edit/${gedung.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(kurikulum.id)}>
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(gedung.id)}>
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>
@@ -236,4 +264,4 @@ const DataKurikulum = () => {
   );
 };
 
-export default DataKurikulum;
+export default DataGedung;

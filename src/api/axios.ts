@@ -9,29 +9,38 @@ const api = axios.create({
 });
 
 // 🔹 Middleware untuk menyisipkan token otomatis
+// api.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("token")?.trim();
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   return config;
+// });
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token")?.trim();
+  // Ambil token sesuai role
+  const token = localStorage.getItem("token_siswa") || localStorage.getItem("token") || "";
+
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token.trim()}`;
   }
   return config;
 });
 
 // 🔹 Middleware untuk handle response error (misalnya token expired)
 api.interceptors.response.use(
-  (response) => response, // biarkan response sukses lewat
+  (response) => response,
   (error) => {
-    if (error.response) {
-      // Cek jika token sudah expired / invalid / unauthorized
-      if (error.response.status === 401) {
-        // Hapus token dari localStorage
-        localStorage.removeItem("token");
-        localStorage.removeItem("user"); // kalau kamu juga simpan data user
-        // Redirect ke halaman login
-        window.location.href = "/login-kepegawaian";
-      }
-    }
+    if (error.response?.status === 401) {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const isSiswa = user.role === "siswa";
 
+      localStorage.removeItem("token");
+      localStorage.removeItem("token_siswa");
+      localStorage.removeItem("user");
+
+      // Redirect sesuai role
+      window.location.href = isSiswa ? "/login-siswa" : "/login-kepegawaian";
+    }
     return Promise.reject(error);
   }
 );

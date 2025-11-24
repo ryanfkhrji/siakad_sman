@@ -1,5 +1,5 @@
 import { SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/components/ui/sidebar";
-import { Home, GraduationCap, ClipboardList, Settings, ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, Menu, FileBarChart, CalendarCheck, Palette } from "lucide-react";
+import { Home, GraduationCap, ClipboardList, Settings, ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, Menu, FileBarChart, CalendarCheck, Palette, DoorOpenIcon, CalendarRangeIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -129,6 +129,26 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
+                  {/* Detail Kelas */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/siswa/detail-kelas") && "bg-primary text-white font-medium")}>
+                      <Link to="/siswa/detail-kelas" className="flex items-center gap-2">
+                        <DoorOpenIcon className="h-4 w-4" />
+                        {!isCollapsed && <span>Detail Kelas</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  {/* Jadwal Pelajaran */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/siswa/jadwal-pelajaran") && "bg-primary text-white font-medium")}>
+                      <Link to="/siswa/jadwal-pelajaran" className="flex items-center gap-2">
+                        <CalendarRangeIcon className="h-4 w-4" />
+                        {!isCollapsed && <span>Jadwal Pelajaran</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
                   {/* e-rapot */}
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary text-white font-medium")}>
@@ -151,12 +171,28 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
 
                   {/* Pengaturan */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary text-white font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton onClick={() => toggleDropdown("pengaturan")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                      <span className="flex items-center gap-2">
                         <Settings className="h-4 w-4" />
-                        {!isCollapsed && <span>Pengaturan</span>}
-                      </Link>
+                        {!isCollapsed && "Pengaturan"}
+                      </span>
+                      {!isCollapsed && <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === "pengaturan" && "rotate-180")} />}
                     </SidebarMenuButton>
+
+                    {!isCollapsed && openDropdown === "pengaturan" && (
+                      <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                        {[
+                          { to: "/superadmin/settings-profile/ubah-profile", label: "Ubah Profile" },
+                          { to: "/superadmin/settings-profile/ubah-password", label: "Ubah Password" },
+                        ].map((item) => (
+                          <SidebarMenuSubItem key={item.to}>
+                            <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes(item.to) && "bg-primary text-white font-medium")}>
+                              <Link to={item.to}>{item.label}</Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    )}
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
