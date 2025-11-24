@@ -98,7 +98,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
 
-    // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
+    // ! CRUD Penerimaan Siswa Baru Oleh  Super Admin (Tinggal debug import excel dan zip)
+    // ! coba export excel dibalik, id 2 dan 1, cek excelnya kebalik juga apa engga
     Route::apiResource('psb', PsbController::class);
     Route::get('/export-data-psb', [PsbController::class, 'exportExcel']);
     Route::get('/export-berkas-zip', [PsbController::class, 'exportBerkasZip']);
@@ -149,7 +150,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
 Route::get('/cache-cleaner', [CacheCleanerController::class, 'triggerCacheCleanup']);
 
 // ✅ untuk menampilkan berkas / foto yang private
-Route::get('/tampil-berkas/{jenis}/{filename}', [PsbController::class, 'tampilkanBerkas']);
+Route::get('/tampil-berkas/{jenis}/{filename}', [PsbController::class, 'tampilkanBerkas'])->name('berkas.view');
 
 // ✅ akses jurusan di register
 Route::get('/jurusan-register', [JurusanController::class, 'index']);

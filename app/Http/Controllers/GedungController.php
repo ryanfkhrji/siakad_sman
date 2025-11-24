@@ -86,8 +86,8 @@ class GedungController extends Controller
     
             if ($request->hasFile('foto_gedung')) {
                 $validated['foto_gedung'] = $this->simpanFoto(
-                    $request->file($validated['foto_gedung']),
-                    $field, // folder penyimpanan
+                    $request->file('foto_gedung'),
+                    'foto_gedung', // folder penyimpanan
                     $request->nama_gedung
                 );
             }

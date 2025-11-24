@@ -54,11 +54,23 @@ class PsbController extends Controller
                 'kelas_terakhir' => $item->kelas_terakhir,
                 'nilai_raport_terakhir' => $item->nilai_raport_terakhir,
                 'alasan_pindah' => $item->alasan_pindah,
-                'berkas_raport' => $item->berkas_raport,
-                'suket_pindah' => $item->suket_pindah,
-                'berkas_kartu_keluarga' => $item->berkas_kartu_keluarga,
-                'berkas_akta_lahir' => $item->berkas_akta_lahir,
-                'foto_siswa' => $item->foto_siswa,
+                'berkas_raport' => route('berkas.view', [
+                    'jenis'    => 'berkas_raport',
+                    'filename' => basename($item->berkas_raport),
+                ]),                
+                'suket_pindah' => route('berkas.view', [
+                    'jenis'    => 'suket_pindah',
+                    'filename' => basename($item->suket_pindah),
+                ]),                 
+                'berkas_kartu_keluarga' => route('berkas.view', [
+                    'jenis'    => 'berkas_kartu_keluarga',
+                    'filename' => basename($item->berkas_kartu_keluarga),
+                ]),                 
+                'berkas_akta_lahir' => route('berkas.view', [
+                    'jenis'    => 'berkas_akta_lahir',
+                    'filename' => basename($item->berkas_akta_lahir),
+                ]),                                 
+                'foto_siswa' => $item->foto_siswa ? asset(str_replace('public/', 'storage/', $item->foto_siswa)) : null,
             ];
         });
 
@@ -104,11 +116,23 @@ class PsbController extends Controller
             'kelas_terakhir' => $psb->kelas_terakhir,
             'nilai_raport_terakhir' => $psb->nilai_raport_terakhir,
             'alasan_pindah' => $psb->alasan_pindah,
-            'berkas_raport' => $psb->berkas_raport,
-            'suket_pindah' => $psb->suket_pindah,
-            'berkas_kartu_keluarga' => $psb->berkas_kartu_keluarga,
-            'berkas_akta_lahir' => $psb->berkas_akta_lahir,
-            'foto_siswa' => $psb->foto_siswa,
+            'berkas_raport' => route('berkas.view', [
+                'jenis'    => 'berkas_raport',
+                'filename' => basename($psb->berkas_raport),
+            ]),                
+            'suket_pindah' => route('berkas.view', [
+                'jenis'    => 'suket_pindah',
+                'filename' => basename($psb->suket_pindah),
+            ]),                 
+            'berkas_kartu_keluarga' => route('berkas.view', [
+                'jenis'    => 'berkas_kartu_keluarga',
+                'filename' => basename($psb->berkas_kartu_keluarga),
+            ]),                 
+            'berkas_akta_lahir' => route('berkas.view', [
+                'jenis'    => 'berkas_akta_lahir',
+                'filename' => basename($psb->berkas_akta_lahir),
+            ]),                                 
+            'foto_siswa' => $psb->foto_siswa ? asset(str_replace('public/', 'storage/', $psb->foto_siswa)) : null,        
         ];
 
         return ApiResponse::success($formatted, 'Detail peserta berhasil diambil');
@@ -221,18 +245,19 @@ class PsbController extends Controller
                 'pekerjaan_ibu' => 'required|string',
                 'no_hp_ibu' => 'required',
 
-                'nama_wali' => 'string',
-                'pekerjaan_wali' => 'string',
-                'no_hp_wali' => 'string',
+                'nama_wali' => 'string|nullable',
+                'pekerjaan_wali' => 'string|nullable',
+                'no_hp_wali' => 'string|nullable',
 
                 'sekolah_asal' => 'required|string',
                 'alamat_sekolah_asal' => 'required|string',
-                'kelas_terakhir' => 'string',
-                'nilai_raport_terakhir' => 'string',
-                'alasan_pindah' => 'string',
-                'berkas_raport' => 'required||image|mimes:jpeg,png,jpg|max:2048',
-                'berkas_kartu_keluarga' => 'required||image|mimes:jpeg,png,jpg|max:2048',
-                'berkas_akta_lahir' => 'required||image|mimes:jpeg,png,jpg|max:2048',
+                'kelas_terakhir' => 'string|nullable',
+                'nilai_raport_terakhir' => 'string|nullable',
+                'alasan_pindah' => 'string|nullable',
+                'berkas_raport' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'suket_pindah' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx',
+                'berkas_kartu_keluarga' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'berkas_akta_lahir' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 'foto_siswa' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             ],[
                 'nama_siswa.required' => 'Nama siswa wajib diisi',
@@ -257,6 +282,9 @@ class PsbController extends Controller
                 'berkas_raport.image' => 'Harus berupa gambar atau foto',
                 'berkas_raport.mimes' => 'Format foto tidak didukung',
                 'berkas_raport.max' => 'Ukuran foto maksimal 2 MB',
+
+                'suket_pindah.file' => 'Harus berupa file',
+                'suket_pindah.mimes' => 'Format harus pdf, word, atau excel',                
 
                 'berkas_kartu_keluarga.required' => 'Wajib diisi',
                 'berkas_kartu_keluarga.image' => 'Harus berupa gambar atau foto',
@@ -325,13 +353,24 @@ class PsbController extends Controller
                 'alamat_sekolah_asal' => $psb->alamat_sekolah_asal,
                 'kelas_terakhir' => $psb->kelas_terakhir,
                 'nilai_raport_terakhir' => $psb->nilai_raport_terakhir,
-                'alasan_pindah' => $psb->alasan_pindah,
-                'berkas_raport' => $psb->berkas_raport,
-                'suket_pindah' => $psb->suket_pindah,
-                'berkas_kartu_keluarga' => $psb->berkas_kartu_keluarga,
-                'berkas_akta_lahir' => $psb->berkas_akta_lahir,
-                // 'foto_siswa' => asset('storage/' . $psb->foto_siswa),
-                'foto_siswa' => $psb->foto_siswa,
+                'alasan_pindah' => $psb->alasan_pindah,                
+                'berkas_raport' => route('berkas.view', [
+                    'jenis'    => 'berkas_raport',
+                    'filename' => basename($psb->berkas_raport),
+                ]),                
+                'suket_pindah' => route('berkas.view', [
+                    'jenis'    => 'suket_pindah',
+                    'filename' => basename($psb->suket_pindah),
+                ]),                 
+                'berkas_kartu_keluarga' => route('berkas.view', [
+                    'jenis'    => 'berkas_kartu_keluarga',
+                    'filename' => basename($psb->berkas_kartu_keluarga),
+                ]),                 
+                'berkas_akta_lahir' => route('berkas.view', [
+                    'jenis'    => 'berkas_akta_lahir',
+                    'filename' => basename($psb->berkas_akta_lahir),
+                ]),                                 
+                'foto_siswa' => $psb->foto_siswa ? asset(str_replace('public/', 'storage/', $psb->foto_siswa)) : null,    
             ], 'Peserta berhasil mendaftar');
     
         } catch (ValidationException $e) {
@@ -374,10 +413,44 @@ class PsbController extends Controller
             'nilai_raport_terakhir' => 'sometimes',
             'alasan_pindah' => 'sometimes',
             'berkas_raport' => 'sometimes|image|mimes:jpeg,jpg,png|max:2048',
-            'suket_pindah' => 'sometimes|file',
+            'suket_pindah' => 'sometimes|file|mimes:pdf,doc,docx,xls,xlsx|max:2048',
             'berkas_kartu_keluarga' => 'sometimes|image|mimes:jpeg,jpg,png|max:2048',
             'berkas_akta_lahir' => 'sometimes|image|mimes:jpeg,jpg,png|max:2048',
             'foto_siswa' => 'sometimes|image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'nama_siswa.required' => 'Nama siswa wajib diisi',
+            'nisn.required' => 'NISN wajib diisi',
+            'nisn.unique' => 'NISN sudah ada',
+            'jk.required' => 'Jenis kelamin wajib diisi',
+            'tempat_lahir.required' => 'Tempat lahir wajib diisi',
+            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi',
+            'tanggal_lahir.date' => 'Format tanggal tidak sesuai',
+            'agama.required' => 'Wajib diisi',
+            'alamat.required' => 'Wajib diisi',
+            'no_hp_siswa.required' => 'Wajib diisi',
+            'nama_ayah.required' => 'Wajib diisi',
+            'pekerjaan_ayah.required' => 'Wajib diisi',
+            'no_hp_ayah.required' => 'Wajib diisi',
+            'nama_ibu.required' => 'Wajib diisi',
+            'pekerjaan_ibu.required' => 'Wajib diisi',
+            'no_hp_ibu.required' => 'Wajib diisi',
+            'sekolah_asal.required' => 'Wajib diisi',
+            'alamat_sekolah_asal.required' => 'Wajib diisi',
+            'berkas_raport.image' => 'Format harus foto atau gambar',
+            'berkas_raport.mimes' => 'Format harus jpeg, jpg, atau png',
+            'berkas_raport.max' => 'Maksimal 2 MB',
+            'suket_pindah.file' => 'Format harus berupa file',
+            'suket_pindah.mimes' => 'Format harus pdf, word, atau excel',
+            'suket_pindah.max' => 'Maksimal 2 MB',
+            'berkas_kartu_keluarga.image' => 'Format harus foto atau gambar',
+            'berkas_kartu_keluarga.mimes' => 'Format harus jpeg, jpg, atau png',
+            'berkas_kartu_keluarga.max' => 'Maksimal 2 MB',
+            'berkas_akta_lahir.image' => 'Format harus foto atau gambar',
+            'berkas_akta_lahir.mimes' => 'Format harus jpeg, jpg, atau png',
+            'berkas_akta_lahir.max' => 'Maksimal 2 MB',
+            'foto_siswa.image' => 'Format harus foto atau gambar',
+            'foto_siswa.mimes' => 'Format harus jpeg, jpg, atau png',
+            'foto_siswa.max' => 'Maksimal 2 MB',
         ]);
 
         // 🔹 File fields dengan disk
@@ -452,11 +525,23 @@ class PsbController extends Controller
             'kelas_terakhir' => $psb->kelas_terakhir,
             'nilai_raport_terakhir' => $psb->nilai_raport_terakhir,
             'alasan_pindah' => $psb->alasan_pindah,
-            'berkas_raport' => $psb->berkas_raport,
-            'suket_pindah' => $psb->suket_pindah,
-            'berkas_kartu_keluarga' => $psb->berkas_kartu_keluarga,
-            'berkas_akta_lahir' => $psb->berkas_akta_lahir,
-            'foto_siswa' => $psb->foto_siswa,
+            'berkas_raport' => route('berkas.view', [
+                'jenis'    => 'berkas_raport',
+                'filename' => basename($psb->berkas_raport),
+            ]),                
+            'suket_pindah' => route('berkas.view', [
+                'jenis'    => 'suket_pindah',
+                'filename' => basename($psb->suket_pindah),
+            ]),                 
+            'berkas_kartu_keluarga' => route('berkas.view', [
+                'jenis'    => 'berkas_kartu_keluarga',
+                'filename' => basename($psb->berkas_kartu_keluarga),
+            ]),                 
+            'berkas_akta_lahir' => route('berkas.view', [
+                'jenis'    => 'berkas_akta_lahir',
+                'filename' => basename($psb->berkas_akta_lahir),
+            ]),                                 
+            'foto_siswa' => $psb->foto_siswa ? asset(str_replace('public/', 'storage/', $psb->foto_siswa)) : null,  
         ], 'Peserta berhasil diperbarui');
     }
 
