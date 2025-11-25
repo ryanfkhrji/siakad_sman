@@ -78,6 +78,8 @@ import EditPasswordSiswa from "@/pages/Siswa/SettingProfile/EditPasswordSiswa";
 import EditProfileSiswa from "@/pages/Siswa/SettingProfile/EditProfileSiswa";
 import EditPasswordGuru from "@/pages/Guru/SettingsProfile/EditPasswordGuru";
 import EditProfileGuru from "@/pages/Guru/SettingsProfile/EditProfileGuru";
+import DetailKelasGuru from "@/pages/Guru/Kelas";
+import EditKelasGuru from "@/pages/Guru/Kelas/EditKelasGuru";
 
 export default function AppRoutes() {
   return (
@@ -563,7 +565,7 @@ export default function AppRoutes() {
           }
         />
 
-        {/* ================= DATA DASHBOARD SUPER ADMIN ================= */}
+        {/* ================= DATA DASHBOARD GURU ================= */}
         {/* Setting User */}
         <Route
           path="/guru/settings-profile/ubah-password"
@@ -573,12 +575,29 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/guru/settings-profile/ubah-profile"
           element={
             <ProtectedRoute roles={["guru"]}>
               <EditProfileGuru />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Kelas */}
+        <Route
+          path="/guru/kelas/detail-kelas"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <DetailKelasGuru />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guru/kelas/edit"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <EditKelasGuru />
             </ProtectedRoute>
           }
         />

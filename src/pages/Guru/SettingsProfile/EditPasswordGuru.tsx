@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
+import { SidebarGuru } from "@/components/SidebarGuru";
 import PageTitle from "@/components/PageTitle";
 import { Button } from "@/components/ui/button";
 import Footer from "@/pages/Footer";
@@ -160,13 +160,13 @@ const EditPasswordGuru = () => {
 
   return (
     <SidebarProvider>
-      <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <SidebarGuru isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Edit User Super Admin" />
+        <PageTitle title="Edit Password Guru" />
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Edit Password Super Admin</h1>
+          <h1 className="text-3xl font-bold mb-6">Edit Password Guru</h1>
 
           {/* ⏳ Loading State */}
           {loading ? (
@@ -175,7 +175,7 @@ const EditPasswordGuru = () => {
               <p className="text-lg font-medium">Memuat data...</p>
             </div>
           ) : !pegawai ? (
-            <p className="text-center text-gray-600 mt-6">Data super admin tidak ditemukan.</p>
+            <p className="text-center text-gray-600 mt-6">Data guru tidak ditemukan.</p>
           ) : (
             <div className="bg-white rounded shadow p-5">
               {/* Error general */}

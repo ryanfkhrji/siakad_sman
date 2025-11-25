@@ -114,8 +114,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Kelas */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/kelas/detail-kelas") && "bg-primary/10 text-primary font-medium")}>
+                      <Link to="/guru/kelas/detail-kelas" className="flex items-center gap-2">
                         <DoorOpen className="h-4 w-4" />
                         {!isCollapsed && <span>Data Kelas</span>}
                       </Link>

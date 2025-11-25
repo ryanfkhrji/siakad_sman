@@ -268,7 +268,7 @@ const EditProfileGuru = () => {
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900">Edit Profil Guru</h1>
-            <p className="text-sm text-gray-500 mt-2">Perbarui informasi profil Anda sebagai Guru</p>
+            <p className="text-sm text-gray-500 mt-2">Perbarui informasi profil anda sebagai guru</p>
           </div>
 
           {/* ⏳ Loading State */}
