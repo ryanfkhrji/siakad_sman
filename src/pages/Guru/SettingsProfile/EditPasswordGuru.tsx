@@ -16,7 +16,7 @@ interface ApiResponse<T> {
   data: T;
 }
 
-const SettingUserSuperAdmin = () => {
+const EditPasswordGuru = () => {
   // const navigate = useNavigate();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -63,7 +63,7 @@ const SettingUserSuperAdmin = () => {
       try {
         setLoading(true);
 
-        const res = await api.get<ApiResponse<Pegawai>>("/spa/show/diri");
+        const res = await api.get<ApiResponse<Pegawai>>("/pegawai/show/diri");
 
         if (res.data.status !== "success") {
           return Swal.fire("Error", res.data.message || "Gagal mengambil data", "error");
@@ -71,15 +71,15 @@ const SettingUserSuperAdmin = () => {
 
         const user = res.data.data;
 
-        if (user.role !== "super_admin") {
-          Swal.fire("Error", "User ini bukan super admin", "error");
+        if (user.role !== "guru") {
+          Swal.fire("Error", "User ini bukan guru", "error");
           return;
         }
 
         setPegawai(user);
       } catch (error) {
         console.error("Gagal mengambil data:", error);
-        Swal.fire("Error", "Terjadi kesalahan mengambil data super admin", "error");
+        Swal.fire("Error", "Terjadi kesalahan mengambil data guru", "error");
       } finally {
         setLoading(false);
       }
@@ -114,7 +114,7 @@ const SettingUserSuperAdmin = () => {
         konfirmasi_password: confirmPassword,
       };
 
-      const res = await api.put("/spa/ubah-password/diri", payload);
+      const res = await api.put("/pegawai/ubah-password/diri", payload);
 
       if (res.data?.status === "success") {
         await Swal.fire({
@@ -281,4 +281,4 @@ const SettingUserSuperAdmin = () => {
   );
 };
 
-export default SettingUserSuperAdmin;
+export default EditPasswordGuru;

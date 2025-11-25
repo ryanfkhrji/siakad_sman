@@ -1,5 +1,5 @@
-import { SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { Home, GraduationCap, ClipboardList, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Menu, Users, CalendarDays, BookOpen, DoorOpen, ClipboardCheck, IdCard } from "lucide-react";
+import { SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/components/ui/sidebar";
+import { Home, GraduationCap, ClipboardList, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Menu, Users, CalendarDays, BookOpen, DoorOpen, ClipboardCheck, IdCard, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import { useAuthStore } from "@/store/authStore";
 import Swal from "sweetalert2";
 
 export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>> }) {
-  // const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   // const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -17,9 +17,9 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
   const navigate = useNavigate();
   const { logout, user } = useAuthStore();
 
-  // const toggleDropdown = (name: string) => {
-  //   setOpenDropdown(openDropdown === name ? null : name);
-  // };
+  const toggleDropdown = (name: string) => {
+    setOpenDropdown(openDropdown === name ? null : name);
+  };
 
   // const toggleSubDropdown = (menu: string) => {
   //   setOpenSubDropdown(openSubDropdown === menu ? null : menu);
@@ -162,14 +162,30 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
-                  {/* Pengaturan */}
+                  {/* Data Pengaturan */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton onClick={() => toggleDropdown("pengaturan")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                      <span className="flex items-center gap-2">
                         <Settings className="h-4 w-4" />
-                        {!isCollapsed && <span>Pengaturan</span>}
-                      </Link>
+                        {!isCollapsed && "Pengaturan"}
+                      </span>
+                      {!isCollapsed && <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === "pengaturan" && "rotate-180")} />}
                     </SidebarMenuButton>
+
+                    {!isCollapsed && openDropdown === "pengaturan" && (
+                      <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                        {[
+                          { to: "/guru/settings-profile/ubah-profile", label: "Ubah Profile" },
+                          { to: "/guru/settings-profile/ubah-password", label: "Ubah Password" },
+                        ].map((item) => (
+                          <SidebarMenuSubItem key={item.to}>
+                            <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes(item.to) && "bg-primary text-white font-medium")}>
+                              <Link to={item.to}>{item.label}</Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    )}
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>

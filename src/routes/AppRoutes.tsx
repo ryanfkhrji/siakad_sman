@@ -40,7 +40,7 @@ import UserTu from "@/pages/SuperAdmin/ManajemenUser/Tu";
 import EditUserTu from "@/pages/SuperAdmin/ManajemenUser/Tu/EditUserTu";
 import UserStaff from "@/pages/SuperAdmin/ManajemenUser/Staff";
 import EditUserStaff from "@/pages/SuperAdmin/ManajemenUser/Staff/EditUserStaff";
-import SettingUserSuperAdmin from "@/pages/SuperAdmin/SettingsProfile/SettingUserSuperAdmin";
+import EditPasswordSuperAdmin from "@/pages/SuperAdmin/SettingsProfile/EditPasswordSuperAdmin";
 import DataEkstrakurikuler from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler";
 import CreateEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/CreateEkskul";
 import EditEkskul from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/EditEkskul";
@@ -76,6 +76,8 @@ import DetailKelas from "@/pages/Siswa/Kelas";
 import JadwalPelajaranSiswa from "@/pages/Siswa/JadwalPelajaran";
 import EditPasswordSiswa from "@/pages/Siswa/SettingProfile/EditPasswordSiswa";
 import EditProfileSiswa from "@/pages/Siswa/SettingProfile/EditProfileSiswa";
+import EditPasswordGuru from "@/pages/Guru/SettingsProfile/EditPasswordGuru";
+import EditProfileGuru from "@/pages/Guru/SettingsProfile/EditProfileGuru";
 
 export default function AppRoutes() {
   return (
@@ -138,7 +140,7 @@ export default function AppRoutes() {
           path="/superadmin/settings-profile/ubah-password"
           element={
             <ProtectedRoute roles={["super_admin"]}>
-              <SettingUserSuperAdmin />
+              <EditPasswordSuperAdmin />
             </ProtectedRoute>
           }
         />
@@ -557,6 +559,26 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditKompetensiDasar />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= DATA DASHBOARD SUPER ADMIN ================= */}
+        {/* Setting User */}
+        <Route
+          path="/guru/settings-profile/ubah-password"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <EditPasswordGuru />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/guru/settings-profile/ubah-profile"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <EditProfileGuru />
             </ProtectedRoute>
           }
         />
