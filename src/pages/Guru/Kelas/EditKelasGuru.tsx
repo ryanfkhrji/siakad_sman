@@ -1,5 +1,4 @@
 import PageTitle from "@/components/PageTitle";
-import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/pages/Footer";
@@ -8,6 +7,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
+import { SidebarGuru } from "@/components/SidebarGuru";
 
 interface FormErrors {
   nama_kelas?: string[];
@@ -140,11 +140,11 @@ const EditKelasGuru = () => {
 
   return (
     <SidebarProvider>
-      <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <SidebarGuru isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main
         className={`w-full min-h-screen bg-background transition-all duration-300
-        ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}
+        ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}`}
       >
         <PageTitle title="Edit Kelas" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">

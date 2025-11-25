@@ -299,7 +299,7 @@ const EditProfileGuru = () => {
                   {/* NIP */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      NIP <span className="text-red-500">*</span>
+                      NIP
                     </label>
                     <input
                       type="text"
@@ -323,7 +323,7 @@ const EditProfileGuru = () => {
                   {/* Nama Lengkap */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nama Lengkap <span className="text-red-500">*</span>
+                      Nama Lengkap
                     </label>
                     <input
                       type="text"
@@ -347,7 +347,7 @@ const EditProfileGuru = () => {
                   {/* Email */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email <span className="text-red-500">*</span>
+                      Email
                     </label>
                     <input
                       type="email"
@@ -393,7 +393,7 @@ const EditProfileGuru = () => {
                   {/* Role */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Role <span className="text-red-500">*</span>
+                      Role
                     </label>
                     <select
                       name="role"

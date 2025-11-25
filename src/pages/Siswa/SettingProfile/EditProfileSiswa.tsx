@@ -263,7 +263,7 @@ const EditProfileSiswa = () => {
     <SidebarProvider>
       <SidebarSiswa isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
+      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}`}>
         <PageTitle title="Edit Profil Siswa" />
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
@@ -301,7 +301,7 @@ const EditProfileSiswa = () => {
                   {/* NISN */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      NISN <span className="text-red-500">*</span>
+                      NISN {/*<span className="text-red-500">*</span> */}
                     </label>
                     <input
                       type="text"
@@ -325,7 +325,7 @@ const EditProfileSiswa = () => {
                   {/* NIS */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      NIS <span className="text-red-500">*</span>
+                      NIS
                     </label>
                     <input
                       type="text"
@@ -349,7 +349,7 @@ const EditProfileSiswa = () => {
                   {/* Nama Lengkap */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nama Lengkap <span className="text-red-500">*</span>
+                      Nama Lengkap
                     </label>
                     <input
                       type="text"
@@ -373,7 +373,7 @@ const EditProfileSiswa = () => {
                   {/* Email */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email <span className="text-red-500">*</span>
+                      Email
                     </label>
                     <input
                       type="email"

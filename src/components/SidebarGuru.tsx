@@ -74,8 +74,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
                 <SidebarMenu>
                   {/* Dashboard */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/dashboard") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/dashboard" className="flex items-center gap-2">
                         <Home className="h-4 w-4" />
                         {!isCollapsed && <span>Dashboard</span>}
                       </Link>
@@ -84,8 +84,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Siswa */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/siswa/data-siswa") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/siswa/data-siswa" className="flex items-center gap-2">
                         <Users className="h-4 w-4" />
                         {!isCollapsed && <span>Data Siswa</span>}
                       </Link>
@@ -94,8 +94,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Jadwal Pelajaran */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/jadwal-pelajaran/data-jadwal") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/jadwal-pelajaran/data-jadwal" className="flex items-center gap-2">
                         <CalendarDays className="h-4 w-4" />
                         {!isCollapsed && <span>Data Jadwal Pelajaran</span>}
                       </Link>
@@ -104,8 +104,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Nilai */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/nilai/data-nilai") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/nilai/data-nilai" className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         {!isCollapsed && <span>Data Nilai</span>}
                       </Link>
@@ -114,7 +114,7 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Kelas */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/kelas/detail-kelas") && "bg-primary/10 text-primary font-medium")}>
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/kelas/detail-kelas") && "bg-primary text-white font-medium")}>
                       <Link to="/guru/kelas/detail-kelas" className="flex items-center gap-2">
                         <DoorOpen className="h-4 w-4" />
                         {!isCollapsed && <span>Data Kelas</span>}
@@ -124,8 +124,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Akademik */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/informasi-akademik/data-akademik") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/informasi-akademik/data-akademik" className="flex items-center gap-2">
                         <GraduationCap className="h-4 w-4" />
                         {!isCollapsed && <span>Data Akademik</span>}
                       </Link>
@@ -134,8 +134,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Absensi */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/absensi/data-absensi") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/absensi/data-absensi" className="flex items-center gap-2">
                         <ClipboardCheck className="h-4 w-4" />
                         {!isCollapsed && <span>Data Absensi</span>}
                       </Link>
@@ -144,8 +144,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Kebutuhan Siswa */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/kebutuhan-siswa/data-kebutuhan-siswa") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/kebutuhan-siswa/data-kebutuhan-siswa" className="flex items-center gap-2">
                         <ClipboardList className="h-4 w-4" />
                         {!isCollapsed && <span>Data Kebutuhan Siswa</span>}
                       </Link>
@@ -154,8 +154,8 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Status Kepegawaian */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/settings") && "bg-primary/10 text-primary font-medium")}>
-                      <Link to="/superadmin/settings" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/status-kepegawaian/data-status") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/status-kepegawaian/data-status" className="flex items-center gap-2">
                         <IdCard className="h-4 w-4" />
                         {!isCollapsed && <span>Data Status Kepegawaian</span>}
                       </Link>

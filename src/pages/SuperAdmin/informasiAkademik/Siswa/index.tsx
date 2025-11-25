@@ -240,7 +240,9 @@ const DataSiswa = () => {
                           <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.nama_kelas ?? "-"}</TableCell>
                           <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.wali_kelas?.nama ?? "-"}</TableCell>
                           <TableCell>{siswa.nama_ekstrakurikuler ?? "-"}</TableCell>
-                          <TableCell>{siswa.status ?? "-"}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${siswa.status === "aktif" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{siswa.status ?? "-"}</span>
+                          </TableCell>
                           {/* <TableCell>{siswa.role ?? "-"}</TableCell> */}
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}

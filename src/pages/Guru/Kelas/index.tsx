@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PageTitle from "@/components/PageTitle";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Loader2Icon, PenBoxIcon, UsersIcon, ClockIcon, DoorOpenIcon, User2Icon } from "lucide-react";
+import { Loader2Icon, PenBoxIcon, UsersIcon, ClockIcon, DoorOpenIcon, User2Icon, SearchIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Footer from "@/pages/Footer";
@@ -9,7 +9,8 @@ import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
+import { SidebarGuru } from "@/components/SidebarGuru";
+import { Input } from "@/components/ui/input";
 
 interface Siswa {
   id: number;
@@ -41,6 +42,10 @@ const DetailKelasGuru = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dataKelas, setDataKelas] = useState<DataKelas | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState<Siswa[]>([]);
 
   // Fetch data kelas
   useEffect(() => {
@@ -67,14 +72,44 @@ const DetailKelasGuru = () => {
     fetchData();
   }, []);
 
+  // Filter berdasarkan jenjang dan pencarian
+  useEffect(() => {
+    if (dataKelas) {
+      const lower = searchTerm.toLowerCase();
+
+      const filtered = dataKelas.anggota.filter((p) => {
+        const nama = p.nama?.toLowerCase() || "";
+        const nisn = p.nisn?.toLowerCase() || "";
+        const nis = p.nis?.toLowerCase() || "";
+
+        return nama.includes(lower) || nisn.includes(lower) || nis.includes(lower);
+      });
+
+      setFilteredData(filtered);
+      setCurrentPage(1);
+    }
+  }, [searchTerm, dataKelas]);
+
+  // Pagination logic
+  const totalPages = Math.ceil((filteredData.length || 1) / rowsPerPage);
+
+  const paginated = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    return filteredData.slice(start, start + rowsPerPage);
+  }, [filteredData, currentPage, rowsPerPage]);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
   return (
     <SidebarProvider>
-      <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <SidebarGuru isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main
         className={`
         w-full min-h-screen bg-background transition-all duration-300
-        ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}
+        ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}
       `}
       >
         <PageTitle title="Kelas Saya" />
@@ -139,8 +174,13 @@ const DetailKelasGuru = () => {
 
               {/* Tabel Siswa */}
               <div className="bg-white rounded shadow">
-                <div className="p-4 border-b">
+                <div className="p-4 border-b mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                   <h2 className="text-xl font-bold">Daftar Siswa</h2>
+
+                  <div className="relative w-full md:w-1/3">
+                    <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
+                    <Input type="text" placeholder="Cari siswa..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  </div>
                 </div>
                 <div className="w-full overflow-x-auto">
                   <Table className="min-w-full">
@@ -158,8 +198,8 @@ const DetailKelasGuru = () => {
                     </TableHeader>
 
                     <TableBody>
-                      {dataKelas.anggota.length > 0 ? (
-                        dataKelas.anggota.map((siswa, index) => (
+                      {paginated.length > 0 ? (
+                        paginated.map((siswa, index) => (
                           <TableRow key={siswa.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                             <TableCell className="text-center font-medium">{index + 1}</TableCell>
                             <TableCell>{siswa.nisn ?? "-"}</TableCell>
@@ -182,6 +222,40 @@ const DetailKelasGuru = () => {
                       )}
                     </TableBody>
                   </Table>
+                </div>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span>Tampilkan:</span>
+                  <select
+                    value={rowsPerPage}
+                    onChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="border border-gray-300 rounded px-2 py-1"
+                  >
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span>data per halaman</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button size="sm" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+                    Prev
+                  </Button>
+
+                  <span className="text-sm">
+                    Halaman <strong>{currentPage}</strong> dari <strong>{totalPages}</strong>
+                  </span>
+
+                  <Button size="sm" disabled={currentPage >= totalPages} onClick={() => handlePageChange(currentPage + 1)}>
+                    Next
+                  </Button>
                 </div>
               </div>
             </>

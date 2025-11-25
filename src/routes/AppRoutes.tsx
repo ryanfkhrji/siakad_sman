@@ -80,6 +80,8 @@ import EditPasswordGuru from "@/pages/Guru/SettingsProfile/EditPasswordGuru";
 import EditProfileGuru from "@/pages/Guru/SettingsProfile/EditProfileGuru";
 import DetailKelasGuru from "@/pages/Guru/Kelas";
 import EditKelasGuru from "@/pages/Guru/Kelas/EditKelasGuru";
+import JadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran";
+import DetailJadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran/DetailJadwalPelajaranGuru";
 
 export default function AppRoutes() {
   return (
@@ -598,6 +600,24 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["guru"]}>
               <EditKelasGuru />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Jadwal Pembelajaran */}
+        <Route
+          path="/guru/jadwal-pelajaran/data-jadwal"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <JadwalPelajaranGuru />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guru/jadwal-pelajaran/detail/:id"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <DetailJadwalPelajaranGuru />
             </ProtectedRoute>
           }
         />
