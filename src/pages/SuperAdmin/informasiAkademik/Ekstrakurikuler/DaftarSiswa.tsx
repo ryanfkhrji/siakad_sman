@@ -241,7 +241,7 @@ const DaftarSiswa = () => {
                           <TableCell>{siswa.nama_siswa}</TableCell>
                           <TableCell>{siswa.jurusan}</TableCell>
                           <TableCell>{siswa.kelas}</TableCell>
-                          <TableCell className="flex gap-1 justify-center">
+                          <TableCell className="flex justify-center">
                             <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.id_pivot)}>
                               <Trash2Icon size={16} />
                             </Button>

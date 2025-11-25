@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PageTitle from "@/components/PageTitle";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { SearchIcon, Loader2Icon, ClockIcon, BookOpenIcon } from "lucide-react";
+import { SearchIcon, Loader2Icon, ClockIcon, BookOpenIcon, CalendarIcon, DoorOpenIcon } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Footer from "@/pages/Footer";
 import { Input } from "@/components/ui/input";
@@ -159,22 +159,18 @@ const JadwalPelajaranSiswa = () => {
                           <div className="grid gap-3 text-sm">
                             {/* Hari */}
                             <div className="flex justify-between items-start">
-                              <span className="font-semibold text-gray-700">Hari</span>
+                              <span className="font-semibold text-gray-700 flex items-center gap-1">
+                                <CalendarIcon className="text-primary" size={14} />
+                                Hari
+                              </span>
                               <span className="text-right font-medium text-primary">{jadwal.hari || "-"}</span>
                             </div>
                             <Separator />
 
-                            {/* Guru */}
-                            {/* <div className="flex justify-between items-start">
-                              <span className="font-semibold text-gray-700">Guru Pengajar</span>
-                              <span className="text-right max-w-[60%]">{jadwal.guru || "-"}</span>
-                            </div>
-                            <Separator /> */}
-
                             {/* Jam Pelajaran */}
                             <div className="flex justify-between items-center">
                               <span className="font-semibold text-gray-700 flex items-center gap-1">
-                                <ClockIcon size={14} />
+                                <ClockIcon className="text-primary" size={14} />
                                 Jam Pelajaran
                               </span>
                               <span className="font-medium text-primary">{jadwal.jam_pelajaran || "-"}</span>
@@ -183,8 +179,11 @@ const JadwalPelajaranSiswa = () => {
 
                             {/* Ruangan */}
                             <div className="flex justify-between">
-                              <span className="font-semibold text-gray-700">Ruangan</span>
-                              <span>{jadwal.ruangan || "-"}</span>
+                              <span className="font-semibold text-gray-700 flex items-center gap-1">
+                                <DoorOpenIcon className="text-primary" size={14} />
+                                Ruangan
+                              </span>
+                              <span className="font-medium text-primary">{jadwal.ruangan || "-"}</span>
                             </div>
                           </div>
                         </CardContent>

@@ -84,6 +84,7 @@ import JadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran";
 import DetailJadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran/DetailJadwalPelajaranGuru";
 import DataSiswaGuru from "@/pages/Guru/Siswa";
 import DetailSiswaGuru from "@/pages/Guru/Siswa/DetailSiswaGuru";
+import DetailEkskulGuru from "@/pages/Guru/Ekstrakurikuler";
 
 export default function AppRoutes() {
   return (
@@ -638,6 +639,16 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["guru"]}>
               <DetailSiswaGuru />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Ekstrakurikuler */}
+        <Route
+          path="/guru/ekstrakurikuler/data-ekstrakurikuler"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <DetailEkskulGuru />
             </ProtectedRoute>
           }
         />

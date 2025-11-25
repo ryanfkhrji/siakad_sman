@@ -1,5 +1,5 @@
 import { SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/components/ui/sidebar";
-import { Home, GraduationCap, ClipboardList, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Menu, Users, CalendarDays, BookOpen, DoorOpen, ClipboardCheck, IdCard, ChevronDown } from "lucide-react";
+import { Home, GraduationCap, ClipboardList, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Menu, Users, CalendarDays, BookOpen, DoorOpen, ClipboardCheck, IdCard, ChevronDown, TrophyIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -148,6 +148,16 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
                       <Link to="/guru/kebutuhan-siswa/data-kebutuhan-siswa" className="flex items-center gap-2">
                         <ClipboardList className="h-4 w-4" />
                         {!isCollapsed && <span>Data Kebutuhan Siswa</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  {/* Data Ekstrakurikuler */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/ekstrakurikuler/data-ekstrakurikuler") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/ekstrakurikuler/data-ekstrakurikuler" className="flex items-center gap-2">
+                        <TrophyIcon className="h-4 w-4" />
+                        {!isCollapsed && <span>Data Ekstrakurikuler</span>}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
