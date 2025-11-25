@@ -82,6 +82,8 @@ import DetailKelasGuru from "@/pages/Guru/Kelas";
 import EditKelasGuru from "@/pages/Guru/Kelas/EditKelasGuru";
 import JadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran";
 import DetailJadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran/DetailJadwalPelajaranGuru";
+import DataSiswaGuru from "@/pages/Guru/Siswa";
+import DetailSiswaGuru from "@/pages/Guru/Siswa/DetailSiswaGuru";
 
 export default function AppRoutes() {
   return (
@@ -618,6 +620,24 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["guru"]}>
               <DetailJadwalPelajaranGuru />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Siswa */}
+        <Route
+          path="/guru/siswa/data-siswa"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <DataSiswaGuru />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guru/siswa/data-siswa/detail-siswa/:id"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <DetailSiswaGuru />
             </ProtectedRoute>
           }
         />

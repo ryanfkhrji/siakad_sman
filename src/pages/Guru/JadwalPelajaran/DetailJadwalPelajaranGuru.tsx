@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import PageTitle from "@/components/PageTitle";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Loader2, BookOpen, Calendar, Clock, DoorOpen, User2, Link as LinkIcon, Users, ArrowLeftIcon, SearchIcon } from "lucide-react";
+import { Loader2, BookOpen, Calendar, Clock, DoorOpen, User2, Link as LinkIcon, Users, ArrowLeftIcon, SearchIcon, DoorClosedIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Footer from "@/pages/Footer";
@@ -170,7 +170,7 @@ const DetailJadwalPelajaranGuru = () => {
                     </div>
                     <div>
                       <p className="text-gray-600 font-medium flex items-center gap-1">
-                        <BookOpen size={16} />
+                        <DoorClosedIcon size={16} />
                         Kelas
                       </p>
                       <p className="text-lg font-bold text-primary">{dataJadwal.kelas}</p>
