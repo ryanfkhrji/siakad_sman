@@ -85,10 +85,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD kompetensi dasar
     Route::apiResource('/spa/kompetensi-dasar', KompetensiDasarController::class);
 
-    // ✅ CRUD gedung
+    // ! ✅ CRUD gedung (tambahin ruangan di detail)
     Route::apiResource('/spa/gedung', GedungController::class);
     
-    // ! Ruangan
+    // ✅ Ruangan
     Route::apiResource('/spa/ruangan', RuanganController::class);
 
     // ✅ CRUD Kelas

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Gedung;
+use App\Models\Ruangan;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Response;
@@ -117,7 +118,7 @@ class GedungController extends Controller
      */
     public function show(string $id)
     {
-        $gedung = Gedung::find($id);
+        $gedung = Gedung::with('ruangan')->find($id);
 
         if (!$gedung) {
             return ApiResponse::error('Data gedung tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
@@ -133,6 +134,20 @@ class GedungController extends Controller
                 'tahun_dibangun' => $gedung->tahun_dibangun,
                 'kondisi' => $gedung->kondisi,
                 'keterangan' => $gedung->keterangan,
+                'ruangan' => $gedung->ruangan->map(function ($item) {
+                    return [
+                        'id' => $item->id ?? null,
+                        'kode_ruangan' => $item->kode_ruangan ?? null,
+                        'nama_ruangan' => $item->nama_ruangan ?? null,
+                        'jenis_ruangan' => $item->jenis_ruangan ?? null,
+                        'lantai' => $item->lantai ?? null,
+                        'kapasitas' => $item->kapasitas ?? null,
+                        'luas_ruangan' => $item->luas_ruangan ?? null,
+                        'kondisi' => $item->kondisi ?? null,
+                        'fasilitas' => $item->fasilitas ?? null,
+                        'keterangan' => $item->keterangan ?? null,
+                    ];
+                }),
         ];
 
         return ApiResponse::success($formatted, 'Detail gedung berhasil diambil');
