@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('nama_sekolah');
             $table->string('status_sekolah')->nullable();      // Negeri/Swasta
             $table->string('jenjang')->nullable();             // SD/SMP/SMA/SMK
+            $table->string('akreditasi')->nullable();          
 
             // Alamat
             $table->string('alamat')->nullable();

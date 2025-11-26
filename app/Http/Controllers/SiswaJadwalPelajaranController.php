@@ -142,6 +142,33 @@ class SiswaJadwalPelajaranController extends Controller
         return ApiResponse::success($formatted, 'Semua jadwal siswa berhasil diambil');
     }
 
+    // ✅ show detail jadwal sendiri untuk siswa
+    public function showDetailJadwalSendiri($id)
+    {
+        $user = Auth::guard('siswa')->user();
+
+        $jadwal = SiswaJadwalPelajaran::with('jadwal', 'siswa')->where('siswa_id', $user->id)->find($id);
+
+        if (!$jadwal) {
+            return ApiResponse::error('Jadwal tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        $formatted = [                                    
+            'id' => $jadwal->id ?? null,
+            // tidak pakai id_pivot karena get tabelnya langsung, tidak lewat tabel lain
+            'mata_pelajaran' => $jadwal->jadwal->mataPelajaran->nama_pelajaran ?? null,
+            'hari' => $jadwal->jadwal->hari ?? null,
+            'guru' => $jadwal->jadwal->guru->nama ?? null,
+            'kelas' => $jadwal->jadwal->kelas->nama_kelas ?? null,
+            'jam_pelajaran' => $jadwal->jadwal->jam_pelajaran ?? null,
+            'ruangan' => $jadwal->jadwal->ruangan ?? null,
+            'link_opsional' => $jadwal->jadwal->link_opsional ?? null,                            
+        ];
+
+        return ApiResponse::success($formatted, 'Detail jadwal berhasil diambil');
+    }
+
+
     // ✅ show jadwal sendiri untuk siswa
     public function showAllJadwalSendiri()
     {

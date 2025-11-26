@@ -11,6 +11,7 @@ use App\Http\Controllers\SiswaJadwalPelajaranController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\KompetensiDasarController;
 use App\Http\Controllers\GedungController;
+use App\Http\Controllers\IdentitasSekolahController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
@@ -202,8 +203,8 @@ Route::middleware('auth:siswa')->group(function () {
     // ✅ Get all jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
     
-    // ✅ Get detail jadwal pelajaran sendiri
-    Route::apiResource('/siswa/jadwal-pelajaran/show/diri', SiswaJadwalPelajaranController::class)->only('show');
+    // ! Get detail jadwal pelajaran sendiri
+    Route::get('/siswa/jadwal-pelajaran/show/diri/{id}', [SiswaJadwalPelajaranController::class, 'showDetailJadwalSendiri']);
 
     // ✅ get all ekskul untuk siswa
     Route::apiResource('/siswa/ekstrakurikuler/all', EkstrakurikulerController::class)->only(['index', 'show']);
