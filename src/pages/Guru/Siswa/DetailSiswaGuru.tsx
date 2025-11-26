@@ -37,15 +37,15 @@ interface DataJadwalSiswa {
     id: number;
     nama_kelas: string;
     jam_masuk: string;
-    wali_kelas: {
-      id: number;
-      nama: string;
-      email: string;
-      status: string;
-      nip: string;
-      keterangan: string;
-      role: string;
-    };
+  };
+  wali_kelas: {
+    id: number;
+    nama: string;
+    email: string;
+    status: string;
+    nip: string;
+    keterangan: string;
+    role: string;
   };
   jadwal_pelajaran: JadwalPelajaran[];
 }
@@ -144,7 +144,7 @@ const DetailSiswaGuru = () => {
                         <User2 size={16} />
                         Wali Kelas
                       </p>
-                      <p className="text-lg font-bold text-primary">{dataJadwal.kelas.wali_kelas.nama}</p>
+                      <p className="text-lg font-bold text-primary">{dataJadwal.wali_kelas.nama}</p>
                     </div>
                     <div>
                       <p className="text-gray-600 font-medium flex items-center gap-1">

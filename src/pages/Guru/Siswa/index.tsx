@@ -55,7 +55,6 @@ export interface Siswa {
   jadwal_pelajaran: JadwalPelajaran[];
 }
 
-
 const DataSiswaGuru = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [dataSiswa, setDataSiswa] = useState<Siswa[]>([]);
@@ -73,7 +72,7 @@ const DataSiswaGuru = () => {
         setLoading(true);
         const res = await api.get("/pegawai/siswa");
         if (res.data.status === "success") {
-          const siswaOnly = res.data.data;
+          const siswaOnly = res.data.data.filter((s: Siswa) => s.role === "siswa");
           setDataSiswa(siswaOnly);
           setFilteredSiswa(siswaOnly);
         }
@@ -104,7 +103,9 @@ const DataSiswaGuru = () => {
 
     if (searchTerm.trim() !== "") {
       const lowerSearch = searchTerm.toLowerCase();
-      filtered = filtered.filter((siswa) => siswa.nama.toLowerCase().includes(lowerSearch) || siswa.nisn?.toLowerCase().includes(lowerSearch) || siswa.nis?.toLowerCase().includes(lowerSearch) || siswa.kelas?.nama_kelas?.toLowerCase().includes(lowerSearch));
+      filtered = filtered.filter(
+        (siswa) => siswa.nama.toLowerCase().includes(lowerSearch) || siswa.nisn?.toLowerCase().includes(lowerSearch) || siswa.nis?.toLowerCase().includes(lowerSearch) || siswa.kelas?.nama_kelas?.toLowerCase().includes(lowerSearch)
+      );
     }
 
     setFilteredSiswa(filtered);
@@ -219,7 +220,7 @@ const DataSiswaGuru = () => {
                           </TableCell>
                           {/* <TableCell>{siswa.role ?? "-"}</TableCell> */}
                           <TableCell className="flex gap-1 justify-center">
-                            <Link to={`/superadmin/informasi-akademik/siswa/edit/${siswa.id}`}>
+                            <Link to={`/guru/siswa/data-siswa/detail-siswa/${siswa.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <InfoIcon size={16} />
                                 Lihat Detail

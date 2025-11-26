@@ -17,8 +17,16 @@ const api = axios.create({
 //   return config;
 // });
 api.interceptors.request.use((config) => {
-  // Ambil token sesuai role
-  const token = localStorage.getItem("token_siswa") || localStorage.getItem("token") || "";
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  // Tentukan token berdasarkan role
+  let token = "";
+  if (user.role === "siswa") {
+    token = localStorage.getItem("token_siswa") || "";
+  } else {
+    // Untuk guru, admin, superadmin, dll
+    token = localStorage.getItem("token") || "";
+  }
 
   if (token) {
     config.headers.Authorization = `Bearer ${token.trim()}`;
