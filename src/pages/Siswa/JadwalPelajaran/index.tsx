@@ -9,6 +9,8 @@ import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Separator } from "@/components/ui/separator";
 import { SidebarSiswa } from "@/components/SidebarSiswa";
+// import { Button } from "@/components/ui/button";
+// import { useNavigate } from "react-router-dom";
 import { DialogDetailJadwalSiswa } from "./DetailJadwalPelajaran";
 
 interface JadwalPelajaran {
@@ -50,6 +52,7 @@ interface DataJadwalSiswa {
 }
 
 const JadwalPelajaranSiswa = () => {
+  // const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

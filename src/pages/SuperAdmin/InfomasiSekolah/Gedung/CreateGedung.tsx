@@ -179,7 +179,7 @@ const CreateGedung = () => {
                 {/* Kode Gedung */}
                 <div>
                   <label className="block font-semibold">
-                    Kode Gedung <span className="text-red-500">*</span>
+                    Kode Gedung
                   </label>
                   <input type="text" placeholder="cth: GD_01" value={formData.kode_gedung} onChange={(e) => setFormData({ ...formData, kode_gedung: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                   {errors.kode_gedung && errors.kode_gedung.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kode_gedung[0]}</p>}
@@ -188,7 +188,7 @@ const CreateGedung = () => {
                 {/* Nama Gedung */}
                 <div>
                   <label className="block font-semibold">
-                    Nama Gedung <span className="text-red-500">*</span>
+                    Nama Gedung
                   </label>
                   <input type="text" placeholder="cth: Gedung Pratama" value={formData.nama_gedung} onChange={(e) => setFormData({ ...formData, nama_gedung: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                   {errors.nama_gedung && errors.nama_gedung.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.nama_gedung[0]}</p>}

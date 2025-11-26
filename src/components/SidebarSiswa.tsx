@@ -52,7 +52,7 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
             </div>
             {!isCollapsed && (
               <div className="font-semibold text-sm leading-tight">
-                <div>SMA Negeri Jakarta</div>
+                <div>SMA Negeri 43 Jakarta</div>
                 <span className="text-xs text-muted-foreground">{user?.role}</span>
               </div>
             )}

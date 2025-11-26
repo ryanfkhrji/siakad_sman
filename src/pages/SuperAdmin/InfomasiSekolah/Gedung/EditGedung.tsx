@@ -190,9 +190,9 @@ const EditGedung = () => {
       <SidebarProvider>
         <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
         <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-          <div className="flex flex-col items-center justify-center h-screen text-gray-600">
+          <div className="flex flex-col items-center justify-center h-96 text-gray-600">
             <Loader2Icon className="animate-spin mb-2" size={32} />
-            <p className="text-lg font-medium">Memuat data gedung...</p>
+            <p className="text-lg font-medium">Memuat data...</p>
           </div>
         </main>
       </SidebarProvider>
@@ -255,7 +255,7 @@ const EditGedung = () => {
                 {/* Kode Gedung */}
                 <div>
                   <label className="block font-semibold">
-                    Kode Gedung <span className="text-red-500">*</span>
+                    Kode Gedung
                   </label>
                   <input type="text" placeholder="cth: GD_01" value={formData.kode_gedung} onChange={(e) => setFormData({ ...formData, kode_gedung: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                   {errors.kode_gedung && errors.kode_gedung.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kode_gedung[0]}</p>}
@@ -264,7 +264,7 @@ const EditGedung = () => {
                 {/* Nama Gedung */}
                 <div>
                   <label className="block font-semibold">
-                    Nama Gedung <span className="text-red-500">*</span>
+                    Nama Gedung
                   </label>
                   <input type="text" placeholder="cth: Gedung Pratama" value={formData.nama_gedung} onChange={(e) => setFormData({ ...formData, nama_gedung: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                   {errors.nama_gedung && errors.nama_gedung.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.nama_gedung[0]}</p>}

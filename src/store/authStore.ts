@@ -73,6 +73,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
           token: userData.token,
         };
         localStorage.setItem("user", JSON.stringify(siswaDetail));
+
+        localStorage.setItem("token_siswa", userData.token);
       } else {
         // Pegawai (kepegawaian)
         localStorage.setItem("user", JSON.stringify(userData));

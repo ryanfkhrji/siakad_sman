@@ -52,7 +52,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
             </div>
             {!isCollapsed && (
               <div className="font-semibold text-sm leading-tight">
-                <div>SMA Negeri Jakarta</div>
+                <div>SMA Negeri 43 Jakarta</div>
                 <span className="text-xs text-muted-foreground">{user?.role}</span>
               </div>
             )}
@@ -128,8 +128,8 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                       <SidebarMenuSub className="ml-4 mt-1 space-y-1">
                         {/* Item biasa */}
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/siswa") && "bg-primary text-white font-medium")}>
-                            <Link to="/superadmin/siswa">Data Identitas Sekolah</Link>
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/identitas-sekolah") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-sekolah/identitas-sekolah">Data Identitas Sekolah</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 

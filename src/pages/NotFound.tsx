@@ -1,4 +1,5 @@
 import NotFoundImage from "@/assets/404.svg";
+import Footer from "./Footer";
 
 export const NotFound = () => {
   return (
@@ -6,6 +7,7 @@ export const NotFound = () => {
       <div className="flex flex-col items-center">
         <img src={NotFoundImage} alt="404 NotFound" className="object-cover bg-no-repeat bg-center h-96" />
         <h4 className="text-primary font-semibold text-xl">Halaman tidak ditemukan.</h4>
+        <Footer />
       </div>
     </div>
   );

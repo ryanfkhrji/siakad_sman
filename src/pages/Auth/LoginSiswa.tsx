@@ -45,17 +45,55 @@ export default function LoginSiswa() {
     }
   }, [isAuthenticated, user, isCheckingAuth, navigate]);
 
+  // const onSubmit = async (data: FormData) => {
+  //   try {
+  //     setLoading(true);
+  //     await login("siswa/login", data);
+  //     const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+  //     await Swal.fire({
+  //       title: "Login Berhasil!",
+  //       text: `Selamat datang, ${savedUser.nama || savedUser.name || "Siswa"}`,
+  //       icon: "success",
+  //       confirmButtonText: "OK",
+  //       confirmButtonColor: "#4F46E5",
+  //     });
+
+  //     navigate("/siswa/dashboard", { replace: true });
+  //   } catch (err) {
+  //     console.error("Login Error:", err);
+  //     let message = "Periksa kembali NISN dan password Anda.";
+
+  //     if (err instanceof AxiosError) {
+  //       message = err.response?.data?.message || err.response?.data?.errors || message;
+  //     } else if (err instanceof Error) {
+  //       message = err.message;
+  //     }
+
+  //     await Swal.fire({
+  //       title: "Login Gagal",
+  //       text: message,
+  //       icon: "error",
+  //       confirmButtonColor: "#EF4444",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
+
       await login("siswa/login", data);
-      const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+      // Ambil user langsung dari Zustand, lebih aman
+      const savedUser = useAuthStore.getState().user;
 
       await Swal.fire({
         title: "Login Berhasil!",
-        text: `Selamat datang, ${savedUser.nama || savedUser.name || "Siswa"}`,
+        text: `Selamat datang, ${savedUser?.nama || "Siswa"}`,
         icon: "success",
-        confirmButtonText: "OK",
         confirmButtonColor: "#4F46E5",
       });
 
@@ -80,6 +118,7 @@ export default function LoginSiswa() {
       setLoading(false);
     }
   };
+
 
   // ✅ UX lebih baik: Tampilkan loading dulu sebelum tahu status login
   if (isCheckingAuth) {

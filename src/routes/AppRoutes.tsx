@@ -85,6 +85,9 @@ import DetailJadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran/DetailJadwal
 import DataSiswaGuru from "@/pages/Guru/Siswa";
 import DetailSiswaGuru from "@/pages/Guru/Siswa/DetailSiswaGuru";
 import DetailEkskulGuru from "@/pages/Guru/Ekstrakurikuler";
+import DataIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah";
+import CreateIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah/CreateIdentitasSekolah";
+import EditIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah/EditIdentitasSekolah";
 
 export default function AppRoutes() {
   return (
@@ -566,6 +569,32 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditKompetensiDasar />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Identitas Sekolah */}
+        <Route
+          path="/superadmin/informasi-sekolah/identitas-sekolah"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataIdentitasSekolah />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/identitas-sekolah/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateIdentitasSekolah />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/identitas-sekolah/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditIdentitasSekolah />
             </ProtectedRoute>
           }
         />
