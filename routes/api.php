@@ -11,6 +11,7 @@ use App\Http\Controllers\SiswaJadwalPelajaranController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\KompetensiDasarController;
 use App\Http\Controllers\GedungController;
+use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\IdentitasSekolahController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\EkstrakurikulerController;
@@ -86,6 +87,9 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅ CRUD gedung
     Route::apiResource('/spa/gedung', GedungController::class);
+    
+    // ! Ruangan
+    Route::apiResource('/spa/ruangan', RuanganController::class);
 
     // ✅ CRUD Kelas
     Route::apiResource('/spa/kelas', KelasController::class);
@@ -98,6 +102,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
+    
+    // ! Absensi
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);

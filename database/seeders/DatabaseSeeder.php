@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\IdentitasSekolah;
 use App\Models\Gedung;
+use App\Models\Ruangan;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
@@ -72,6 +73,34 @@ class DatabaseSeeder extends Seeder
                 'lokasi' => 'Jl. Raya',
                 'Keterangan' => 'Silakan isi sendiri'
             ],
+        ]);
+
+        // Seed Ruangan
+        Ruangan::insert([
+           [
+            'gedung_id' => 1, // GD_01
+            'kode_ruangan' => '1.3.3', // gedung, lantai, ruangan
+            'nama_ruangan' => 'Ruang Olahraga',
+            'jenis_ruangan' => 'Aula',
+            'lantai' => 3,
+            'kapasitas' => 50,
+            'luas_ruangan' => 50,
+            'kondisi' => 'Dalam Perbaikan',
+            'fasilitas' => 'Matras, Voli, Basket',
+            'keterangan' => 'Buka sampai jam 8 malam'
+           ],
+           [
+            'gedung_id' => 2, // GD_02
+            'kode_ruangan' => '2.2.2', // gedung, lantai, ruangan
+            'nama_ruangan' => 'Kantor Kepala Sekolah',
+            'jenis_ruangan' => 'Kantor',
+            'lantai' => 2,
+            'kapasitas' => 15,
+            'luas_ruangan' => 30,
+            'kondisi' => 'Baik',
+            'fasilitas' => 'ATK, Dispenser, Rak Buku',
+            'keterangan' => 'Tutup saat jam makan siang'
+           ]
         ]);
 
         // Seed Kepegawaian
