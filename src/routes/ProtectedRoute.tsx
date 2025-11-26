@@ -11,12 +11,11 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
   const { token, user, isAuthenticated, isCheckingAuth, checkAuth } = useAuthStore();
   const location = useLocation();
 
-  // Jalankan checkAuth saat komponen dimount
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  // 🔄 Tampilkan loading sementara sedang cek sesi login
+  // 🔄 Tampilkan loading saat cek sesi
   if (isCheckingAuth) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -25,45 +24,21 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
     );
   }
 
-  // 🔍 Deteksi apakah route milik siswa (berdasarkan path)
   const isSiswaRoute = location.pathname.startsWith("/siswa");
-  const isOnLoginSiswa = location.pathname.startsWith("/login-siswa");
-  const isOnLoginKepegawaian = location.pathname.startsWith("/login-kepegawaian");
 
-  // 🚫 Jika user belum login
+  // 🚫 Jika belum login, redirect ke halaman login
   if (!token || !isAuthenticated) {
     const loginPath = isSiswaRoute ? "/login-siswa" : "/login-kepegawaian";
     return <Navigate to={loginPath} replace state={{ from: location }} />;
   }
 
-  // 🔁 Jika user sudah login tapi buka halaman login, redirect ke dashboard sesuai role
+  // ✅ User sudah login, validasi role
   if (isAuthenticated && user) {
-    // Jika siswa mengakses login siswa → redirect ke dashboard siswa
-    if (isOnLoginSiswa && user.role === "siswa") {
-      return <Navigate to="/siswa/dashboard" replace />;
-    }
-
-    // Jika bukan siswa (admin/guru/dll) mengakses login siswa → redirect ke dashboard mereka
-    if (isOnLoginSiswa && user.role !== "siswa") {
-      return <Navigate to="/unauthorized" replace />;
-    }
-
-    // Jika non-siswa mengakses login kepegawaian → redirect ke dashboard mereka
-    if (isOnLoginKepegawaian && user.role !== "siswa") {
-      return <Navigate to="/unauthorized" replace />;
-    }
-
-    // Jika siswa mengakses login kepegawaian → redirect ke dashboard siswa
-    if (isOnLoginKepegawaian && user.role === "siswa") {
+    // ⚠️ Validasi role sesuai yang diizinkan di route ini
+    if (roles && !roles.includes(user.role)) {
       return <Navigate to="/unauthorized" replace />;
     }
   }
 
-  // ⚠️ Jika role tidak sesuai dengan yang diizinkan
-  if (roles && user && !roles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
-  }
-
-  // ✅ Semua validasi lolos
   return <>{children}</>;
 }

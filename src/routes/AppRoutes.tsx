@@ -88,6 +88,7 @@ import DetailEkskulGuru from "@/pages/Guru/Ekstrakurikuler";
 import DataIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah";
 import CreateIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah/CreateIdentitasSekolah";
 import EditIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah/EditIdentitasSekolah";
+import PublicRoute from "./PublicRoute";
 
 export default function AppRoutes() {
   return (
@@ -96,13 +97,56 @@ export default function AppRoutes() {
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/login-kepegawaian" replace />} />
         {/* ================= AUTH ================= */}
-        <Route path="/login-kepegawaian" element={<LoginKepegawaian />} />
-        <Route path="/login-siswa" element={<LoginSiswa />} />
-        <Route path="/register-kepegawaian" element={<RegisterKepegawaian />} />
-        <Route path="/register-siswa" element={<RegisterSiswa />} />
+        <Route
+          path="/login-kepegawaian"
+          element={
+            <PublicRoute>
+              <LoginKepegawaian />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login-siswa"
+          element={
+            <PublicRoute>
+              <LoginSiswa />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register-kepegawaian"
+          element={
+            <PublicRoute>
+              <RegisterKepegawaian />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register-siswa"
+          element={
+            <PublicRoute>
+              <RegisterSiswa />
+            </PublicRoute>
+          }
+        />
+
         {/* ================= AUTH LUPA PASSWORD ================= */}
-        <Route path="/lupa-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route
+          path="/lupa-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
         {/* ================= DASHBOARD PER ROLE ================= */}
         <Route
           path="/superadmin/dashboard"

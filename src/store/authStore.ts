@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import axios from "axios";
+// import axios from "axios";
 import api from "../api/axios";
 import type { NavigateFunction } from "react-router-dom";
 
@@ -35,20 +35,79 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isCheckingAuth: true,
 
   // 🔹 LOGIN
+  // login: async (endpoint, data) => {
+  //   try {
+  //     // Hapus token lama lebih awal
+  //     localStorage.removeItem("token");
+  //     localStorage.removeItem("role");
+  //     localStorage.removeItem("user");
+
+  //     const res = await api.post<LoginResponse>(endpoint, data);
+  //     const { data: userData } = res.data;
+
+  //     // Deteksi apakah siswa atau pegawai
+  //     const isSiswa = userData.role === "siswa";
+
+  //     // Map sesuai tipe user
+  //     const user: User = {
+  //       id: userData.id,
+  //       nama: userData.nama || userData.name,
+  //       role: userData.role,
+  //     };
+
+  //     const token = userData.token;
+
+  //     // 💾 Simpan data user berbeda tergantung role
+  //     if (isSiswa) {
+  //       const siswaDetail = {
+  //         id: userData.id,
+  //         nisn: userData.nisn,
+  //         nama: userData.nama,
+  //         nis: userData.nis,
+  //         nama_jurusan: userData.nama_jurusan,
+  //         nama_ekstrakurikuler: userData.nama_ekstrakurikuler,
+  //         status: userData.status,
+  //         role: userData.role,
+  //         kelas: userData.kelas?.nama_kelas,
+  //         wali_kelas: userData.kelas?.wali_kelas?.nama,
+  //         token: userData.token,
+  //       };
+  //       localStorage.setItem("user", JSON.stringify(siswaDetail));
+
+  //       localStorage.setItem("token_siswa", userData.token);
+  //     } else {
+  //       // Pegawai (kepegawaian)
+  //       localStorage.setItem("user", JSON.stringify(userData));
+  //     }
+
+  //     localStorage.setItem("token", token);
+  //     localStorage.setItem("role", user.role);
+  //     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+  //     set({ user, token, isAuthenticated: true });
+  //   } catch (err: unknown) {
+  //     if (axios.isAxiosError(err)) {
+  //       console.error("Login gagal:", err.response?.data ?? err.message);
+  //       throw err;
+  //     }
+  //     console.error("Login gagal:", String(err));
+  //     throw new Error(String(err));
+  //   }
+  // },
+
   login: async (endpoint, data) => {
     try {
-      // Hapus token lama lebih awal
+      // Bersihkan data lama
       localStorage.removeItem("token");
+      localStorage.removeItem("token_siswa");
       localStorage.removeItem("role");
       localStorage.removeItem("user");
 
       const res = await api.post<LoginResponse>(endpoint, data);
       const { data: userData } = res.data;
 
-      // Deteksi apakah siswa atau pegawai
       const isSiswa = userData.role === "siswa";
 
-      // Map sesuai tipe user
       const user: User = {
         id: userData.id,
         nama: userData.nama || userData.name,
@@ -57,7 +116,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
       const token = userData.token;
 
-      // 💾 Simpan data user berbeda tergantung role
+      // Simpan data user
       if (isSiswa) {
         const siswaDetail = {
           id: userData.id,
@@ -72,26 +131,29 @@ export const useAuthStore = create<AuthStore>((set) => ({
           wali_kelas: userData.kelas?.wali_kelas?.nama,
           token: userData.token,
         };
+
         localStorage.setItem("user", JSON.stringify(siswaDetail));
 
-        localStorage.setItem("token_siswa", userData.token);
+        // token khusus siswa
+        localStorage.setItem("token_siswa", token);
+        localStorage.removeItem("token");
       } else {
-        // Pegawai (kepegawaian)
         localStorage.setItem("user", JSON.stringify(userData));
+
+        // token khusus pegawai
+        localStorage.setItem("token", token);
+        localStorage.removeItem("token_siswa");
       }
 
-      localStorage.setItem("token", token);
       localStorage.setItem("role", user.role);
+
+      // set ke axios
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       set({ user, token, isAuthenticated: true });
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        console.error("Login gagal:", err.response?.data ?? err.message);
-        throw err;
-      }
-      console.error("Login gagal:", String(err));
-      throw new Error(String(err));
+    } catch (err) {
+      console.error("Login gagal:", err);
+      throw err;
     }
   },
 
@@ -159,19 +221,65 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setUser: (user) => set({ user }),
 
   // 🔹 CHECK AUTH
+  // checkAuth: async () => {
+  //   set({ isCheckingAuth: true });
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const user = localStorage.getItem("user");
+
+  //     if (token && user) {
+  //       // ⬇️ Tambahkan baris ini supaya axios kirim token lagi setelah reload
+  //       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+  //       set({
+  //         token,
+  //         user: JSON.parse(user),
+  //         isAuthenticated: true,
+  //         isCheckingAuth: false,
+  //       });
+  //     } else {
+  //       set({
+  //         token: null,
+  //         user: null,
+  //         isAuthenticated: false,
+  //         isCheckingAuth: false,
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error("CheckAuth error:", err);
+  //     set({
+  //       token: null,
+  //       user: null,
+  //       isAuthenticated: false,
+  //       isCheckingAuth: false,
+  //     });
+  //   }
+  // },
+
   checkAuth: async () => {
     set({ isCheckingAuth: true });
     try {
-      const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
+      const tokenPegawai = localStorage.getItem("token");
+      const tokenSiswa = localStorage.getItem("token_siswa");
+      const activeToken = tokenPegawai || tokenSiswa;
+      const saved = localStorage.getItem("user");
 
-      if (token && user) {
-        // ⬇️ Tambahkan baris ini supaya axios kirim token lagi setelah reload
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      if (activeToken && saved) {
+        const parsed = JSON.parse(saved);
+
+        // Normalisasi user supaya sesuai interface User
+        const normalizedUser: User = {
+          id: parsed.id,
+          nama: parsed.nama || parsed.name,
+          role: parsed.role?.toLowerCase(),
+        };
+
+        // Set token ke axios (supaya tetap login setelah refresh)
+        api.defaults.headers.common["Authorization"] = `Bearer ${activeToken}`;
 
         set({
-          token,
-          user: JSON.parse(user),
+          token: activeToken,
+          user: normalizedUser,
           isAuthenticated: true,
           isCheckingAuth: false,
         });

@@ -13,6 +13,7 @@ import { SidebarSiswa } from "@/components/SidebarSiswa";
 
 interface JadwalDetail {
   id: number;
+  pivot_id: number;
   mata_pelajaran: string;
   guru: string;
   kelas: string;

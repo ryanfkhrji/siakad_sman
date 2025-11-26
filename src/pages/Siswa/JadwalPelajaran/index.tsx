@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PageTitle from "@/components/PageTitle";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { SearchIcon, Loader2Icon, ClockIcon, BookOpenIcon, CalendarIcon, DoorOpenIcon } from "lucide-react";
+import { SearchIcon, Loader2Icon, ClockIcon, BookOpenIcon, CalendarIcon, DoorOpenIcon, InfoIcon } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Footer from "@/pages/Footer";
 import { Input } from "@/components/ui/input";
@@ -9,12 +9,13 @@ import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Separator } from "@/components/ui/separator";
 import { SidebarSiswa } from "@/components/SidebarSiswa";
-// import { Button } from "@/components/ui/button";
-// import { useNavigate } from "react-router-dom";
-import { DialogDetailJadwalSiswa } from "./DetailJadwalPelajaran";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+// import { DialogDetailJadwalSiswa } from "./DetailJadwalPelajaran";
 
 interface JadwalPelajaran {
   id: number;
+  pivot_id?: number;
   mata_pelajaran: string;
   guru: string;
   kelas: string;
@@ -52,7 +53,7 @@ interface DataJadwalSiswa {
 }
 
 const JadwalPelajaranSiswa = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -191,11 +192,11 @@ const JadwalPelajaranSiswa = () => {
                           </div>
                         </CardContent>
                         <CardFooter className="flex-col gap-2">
-                          {/* <Button className="w-full" onClick={() => navigate(`/siswa/jadwal-pelajaran/detail/${jadwal.id}`)}>
+                          <Button className="w-full" onClick={() => navigate(`/siswa/jadwal-pelajaran/detail/${jadwal.pivot_id}`)}>
                             <InfoIcon size={18} />
                             Lihat Detail
-                          </Button> */}
-                          <DialogDetailJadwalSiswa jadwal={jadwal} />
+                          </Button>
+                          {/* <DialogDetailJadwalSiswa jadwal={jadwal} /> */}
                         </CardFooter>
                       </Card>
                     ))
