@@ -7,6 +7,8 @@ use App\Models\IdentitasSekolah;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class IdentitasSekolahController extends Controller
 {
@@ -15,28 +17,33 @@ class IdentitasSekolahController extends Controller
      */
     public function index()
     {
-        $identitas = IdentitasSekolah::all();
+        $identitas = IdentitasSekolah::get();
 
-        return ApiResponse::success([
-            'id' => $identitas->id,
-            'npsn' => $identitas->npsn,
-            'nama_sekolah' => $identitas->nama_sekolah,
-            'status_sekolah' => $identitas->status_sekolah,
-            'jenjang' => $identitas->jenjang,
-            'alamat' => $identitas->alamat,
-            'desa_kelurahan' => $identitas->desa_kelurahan,
-            'kecamatan' => $identitas->kecamatan,
-            'kabupaten_kota' => $identitas->kabupaten_kota,
-            'provinsi' => $identitas->provinsi,
-            'kode_pos' => $identitas->kode_pos,
-            'email' => $identitas->email,
-            'no_telepon' => $identitas->no_telepon,
-            'kepala_sekolah' => $identitas->kepala_sekolah,
-            'nip_kepala_sekolah' => $identitas->nip_kepala_sekolah,
-            'visi' => $identitas->visi,
-            'misi' => $identitas->misi,
-            'logo' => $gedung->logo ? asset(str_replace('public/', 'storage/', $gedung->logo)) : null,     
-        ], 'Identitas sekolah berhasil diambil');
+        $formatted = $identitas->map(function ($item) {
+            return [        
+                'id' => $item->id,
+                'npsn' => $item->npsn,
+                'nama_sekolah' => $item->nama_sekolah,
+                'status_sekolah' => $item->status_sekolah,
+                'jenjang' => $item->jenjang,
+                'akreditasi' => $item->akreditasi,
+                'alamat' => $item->alamat,
+                'desa_kelurahan' => $item->desa_kelurahan,
+                'kecamatan' => $item->kecamatan,
+                'kabupaten_kota' => $item->kabupaten_kota,
+                'provinsi' => $item->provinsi,
+                'kode_pos' => $item->kode_pos,
+                'email' => $item->email,
+                'no_telepon' => $item->no_telepon,
+                'kepala_sekolah' => $item->kepala_sekolah,
+                'nip_kepala_sekolah' => $item->nip_kepala_sekolah,
+                'visi' => $item->visi,
+                'misi' => $item->misi,
+                'logo' => $item->logo ? asset(str_replace('public/', 'storage/', $item->logo)) : null,     
+            ];
+        });
+
+        return ApiResponse::success($formatted, 'Identitas sekolah berhasil diambil');
     }
 
     private function simpanFoto($file, $folder, $nama_sekolah)
@@ -64,10 +71,11 @@ class IdentitasSekolahController extends Controller
     {
        try {
             $validated = $request->validate([
-                'npsn' => 'nullable|string',
-                'nama_sekolah' => 'required|string',
+                'npsn' => 'nullable|string|unique:identitas_sekolah,npsn',
+                'nama_sekolah' => 'required|string|unique:identitas_sekolah,nama_sekolah',
                 'status_sekolah' => 'nullable|string',
                 'jenjang' => 'nullable|string',
+                'akreditasi' => 'nullable|string',
                 'alamat' => 'nullable|string',
                 'desa_kelurahan' => 'nullable|string',
                 'kecamatan' => 'nullable|string',
@@ -82,6 +90,8 @@ class IdentitasSekolahController extends Controller
                 'misi' => 'nullable|string',
                 'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
             ], [
+                'npsn.unique' => 'NPSN sudah ada',
+                'nama_sekolah.unique' => 'Nama sekolah sudah ada',
                 'nama_sekolah.required' => 'Nama sekolah wajib diisi',
                 'email.email' => 'Format tidak valid',
                 'logo.image' => 'Hanya boleh berisi gambar atau foto',
@@ -93,7 +103,7 @@ class IdentitasSekolahController extends Controller
                 $validated['logo'] = $this->simpanFoto(
                     $request->file('logo'),
                     'logo', // folder penyimpanan
-                    'logo' // nama si file
+                    'logo-sekolah' // nama si file
                 );
             }
 
@@ -105,6 +115,7 @@ class IdentitasSekolahController extends Controller
                 'nama_sekolah' => $identitas->nama_sekolah,
                 'status_sekolah' => $identitas->status_sekolah,
                 'jenjang' => $identitas->jenjang,
+                'akreditasi' => $identitas->akreditasi,
                 'alamat' => $identitas->alamat,
                 'desa_kelurahan' => $identitas->desa_kelurahan,
                 'kecamatan' => $identitas->kecamatan,
@@ -117,7 +128,7 @@ class IdentitasSekolahController extends Controller
                 'nip_kepala_sekolah' => $identitas->nip_kepala_sekolah,
                 'visi' => $identitas->visi,
                 'misi' => $identitas->misi,
-                'logo' => $gedung->logo ? asset(str_replace('public/', 'storage/', $gedung->logo)) : null,                    
+                'logo' => $identitas->logo ? asset(str_replace('public/', 'storage/', $identitas->logo)) : null,                    
             ], 'Data identitas berhasil dibuat');
        } catch (ValidationException $e) {
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);
@@ -129,7 +140,33 @@ class IdentitasSekolahController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $identitas = IdentitasSekolah::find($id);
+
+        if(!$identitas) {
+            return ApiResponse::error('Not found', ['id' => 'Identitas tidak ditemukan']);
+        }
+
+        return ApiResponse::success([
+            'id' => $identitas->id,
+            'npsn' => $identitas->npsn,
+            'nama_sekolah' => $identitas->nama_sekolah,
+            'status_sekolah' => $identitas->status_sekolah,
+            'jenjang' => $identitas->jenjang,
+            'akreditasi' => $identitas->akreditasi,
+            'alamat' => $identitas->alamat,
+            'desa_kelurahan' => $identitas->desa_kelurahan,
+            'kecamatan' => $identitas->kecamatan,
+            'kabupaten_kota' => $identitas->kabupaten_kota,
+            'provinsi' => $identitas->provinsi,
+            'kode_pos' => $identitas->kode_pos,
+            'email' => $identitas->email,
+            'no_telepon' => $identitas->no_telepon,
+            'kepala_sekolah' => $identitas->kepala_sekolah,
+            'nip_kepala_sekolah' => $identitas->nip_kepala_sekolah,
+            'visi' => $identitas->visi,
+            'misi' => $identitas->misi,
+            'logo' => $identitas->logo ? asset(str_replace('public/', 'storage/', $identitas->logo)) : null,
+        ], 'Detail identitas berasil diambil');
     }
 
     /**
@@ -148,24 +185,37 @@ class IdentitasSekolahController extends Controller
             }
 
             $validated = $request->validate([
-                'npsn' => 'nullable|string',
-                'nama_sekolah' => 'sometimes|required|string',
-                'status_sekolah' => 'nullable|string',
-                'jenjang' => 'nullable|string',
-                'alamat' => 'nullable|string',
-                'desa_kelurahan' => 'nullable|string',
-                'kecamatan' => 'nullable|string',
-                'kabupaten_kota' => 'nullable|string',
-                'provinsi' => 'nullable|string',
-                'kode_pos' => 'nullable|string',
-                'email' => 'nullable|email',
-                'no_telepon' => 'nullable|string',
-                'kepala_sekolah' => 'nullable|string',
-                'nip_kepala_sekolah' => 'nullable|string',
-                'visi' => 'nullable|string',
-                'misi' => 'nullable|string',
+                'npsn' => [
+                    'sometimes',
+                    'nullable',
+                    'string',
+                    Rule::unique('identitas_sekolah')->ignore($id)
+                ],
+                'nama_sekolah' => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    Rule::unique('identitas_sekolah')->ignore($id)
+                ],
+                'status_sekolah' => 'sometimes|nullable|string',
+                'jenjang' => 'sometimes|nullable|string',
+                'akreditasi' => 'sometimes|nullable|string',                
+                'alamat' => 'sometimes|nullable|string',
+                'desa_kelurahan' => 'sometimes|nullable|string',
+                'kecamatan' => 'sometimes|nullable|string',
+                'kabupaten_kota' => 'sometimes|nullable|string',
+                'provinsi' => 'sometimes|nullable|string',
+                'kode_pos' => 'sometimes|nullable|string',
+                'email' => 'sometimes|nullable|email',
+                'no_telepon' => 'sometimes|nullable|string',
+                'kepala_sekolah' => 'sometimes|nullable|string',
+                'nip_kepala_sekolah' => 'sometimes|nullable|string',
+                'visi' => 'sometimes|nullable|string',
+                'misi' => 'sometimes|nullable|string',
                 'logo' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',                
             ], [
+                'npsn.unique' => 'NPSN sudah ada',
+                'nama_sekolah.unique' => 'Nama sekolah sudah ada',
                 'nama_sekolah.required' => 'Nama sekolah wajib diisi',
                 'email.email' => 'Format tidak valid',
                 'logo.image' => 'Hanya boleh berisi gambar atau foto',
@@ -182,7 +232,7 @@ class IdentitasSekolahController extends Controller
                 $validated['logo'] = $this->simpanFoto(
                     $request->file('logo'),
                     'logo',      // folder
-                    $request->logo ?? $identitas->logo,
+                    'logo-sekolah',
                 );
             
                 try {
@@ -207,6 +257,7 @@ class IdentitasSekolahController extends Controller
                 'nama_sekolah' => $identitas->nama_sekolah,
                 'status_sekolah' => $identitas->status_sekolah,
                 'jenjang' => $identitas->jenjang,
+                'akreditasi' => $identitas->akreditasi,
                 'alamat' => $identitas->alamat,
                 'desa_kelurahan' => $identitas->desa_kelurahan,
                 'kecamatan' => $identitas->kecamatan,
@@ -219,7 +270,7 @@ class IdentitasSekolahController extends Controller
                 'nip_kepala_sekolah' => $identitas->nip_kepala_sekolah,
                 'visi' => $identitas->visi,
                 'misi' => $identitas->misi,
-                'logo' => $gedung->logo ? asset(str_replace('public/', 'storage/', $gedung->logo)) : null,                    
+                'logo' => $identitas->logo ? asset(str_replace('public/', 'storage/', $identitas->logo)) : null,                    
             ], 'Data identitas berhasil diperbarui');
         } catch (ValidationException $e) {
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);

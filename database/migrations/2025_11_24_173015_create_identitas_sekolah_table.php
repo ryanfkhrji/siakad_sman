@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             
             // Identitas umum
-            $table->string('npsn')->nullable();                // Nomor Pokok Sekolah Nasional
-            $table->string('nama_sekolah');
+            $table->string('npsn')->unique()->nullable();       // Nomor Pokok Sekolah Nasional
+            $table->string('nama_sekolah')->unique();
             $table->string('status_sekolah')->nullable();      // Negeri/Swasta
             $table->string('jenjang')->nullable();             // SD/SMP/SMA/SMK
             $table->string('akreditasi')->nullable();          

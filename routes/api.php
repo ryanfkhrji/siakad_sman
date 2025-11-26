@@ -151,8 +151,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
 // ✅ membersihkan cache oleh super admin
 Route::get('/cache-cleaner', [CacheCleanerController::class, 'triggerCacheCleanup']);
 
-// ! CRUD identitas sekolah oleh super admin (tinggal debug)
-Route::apiResource('/spa/identitas-sekolah', IdentitasSekolahController::class)->except('show');
+// ✅ CRUD identitas sekolah oleh super admin
+Route::apiResource('/spa/identitas-sekolah', IdentitasSekolahController::class);
 
 // ✅ untuk menampilkan berkas / foto yang private
 Route::get('/tampil-berkas/{jenis}/{filename}', [PsbController::class, 'tampilkanBerkas'])->name('berkas.view');
@@ -203,7 +203,7 @@ Route::middleware('auth:siswa')->group(function () {
     // ✅ Get all jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
     
-    // ! Get detail jadwal pelajaran sendiri
+    // ✅ Get detail jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/show/diri/{id}', [SiswaJadwalPelajaranController::class, 'showDetailJadwalSendiri']);
 
     // ✅ get all ekskul untuk siswa
