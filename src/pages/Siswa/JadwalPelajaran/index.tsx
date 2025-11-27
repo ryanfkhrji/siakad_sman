@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 
 interface JadwalPelajaran {
   id: number;
-  pivot_id?: number;
   mata_pelajaran: string;
   guru: string;
   kelas: string;
@@ -67,6 +66,7 @@ const JadwalPelajaranSiswa = () => {
         setLoading(true);
 
         const res = await api.get("/siswa/jadwal-pelajaran/all/diri");
+        console.log(res.data.data);
 
         if (res.data.status === "success") {
           setDataJadwal(res.data.data);
@@ -192,7 +192,7 @@ const JadwalPelajaranSiswa = () => {
                           </div>
                         </CardContent>
                         <CardFooter className="flex-col gap-2">
-                          <Button className="w-full" onClick={() => navigate(`/siswa/jadwal-pelajaran/detail/${jadwal.pivot_id}`)}>
+                          <Button className="w-full" onClick={() => navigate(`/siswa/jadwal-pelajaran/detail/${jadwal.id}`, { state: { jadwalData: jadwal } })}>
                             <InfoIcon size={18} />
                             Lihat Detail
                           </Button>
