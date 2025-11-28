@@ -13,6 +13,7 @@ use App\Models\TahunAkademik;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
+use App\Models\Prestasi;
 use App\Models\Kelas;
 use App\Models\JadwalPelajaran;
 use App\Models\Kurikulum;
@@ -114,7 +115,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'aktif',
                 'keterangan' => 'Kurikulum Merdeka'
             ]
-        ]);
+        ]);        
 
         // Seed Kepegawaian
         Kepegawaian::insert([
@@ -380,6 +381,16 @@ class DatabaseSeeder extends Seeder
                 'siswa_id' => 2,
                 'ekstrakurikuler_id' => 3,
             ],
+        ]);
+
+        // Seed Prestasi
+        Prestasi::insert([
+            [
+                'siswa_id' => 1,
+                'kelas_id' => 2,
+                'jurusan_id' => 2,
+                'prestasi_diraih' => 'Juara 2 lomba renang tingkat kabupaten',
+            ]
         ]);
     }
 }
