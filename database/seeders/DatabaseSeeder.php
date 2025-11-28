@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use App\Models\IdentitasSekolah;
 use App\Models\Gedung;
 use App\Models\Ruangan;
+use App\Models\TahunAkademik;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
@@ -101,6 +102,18 @@ class DatabaseSeeder extends Seeder
             'fasilitas' => 'ATK, Dispenser, Rak Buku',
             'keterangan' => 'Tutup saat jam makan siang'
            ]
+        ]);
+
+        // Seed Tahun Akademik
+        TahunAkademik::insert([
+            [
+                'tahun_akademik' => '2024/2025',
+                'semester' => 'Genap',
+                'tanggal_mulai' => '2024-07-24',
+                'tanggal_selesai' => '2025-07-25',
+                'status' => 'aktif',
+                'keterangan' => 'Kurikulum Merdeka'
+            ]
         ]);
 
         // Seed Kepegawaian
