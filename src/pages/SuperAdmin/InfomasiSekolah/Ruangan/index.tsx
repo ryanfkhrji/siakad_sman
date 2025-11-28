@@ -7,36 +7,36 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { Gedung } from "@/types";
+import type { Ruangan } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
-import { DialogDetailGedung } from "./DialogDetailGedung";
+import { DialogDetailRuangan } from "./DialogDetailRuangan";
 
-const DataGedung = () => {
+const DataRuangan = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [dataGedung, setDataGedung] = useState<Gedung[]>([]);
+  const [dataRuangan, setDataRuangan] = useState<Ruangan[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<Gedung[]>([]);
+  const [filteredData, setFilteredData] = useState<Ruangan[]>([]);
 
   // Ambil data dari backend
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/spa/gedung");
+        const res = await api.get("/spa/ruangan");
         if (res.data.status === "success") {
-          setDataGedung(res.data.data);
+          setDataRuangan(res.data.data);
         }
       } catch (error: any) {
         Swal.fire({
           icon: "error",
           title: "Gagal memuat data!",
-          text: error.response?.data?.message || "Tidak dapat memuat data gedung.",
-        });
+          text: error.response?.data?.message || "Tidak dapat memuat data ruangan.",
+        })
       } finally {
         setLoading(false);
       }
@@ -48,13 +48,13 @@ const DataGedung = () => {
   // Search filtering
   useEffect(() => {
     if (searchTerm.trim() === "") {
-      setFilteredData(dataGedung);
+      setFilteredData(dataRuangan);
     } else {
       const lower = searchTerm.toLowerCase();
-      setFilteredData(dataGedung.filter((item) => item.nama_gedung.toLowerCase().includes(lower) || item.kode_gedung.toLowerCase().includes(lower)));
+      setFilteredData(dataRuangan.filter((item) => item.kode_ruangan.toLowerCase().includes(lower) || item.nama_ruangan.toLowerCase().includes(lower)));
     }
     setCurrentPage(1);
-  }, [searchTerm, dataGedung]);
+  }, [searchTerm, dataRuangan]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -70,7 +70,7 @@ const DataGedung = () => {
   const handleDelete = async (id: number) => {
     const result = await Swal.fire({
       title: "Yakin ingin menghapus?",
-      text: "Data gedung yang dihapus tidak dapat dikembalikan.",
+      text: "Data ruangan yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#4F46E5",
@@ -82,15 +82,15 @@ const DataGedung = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/spa/gedung/${id}`);
+      const res = await api.delete(`/spa/ruangan/${id}`);
 
       if (res.data.status === "success") {
-        setDataGedung((prev) => prev.filter((j) => j.id !== id));
+        setDataRuangan((prev) => prev.filter((j) => j.id !== id));
 
         Swal.fire({
           icon: "success",
           title: "Berhasil!",
-          text: "Data gedung berhasil dihapus.",
+          text: "Data ruangan berhasil dihapus.",
           showConfirmButton: false,
           timer: 1800,
         });
@@ -98,7 +98,7 @@ const DataGedung = () => {
         Swal.fire({
           icon: "error",
           title: "Gagal menghapus!",
-          text: res.data.message || "Terjadi kesalahan saat menghapus gedung.",
+          text: res.data.message || "Terjadi kesalahan saat menghapus ruangan.",
         });
       }
     } catch (err: any) {
@@ -106,7 +106,7 @@ const DataGedung = () => {
         Swal.fire({
           icon: "error",
           title: "Gagal menghapus!",
-          text: err.response.data.message || "Gedung tidak ditemukan.",
+          text: err.response.data.message || "Ruangan tidak ditemukan.",
         });
       } else {
         Swal.fire({
@@ -115,7 +115,7 @@ const DataGedung = () => {
           text: "Terjadi kesalahan koneksi ke server.",
         });
       }
-      console.error("Gagal menghapus gedung:", err);
+      console.error("Gagal menghapus ruangan:", err);
     } finally {
       setLoading(false);
     }
@@ -132,14 +132,15 @@ const DataGedung = () => {
     return <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>{kondisi}</span>;
   };
 
+
   return (
     <SidebarProvider>
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Data Gedung" />
+        <PageTitle title="Data Ruangan" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Data Gedung</h1>
+          <h1 className="text-3xl font-bold mb-6">Data Ruangan</h1>
 
           {/* Loading State */}
           {loading ? (
@@ -151,16 +152,16 @@ const DataGedung = () => {
             <>
               {/* Tombol Tambah */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-                <Link to="/superadmin/informasi-sekolah/gedung/create" className="w-full md:w-auto">
+                <Link to="/superadmin/informasi-sekolah/ruangan/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
                     <PlusIcon size={18} />
-                    Tambah Gedung
+                    Tambah Ruangan
                   </Button>
                 </Link>
 
                 <div className="relative w-full md:w-1/3">
                   <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari gedung..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  <Input type="text" placeholder="Cari ruangan..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
                 </div>
               </div>
 
@@ -170,13 +171,15 @@ const DataGedung = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Foto Gedung</TableHead>
-                      <TableHead className="font-semibold text-white">Kode Gedung</TableHead>
                       <TableHead className="font-semibold text-white">Nama Gedung</TableHead>
-                      <TableHead className="font-semibold text-white">Jumlah Lantai</TableHead>
-                      <TableHead className="font-semibold text-white">Luas Bangunan</TableHead>
-                      <TableHead className="font-semibold text-white">Tahun Dibangun</TableHead>
+                      <TableHead className="font-semibold text-white">Kode Ruangan</TableHead>
+                      <TableHead className="font-semibold text-white">Nama Ruangan</TableHead>
+                      <TableHead className="font-semibold text-white">Jenis Ruangan</TableHead>
+                      <TableHead className="font-semibold text-white">Lantai</TableHead>
+                      <TableHead className="font-semibold text-white">Kapasitas</TableHead>
+                      <TableHead className="font-semibold text-white">Luas Ruangan</TableHead>
                       <TableHead className="font-semibold text-white">Kondisi</TableHead>
+                      <TableHead className="font-semibold text-white">Fasilitas</TableHead>
                       <TableHead className="font-semibold text-white">Keterangan</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
@@ -184,44 +187,30 @@ const DataGedung = () => {
 
                   <TableBody>
                     {paginated.length > 0 ? (
-                      paginated.map((gedung, index) => (
-                        <TableRow key={gedung.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                      paginated.map((ruangan, index) => (
+                        <TableRow key={ruangan.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>
-                            {gedung.foto_gedung ? (
-                              <img
-                                src={gedung.foto_gedung}
-                                alt={gedung.nama_gedung}
-                                className="w-16 h-16 object-cover rounded border border-gray-200"
-                                onError={(e) => {
-                                  const target = e.currentTarget;
-                                  target.onerror = null;
-                                  target.src =
-                                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64"%3E%3Crect fill="%23e5e7eb" width="64" height="64"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="10"%3ENo Image%3C/text%3E%3C/svg%3E';
-                                }}
-                              />
-                            ) : (
-                              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">No Image</div>
-                            )}
-                          </TableCell>
-                          <TableCell>{gedung.kode_gedung || "-"}</TableCell>
-                          <TableCell>{gedung.nama_gedung || "-"}</TableCell>
-                          <TableCell>{gedung.jumlah_lantai || "-"}</TableCell>
-                          <TableCell>{gedung.luas_bangunan || "-"}</TableCell>
-                          <TableCell>{gedung.tahun_dibangun || "-"}</TableCell>
-                          <TableCell>{getKondisiBadge(gedung.kondisi || "-")}</TableCell>
-                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{gedung.keterangan || "-"}</TableCell>
+                          <TableCell>{ruangan.nama_gedung || "-"}</TableCell>
+                          <TableCell>{ruangan.kode_ruangan || "-"}</TableCell>
+                          <TableCell>{ruangan.nama_ruangan || "-"}</TableCell>
+                          <TableCell>{ruangan.jenis_ruangan || "-"}</TableCell>
+                          <TableCell>{ruangan.lantai || "-"}</TableCell>
+                          <TableCell>{ruangan.kapasitas || "-"}</TableCell>
+                          <TableCell>{ruangan.luas_ruangan || "-"}</TableCell>
+                          <TableCell>{getKondisiBadge(ruangan.kondisi || "-")}</TableCell>
+                          <TableCell>{ruangan.fasilitas || "-"}</TableCell>
+                          <TableCell>{ruangan.keterangan || "-"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
-                            <DialogDetailGedung gedungId={gedung.id} />
+                            <DialogDetailRuangan ruanganId={ruangan.id} />
 
-                            <Link to={`/superadmin/informasi-sekolah/gedung/edit/${gedung.id}`}>
+                            <Link to={`/superadmin/informasi-sekolah/ruangan/edit/${ruangan.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(gedung.id)}>
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(ruangan.id)}>
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>
@@ -279,4 +268,4 @@ const DataGedung = () => {
   );
 };
 
-export default DataGedung;
+export default DataRuangan;

@@ -13,6 +13,7 @@ import { SidebarSiswa } from "@/components/SidebarSiswa";
 
 interface JadwalPelajaran {
   id: number;
+  id_pivot: number;
   mata_pelajaran: string;
   guru: string;
   kelas: string;
@@ -27,7 +28,7 @@ const DetailJadwalPelajaranSiswa = () => {
   const [loading, setLoading] = useState(true);
   const [jadwal, setJadwal] = useState<JadwalPelajaran | null>(null);
 
-  const { id } = useParams<{ id: string }>(); // id = pivot_id
+  const { id_pivot } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +37,7 @@ const DetailJadwalPelajaranSiswa = () => {
         setLoading(true);
 
         // 🔥 PANGGIL API SESUAI RESPONS ASLI
-        const res = await api.get(`/siswa/jadwal-pelajaran/show/diri/${id}`);
+        const res = await api.get(`/siswa/jadwal-pelajaran/show/diri/${id_pivot}`);
 
         if (res.data.status === "success") {
           setJadwal(res.data.data); // langsung jadwal 1 item
@@ -56,8 +57,8 @@ const DetailJadwalPelajaranSiswa = () => {
       }
     };
 
-    if (id) fetchDetail();
-  }, [id, navigate]);
+    if (id_pivot) fetchDetail();
+  }, [id_pivot, navigate]);
 
   return (
     <SidebarProvider>

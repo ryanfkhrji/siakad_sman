@@ -147,3 +147,17 @@ export interface IdentitasSekolah {
   misi: string;
   logo: string;
 }
+
+export interface Ruangan {
+  id: number;
+  nama_gedung: string;
+  kode_ruangan: string;
+  nama_ruangan: string;
+  jenis_ruangan: string;
+  lantai: number;
+  kapasitas: number;
+  luas_ruangan: string;
+  kondisi: string;
+  fasilitas: string;
+  keterangan: string;
+}

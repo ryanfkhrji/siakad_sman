@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 interface JadwalPelajaran {
   id: number;
+  id_pivot: number;
   mata_pelajaran: string;
   guru: string;
   kelas: string;
@@ -192,7 +193,7 @@ const JadwalPelajaranSiswa = () => {
                           </div>
                         </CardContent>
                         <CardFooter className="flex-col gap-2">
-                          <Button className="w-full" onClick={() => navigate(`/siswa/jadwal-pelajaran/detail/${jadwal.id}`, { state: { jadwalData: jadwal } })}>
+                          <Button className="w-full" onClick={() => navigate(`/siswa/jadwal-pelajaran/detail/${jadwal.id_pivot}`)}>
                             <InfoIcon size={18} />
                             Lihat Detail
                           </Button>

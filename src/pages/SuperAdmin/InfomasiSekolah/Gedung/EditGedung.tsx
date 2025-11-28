@@ -254,18 +254,14 @@ const EditGedung = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Kode Gedung */}
                 <div>
-                  <label className="block font-semibold">
-                    Kode Gedung
-                  </label>
+                  <label className="block font-semibold">Kode Gedung</label>
                   <input type="text" placeholder="cth: GD_01" value={formData.kode_gedung} onChange={(e) => setFormData({ ...formData, kode_gedung: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                   {errors.kode_gedung && errors.kode_gedung.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kode_gedung[0]}</p>}
                 </div>
 
                 {/* Nama Gedung */}
                 <div>
-                  <label className="block font-semibold">
-                    Nama Gedung
-                  </label>
+                  <label className="block font-semibold">Nama Gedung</label>
                   <input type="text" placeholder="cth: Gedung Pratama" value={formData.nama_gedung} onChange={(e) => setFormData({ ...formData, nama_gedung: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                   {errors.nama_gedung && errors.nama_gedung.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.nama_gedung[0]}</p>}
                 </div>
@@ -304,6 +300,7 @@ const EditGedung = () => {
                         <SelectItem value="Baik">Baik</SelectItem>
                         <SelectItem value="Rusak Ringan">Rusak Ringan</SelectItem>
                         <SelectItem value="Rusak Berat">Rusak Berat</SelectItem>
+                        <SelectItem value="Dalam Perbaikan">Dalam Perbaikan</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>

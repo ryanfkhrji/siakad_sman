@@ -228,6 +228,7 @@ const CreateGedung = () => {
                         <SelectItem value="Baik">Baik</SelectItem>
                         <SelectItem value="Rusak Ringan">Rusak Ringan</SelectItem>
                         <SelectItem value="Rusak Berat">Rusak Berat</SelectItem>
+                        <SelectItem value="Dalam Perbaikan">Dalam Perbaikan</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>

@@ -108,7 +108,9 @@ export function DialogDetailGedung({ gedungId }: DialogDetailGedungProps) {
             {/* Kondisi */}
             <div className="flex justify-between">
               <span className="font-semibold text-gray-700">Kondisi</span>
-              <span className={`font-medium ${gedung.kondisi === "Baik" ? "text-green-600" : gedung.kondisi === "Rusak Ringan" ? "text-yellow-600" : gedung.kondisi === "Rusak Berat" ? "text-red-600" : ""}`}>{gedung.kondisi ?? "-"}</span>
+              <span className={`font-medium ${gedung.kondisi === "Baik" ? "text-green-600" : gedung.kondisi === "Rusak Ringan" ? "text-yellow-600" : gedung.kondisi === "Rusak Berat" ? "text-red-600" : "text-blue-600"}`}>
+                {gedung.kondisi ?? "-"}
+              </span>
             </div>
             <Separator />
 

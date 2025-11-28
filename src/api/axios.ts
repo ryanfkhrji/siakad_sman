@@ -51,15 +51,15 @@ api.interceptors.response.use(
     console.error("Full Error:", error.response?.data);
 
     if (error.response?.status === 401) {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      const isSiswa = user.role === "siswa";
+      // const user = JSON.parse(localStorage.getItem("user") || "{}");
+      // const isSiswa = user.role === "siswa";
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("token_siswa");
-      localStorage.removeItem("user");
+      // localStorage.removeItem("token");
+      // localStorage.removeItem("token_siswa");
+      // localStorage.removeItem("user");
 
-      // Redirect sesuai role
-      window.location.href = isSiswa ? "/login-siswa" : "/login-kepegawaian";
+      // // Redirect sesuai role
+      // window.location.href = isSiswa ? "/login-siswa" : "/login-kepegawaian";
     }
     return Promise.reject(error);
   }

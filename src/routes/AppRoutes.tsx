@@ -89,6 +89,9 @@ import DataIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSe
 import CreateIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah/CreateIdentitasSekolah";
 import EditIdentitasSekolah from "@/pages/SuperAdmin/InfomasiSekolah/IdentitasSekolah/EditIdentitasSekolah";
 import PublicRoute from "./PublicRoute";
+import DataRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan";
+import CreateRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan/CreateRuangan";
+import EditRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan/EditRuangan";
 
 export default function AppRoutes() {
   return (
@@ -437,6 +440,31 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditGedung />
+            </ProtectedRoute>
+          }
+        />
+        {/* Data Ruangan*/}
+        <Route
+          path="/superadmin/informasi-sekolah/ruangan"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataRuangan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/ruangan/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateRuangan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/ruangan/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditRuangan />
             </ProtectedRoute>
           }
         />
