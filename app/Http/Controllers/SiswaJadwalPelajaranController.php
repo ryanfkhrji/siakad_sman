@@ -145,9 +145,7 @@ class SiswaJadwalPelajaranController extends Controller
     // ✅ show detail jadwal sendiri untuk siswa
     public function showDetailJadwalSendiri($id)
     {
-        $user = Auth::guard('siswa')->user();
-
-        $jadwal = SiswaJadwalPelajaran::with('jadwal', 'siswa')->where('siswa_id', $user->id)->find($id);
+        $jadwal = SiswaJadwalPelajaran::with('jadwal', 'siswa')->find($id);
 
         if (!$jadwal) {
             return ApiResponse::error('Jadwal tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
@@ -155,7 +153,6 @@ class SiswaJadwalPelajaranController extends Controller
 
         $formatted = [                                    
             'id' => $jadwal->id ?? null,
-            // tidak pakai id_pivot karena get tabelnya langsung, tidak lewat tabel lain
             'mata_pelajaran' => $jadwal->jadwal->mataPelajaran->nama_pelajaran ?? null,
             'hari' => $jadwal->jadwal->hari ?? null,
             'guru' => $jadwal->jadwal->guru->nama ?? null,
@@ -170,56 +167,90 @@ class SiswaJadwalPelajaranController extends Controller
 
 
     // ✅ show jadwal sendiri untuk siswa
-    public function showAllJadwalSendiri()
-    {
-        $user = Auth::guard('siswa')->user();
+    // public function showAllJadwalSendiri()
+    // {
+    //     $user = Auth::guard('siswa')->user();
 
-        $siswa = Siswa::with('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($user->id);
-        if (!$siswa) {
-            return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
-        }
+    //     $siswa = Siswa::with('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($user->id);
+    //     if (!$siswa) {
+    //         return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+    //     }
 
-        $formatted = [
-            'id' => $siswa->id,
-            'nisn' => $siswa->nisn,
-            'nama' => $siswa->nama,
-            'email' => $siswa->email,
-            'nis' => $siswa->nis,
-            'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-            'nama_ekstrakurikuler' => $siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
-            'status' => $siswa->status,
-            'role' => $siswa->role,
-            'kelas' => [
-                'id' => $siswa->kelas->id ?? null,
-                'nama_kelas' => $siswa->kelas->nama_kelas ?? null,
-                'jam_masuk' => $siswa->kelas->jam_masuk ?? null,
-                'wali_kelas' => [
-                    'id' => $siswa->kelas->wali->id ?? null,
-                    'nama' => $siswa->kelas->wali->nama ?? null,
-                    'email' => $siswa->kelas->wali->email ?? null,
-                    'status' => $siswa->kelas->wali->status ?? null,
-                    'nip' => $siswa->kelas->wali->nip ?? null,
-                    'keterangan' => $siswa->kelas->wali->keterangan ?? null,
-                    'role' => $siswa->kelas->wali->role ?? null,
-                ],
-            ],            
-            'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
-                return [
-                'id' => $item->id ?? null,
-                'id_pivot' => $item->pivot->id ?? null,
-                'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                'hari' => $item->hari ?? null,
-                'guru' => $item->guru->nama ?? null,
-                'kelas' => $item->kelas->nama_kelas ?? null,
-                'jam_pelajaran' => $item->jam_pelajaran ?? null,
-                'ruangan' => $item->ruangan ?? null,
-                'link_opsional' => $item->link_opsional ?? null,    
-                ];
-            }),  
-        ];
+    //     $formatted = [
+    //         'id' => $siswa->id,
+    //         'nisn' => $siswa->nisn,
+    //         'nama' => $siswa->nama,
+    //         'email' => $siswa->email,
+    //         'nis' => $siswa->nis,
+    //         'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
+    //         'nama_ekstrakurikuler' => $siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
+    //         'status' => $siswa->status,
+    //         'role' => $siswa->role,
+    //         'kelas' => [
+    //             'id' => $siswa->kelas->id ?? null,
+    //             'nama_kelas' => $siswa->kelas->nama_kelas ?? null,
+    //             'jam_masuk' => $siswa->kelas->jam_masuk ?? null,
+    //             'wali_kelas' => [
+    //                 'id' => $siswa->kelas->wali->id ?? null,
+    //                 'nama' => $siswa->kelas->wali->nama ?? null,
+    //                 'email' => $siswa->kelas->wali->email ?? null,
+    //                 'status' => $siswa->kelas->wali->status ?? null,
+    //                 'nip' => $siswa->kelas->wali->nip ?? null,
+    //                 'keterangan' => $siswa->kelas->wali->keterangan ?? null,
+    //                 'role' => $siswa->kelas->wali->role ?? null,
+    //             ],
+    //         ],            
+    //         'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
+    //             return [
+    //             'id' => $item->id ?? null,
+    //             'id_pivot' => $item->pivot->id ?? null,
+    //             'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+    //             'hari' => $item->hari ?? null,
+    //             'guru' => $item->guru->nama ?? null,
+    //             'kelas' => $item->kelas->nama_kelas ?? null,
+    //             'jam_pelajaran' => $item->jam_pelajaran ?? null,
+    //             'ruangan' => $item->ruangan ?? null,
+    //             'link_opsional' => $item->link_opsional ?? null,    
+    //             ];
+    //         }),  
+    //     ];
 
-        return ApiResponse::success($formatted, 'Semua jadwal siswa berhasil diambil');
+    //     return ApiResponse::success($formatted, 'Semua jadwal siswa berhasil diambil');
+    // }
+
+    public function showAllJadwalSendiri() {
+        $siswa = Auth::guard('siswa')->user();
+
+        $jadwal = SiswaJadwalPelajaran::with([
+            'siswa',
+            'jadwal.mataPelajaran',
+            'jadwal.guru',
+            'jadwal.kelas'
+        ])
+        ->where('siswa_id', $siswa->id)
+        ->get();
+
+        $hasil = $jadwal->map(function ($item) {
+            return [
+                'pivot_id' => $item->id ?? null,
+                'nama_pelajaran' => $item->jadwal->mataPelajaran->nama_pelajaran ?? null,
+                'hari' => $item->jadwal->hari ?? null,        
+                'guru' => $item->jadwal->guru->nama ?? null,        
+                'kelas' => $item->jadwal->kelas->nama_kelas ?? null,        
+                'jam_pelajaran' => $item->jadwal->jam_pelajaran ?? null,        
+                'ruangan' => $item->jadwal->ruangan ?? null,        
+                'link_opsional' => $item->jadwal->link_opsional ?? null,        
+            ];
+        });
+
+        return response()->json([
+            'status'       => 'success',
+            'message'         => 'Semua jadwal '.$siswa->nama.' berhasil diambil',
+            'total_jadwal' => $hasil->count(),
+            'data'         => $hasil
+        ]);
     }
+
 
     /**
      * ✅ Update untuk super admin

@@ -19,8 +19,7 @@ class Ekstrakurikuler extends Model
      * Menggunakan pivot table
      *  */
     public function siswas()
-    {
-        // return $this->belongsToMany(Siswa::class, 'ekskul_siswa_pivot');
+    {        
         return $this->belongsToMany(Siswa::class, 'ekskul_siswa_pivot')
             ->withPivot('id')
             ->withTimestamps();

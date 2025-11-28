@@ -78,16 +78,21 @@ class Siswa extends Authenticatable
     }
 
     // 1 jadwal bisa diambil banyak siswa
+    // public function jadwalPelajarans()
+    // {
+    //     return $this->belongsToMany(
+    //         JadwalPelajaran::class,
+    //         'siswa_jadwal_pelajaran',
+    //         'siswa_id',
+    //         'jadwal_pelajaran_id'
+    //     )
+    //     ->using(SiswaJadwalPelajaran::class) // custom pivot model
+    //     ->withPivot('id')
+    //     ->withTimestamps();
+    // }
+
     public function jadwalPelajarans()
     {
-        return $this->belongsToMany(
-            JadwalPelajaran::class,
-            'siswa_jadwal_pelajaran',
-            'siswa_id',
-            'jadwal_pelajaran_id'
-        )
-        ->using(SiswaJadwalPelajaran::class) // custom pivot model
-        ->withPivot('id')
-        ->withTimestamps();
+        return $this->belongsToMany(JadwalPelajaran::class, 'siswa_jadwal_pelajaran');
     }
 }
