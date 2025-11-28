@@ -179,9 +179,6 @@ class SiswaJadwalPelajaranController extends Controller
             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
-        // get all jadwal pelajaran di pivot
-        $jadwal = SiswaJadwalPelajaran::where('siswa_id', $user->id)->get();
-
         $formatted = [
             'id' => $siswa->id,
             'nisn' => $siswa->nisn,
@@ -206,16 +203,17 @@ class SiswaJadwalPelajaranController extends Controller
                     'role' => $siswa->kelas->wali->role ?? null,
                 ],
             ],            
-            'jadwal_pelajaran' => $jadwal->map(function ($item) {
+            'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
                 return [
                 'id' => $item->id ?? null,
-                'mata_pelajaran' => $item->jadwal->mataPelajaran->nama_pelajaran ?? null,
-                'hari' => $item->jadwal->hari ?? null,
-                'guru' => $item->jadwal->guru->nama ?? null,
-                'kelas' => $item->jadwal->kelas->nama_kelas ?? null,
-                'jam_pelajaran' => $item->jadwal->jam_pelajaran ?? null,
-                'ruangan' => $item->jadwal->ruangan ?? null,
-                'link_opsional' => $item->jadwal->link_opsional ?? null,    
+                'id_pivot' => $item->pivot->id ?? null,
+                'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                'hari' => $item->hari ?? null,
+                'guru' => $item->guru->nama ?? null,
+                'kelas' => $item->kelas->nama_kelas ?? null,
+                'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                'ruangan' => $item->ruangan ?? null,
+                'link_opsional' => $item->link_opsional ?? null,    
                 ];
             }),  
         ];
