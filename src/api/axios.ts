@@ -29,11 +29,11 @@ api.interceptors.request.use((config) => {
   }
 
   // ✅ TAMBAHKAN LOGGING
-  console.log("🔍 Debug Auth:");
-  console.log("User:", user);
-  console.log("Role:", user.role);
-  console.log("Token:", token ? token.substring(0, 20) + "..." : "NO TOKEN");
-  console.log("Request URL:", config.url);
+  // console.log("🔍 Debug Auth:");
+  // console.log("User:", user);
+  // console.log("Role:", user.role);
+  // console.log("Token:", token ? token.substring(0, 20) + "..." : "NO TOKEN");
+  // console.log("Request URL:", config.url);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token.trim()}`;
@@ -46,20 +46,20 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // ✅ TAMBAHKAN LOGGING ERROR
-    console.error("❌ API Error:", error.response?.status);
-    console.error("Error Message:", error.response?.data?.message);
-    console.error("Full Error:", error.response?.data);
+    // console.error("❌ API Error:", error.response?.status);
+    // console.error("Error Message:", error.response?.data?.message);
+    // console.error("Full Error:", error.response?.data);
 
     if (error.response?.status === 401) {
-      // const user = JSON.parse(localStorage.getItem("user") || "{}");
-      // const isSiswa = user.role === "siswa";
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const isSiswa = user.role === "siswa";
 
-      // localStorage.removeItem("token");
-      // localStorage.removeItem("token_siswa");
-      // localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("token_siswa");
+      localStorage.removeItem("user");
 
-      // // Redirect sesuai role
-      // window.location.href = isSiswa ? "/login-siswa" : "/login-kepegawaian";
+      // Redirect sesuai role
+      window.location.href = isSiswa ? "/login-siswa" : "/login-kepegawaian";
     }
     return Promise.reject(error);
   }

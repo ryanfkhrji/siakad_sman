@@ -47,7 +47,7 @@ interface JadwalPelajaranDetail {
   }>;
 }
 
-const DetailJadwalPelajaranSiswa = () => {
+const DialogDetailJadwalPelajaranSiswa = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
@@ -176,7 +176,7 @@ const DetailJadwalPelajaranSiswa = () => {
   );
 };
 
-export default DetailJadwalPelajaranSiswa;
+export default DialogDetailJadwalPelajaranSiswa;
 
 /* ===========================================================
                       COMPONENT PARTIALS

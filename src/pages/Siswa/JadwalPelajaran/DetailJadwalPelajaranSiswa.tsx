@@ -28,7 +28,7 @@ const DetailJadwalPelajaranSiswa = () => {
   const [loading, setLoading] = useState(true);
   const [jadwal, setJadwal] = useState<JadwalPelajaran | null>(null);
 
-  const { id_pivot } = useParams();
+  const { id } = useParams<{ id: string }>(); // id = pivot_id
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const DetailJadwalPelajaranSiswa = () => {
         setLoading(true);
 
         // 🔥 PANGGIL API SESUAI RESPONS ASLI
-        const res = await api.get(`/siswa/jadwal-pelajaran/show/diri/${id_pivot}`);
+        const res = await api.get(`/siswa/jadwal-pelajaran/show/diri/${id}`);
 
         if (res.data.status === "success") {
           setJadwal(res.data.data); // langsung jadwal 1 item
@@ -57,8 +57,8 @@ const DetailJadwalPelajaranSiswa = () => {
       }
     };
 
-    if (id_pivot) fetchDetail();
-  }, [id_pivot, navigate]);
+    if (id) fetchDetail();
+  }, [id, navigate]);
 
   return (
     <SidebarProvider>
@@ -71,13 +71,7 @@ const DetailJadwalPelajaranSiswa = () => {
         <PageTitle title="Detail Jadwal Pelajaran" />
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Link to="/siswa/jadwal-pelajaran">
-              <Button variant="outline" size="sm">
-                <ArrowLeftIcon size={18} />
-                Kembali
-              </Button>
-            </Link>
+          <div className="mb-6">
             <h1 className="text-3xl font-bold">Detail Jadwal</h1>
           </div>
 
@@ -88,16 +82,24 @@ const DetailJadwalPelajaranSiswa = () => {
             </div>
           ) : jadwal ? (
             <>
-              <Card className="w-full max-w-3xl mx-auto shadow-lg">
+              <div className="mb-6">
+                <Link to="/siswa/jadwal-pelajaran">
+                  <Button variant="outline" size="sm">
+                    <ArrowLeftIcon size={18} />
+                    Kembali
+                  </Button>
+                </Link>
+              </div>
+              <Card className="w-full mx-auto shadow">
                 <CardHeader className="bg-primary text-white">
-                  <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                  <CardTitle className="text-2xl font-bold flex items-center gap-3 pt-3">
                     <BookOpenIcon size={28} />
                     {jadwal.mata_pelajaran}
                   </CardTitle>
                 </CardHeader>
 
-                <CardContent className="pt-6">
-                  <div className="grid gap-4 text-sm">
+                <CardContent className="pt-4">
+                  <div className="grid gap-3 text-sm">
                     <DetailItem icon={<CalendarIcon className="text-primary" size={20} />} label="Hari" value={jadwal.hari} />
 
                     <Separator />
@@ -143,9 +145,9 @@ const DetailJadwalPelajaranSiswa = () => {
                 </CardContent>
               </Card>
 
-              <div className="mt-6 max-w-3xl mx-auto">
+              <div className="mt-6 w-full mx-auto">
                 <Card className="border-l-4 border-l-primary bg-blue-50">
-                  <CardContent className="pt-4">
+                  <CardContent>
                     <p className="text-sm text-gray-700">
                       <span className="font-semibold">💡 Info:</span>
                       Pastikan hadir tepat waktu sesuai jadwal.
@@ -155,7 +157,7 @@ const DetailJadwalPelajaranSiswa = () => {
               </div>
             </>
           ) : (
-            <Card className="w-full max-w-3xl mx-auto">
+            <Card className="w-full mx-auto">
               <CardContent className="py-8 text-center">
                 <p className="text-gray-500 text-lg">Data tidak ditemukan.</p>
               </CardContent>
@@ -173,7 +175,7 @@ export default DetailJadwalPelajaranSiswa;
 
 // COMPONENT DETAIL ITEM
 const DetailItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
-  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+  <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
     <div className="flex items-center gap-3">
       <div className="bg-primary/10 p-3 rounded-full">{icon}</div>
       <span className="font-semibold text-gray-700">{label}</span>

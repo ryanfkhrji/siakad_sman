@@ -62,7 +62,6 @@ import EditJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPela
 import CreateJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/CreateJadwalPelajaranSiswa";
 import EditJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/EditJadwalPelajaranSiswa";
 import DataJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa";
-import DetailJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/DialogDetailJadwalPelajaranSiswa";
 import DataKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum";
 import CreateKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum/CreateKurikulum";
 import EditKurikulum from "@/pages/SuperAdmin/InfomasiSekolah/Kurikulum/EditKurikulum";
@@ -92,6 +91,8 @@ import PublicRoute from "./PublicRoute";
 import DataRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan";
 import CreateRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan/CreateRuangan";
 import EditRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan/EditRuangan";
+import DialogDetailJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/DialogDetailJadwalPelajaranSiswa";
+import DetailJadwalPelajaranSiswa from "@/pages/Siswa/JadwalPelajaran/DetailJadwalPelajaranSiswa";
 
 export default function AppRoutes() {
   return (
@@ -615,7 +616,7 @@ export default function AppRoutes() {
           path="/superadmin/informasi-akademik/jadwal-pelajaran-siswa/detail/:id"
           element={
             <ProtectedRoute roles={["super_admin"]}>
-              <DetailJadwalPelajaranSiswa />{" "}
+              <DialogDetailJadwalPelajaranSiswa />{" "}
             </ProtectedRoute>
           }
         />

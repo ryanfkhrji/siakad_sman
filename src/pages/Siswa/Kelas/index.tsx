@@ -63,8 +63,8 @@ const DetailKelas = () => {
           ) : dataKelas ? (
             <>
               {/* Card Informasi Kelas */}
-              <Card className="w-full max-w-5xl mx-auto shadow">
-                <CardHeader className="bg-primary text-white py-4 px-10">
+              <Card className="w-full mx-auto shadow">
+                <CardHeader className="bg-primary text-white pt-2 px-10">
                   <CardTitle className="text-2xl font-bold flex items-center gap-3">
                     <UsersIcon size={28} />
                     Kelas: {dataKelas.nama_kelas}
@@ -116,9 +116,9 @@ const DetailKelas = () => {
               </Card>
 
               {/* Info Card */}
-              <div className="mt-6 max-w-5xl mx-auto">
+              <div className="mt-6 w-full mx-auto">
                 <Card className="border-l-4 border-l-primary bg-blue-50">
-                  <CardContent className="p-2">
+                  <CardContent>
                     <p className="text-sm text-gray-700">
                       <span className="font-semibold text-primary">💡 Info:</span> Ini adalah informasi kelas Anda saat ini. Jika ada pertanyaan atau kendala, silakan hubungi wali kelas Anda.
                     </p>
