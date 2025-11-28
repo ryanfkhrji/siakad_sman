@@ -85,7 +85,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD kompetensi dasar
     Route::apiResource('/spa/kompetensi-dasar', KompetensiDasarController::class);
 
-    // ! ✅ CRUD gedung (tambahin ruangan di detail)
+    // ✅ CRUD gedung (tambahin ruangan di detail)
     Route::apiResource('/spa/gedung', GedungController::class);
     
     // ✅ Ruangan
@@ -104,6 +104,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
     
     // ! Absensi
+    
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
