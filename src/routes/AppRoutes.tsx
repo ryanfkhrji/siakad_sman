@@ -93,6 +93,9 @@ import CreateRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan/CreateRuan
 import EditRuangan from "@/pages/SuperAdmin/InfomasiSekolah/Ruangan/EditRuangan";
 import DialogDetailJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/DialogDetailJadwalPelajaranSiswa";
 import DetailJadwalPelajaranSiswa from "@/pages/Siswa/JadwalPelajaran/DetailJadwalPelajaranSiswa";
+import DataTahunAkademik from "@/pages/SuperAdmin/InfomasiSekolah/TahunAkademik";
+import CreateTahunAkademik from "@/pages/SuperAdmin/InfomasiSekolah/TahunAkademik/CreateTahunAkademik";
+import EditTahunAkademik from "@/pages/SuperAdmin/InfomasiSekolah/TahunAkademik/EditTahunAkademik";
 
 export default function AppRoutes() {
   return (
@@ -309,7 +312,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-sekolah/kepegawaian/create"
           element={
@@ -318,7 +320,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/superadmin/informasi-sekolah/kepegawaian/guru/edit/:id"
           element={
@@ -466,6 +467,56 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditRuangan />
+            </ProtectedRoute>
+          }
+        />
+        {/* Data Identitas Sekolah */}
+        <Route
+          path="/superadmin/informasi-sekolah/identitas-sekolah"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataIdentitasSekolah />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/identitas-sekolah/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateIdentitasSekolah />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/identitas-sekolah/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditIdentitasSekolah />
+            </ProtectedRoute>
+          }
+        />
+        {/* Data Tahun Akademik */}
+        <Route
+          path="/superadmin/informasi-sekolah/tahun-akademik"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataTahunAkademik />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/tahun-akademik/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateTahunAkademik />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/tahun-akademik/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditTahunAkademik />
             </ProtectedRoute>
           }
         />
@@ -642,32 +693,6 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditKompetensiDasar />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Data Identitas Sekolah */}
-        <Route
-          path="/superadmin/informasi-sekolah/identitas-sekolah"
-          element={
-            <ProtectedRoute roles={["super_admin"]}>
-              <DataIdentitasSekolah />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/superadmin/informasi-sekolah/identitas-sekolah/create"
-          element={
-            <ProtectedRoute roles={["super_admin"]}>
-              <CreateIdentitasSekolah />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/superadmin/informasi-sekolah/identitas-sekolah/edit/:id"
-          element={
-            <ProtectedRoute roles={["super_admin"]}>
-              <EditIdentitasSekolah />
             </ProtectedRoute>
           }
         />

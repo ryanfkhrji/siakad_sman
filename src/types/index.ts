@@ -161,3 +161,13 @@ export interface Ruangan {
   fasilitas: string;
   keterangan: string;
 }
+
+export interface TahunAkademik {
+  id: number;
+  tahun_akademik: string;
+  semester: string;
+  tanggal_mulai: string;
+  tanggal_selesai: string;
+  status: string;
+  keterangan: string;
+}

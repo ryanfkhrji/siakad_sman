@@ -7,34 +7,34 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { Kurikulum } from "@/types";
+import type { TahunAkademik } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 
-const DataKurikulum = () => {
+const DataTahunAkademik = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [datakurikulum, setDataKurikulum] = useState<Kurikulum[]>([]);
+  const [dataTahunAkademik, setDataTahunAkademik] = useState<TahunAkademik[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<Kurikulum[]>([]);
+  const [filteredData, setFilteredData] = useState<TahunAkademik[]>([]);
 
   // Ambil data dari backend
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/spa/kurikulum");
+        const res = await api.get("/spa/tahun-akademik");
         if (res.data.status === "success") {
-          setDataKurikulum(res.data.data);
+          setDataTahunAkademik(res.data.data);
         }
       } catch (error: any) {
         Swal.fire({
           icon: "error",
           title: "Gagal memuat data!",
-          text: error.response?.data?.message || "Tidak dapat memuat data kurikulum.",
+          text: error.response?.data?.message || "Tidak dapat memuat data tahun akademik",
         });
       } finally {
         setLoading(false);
@@ -47,13 +47,13 @@ const DataKurikulum = () => {
   // Search filtering
   useEffect(() => {
     if (searchTerm.trim() === "") {
-      setFilteredData(datakurikulum);
+      setFilteredData(dataTahunAkademik);
     } else {
       const lower = searchTerm.toLowerCase();
-      setFilteredData(datakurikulum.filter((item) => item.nama_kurikulum.toLowerCase().includes(lower)));
+      setFilteredData(dataTahunAkademik.filter((item) => item.tahun_akademik.toLowerCase().includes(lower)));
     }
     setCurrentPage(1);
-  }, [searchTerm, datakurikulum]);
+  }, [searchTerm, dataTahunAkademik]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -69,7 +69,7 @@ const DataKurikulum = () => {
   const handleDelete = async (id: number) => {
     const result = await Swal.fire({
       title: "Yakin ingin menghapus?",
-      text: "Data kurikulum yang dihapus tidak dapat dikembalikan.",
+      text: "Data tahun akademik yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#4F46E5",
@@ -81,15 +81,15 @@ const DataKurikulum = () => {
 
     try {
       setLoading(true);
-      const res = await api.delete(`/spa/kurikulum/${id}`);
+      const res = await api.delete(`/spa/tahun-akademik/${id}`);
 
       if (res.data.status === "success") {
-        setDataKurikulum((prev) => prev.filter((j) => j.id !== id));
+        setDataTahunAkademik((prev) => prev.filter((j) => j.id !== id));
 
         Swal.fire({
           icon: "success",
           title: "Berhasil!",
-          text: "Data kurikulum berhasil dihapus.",
+          text: "Data tahun akademik berhasil dihapus.",
           showConfirmButton: false,
           timer: 1800,
         });
@@ -97,7 +97,7 @@ const DataKurikulum = () => {
         Swal.fire({
           icon: "error",
           title: "Gagal menghapus!",
-          text: res.data.message || "Terjadi kesalahan saat menghapus kurikulum.",
+          text: res.data.message || "Terjadi kesalahan saat menghapus tahun akademik.",
         });
       }
     } catch (err: any) {
@@ -125,9 +125,9 @@ const DataKurikulum = () => {
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Data Kurikulum" />
+        <PageTitle title="Data Tahun Akademik" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Data Kurikulum</h1>
+          <h1 className="text-3xl font-bold mb-6">Data Tahun Akademik</h1>
 
           {/* Loading State */}
           {loading ? (
@@ -139,16 +139,16 @@ const DataKurikulum = () => {
             <>
               {/* Tombol Tambah */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-                <Link to="/superadmin/informasi-sekolah/kurikulum/create" className="w-full md:w-auto">
+                <Link to="/superadmin/informasi-sekolah/tahun-akademik/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
                     <PlusIcon size={18} />
-                    Tambah Kurikulum
+                    Tambah Tahun Akademik
                   </Button>
                 </Link>
 
                 <div className="relative w-full md:w-1/3">
                   <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari kurikulum..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  <Input type="text" placeholder="Cari tahun akademik..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
                 </div>
               </div>
 
@@ -158,31 +158,35 @@ const DataKurikulum = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Kurikulum</TableHead>
-                      <TableHead className="font-semibold text-white">Tahun Berlaku</TableHead>
+                      <TableHead className="font-semibold text-white">Tahun Akademik</TableHead>
+                      <TableHead className="font-semibold text-white">Semester</TableHead>
+                      <TableHead className="font-semibold text-white">Tanggal Mulai</TableHead>
+                      <TableHead className="font-semibold text-white">Tanggal Selesai</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
-                      <TableHead className="font-semibold text-white">Deskripsi</TableHead>
+                      <TableHead className="font-semibold text-white">Keterangan</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
                     {paginated.length > 0 ? (
-                      paginated.map((kurikulum, index) => (
-                        <TableRow key={kurikulum.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                      paginated.map((tahunAkademik, index) => (
+                        <TableRow key={tahunAkademik.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{kurikulum.nama_kurikulum}</TableCell>
-                          <TableCell>{kurikulum.tahun_berlaku}</TableCell>
-                          <TableCell>{kurikulum.status}</TableCell>
-                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{kurikulum.deskripsi || "-"}</TableCell>
+                          <TableCell>{tahunAkademik.tahun_akademik}</TableCell>
+                          <TableCell>{tahunAkademik.semester}</TableCell>
+                          <TableCell>{tahunAkademik.tanggal_mulai}</TableCell>
+                          <TableCell>{tahunAkademik.tanggal_selesai}</TableCell>
+                          <TableCell>{tahunAkademik.status}</TableCell>
+                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{tahunAkademik.keterangan || "-"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
-                            <Link to={`/superadmin/informasi-sekolah/kurikulum/edit/${kurikulum.id}`}>
+                            <Link to={`/superadmin/informasi-sekolah/tahun-akademik/edit/${tahunAkademik.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(kurikulum.id)}>
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(tahunAkademik.id)}>
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>
@@ -190,8 +194,8 @@ const DataKurikulum = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-gray-500 py-4">
-                          Tidak ada data kurikulum yang ditemukan
+                        <TableCell colSpan={8} className="text-center text-gray-500 py-4">
+                          Tidak ada data tahun akademik yang ditemukan
                         </TableCell>
                       </TableRow>
                     )}
@@ -240,4 +244,4 @@ const DataKurikulum = () => {
   );
 };
 
-export default DataKurikulum;
+export default DataTahunAkademik;
