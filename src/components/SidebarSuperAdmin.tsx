@@ -226,7 +226,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                     <SidebarMenuButton onClick={() => toggleDropdown("data-akademik")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
                       <span className="flex items-center gap-2">
                         <GraduationCap className="h-4 w-4" />
-                        {!isCollapsed && "Data Akademik"}
+                        {!isCollapsed && "Informasi Akademik"}
                       </span>
 
                       {!isCollapsed && <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === "data-akademik" && "rotate-180")} />}
@@ -319,6 +319,12 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
                             <Link to="/superadmin/informasi-akademik/ekstrakurikuler">Data Ekstrakurikuler</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className="hover:bg-primary rounded-md px-3 py-1.5 text-sm">
+                            <Link to="/superadmin/informasi-akademik/prestasi-siswa">Data Prestasi</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       </SidebarMenuSub>

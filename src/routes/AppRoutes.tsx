@@ -96,6 +96,9 @@ import DetailJadwalPelajaranSiswa from "@/pages/Siswa/JadwalPelajaran/DetailJadw
 import DataTahunAkademik from "@/pages/SuperAdmin/InfomasiSekolah/TahunAkademik";
 import CreateTahunAkademik from "@/pages/SuperAdmin/InfomasiSekolah/TahunAkademik/CreateTahunAkademik";
 import EditTahunAkademik from "@/pages/SuperAdmin/InfomasiSekolah/TahunAkademik/EditTahunAkademik";
+import DataPrestasiSiswa from "@/pages/SuperAdmin/informasiAkademik/Prestasi";
+import CreatePrestasiSiswa from "@/pages/SuperAdmin/informasiAkademik/Prestasi/CreatePrestasiSiswa";
+import EditPrestasiSiswa from "@/pages/SuperAdmin/informasiAkademik/Prestasi/EditPrestasiSiswa";
 
 export default function AppRoutes() {
   return (
@@ -693,6 +696,31 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditKompetensiDasar />
+            </ProtectedRoute>
+          }
+        />
+        {/* Data Prestasi Siswa */}
+        <Route
+          path="/superadmin/informasi-akademik/prestasi-siswa"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataPrestasiSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/prestasi-siswa/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreatePrestasiSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/prestasi-siswa/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditPrestasiSiswa />
             </ProtectedRoute>
           }
         />

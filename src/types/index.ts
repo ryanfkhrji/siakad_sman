@@ -171,3 +171,11 @@ export interface TahunAkademik {
   status: string;
   keterangan: string;
 }
+
+export interface PrestasiSiswa {
+  id: number;
+  siswa_id: string;
+  kelas_id: string;
+  jurusan_id: string;
+  prestasi_diraih: string;
+}
