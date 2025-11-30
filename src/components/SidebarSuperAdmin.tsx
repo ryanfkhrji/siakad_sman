@@ -52,7 +52,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
             </div>
             {!isCollapsed && (
               <div className="font-semibold text-sm leading-tight">
-                <div>SMA Negeri 43 Jakarta</div>
+                <div>SMA Negeri 42 Jakarta</div>
                 <span className="text-xs text-muted-foreground">{user?.role}</span>
               </div>
             )}
@@ -381,9 +381,6 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                           { to: "/superadmin/siswa", label: "Data Halaman" },
                           { to: "/superadmin/guru", label: "Kode Aktivasi" },
                           { to: "/superadmin/staff", label: "Data Pendaftaran Siswa" },
-                          { to: "/superadmin/staff", label: "Laporan Nilai Siswa" },
-                          { to: "/superadmin/staff", label: "Data Status Kepegawaian" },
-                          { to: "/superadmin/staff", label: "Data keuangan" },
                         ].map((item) => (
                           <SidebarMenuSubItem key={item.to}>
                             <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes(item.to) && "bg-primary text-white font-medium")}>
