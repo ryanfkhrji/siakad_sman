@@ -140,7 +140,7 @@ export default function AppRoutes() {
           }
         />
 
-        {/* ================= AUTH LUPA PASSWORD ================= */}
+        {/* ================= AUTH LUPA PASSWORD Pegawai ================= */}
         <Route
           path="/lupa-password"
           element={
@@ -150,7 +150,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/reset-password/:token"
+          path="/reset-password"
           element={
             <PublicRoute>
               <ResetPassword />

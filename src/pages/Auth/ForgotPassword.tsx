@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/PageTitle";
 import { AxiosError } from "axios";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useState } from "react";
 
 const forgotPasswordSchema = z.object({
@@ -29,7 +29,7 @@ export default function ForgotPassword() {
     try {
       setLoading(true);
 
-      const res = await api.post("/kepegawaian/lupa-password", data);
+      const res = await api.post("/lupa-password", data);
       Swal.fire({
         title: "Berhasil!",
         text: res.data.message || "Link reset password telah dikirim ke email Anda.",
@@ -71,13 +71,13 @@ export default function ForgotPassword() {
             {loading ? "Mengirim..." : "Kirim Link Reset Password"}
           </Button>
 
-          <div className="mt-3 text-center">
+          {/* <div className="mt-3 text-center">
             <Link to="/login-kepegawaian">
               <Button variant={"outline"} size={"lg"} className="w-full text-base font-semibold">
                 Kembali Ke Login
               </Button>
             </Link>
-          </div>
+          </div> */}
         </form>
       </div>
     </>
