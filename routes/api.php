@@ -19,6 +19,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\EkskulSiswaPivotController;
+use App\Http\Controllers\AbsensiPegawaiController;
 use App\Http\Controllers\PsbController;
 use App\Http\Controllers\CacheCleanerController;
 
@@ -32,11 +33,9 @@ use App\Http\Controllers\CacheCleanerController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-// Route::get('/me', [SiswaController::class, 'me']);
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 
 // ? ===================================================================================== ?
@@ -109,7 +108,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/spa/tahun-akademik', TahunAkademikController::class);
 
     // ✅ Prestasi
-    Route::apiResource('/spa/prestasi', PrestasiController::class);
+    Route::apiResource('/spa/prestasi', PrestasiController::class);   
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
@@ -153,6 +152,9 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD peserta ekstrakurikuler oleh pegawai
     Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
 
+     // ! ✅ Absensi
+    Route::apiResource('/pegawai/absensi', AbsensiPegawaiController::class);
+
     // ! show gedung, ruangan, tahun akademik
     // -------------------------------------------------------------------------------------
      
@@ -177,15 +179,21 @@ Route::get('/jurusan-register', [JurusanController::class, 'index']);
 // ✅ akses kelas di register
 Route::get('/kelas-register', [KelasController::class, 'index']);
 
-// ✅ lupa password untuk dirinya sendiri
-// ? 1. Button lupa password + send link via email
+// ✅ lupa password pegawai + super admin untuk dirinya sendiri
+// 1. Button lupa password + send link via email
 Route::post('/lupa-password', [KepegawaianController::class, 'sendResetLink'])->name('password.email');
-
-// ? 2. Tampilkan form reset password
+// 2. Tampilkan form reset password
 Route::get('/reset-password/{token}', [KepegawaianController::class, 'redirectToFrontendForm'])->name('password.reset');
-
-// ? 3. Proses reset password
+// 3. Proses reset password
 Route::post('/reset-password', [KepegawaianController::class, 'resetPassword'])->name('password.update');
+
+// ✅ lupa password siswa (tinggal debug)
+// 1. Button lupa password + send link via email
+Route::post('/siswa/lupa-password', [SiswaController::class, 'sendResetLink'])->name('siswa.password.email');
+// 2. Tampilkan form reset password
+Route::get('/reset-password/{token}', [SiswaController::class, 'redirectToFrontendForm'])->name('siswa.password.reset');
+// 3. Proses reset password
+Route::post('/siswa/reset-password', [SiswaController::class, 'resetPassword'])->name('siswa.password.update');
 
 // ? ===================================================================================== ?
 // ?                                        SISWA

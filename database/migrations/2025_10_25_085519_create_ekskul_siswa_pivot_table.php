@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
 
             // ketika siswa di tabel siswa dihapus, maka yang mengandung id siswa tsb di pivot ini juga dihapus
-            $table->foreignId('siswa_id')->constrained()->onDelete('cascade');
+            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
 
             // ketika ekskul di tabel ekskul dihapus, maka yang mengandung id ekskul tsb di pivot ini juga dihapus
-            $table->foreignId('ekstrakurikuler_id')->constrained()->onDelete('cascade');
+            $table->foreignId('ekstrakurikuler_id')->constrained('ekstrakurikulers')->onDelete('cascade');
 
             $table->unique(['siswa_id', 'ekstrakurikuler_id']); // mencegah daftar ekskul yang sama > 1x
             $table->timestamps();

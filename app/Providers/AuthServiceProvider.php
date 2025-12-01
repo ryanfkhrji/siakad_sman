@@ -29,7 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         ResetPassword::createUrlUsing(function ($notifiable, $token) {
             $email = urlencode($notifiable->email);
         
-            // arahkan ke backend, bukan frontend
+            // arahkan ke backend dulu, bukan frontend
             return "http://localhost:8000/api/reset-password/{$token}?email={$email}";
         });
         

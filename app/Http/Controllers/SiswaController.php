@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Kelas;
 use App\Models\Siswa;
-use App\Models\Kepegawaian;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\MataPelajaran;
@@ -12,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password; // Mengimpor facade Password untuk fitur reset password
+use Illuminate\Support\Facades\Validator;
 
 class SiswaController extends Controller
 {
@@ -703,25 +703,120 @@ class SiswaController extends Controller
     }
     
     
-    // ✅ Lupa password oleh siswa
+    // ✅ Lupa password siswa
+    // ? Button forgot ppassword + send reset link email 
     public function sendResetLink(Request $request)
     {
-        // Validasi input: pastikan email diisi dan ada di tabel siswas
+        // 1. Validasi email wajib ada dan harus terdaftar
         $request->validate([
             'email' => 'required|email|exists:siswas,email'
+        ], [
+            'email.exists' => 'Email tidak terdaftar dalam sistem.'
         ]);
-    
-        // Kirim link reset password menggunakan broker 'siswa'
-        // Broker akan membuat token, menyimpan ke tabel password_reset_tokens, dan mengirim email ke pengguna
-        $status = Password::broker('siswa')->sendResetLink(
-            ['email' => $request->email] // Data yang digunakan untuk mencari pengguna dan mengirim link
-        );
-    
-        // Cek apakah pengiriman berhasil, lalu kirim respons JSON sesuai hasilnya
-        return $status === Password::RESET_LINK_SENT
-            ? response()->json(['message' => 'Link reset dikirim']) // Jika berhasil
-            : response()->json(['message' => 'Gagal mengirim link'], 500); // Jika gagal
-    }
-    
 
+        // 2. Kirim link reset password via email menggunakan broker "siswa" di config/auth.php bagian password
+        //    Broker akan otomatis:
+        //    - generate token
+        //    - simpan hash token ke tabel password_reset_tokens
+        //    - mengirim email berisi link reset
+        $status = Password::broker('siswa')->sendResetLink(
+            $request->only('email')
+        );
+
+        // 3. Jika email berhasil dikirim
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Link reset password telah dikirim ke email Anda.'
+            ], 200);
+        }
+
+        // 4. Jika gagal (biasanya karena server email)
+        return response()->json([
+            'status'  => false,
+            'message' => 'Gagal mengirim link reset password. Coba lagi nanti.'
+        ], 500);
+    }
+
+    // ? Tampilkan form react untuk reset password
+    public function redirectToFrontendForm(Request $request, $token)
+    {
+        // Ambil email dari query param
+        $email = $request->query('email');
+
+        // Jika tidak ada email → error
+        if (!$email) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email tidak ditemukan dalam permintaan.'
+            ], 400);
+        }
+
+        // sebelum diarahkan ke react, ubah dulu di AuthServiceProvider.php
+
+        // URL React (ubah sesuai domain kamu)
+        $frontendUrl = "http://localhost:5173/reset-password";
+
+        // Redirect ke frontend sambil membawa token & email di params
+        return redirect()->away($frontendUrl . "?token={$token}&email={$email}");
+
+        /**
+         * Front end bisa ambil dari param denga cara berikut, lalu jadikan hidden untuk dikirim ke route Post::reset-password
+         * const [params] = useSearchParams();
+         * const token = params.get("token");
+         * const email = params.get("email");
+         */
+    }
+
+    // ? Proses reset password
+    public function resetPassword(Request $request)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'token'    => 'required',                                // token wajib yang dikirim ke email
+            'email'    => 'required|email|exists:siswas,email', // email valid & terdaftar
+            'password' => 'required|min:6|confirmed',                 // password & konfirmasi wajib sama
+            // password_confirmation tidak perlu disini tapi wajib di body
+        ]);
+
+        // Jika validasi gagal, respon error rapi
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors(),  // daftar error lengkap
+            ], 422);
+        }
+
+        // Proses reset password menggunakan broker
+        $status = Password::broker('siswa')->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+
+            // Jika token dan email cocok
+            function ($user) use ($request) {
+                $user->password = bcrypt($request->password);
+                $user->save();
+            }
+        );
+
+        // Jika password berhasil direset
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Password berhasil direset',
+                'data'    => [
+                    'email' => $request->email
+                ]
+            ]);
+        }
+
+        // Jika token salah, email salah, atau token kedaluwarsa
+        return response()->json([
+            'status'  => false,
+            'message' => 'Gagal mereset password',
+            'errors'  => [
+                'token' => ['Token tidak valid atau kadaluarsa']
+            ]
+        ], 400);
+    }
 }

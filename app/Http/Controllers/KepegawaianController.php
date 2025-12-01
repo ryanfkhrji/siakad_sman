@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Password; // Mengimpor facade Password untuk mengakses fitur reset password Laravel
+use Illuminate\Support\Facades\Validator;
 
 class KepegawaianController extends Controller
 {
@@ -644,7 +645,7 @@ class KepegawaianController extends Controller
         return ApiResponse::success(null, 'Password berhasil diperbarui. Silakan login kembali.');
     }
 
-    // ✅ Lupa password pegawai oleh diri sendiri
+    // ✅ Ubah password pegawai oleh diri sendiri
     public function ubahPassDiri(Request $request)
     {        
         // Validasi input
@@ -686,7 +687,7 @@ class KepegawaianController extends Controller
     }
 
     // ✅ Lupa password untuk pegawai
-    // ? Button forgot ppassword + send reset link email 
+    // ? Button forgot password + send reset link email 
     public function sendResetLink(Request $request)
     {
         // 1. Validasi email wajib ada dan harus terdaftar
@@ -696,7 +697,7 @@ class KepegawaianController extends Controller
             'email.exists' => 'Email tidak terdaftar dalam sistem.'
         ]);
 
-        // 2. Kirim link reset password via email menggunakan broker "kepegawaian"
+        // 2. Kirim link reset password via email menggunakan broker "kepegawaian" pada config/auth.php bagian password
         //    Broker akan otomatis:
         //    - generate token
         //    - simpan hash token ke tabel password_reset_tokens
