@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('absensi_pegawai', function (Blueprint $table) {
             $table->id();
             $table->string('guru_id')->constrained('kepegawaians')->onDelete('cascade'); // hapus jika guru dihapus
-            $table->foreignId('matpel_id')->nullable()->constrained('mata_pelajarans')->nullOnDelete(); // null jika matpel dihapus
-            $table->string('hari');
+            $table->foreignId('mata_pelajaran_id')->nullable()->constrained('mata_pelajarans')->nullOnDelete(); // null jika matpel dihapus
+            $table->string('tanggal');
             $table->enum('status', ['hadir', 'tidak hadir']);
             $table->timestamps();
         });

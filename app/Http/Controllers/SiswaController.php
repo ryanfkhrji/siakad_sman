@@ -758,7 +758,7 @@ class SiswaController extends Controller
         $frontendUrl = "http://localhost:5173/reset-password";
 
         // Redirect ke frontend sambil membawa token & email di params
-        return redirect()->away($frontendUrl . "?token={$token}&email={$email}");
+        return redirect()->away($frontendUrl . "?token={$token}&email={$email}&type=siswa");
 
         /**
          * Front end bisa ambil dari param denga cara berikut, lalu jadikan hidden untuk dikirim ke route Post::reset-password

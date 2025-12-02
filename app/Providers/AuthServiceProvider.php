@@ -26,12 +26,25 @@ class AuthServiceProvider extends ServiceProvider
         /**
          * Arahkan ke backend dulu untuk ambil token dan email, baru kemudian ke frontend
          */
-        ResetPassword::createUrlUsing(function ($notifiable, $token) {
-            $email = urlencode($notifiable->email);
-        
-            // arahkan ke backend dulu, bukan frontend
-            return "http://localhost:8000/api/reset-password/{$token}?email={$email}";
+
+        ResetPassword::createUrlUsing(function($user, string $token) {
+            // cek apakah user adalah pegawai
+            if ($user instanceof \App\Models\Kepegawaian) {
+                return url(route('password.reset', [
+                    'token' => $token,
+                    'email' => $user->email
+                ], false));
+            }
+            
+            // jika user adalah siswa
+            if ($user instanceof \App\Models\Siswa) {
+                return url(route('siswa.password.reset', [
+                    'token' => $token,
+                    'email' => $user->email
+                ], false));
+            }
+
+            return '';
         });
-        
     }
 }

@@ -79,4 +79,8 @@ class Kepegawaian extends Authenticatable
         return $this->hasMany(JadwalPelajaran::class, 'guru_id'); 
     }
 
+    public function absensiKepegawaians()
+    {
+        return $this->hasMany(AbsensiPegawai::class, 'guru_id'); 
+    }
 }

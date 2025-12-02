@@ -181,17 +181,17 @@ Route::get('/kelas-register', [KelasController::class, 'index']);
 
 // ✅ lupa password pegawai + super admin untuk dirinya sendiri
 // 1. Button lupa password + send link via email
-Route::post('/lupa-password', [KepegawaianController::class, 'sendResetLink'])->name('password.email');
+Route::post('/kepegawaian/lupa-password', [KepegawaianController::class, 'sendResetLink'])->name('password.email');
 // 2. Tampilkan form reset password
-Route::get('/reset-password/{token}', [KepegawaianController::class, 'redirectToFrontendForm'])->name('password.reset');
+Route::get('/kepegawaian/reset-password/{token}', [KepegawaianController::class, 'redirectToFrontendForm'])->name('password.reset');
 // 3. Proses reset password
-Route::post('/reset-password', [KepegawaianController::class, 'resetPassword'])->name('password.update');
+Route::post('kepegawaian/reset-password', [KepegawaianController::class, 'resetPassword'])->name('password.update');
 
-// ✅ lupa password siswa (tinggal debug)
+// ✅ lupa password siswa (done)
 // 1. Button lupa password + send link via email
 Route::post('/siswa/lupa-password', [SiswaController::class, 'sendResetLink'])->name('siswa.password.email');
 // 2. Tampilkan form reset password
-Route::get('/reset-password/{token}', [SiswaController::class, 'redirectToFrontendForm'])->name('siswa.password.reset');
+Route::get('/siswa/reset-password/{token}', [SiswaController::class, 'redirectToFrontendForm'])->name('siswa.password.reset');
 // 3. Proses reset password
 Route::post('/siswa/reset-password', [SiswaController::class, 'resetPassword'])->name('siswa.password.update');
 

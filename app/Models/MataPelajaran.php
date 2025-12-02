@@ -17,4 +17,9 @@ class MataPelajaran extends Model
         return $this->hasMany(JadwalPelajaran::class, 'mata_pelajaran_id');
     }
 
+    public function absensiKepegawaians()
+    {
+        return $this->hasMany(AbsensiPegawai::class, 'mata_pelajaran_id');
+    }
+
 }
