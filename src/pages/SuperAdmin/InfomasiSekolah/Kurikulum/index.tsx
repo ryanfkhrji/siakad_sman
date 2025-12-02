@@ -190,7 +190,7 @@ const DataKurikulum = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-gray-500 py-4">
+                        <TableCell colSpan={6} className="text-center text-gray-500 py-4">
                           Tidak ada data kurikulum yang ditemukan
                         </TableCell>
                       </TableRow>

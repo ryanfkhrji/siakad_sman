@@ -99,6 +99,10 @@ import EditTahunAkademik from "@/pages/SuperAdmin/InfomasiSekolah/TahunAkademik/
 import DataPrestasiSiswa from "@/pages/SuperAdmin/informasiAkademik/Prestasi";
 import CreatePrestasiSiswa from "@/pages/SuperAdmin/informasiAkademik/Prestasi/CreatePrestasiSiswa";
 import EditPrestasiSiswa from "@/pages/SuperAdmin/informasiAkademik/Prestasi/EditPrestasiSiswa";
+import DataPsb from "@/pages/SuperAdmin/PSB";
+import DetailPsb from "@/pages/SuperAdmin/PSB/DetailPsb";
+import CreatePsb from "@/pages/SuperAdmin/PSB/CreatePsb";
+import EditPsb from "@/pages/SuperAdmin/PSB/EditPsb";
 
 export default function AppRoutes() {
   return (
@@ -721,6 +725,39 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditPrestasiSiswa />
+            </ProtectedRoute>
+          }
+        />
+        {/* Data PSB */}
+        <Route
+          path="/superadmin/psb"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataPsb />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/psb/detail/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DetailPsb />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/psb/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreatePsb />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/psb/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditPsb />
             </ProtectedRoute>
           }
         />

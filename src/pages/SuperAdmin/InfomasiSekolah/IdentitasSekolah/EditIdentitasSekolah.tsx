@@ -4,7 +4,7 @@ import PageTitle from "@/components/PageTitle";
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/pages/Footer";
-import { EyeIcon, TargetIcon, Save, CircleXIcon, ImageIcon, XIcon, Loader2Icon } from "lucide-react";
+import { Save, CircleXIcon, ImageIcon, XIcon, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
@@ -390,7 +390,7 @@ export default function EditIdentitasSekolah() {
               {/* Visi */}
               <div className="mb-6">
                 <label className="font-semibold flex items-center gap-2">
-                  <EyeIcon size={18} /> Visi
+                  Visi
                 </label>
                 <textarea name="visi" placeholder="Tuliskan visi sekolah..." value={formData.visi} onChange={handleChange} className="border p-2 w-full mt-2 rounded h-24 resize-none" />
                 {errors.visi && errors.visi.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.visi[0]}</p>}
@@ -399,7 +399,7 @@ export default function EditIdentitasSekolah() {
               {/* Misi */}
               <div className="mb-6">
                 <label className="font-semibold flex items-center gap-2">
-                  <TargetIcon size={18} /> Misi
+                  Misi
                 </label>
                 <textarea name="misi" placeholder="Tuliskan misi sekolah..." value={formData.misi} onChange={handleChange} className="border p-2 w-full mt-2 rounded h-32 resize-none" />
                 {errors.misi && errors.misi.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.misi[0]}</p>}

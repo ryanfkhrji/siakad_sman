@@ -166,7 +166,7 @@ export default function LoginSiswa() {
 
           {/* Tombol Lupa Password */}
           <div className="mt-3 mb-3 text-end">
-            <Link to="/lupa-password" className="text-sm text-primary font-semibold">
+            <Link to="/lupa-password?type=siswa" className="text-sm text-primary font-semibold">
               Lupa Password?
             </Link>
           </div>

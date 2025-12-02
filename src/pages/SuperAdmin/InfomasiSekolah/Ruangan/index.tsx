@@ -177,10 +177,10 @@ const DataRuangan = () => {
                       <TableHead className="font-semibold text-white">Jenis Ruangan</TableHead>
                       <TableHead className="font-semibold text-white">Lantai</TableHead>
                       <TableHead className="font-semibold text-white">Kapasitas</TableHead>
-                      <TableHead className="font-semibold text-white">Luas Ruangan</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Luas Ruangan</TableHead> */}
                       <TableHead className="font-semibold text-white">Kondisi</TableHead>
-                      <TableHead className="font-semibold text-white">Fasilitas</TableHead>
-                      <TableHead className="font-semibold text-white">Keterangan</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Fasilitas</TableHead>
+                      <TableHead className="font-semibold text-white">Keterangan</TableHead> */}
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -196,10 +196,10 @@ const DataRuangan = () => {
                           <TableCell>{ruangan.jenis_ruangan || "-"}</TableCell>
                           <TableCell>{ruangan.lantai || "-"}</TableCell>
                           <TableCell>{ruangan.kapasitas || "-"}</TableCell>
-                          <TableCell>{ruangan.luas_ruangan || "-"}</TableCell>
+                          {/* <TableCell>{ruangan.luas_ruangan || "-"}</TableCell> */}
                           <TableCell>{getKondisiBadge(ruangan.kondisi || "-")}</TableCell>
-                          <TableCell>{ruangan.fasilitas || "-"}</TableCell>
-                          <TableCell>{ruangan.keterangan || "-"}</TableCell>
+                          {/* <TableCell>{ruangan.fasilitas || "-"}</TableCell>
+                          <TableCell>{ruangan.keterangan || "-"}</TableCell> */}
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
                             <DialogDetailRuangan ruanganId={ruangan.id} />
@@ -218,8 +218,8 @@ const DataRuangan = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={10} className="text-center text-gray-500 py-4">
-                          Tidak ada data gedung yang ditemukan
+                        <TableCell colSpan={9} className="text-center text-gray-500 py-4">
+                          Tidak ada data ruangan yang ditemukan
                         </TableCell>
                       </TableRow>
                     )}

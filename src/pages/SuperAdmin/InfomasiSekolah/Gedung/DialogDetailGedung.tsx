@@ -117,9 +117,9 @@ export function DialogDetailGedung({ gedungId }: DialogDetailGedungProps) {
             {/* Keterangan */}
             {gedung.keterangan && (
               <>
-                <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   <span className="font-semibold text-gray-700">Keterangan</span>
-                  <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-3 rounded border">{gedung.keterangan}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-3 rounded border whitespace-pre-wrap break-words">{gedung.keterangan}</p>
                 </div>
               </>
             )}

@@ -242,7 +242,7 @@ const UserGuru = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={9} className="text-center text-gray-500 py-4">
+                        <TableCell colSpan={7} className="text-center text-gray-500 py-4">
                           Tidak ada data guru yang ditemukan
                         </TableCell>
                       </TableRow>

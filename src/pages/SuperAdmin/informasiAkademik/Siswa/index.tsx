@@ -216,11 +216,11 @@ const DataSiswa = () => {
                       <TableHead className="font-semibold text-white">NISN</TableHead>
                       <TableHead className="font-semibold text-white">NIS</TableHead>
                       <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
-                      <TableHead className="font-semibold text-white">Email</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Email</TableHead> */}
                       <TableHead className="font-semibold text-white">Jurusan</TableHead>
                       <TableHead className="font-semibold text-white">Kelas</TableHead>
                       <TableHead className="font-semibold text-white">Wali Kelas</TableHead>
-                      <TableHead className="font-semibold text-white">Ekstrakurikuler</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Ekstrakurikuler</TableHead> */}
                       <TableHead className="font-semibold text-white">Status</TableHead>
                       {/* <TableHead className="font-semibold text-white">Role</TableHead> */}
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
@@ -235,11 +235,11 @@ const DataSiswa = () => {
                           <TableCell>{siswa.nisn ?? "-"}</TableCell>
                           <TableCell>{siswa.nis ?? "-"}</TableCell>
                           <TableCell>{siswa.nama ?? "-"}</TableCell>
-                          <TableCell>{siswa.email ?? "-"}</TableCell>
+                          {/* <TableCell>{siswa.email ?? "-"}</TableCell> */}
                           <TableCell>{siswa.nama_jurusan ?? "-"}</TableCell>
                           <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.nama_kelas ?? "-"}</TableCell>
                           <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.wali_kelas?.nama ?? "-"}</TableCell>
-                          <TableCell>{siswa.nama_ekstrakurikuler ?? "-"}</TableCell>
+                          {/* <TableCell>{siswa.nama_ekstrakurikuler ?? "-"}</TableCell> */}
                           <TableCell>
                             <span className={`px-2 py-1 rounded text-xs font-medium ${siswa.status === "aktif" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{siswa.status ?? "-"}</span>
                           </TableCell>

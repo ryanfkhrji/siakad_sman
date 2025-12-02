@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/PageTitle";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react"; // Import icon
 
 const resetPasswordSchema = z
   .object({
@@ -31,15 +31,14 @@ export default function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // State untuk show/hide password
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Ambil token, email, dan type dari URL params
+  // Ambil token dan email dari URL params
   const token = searchParams.get("token") || "";
   const email = searchParams.get("email") || "";
-  const userType = searchParams.get("type") || "kepegawaian"; // default kepegawaian
-  const isSiswa = userType === "siswa";
 
   const {
     register,
@@ -56,32 +55,26 @@ export default function ResetPassword() {
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
-
-      // Pilih endpoint berdasarkan tipe user
-      const endpoint = isSiswa ? "/siswa/reset-password" : "/kepegawaian/reset-password";
-
-      const res = await api.post(endpoint, {
+      // Kirim ke endpoint tanpa token di URL
+      const res = await api.post("/reset-password", {
         token: data.token,
         email: data.email,
         password: data.password,
         password_confirmation: data.password_confirmation,
       });
 
-      await Swal.fire({
+      Swal.fire({
         title: "Berhasil!",
         text: res.data.message || "Password berhasil diperbarui.",
         icon: "success",
       });
-
-      // Redirect ke login sesuai tipe user
-      const loginUrl = isSiswa ? "/login-siswa" : "/login-kepegawaian";
-      navigate(loginUrl);
     } catch (err) {
       let message = "Token tidak valid atau sudah kedaluwarsa.";
 
       if (err instanceof AxiosError) {
         message = err.response?.data?.message || message;
 
+        // Tampilkan error detail jika ada
         const errors = err.response?.data?.errors;
         if (errors) {
           const errorMessages = Object.values(errors).flat().join(", ");
@@ -101,9 +94,7 @@ export default function ResetPassword() {
     }
   };
 
-  // URL untuk kembali ke lupa password
-  const forgotPasswordUrl = isSiswa ? "/lupa-password?type=siswa" : "/lupa-password?type=kepegawaian";
-
+  // Validasi jika token atau email tidak ada
   if (!token || !email) {
     return (
       <>
@@ -112,7 +103,7 @@ export default function ResetPassword() {
           <div className="bg-white p-6 rounded-md shadow-sm max-w-lg w-full text-center">
             <h2 className="text-2xl font-bold mb-5 text-red-500">Link Tidak Valid</h2>
             <p className="mb-4">Token atau email tidak ditemukan. Silakan minta link reset password baru.</p>
-            <Button onClick={() => navigate(forgotPasswordUrl)} className="w-full">
+            <Button onClick={() => navigate("/lupa-password")} className="w-full">
               Kembali ke Lupa Password
             </Button>
           </div>
@@ -126,16 +117,19 @@ export default function ResetPassword() {
       <PageTitle title="Reset Password" />
       <div className="flex justify-center items-center min-h-dvh bg-background px-4 md:px-0">
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-md shadow-sm max-w-lg w-full">
-          <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Reset Password {isSiswa ? "Siswa" : "Kepegawaian"}</h2>
+          <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Reset Password</h2>
 
+          {/* Hidden inputs untuk token dan email */}
           <input type="hidden" {...register("token")} />
           <input type="hidden" {...register("email")} />
 
+          {/* Tampilkan email (read-only) agar user tahu email mana yang direset */}
           <label className="block mb-4 font-semibold text-foreground">
             Email
             <input type="email" value={email} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100 cursor-not-allowed" />
           </label>
 
+          {/* Password Baru dengan Toggle Show/Hide */}
           <label className="block mb-4 font-semibold text-foreground">
             Password Baru
             <div className="relative">
@@ -152,6 +146,7 @@ export default function ResetPassword() {
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
           </label>
 
+          {/* Konfirmasi Password dengan Toggle Show/Hide */}
           <label className="block mb-4 font-semibold text-foreground">
             Konfirmasi Password
             <div className="relative">
@@ -171,6 +166,12 @@ export default function ResetPassword() {
           <Button type="submit" className="text-white w-full mt-3 text-base font-semibold" disabled={loading}>
             {loading ? "Loading..." : "Ubah Password"}
           </Button>
+
+          {/* <div className="mt-3 text-center">
+            <Button type="button" variant="outline" onClick={() => navigate("/login-kepegawaian")} className="w-full">
+              Kembali ke Login
+            </Button>
+          </div> */}
         </form>
       </div>
     </>

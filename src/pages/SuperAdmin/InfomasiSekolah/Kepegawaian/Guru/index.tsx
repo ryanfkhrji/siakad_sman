@@ -207,9 +207,9 @@ const DataGuru = () => {
                       <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
                       <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Nama Kelas</TableHead>
-                      <TableHead className="font-semibold text-white">Jam Masuk</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Jam Masuk</TableHead> */}
                       <TableHead className="font-semibold text-white">Status</TableHead>
-                      <TableHead className="font-semibold text-white">Keterangan</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Keterangan</TableHead> */}
                       {/* <TableHead className="font-semibold text-white">Role</TableHead> */}
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
                     </TableRow>
@@ -224,9 +224,9 @@ const DataGuru = () => {
                           <TableCell>{guru.nama}</TableCell>
                           <TableCell>{guru.email}</TableCell>
                           <TableCell>{guru.kelas?.nama_kelas ?? "-"}</TableCell>
-                          <TableCell>{guru.kelas?.jam_masuk ?? "-"}</TableCell>
+                          {/* <TableCell>{guru.kelas?.jam_masuk ?? "-"}</TableCell> */}
                           <TableCell>{guru.status}</TableCell>
-                          <TableCell>{guru.keterangan}</TableCell>
+                          {/* <TableCell>{guru.keterangan}</TableCell> */}
                           {/* <TableCell>{guru.role}</TableCell> */}
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
@@ -246,7 +246,7 @@ const DataGuru = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={9} className="text-center text-gray-500 py-4">
+                        <TableCell colSpan={7} className="text-center text-gray-500 py-4">
                           Tidak ada data guru yang ditemukan
                         </TableCell>
                       </TableRow>
