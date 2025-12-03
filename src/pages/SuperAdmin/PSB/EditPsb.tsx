@@ -487,7 +487,7 @@ const EditPsb = () => {
 
                   <form onSubmit={handleSubmit}>
                     <Tabs value={activeTab} onValueChange={setActiveTab}>
-                      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
+                      <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-6">
                         <TabsTrigger value="siswa">Data Siswa</TabsTrigger>
                         <TabsTrigger value="ayah">Data Ayah</TabsTrigger>
                         <TabsTrigger value="ibu">Data Ibu</TabsTrigger>
@@ -571,8 +571,8 @@ const EditPsb = () => {
                       <TabsContent value="wali" className="space-y-4">
                         <Alert className="border border-yellow-200 bg-amber-400/10">
                           <AlertDescription>
-                            <div className="flex items-center justify-between gap-1 text-yellow-500">
-                              <AlertCircleIcon className="h-4 w-4" />
+                            <div className="flex items-center justify-between md:flex-row flex-col gap-1 text-yellow-500">
+                              <AlertCircleIcon size={18} />
                               Data wali bersifat opsional. Isi jika siswa tinggal bersama wali.
                             </div>
                           </AlertDescription>
@@ -628,14 +628,25 @@ const EditPsb = () => {
                           onChange={(value) => handleInputChange("nilai_raport_terakhir", value)}
                         />
 
+                        <Alert className="border border-yellow-200 bg-amber-400/10">
+                          <AlertDescription>
+                            <div className="flex items-center justify-between md:flex-row flex-col gap-1 text-yellow-500">
+                              <AlertCircleIcon size={18} />
+                              Jika bukan siswa pindahan maka di isi "Bukan Pindahan".
+                            </div>
+                          </AlertDescription>
+                        </Alert>
                         <FormField label="Alasan Pindah" field="alasan_pindah" error={errors.alasan_pindah}>
                           <Textarea id="alasan_pindah" value={formData.alasan_pindah || ""} onChange={(e) => handleInputChange("alasan_pindah", e.target.value)} placeholder="Jelaskan alasan pindah sekolah (opsional)" rows={3} />
                         </FormField>
                       </TabsContent>
 
                       <TabsContent value="berkas" className="space-y-6">
-                        <Alert>
-                          <AlertDescription>Upload file baru hanya jika ingin mengganti. Jika tidak, file lama akan tetap digunakan.</AlertDescription>
+                        <Alert className="border border-yellow-200 bg-amber-400/10">
+                          <AlertDescription>
+                            <AlertCircleIcon size={18} />
+                            <div className="flex items-center justify-between md:flex-row flex-col gap-1 text-yellow-500">Upload file baru hanya jika ingin mengganti. Jika tidak, file lama akan tetap digunakan, maksimal ukuran 2MB.</div>
+                          </AlertDescription>
                         </Alert>
 
                         <FileUploadField
