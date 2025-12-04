@@ -204,7 +204,7 @@ class AbsensiPegawaiController extends Controller
     }
 
     /**
-    // ! ✅ untuk super admin (coba export dulu)
+     * ✅ untuk super admin
      * Remove the specified resource from storage.
      * Beberapa data = DELETE /absensi/destroy?ids[]=3&ids[]=5&ids[]=9
      * Satu data = DELETE /absensi/destroy?ids=7
@@ -252,11 +252,11 @@ class AbsensiPegawaiController extends Controller
         }
 
         return response()->json([
-            'message' => 'Parameter ids tidak valid. Kirimkan "all", satu id, atau array id.'
+            'message' => 'Parameter ids tidak valid. Kirimkan satu id, atau array id.'
         ], 422);
     }
 
-    // ! ✅ export data   
+    // ✅ export data ke excel
     /**
      * php artisan make:export AbsensiPegawaiExport --model=AbsensiPegawai
      * Semua data = GET /absensi/export
@@ -265,9 +265,25 @@ class AbsensiPegawaiController extends Controller
      */
     public function export(Request $request)
     {
-        $ids = $request->ids; // bisa null, array, atau 1 id
+        $ids = $request->input('ids'); // bisa null atau array        
+
+         // Validasi ID jika ada
+         if ($ids) {
+            $validIds = AbsensiPegawai::whereIn('id', $ids)->pluck('id')->toArray();
+            $missingIds = array_diff($ids, $validIds);
+
+            if (count($missingIds) > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Beberapa ID tidak ditemukan',
+                    'missing_ids' => array_values($missingIds),
+                ], 404);
+            }
+        }
+
         return Excel::download(new AbsensiPegawaiExport($ids), 'absensi-pegawai.xlsx');
     }
+
 
     // ! tidak ada import karena guru_id dan matpel_Id
 }

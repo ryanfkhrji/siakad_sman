@@ -110,10 +110,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
 
-    // ! Absensi
-    Route::delete('/spa/absensi/hapus', [AbsensiPegawaiController::class, 'destroyData']);
-    Route::apiResource('/spa/absensi', AbsensiPegawaiController::class)->except('store', 'destroy');    
+    // ✅ Absensi
     Route::get('/spa/absensi/export', [AbsensiPegawaiController::class, 'export']);
+    Route::delete('/spa/absensi/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
+    Route::apiResource('/spa/absensi', AbsensiPegawaiController::class)->except('store', 'destroy');    
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
@@ -157,7 +157,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD peserta ekstrakurikuler oleh pegawai
     Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
 
-     // ! ✅ Absensi
+     // ✅ Absensi
     Route::apiResource('/pegawai/absensi', AbsensiPegawaiController::class)->only('store');
     Route::get('/pegawai/absensi/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
     Route::get('/pegawai/absensi/export', [AbsensiPegawaiController::class, 'export']);
@@ -234,6 +234,8 @@ Route::middleware('auth:siswa')->group(function () {
 
     // ✅ Get all jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
+
+    // ! absensi siswa
     
     // ✅ Get detail jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/show/diri/{id}', [SiswaJadwalPelajaranController::class, 'showDetailJadwalSendiri']);

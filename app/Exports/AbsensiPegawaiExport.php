@@ -25,9 +25,9 @@ class AbsensiPegawaiExport implements FromCollection, WithHeadings
     {
         $query = $this->ids
             ? AbsensiPegawai::whereIn('id', $this->ids)->with('mataPelajaran', 'guru')->get()
-            : AbsensiPegawai::with('mataPelajaran', 'guru')->all();
+            : AbsensiPegawai::with('mataPelajaran', 'guru')->get();
 
-        return $query->get()->map(function($item) {
+        return $query->map(function($item) {
             return [
                 $item->guru->nama,
                 $item->mataPelajaran->nama_pelajaran,
