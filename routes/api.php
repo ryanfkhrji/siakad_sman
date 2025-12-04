@@ -110,6 +110,11 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
 
+    // ! Absensi
+    Route::delete('/spa/absensi/hapus', [AbsensiPegawaiController::class, 'destroyData']);
+    Route::apiResource('/spa/absensi', AbsensiPegawaiController::class)->except('store', 'destroy');    
+    Route::get('/spa/absensi/export', [AbsensiPegawaiController::class, 'export']);
+
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
     Route::apiResource('psb', PsbController::class)->except('destroy');
@@ -153,7 +158,9 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
 
      // ! ✅ Absensi
-    Route::apiResource('/pegawai/absensi', AbsensiPegawaiController::class);
+    Route::apiResource('/pegawai/absensi', AbsensiPegawaiController::class)->only('store');
+    Route::get('/pegawai/absensi/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
+    Route::get('/pegawai/absensi/export', [AbsensiPegawaiController::class, 'export']);
 
     // ! show gedung, ruangan, tahun akademik
     // -------------------------------------------------------------------------------------
@@ -169,6 +176,9 @@ Route::get('/cache-cleaner', [CacheCleanerController::class, 'triggerCacheCleanu
 
 // ✅ CRUD identitas sekolah oleh super admin
 Route::apiResource('/spa/identitas-sekolah', IdentitasSekolahController::class);
+
+// ✅ PSB Public
+Route::apiResource('psb', PsbController::class)->only('store');
 
 // ✅ untuk menampilkan berkas / foto yang private
 Route::get('/tampil-berkas/{jenis}/{filename}', [PsbController::class, 'tampilkanBerkas'])->name('berkas.view');

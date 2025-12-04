@@ -2,67 +2,102 @@
 
 namespace App\Http\Controllers;
 use App\Models\AbsensiPegawai;
+use App\Models\JadwalPelajaran;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Helpers\ApiResponse;
+use App\Exports\AbsensiPegawaiExport;
+use Illuminate\Support\Facades\Validator;
+use File;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AbsensiPegawaiController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * ✅ Untuk super admin
      */
     public function index()
     {
         $absen = AbsensiPegawai::with('mataPelajaran', 'guru')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-
-        if (!$absen) {
+            ->orderBy('tanggal', 'desc')
+            ->get();
+    
+        if ($absen->isEmpty()) {
             return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
         }
-
-        $formatted = $absen->map(function ($item) {
+    
+        // Kelompokkan berdasarkan guru_id
+        $grouped = $absen->groupBy('guru_id')->map(function ($item) {
+            $namaGuru = $item->first()->guru->nama ?? null;
+            $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
+    
             return [
-                'id' => $item->id ?? null,
-                'guru_id' => $item->guru->nama ?? null,                
-                'mata_pelajaran_id' => $item->mataPelajaran->nama_pelajaran ?? null,                
-                'tanggal' => $item->tanggal ?? null,                
-                'status' => $item->status ?? null,                
+                'nama_guru' => $namaGuru,
+                'mengajar' => $namaPelajaran,
+                'total_hadir' => $item->where('status', 'hadir')->count(),
+                'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
+                'absensi' => $item->map(function ($abs) {
+                    return [
+                        'id' => $abs->id,
+                        'tanggal' => Carbon::parse($abs->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                        
+                        'status' => $abs->status,
+                    ];
+                })->values()
             ];
-        });
-
-        return ApiResponse::success($formatted, 'Daftar absensi berhasil diambil');
+        })->values();
+    
+        return ApiResponse::success($grouped, 'Absensi berhasil diambil');
     }
+    
 
     /**
-     * Store a newly created resource in storage.
+     * ✅ Untuk pegawai
      */
     public function store(Request $request)
     {
+        Carbon::setLocale('id');
+
+        $pegawai = Auth::guard('kepegawaian')->user();
+
         try {
             $validated = $request->validate([
-                'guru_id' => 'required|exists:kepegawaians,id',
-                'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
-                'tanggal' => 'required|date',
                 'status' => 'required|in:hadir,tidak hadir'
             ],[
-                'guru_id.required' => 'Nama guru wajib diisi',
-                'guru_id.exists' => 'Guru tidak ditemukan',
-                'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-                'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
-                'tanggal.required' => 'Tanggal wajib diisi',
-                'tanggal.date' => 'Format tanggal salah',
                 'status.required' => 'Status wajib diisi',
                 'status.in' => 'Pilihan hanya hadir atau tidak hadir'
-            ]);
+            ]);            
 
-            $absensi = AbsensiPegawai::create($validated);
+            $mataPelajaran = JadwalPelajaran::where('guru_id', $pegawai->id)->first();
+
+            // gabisa absen 2x pada hari yang sama
+            $tanggal = AbsensiPegawai::where('guru_id', $pegawai->id)
+            ->whereDate('tanggal', today())
+            ->first();
+
+            if ($tanggal) {
+                return ApiResponse::error('Gagal', ['pesan' => 'Anda sudah absen hari ini'], 422);
+            }
+
+            $absensi = AbsensiPegawai::create(
+                [
+                    'guru_id' => $pegawai->id,
+                    'mata_pelajaran_id' => $mataPelajaran->id,
+                    'tanggal' => Carbon::today()->toDateString(),
+                    'status' => $validated['status']
+                ]
+            );
+
             $absensi->load('mataPelajaran', 'guru');
 
-            $jumlahHadir = AbsensiPegawai::where('guru_id', $absensi->id)
+            $jumlahHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
             ->where('status', 'hadir')
             ->count();
 
-            $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $absensi->id)
+            $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
             ->where('status', 'tidak hadir')
             ->count();
 
@@ -70,7 +105,8 @@ class AbsensiPegawaiController extends Controller
                 'id' => $absensi->id ?? null,
                 'guru_id' => $absensi->guru->nama ?? null,                
                 'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
-                'tanggal' => $absensi->tanggal ?? null,                
+                // 'tanggal' => Carbon::parse($absensi->tanggal)->translatedFormat('l, d-m-Y') ?? null,   // Senin, 24-06-2026
+                'tanggal' => Carbon::parse($absensi->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
                 'status' => $absensi->status ?? null,       
                 'rekapitulasi' => [
                     'hadir' => $jumlahHadir,
@@ -83,43 +119,47 @@ class AbsensiPegawaiController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $absensi = AbsensiPegawai::with('mataPelajaran', 'guru')->find($id);
 
-        if (!$absensi) {
-            return ApiResponse::error('Not found', ['id' => 'Data tidak ditemukan']);
+    // ✅ show all absen sendiri (untuk pegawai)
+    public function showAbsenSendiri() {
+        $user = Auth::guard('kepegawaian')->user();
+        $matpel = JadwalPelajaran::with('mataPelajaran')->where('guru_id', $user->id)->first();
+
+        $absensi = AbsensiPegawai::with('mataPelajaran')->where('guru_id', $user->id)->get();
+
+        if ($absensi->isEmpty()) {
+            return ApiResponse::error('Absensi tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
         // hitung jumlah hadir/tidak hadir khusus guru ini
-        $jumlahHadir = AbsensiPegawai::where('guru_id', $id)
+        $jumlahHadir = AbsensiPegawai::where('guru_id', $user->id)
         ->where('status', 'hadir')
         ->count();
 
-        $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $id)
+        $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $user->id)
         ->where('status', 'tidak hadir')
         ->count();
 
         $formatted = [
-            'id' => $absensi->id ?? null,
-            'guru_id' => $absensi->guru->nama ?? null,                
-            'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
-            'tanggal' => $absensi->tanggal ?? null,                
-            'status' => $absensi->status ?? null,       
-            'rekapitulasi' => [
-                'hadir' => $jumlahHadir,
-                'tidak_hadir' => $jumlahTidakHadir
-            ]
+            'nama' => $user->nama ?? null,
+            'mata_pelajaran_id' => $matpel->mataPelajaran->nama_pelajaran ?? null,
+            'total_hadir' => $jumlahHadir ?? null,
+            'total_tidak_hadir' => $jumlahTidakHadir ?? null,
+            'absensi' => $absensi->map(function ($item) {
+                return [
+                    'id' => $item->id ?? null,                    
+                    'tanggal' => Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                                
+                    'status' => $item->status ?? null,
+                ];
+            }),
         ];
 
-        return ApiResponse::success($fomatted, 'Detail absensi berhasil diambil');
+        return ApiResponse::success($formatted, 'Absensi berhasil diambil');
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * ✅ Untuk super admin
      */
     public function update(Request $request, string $id)
     {
@@ -129,30 +169,32 @@ class AbsensiPegawaiController extends Controller
             return ApiResponse::error('Not found', ['id', 'Data tidak ditemukan']);
         }
 
-        $validated = $request->validate([
-            'guru_id' => 'sometimes|required|exists:kepegawaians,id',
-            'mata_pelajaran_id' => 'sometimes|required|exists:mata_pelajarans,id',
-            'tanggal' => 'sometimes|required|date',
+        $validated = $request->validate([            
             'status' => 'sometimes|required|in:hadir,tidak hadir',
-        ], [
-            'guru_id.required' => 'Nama guru wajib diisi',
-            'guru_id.exists' => 'Guru tidak ditemukan',
-            'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-            'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
-            'tanggal.required' => 'Tanggal wajib diisi',
-            'tanggal.date' => 'Format tanggal salah',
+        ], [            
             'status.required' => 'Status wajib diisi',
             'status.in' => 'Pilihan hanya hadir atau tidak hadir'
-        ]);
-       
+        ]);        
+
         $absensi->update($validated);
         $absensi->load('mataPelajaran', 'guru');    
+
+        // hitung jumlah hadir/tidak hadir khusus guru ini
+        $jumlahHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
+        ->where('status', 'hadir')
+        ->count();
+
+        $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
+        ->where('status', 'tidak hadir')
+        ->count();
+
+        
 
         return ApiResponse::success([
             'id' => $absensi->id ?? null,
             'guru_id' => $absensi->guru->nama ?? null,                
             'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
-            'tanggal' => $absensi->tanggal ?? null,                
+            'tanggal' => Carbon::parse($absensi->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
             'status' => $absensi->status ?? null,       
             'rekapitulasi' => [
                 'hadir' => $jumlahHadir,
@@ -162,21 +204,70 @@ class AbsensiPegawaiController extends Controller
     }
 
     /**
+    // ! ✅ untuk super admin (coba export dulu)
      * Remove the specified resource from storage.
+     * Beberapa data = DELETE /absensi/destroy?ids[]=3&ids[]=5&ids[]=9
+     * Satu data = DELETE /absensi/destroy?ids=7
      */
-    public function destroy(string $id)
+    public function destroyData(Request $request)
     {
-        $absensi = AbsensiPegawai::find($id);
+        $ids = $request->ids;        
 
-        if (!$absensi) {
-            return ApiResponse::error('Data tidak ditemukan', ['id' => 'Absensi tidak ditemukan']);
+        // HAPUS BEBERAPA DATA
+        if (is_array($ids)) {
+            $validIds = AbsensiPegawai::whereIn('id', $ids)->pluck('id')->toArray();
+            $invalidIds = array_diff($ids, $validIds);
+
+            // Jika terdapat id yang tidak ada
+            if (!empty($invalidIds)) {
+                return response()->json([
+                    'message' => 'Beberapa ID tidak ditemukan.',
+                    'invalid_ids' => array_values($invalidIds)
+                ], 404);
+            }
+
+            AbsensiPegawai::whereIn('id', $validIds)->delete();
+            return response()->json([
+                'message' => 'Beberapa data absensi pegawai berhasil dihapus.',
+                'deleted_ids' => $validIds
+            ]);
         }
 
-        $absensi->delete();
+        // HAPUS SATU DATA
+        if (is_numeric($ids)) {
+            $absensi = AbsensiPegawai::find($ids);
 
-        return ApiResponse::success('null', 'Data absensi berhasil dihapus');
+            if (!$absensi) {
+                return response()->json([
+                    'message' => 'Data tidak ditemukan.',
+                    'invalid_id' => $ids
+                ], 404);
+            }
+
+            $absensi->delete();
+            return response()->json([
+                'message' => 'Data absensi pegawai berhasil dihapus.',
+                'deleted_id' => $ids
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Parameter ids tidak valid. Kirimkan "all", satu id, atau array id.'
+        ], 422);
     }
 
-    // ! export data
-    
+    // ! ✅ export data   
+    /**
+     * php artisan make:export AbsensiPegawaiExport --model=AbsensiPegawai
+     * Semua data = GET /absensi/export
+     * Beberapa data = GET /absensi/export?ids[]=3&ids[]=5&ids[]=10
+     * Satu data = GET /absensi/export?ids[]=7
+     */
+    public function export(Request $request)
+    {
+        $ids = $request->ids; // bisa null, array, atau 1 id
+        return Excel::download(new AbsensiPegawaiExport($ids), 'absensi-pegawai.xlsx');
+    }
+
+    // ! tidak ada import karena guru_id dan matpel_Id
 }

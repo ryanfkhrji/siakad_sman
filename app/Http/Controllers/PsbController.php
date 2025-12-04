@@ -54,22 +54,22 @@ class PsbController extends Controller
                 'kelas_terakhir' => $item->kelas_terakhir,
                 'nilai_raport_terakhir' => $item->nilai_raport_terakhir,
                 'alasan_pindah' => $item->alasan_pindah,
-                'berkas_raport' => route('berkas.view', [
+                'berkas_raport' => $item->berkas_raport ? route('berkas.view', [
                     'jenis'    => 'berkas_raport',
                     'filename' => basename($item->berkas_raport),
-                ]),                
-                'suket_pindah' => route('berkas.view', [
+                ]) : null,                
+                'suket_pindah' => $item->suket_pindah ? route('berkas.view', [
                     'jenis'    => 'suket_pindah',
                     'filename' => basename($item->suket_pindah),
-                ]),                 
-                'berkas_kartu_keluarga' => route('berkas.view', [
+                ]) : null,                 
+                'berkas_kartu_keluarga' => $item->berkas_kartu_keluarga ? route('berkas.view', [
                     'jenis'    => 'berkas_kartu_keluarga',
                     'filename' => basename($item->berkas_kartu_keluarga),
-                ]),                 
-                'berkas_akta_lahir' => route('berkas.view', [
+                ]) : null,                 
+                'berkas_akta_lahir' => $item->berkas_akta_lahir ? route('berkas.view', [
                     'jenis'    => 'berkas_akta_lahir',
                     'filename' => basename($item->berkas_akta_lahir),
-                ]),                                 
+                ]) : null,                                 
                 'foto_siswa' => $item->foto_siswa ? asset(str_replace('public/', 'storage/', $item->foto_siswa)) : null,
             ];
         });
@@ -116,22 +116,22 @@ class PsbController extends Controller
             'kelas_terakhir' => $psb->kelas_terakhir,
             'nilai_raport_terakhir' => $psb->nilai_raport_terakhir,
             'alasan_pindah' => $psb->alasan_pindah,
-            'berkas_raport' => route('berkas.view', [
+            'berkas_raport' => $psb->berkas_raport ? route('berkas.view', [
                 'jenis'    => 'berkas_raport',
                 'filename' => basename($psb->berkas_raport),
-            ]),                
-            'suket_pindah' => route('berkas.view', [
+            ]) : null,                
+            'suket_pindah' => $psb->suket_pindah ? route('berkas.view', [
                 'jenis'    => 'suket_pindah',
                 'filename' => basename($psb->suket_pindah),
-            ]),                 
-            'berkas_kartu_keluarga' => route('berkas.view', [
+            ]) : null,                 
+            'berkas_kartu_keluarga' => $psb->berkas_kartu_keluarga ? route('berkas.view', [
                 'jenis'    => 'berkas_kartu_keluarga',
                 'filename' => basename($psb->berkas_kartu_keluarga),
-            ]),                 
-            'berkas_akta_lahir' => route('berkas.view', [
+            ]) : null,                 
+            'berkas_akta_lahir' => $psb->berkas_akta_lahir ? route('berkas.view', [
                 'jenis'    => 'berkas_akta_lahir',
                 'filename' => basename($psb->berkas_akta_lahir),
-            ]),                                 
+            ]) : null,                                 
             'foto_siswa' => $psb->foto_siswa ? asset(str_replace('public/', 'storage/', $psb->foto_siswa)) : null,        
         ];
 
@@ -354,22 +354,22 @@ class PsbController extends Controller
                 'kelas_terakhir' => $psb->kelas_terakhir,
                 'nilai_raport_terakhir' => $psb->nilai_raport_terakhir,
                 'alasan_pindah' => $psb->alasan_pindah,                
-                'berkas_raport' => route('berkas.view', [
+                'berkas_raport' => $psb->berkas_raport ? route('berkas.view', [
                     'jenis'    => 'berkas_raport',
                     'filename' => basename($psb->berkas_raport),
-                ]),                
-                'suket_pindah' => route('berkas.view', [
+                ]) : null,                
+                'suket_pindah' => $psb->suket_pindah ? route('berkas.view', [
                     'jenis'    => 'suket_pindah',
                     'filename' => basename($psb->suket_pindah),
-                ]),                 
-                'berkas_kartu_keluarga' => route('berkas.view', [
+                ]) : null,                 
+                'berkas_kartu_keluarga' => $psb->berkas_kartu_keluarga ? route('berkas.view', [
                     'jenis'    => 'berkas_kartu_keluarga',
                     'filename' => basename($psb->berkas_kartu_keluarga),
-                ]),                 
-                'berkas_akta_lahir' => route('berkas.view', [
+                ]) : null,                 
+                'berkas_akta_lahir' => $psb->berkas_akta_lahir ? route('berkas.view', [
                     'jenis'    => 'berkas_akta_lahir',
                     'filename' => basename($psb->berkas_akta_lahir),
-                ]),                                 
+                ]) : null,                                 
                 'foto_siswa' => $psb->foto_siswa ? asset(str_replace('public/', 'storage/', $psb->foto_siswa)) : null,    
             ], 'Peserta berhasil mendaftar');
     
@@ -525,70 +525,25 @@ class PsbController extends Controller
             'kelas_terakhir' => $psb->kelas_terakhir,
             'nilai_raport_terakhir' => $psb->nilai_raport_terakhir,
             'alasan_pindah' => $psb->alasan_pindah,
-            'berkas_raport' => route('berkas.view', [
+            'berkas_raport' => $psb->berkas_raport ? route('berkas.view', [
                 'jenis'    => 'berkas_raport',
                 'filename' => basename($psb->berkas_raport),
-            ]),                
-            'suket_pindah' => route('berkas.view', [
+            ]) : null,                
+            'suket_pindah' => $psb->suket_pindah ? route('berkas.view', [
                 'jenis'    => 'suket_pindah',
                 'filename' => basename($psb->suket_pindah),
-            ]),                 
-            'berkas_kartu_keluarga' => route('berkas.view', [
+            ]) : null,                 
+            'berkas_kartu_keluarga' => $psb->berkas_kartu_keluarga ? route('berkas.view', [
                 'jenis'    => 'berkas_kartu_keluarga',
                 'filename' => basename($psb->berkas_kartu_keluarga),
-            ]),                 
-            'berkas_akta_lahir' => route('berkas.view', [
+            ]) : null,                 
+            'berkas_akta_lahir' => $psb->berkas_akta_lahir ? route('berkas.view', [
                 'jenis'    => 'berkas_akta_lahir',
                 'filename' => basename($psb->berkas_akta_lahir),
-            ]),                                 
+            ]) : null,                                 
             'foto_siswa' => $psb->foto_siswa ? asset(str_replace('public/', 'storage/', $psb->foto_siswa)) : null,  
         ], 'Peserta berhasil diperbarui');
     }
-
-    // public function destroy($id)
-    // {
-    //     $psb = Psb::find($id);
-
-    //     if (!$psb) {
-    //         return ApiResponse::error('Peserta tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
-    //     }
-
-    //     // Daftar kolom yang menyimpan file
-    //     $fileColumns = [
-    //         'foto_siswa',
-    //         'berkas_raport',
-    //         'suket_pindah',
-    //         'berkas_kartu_keluarga',
-    //         'berkas_akta_lahir',
-    //     ];
-
-    //     foreach ($fileColumns as $field) {
-    //         $filePath = $psb->$field;
-    //         if (!$filePath) continue;
-
-    //         // Tentukan disk berdasarkan prefix
-    //         if (str_starts_with($filePath, 'public/')) {
-    //             $disk = 'public';
-    //             $relativePath = substr($filePath, strlen('public/'));
-    //         } elseif (str_starts_with($filePath, 'private/')) {
-    //             $disk = 'private';
-    //             $relativePath = substr($filePath, strlen('private/'));
-    //         } else {
-    //             // Jika tidak ada prefix, skip
-    //             continue;
-    //         }
-
-    //         // Hapus file jika ada
-    //         if (Storage::disk($disk)->exists($relativePath)) {
-    //             Storage::disk($disk)->delete($relativePath);
-    //         }
-    //     }
-
-    //     // Hapus record dari database
-    //     $psb->delete();
-
-    //     return ApiResponse::success(null, 'Peserta berhasil dihapus');
-    // }
 
     // ✅ Hapus bannyak sekaligus
     public function destroyMultiple(Request $request, $id = null)

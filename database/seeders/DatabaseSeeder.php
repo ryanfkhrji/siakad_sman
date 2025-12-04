@@ -13,6 +13,7 @@ use App\Models\TahunAkademik;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
+use App\Models\AbsensiPegawai;
 use App\Models\Prestasi;
 use App\Models\Kelas;
 use App\Models\JadwalPelajaran;
@@ -201,7 +202,7 @@ class DatabaseSeeder extends Seeder
                 'nama_pelajaran' => 'Bahasa Sunda',
                 'status' => 'pilihan'
             ],
-        ]);
+        ]);        
 
         // Seed Kurikulum
         Kurikulum::insert([
@@ -278,6 +279,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        // Seed Jadwal Pelajaran Guru
         JadwalPelajaran::insert([
             [
                 'mata_pelajaran_id' => 1,
@@ -297,7 +299,23 @@ class DatabaseSeeder extends Seeder
                 'ruangan' => '7.5.6',
                 'link_opsional' => ''
             ]
-        ]);        
+        ]);      
+        
+        // Seed Absensi Pegawai
+        AbsensiPegawai::insert([
+            [
+                'guru_id' => 5,
+                'mata_pelajaran_id' => 1,
+                'tanggal' => '2025-05-24',
+                'status' => 'hadir'
+            ],
+            [
+                'guru_id' => 6,
+                'mata_pelajaran_id' => 2,
+                'tanggal' => '2025-05-24',
+                'status' => 'tidak hadir'
+            ],
+        ]);
 
         // Seed Ekstrakurikuler
         Ekstrakurikuler::insert([

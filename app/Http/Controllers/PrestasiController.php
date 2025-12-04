@@ -55,6 +55,8 @@ class PrestasiController extends Controller
                 'prestasi_diraih.required' => 'Wajib diisi',
             ]);            
 
+            // selain siswa_id, diakalin pake inputan otomatis di front
+
             $prestasi = Prestasi::create($validated);
             $prestasi->load('siswa', 'kelas', 'jurusan');
 

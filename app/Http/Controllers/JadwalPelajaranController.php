@@ -48,7 +48,7 @@ class JadwalPelajaranController extends Controller
     {
         try {
             $validated = $request->validate([
-                'mata_pelajaran_id' => 'required',
+                'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
                 'hari' => 'required',
                 'guru_id' => 'required|exists:kepegawaians,id',
                 'kelas_id' => 'required|exists:kelas,id',
@@ -57,6 +57,7 @@ class JadwalPelajaranController extends Controller
                 'link_opsional' => 'nullable'
             ], [
                 'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
+                'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
                 'hari.required' => 'Hari wajib diisi',
                 'guru_id.required' => 'Guru wajib diisi',
                 'guru_id.exists' => 'Guru tidak ditemukan',
@@ -66,14 +67,25 @@ class JadwalPelajaranController extends Controller
             ]);
 
             // tidak boleh dobel pelajaran yang sama
-            $existing = JadwalPelajaran::where('guru_id', $validated['guru_id'])
-                ->where('mata_pelajaran_id', $validated['mata_pelajaran_id'])
-                ->first();
+            // $existing = JadwalPelajaran::where('guru_id', $validated['guru_id'])
+            //     ->where('mata_pelajaran_id', $validated['mata_pelajaran_id'])
+            //     ->first();
+
+            // if ($existing) {
+            //     return ApiResponse::error('Guru sudah terdaftar di pelajaran ini', [
+            //         'guru_id' => ['Guru sudah terdaftar di pelajaran ini']
+            //     ], 422);
+            // }
+
+            // pelajaran harus sama dan tidak boleh berbeda
+            $existing = JadwalPelajaran::where('guru_id', $validated['guru_id'])->first();
 
             if ($existing) {
-                return ApiResponse::error('Guru sudah terdaftar di pelajaran ini', [
-                    'guru_id' => ['Guru sudah terdaftar di pelajaran ini']
-                ], 422);
+                if ($existing->mata_pelajaran_id != $validated['mata_pelajaran_id']) {
+                    return ApiResponse::error('Not allowed', [
+                        'pesan' => ['Satu guru hanya boleh satu mata pelajaran']
+                    ], 422);
+                }
             }
     
             $matpel = JadwalPelajaran::create($validated);
@@ -172,28 +184,20 @@ class JadwalPelajaranController extends Controller
         }
 
         $validated = $request->validate([
-            'mata_pelajaran_id' => [
-                'sometimes',
-                'exists:mata_pelajarans,id',
-                'required',
-            ],
             'hari' => 'sometimes|required',
             'kelas_id' => 'sometimes|required|exists:kelas,id',
             'jam_pelajaran' => 'sometimes|required',
             'ruangan' => 'sometimes|nullable',
             'link_opsional' => 'sometimes|nullable',
         ],[
-            'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-            'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
             'hari.required' => 'Hari wajib diisi',
             'kelas_id.required' => 'Kelas wajib diisi',
             'kelas_id.exists' => 'Kelas tidak ditemukan',
             'jam_pelajaran.required' => 'Jam pelajaran wajib diisi',
         ]);
 
-       // guru_id tidak boleh diupdate
+       // guru_id dan mata_pelajaran_id tidak boleh diupdate (karna harus sama)
         $matpel->update([        
-            'mata_pelajaran_id' => $validated['mata_pelajaran_id'],
             'hari' => $validated['hari'],
             'kelas_id' => $validated['kelas_id'],
             'jam_pelajaran' => $validated['jam_pelajaran'],
