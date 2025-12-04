@@ -678,7 +678,7 @@ const EditPsb = () => {
                           allowedTypes={["pdf"]}
                           error={errors.suket_pindah}
                           preview={filePreviews.suket_pindah}
-                          onFileChange={(file) => handleFileChange("suket_pindah", file, ["jpg", "jpeg", "png"])}
+                          onFileChange={(file) => handleFileChange("suket_pindah", file, ["pdf"])}
                           onRemove={() => handleRemoveFile("suket_pindah")}
                         />
 
