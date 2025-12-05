@@ -5,7 +5,7 @@ import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2Icon, SearchIcon, Trash2Icon, FileSpreadsheet, PenBoxIcon, CircleXIcon, FilePlus } from "lucide-react";
+import { Loader2Icon, SearchIcon, Trash2Icon, FileSpreadsheet, PenBoxIcon, CircleXIcon, FilePlus, CalendarCheck, XCircle, UserCheck } from "lucide-react";
 import Footer from "@/pages/Footer";
 import type { AbsensiPegawaiFlat } from "@/types/absensiPegawai";
 import Swal from "sweetalert2";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { absensiPegawaiService } from "@/services/absensiPegawaiService";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 const DataAbsensiPegawai = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -25,6 +26,9 @@ const DataAbsensiPegawai = () => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const selectAllRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [totalHadir, setTotalHadir] = useState(0);
+  const [totalTidakHadir, setTotalTidakHadir] = useState(0);
 
   // Dialog edit state
   const [editDialog, setEditDialog] = useState(false);
@@ -61,6 +65,8 @@ const DataAbsensiPegawai = () => {
         });
 
         setDataAbsensi(flatData);
+        setTotalHadir(flatData.reduce((total, item) => total + (item.status === "hadir" ? 1 : 0), 0));
+        setTotalTidakHadir(flatData.reduce((total, item) => total + (item.status === "tidak hadir" ? 1 : 0), 0));
       }
     } catch (error: any) {
       Swal.fire({
@@ -159,7 +165,7 @@ const DataAbsensiPegawai = () => {
       });
     } finally {
       setLoading(false);
-      setIsLoading(false)
+      setIsLoading(false);
     }
   };
 
@@ -239,6 +245,9 @@ const DataAbsensiPegawai = () => {
     }
   };
 
+  // Calculate percentage
+  const persentaseKehadiran = totalHadir + totalTidakHadir > 0 ? ((totalHadir / (totalHadir + totalTidakHadir)) * 100).toFixed(1) : 0;
+
   return (
     <SidebarProvider>
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
@@ -255,6 +264,51 @@ const DataAbsensiPegawai = () => {
             </div>
           ) : (
             <>
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <Card>
+                  <CardContent>
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-blue-100 rounded-full">
+                        <UserCheck className="text-blue-600" size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Total Hadir</p>
+                        <p className="text-2xl font-bold text-blue-600">{totalHadir}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent>
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-red-100 rounded-full">
+                        <XCircle className="text-red-600" size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Total Tidak Hadir</p>
+                        <p className="text-2xl font-bold text-red-600">{totalTidakHadir}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent>
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-green-100 rounded-full">
+                        <CalendarCheck className="text-green-600" size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Persentase Kehadiran</p>
+                        <p className="text-2xl font-bold text-green-600">{persentaseKehadiran}%</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
               {/* Action Buttons */}
               <div className="mb-6 flex flex-col gap-4">
                 <div className="flex flex-wrap gap-2">
