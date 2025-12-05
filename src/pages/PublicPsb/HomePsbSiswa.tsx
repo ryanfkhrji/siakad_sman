@@ -6,11 +6,45 @@ import { Button } from "@/components/ui/button";
 import BannerSekolah from "@/assets/Banner-image-psb.png";
 import { Link } from "react-router-dom";
 import Footer from "../Footer";
+import type { TahunAkademik } from "@/types";
+import { useEffect, useState } from "react";
+import api from "@/api/axios";
+import Swal from "sweetalert2";
 
 const HomePage = () => {
+  const [dataTahunAkademik, setDataTahunAkademik] = useState<TahunAkademik[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Ambil data dari backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get("/spa/tahun-akademik");
+        if (res.data.status === "success") {
+          setDataTahunAkademik(res.data.data);
+        }
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal memuat data!",
+          text: error.response?.data?.message || "Tidak dapat memuat data tahun akademik",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Ambil tahun akademik aktif (bisa berdasarkan status atau yang pertama)
+  const tahunAkademikAktif = dataTahunAkademik.find((ta) => ta.status === "aktif") || dataTahunAkademik[0];
+
   return (
     <div className="mx-auto max-w-7xl w-full px-4 md:px-0">
       <PageTitle title="Penerimaan Siswa Baru" />
+
       {/* HeaderLayouts */}
       <Card className="overflow-hidden border-0 shadow bg-linear-to-br from-indigo-50 via-white to-purple-50">
         <CardHeader>
@@ -31,17 +65,21 @@ const HomePage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               {/* Text Content */}
               <div className="space-y-6 order-2 lg:order-1">
-                {/* <div className="inline-block">
-                <span className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">Pendaftaran Dibuka</span>
-              </div> */}
-
                 <div className="space-y-3">
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">Penerimaan Siswa Baru</h1>
                   <div className="flex items-center gap-3">
                     <img src={LogoSekolah} alt="Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain" />
                     <div>
                       <h2 className="text-xl md:text-2xl font-bold text-gray-800">SMA Negeri 42 Jakarta</h2>
-                      <p className="text-lg text-gray-600 font-medium">Tahun Ajaran 2026/2027</p>
+
+                      {/* TAMPILKAN TAHUN AKADEMIK DINAMIS */}
+                      {loading ? (
+                        <p className="text-lg text-gray-400 font-medium animate-pulse">Memuat...</p>
+                      ) : tahunAkademikAktif ? (
+                        <p className="text-lg text-gray-600 font-medium">Tahun Ajaran {tahunAkademikAktif.tahun_akademik}</p>
+                      ) : (
+                        <p className="text-lg text-gray-500 font-medium">Tahun Ajaran -</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -60,22 +98,6 @@ const HomePage = () => {
                     Lihat Lokasi
                   </Button>
                 </div>
-
-                {/* Stats */}
-                {/* <div className="grid grid-cols-3 gap-4 pt-6 border-t">
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-indigo-600">500+</div>
-                  <div className="text-xs md:text-sm text-gray-600">Siswa Aktif</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-indigo-600">50+</div>
-                  <div className="text-xs md:text-sm text-gray-600">Pengajar</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-indigo-600">A</div>
-                  <div className="text-xs md:text-sm text-gray-600">Akreditasi</div>
-                </div>
-              </div> */}
               </div>
 
               {/* Image */}
