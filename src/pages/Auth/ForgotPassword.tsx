@@ -8,6 +8,7 @@ import PageTitle from "@/components/PageTitle";
 import { AxiosError } from "axios";
 import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import Footer from "../Footer";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Email tidak valid").nonempty("Email wajib diisi"),
@@ -92,6 +93,8 @@ export default function ForgotPassword() {
           </div>
         </form>
       </div>
+
+      <Footer />
     </>
   );
 }

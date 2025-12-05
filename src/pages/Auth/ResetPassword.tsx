@@ -9,6 +9,7 @@ import PageTitle from "@/components/PageTitle";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import Footer from "../Footer";
 
 const resetPasswordSchema = z
   .object({
@@ -173,6 +174,8 @@ export default function ResetPassword() {
           </Button>
         </form>
       </div>
+
+      <Footer />
     </>
   );
 }

@@ -106,6 +106,7 @@ import EditPsb from "@/pages/SuperAdmin/PSB/EditPsb";
 import HomePage from "@/pages/PublicPsb/HomePsbSiswa";
 import FormPsbPublic from "@/pages/PublicPsb/FormPsbSiswa";
 import PsbSuccess from "@/pages/PublicPsb/PsbSuccess";
+import DataAbsensiPegawai from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPegawai";
 
 export default function AppRoutes() {
   return (
@@ -761,6 +762,17 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditPsb />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* INFORMASI LAPORAN UMUM */}
+        {/* Data Absensi */}
+        <Route
+          path="/superadmin/informasi-laporan-umum/absensi-pegawai"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataAbsensiPegawai />
             </ProtectedRoute>
           }
         />
