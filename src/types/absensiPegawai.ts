@@ -22,14 +22,36 @@ export interface AbsensiPegawaiFlat {
   total_tidak_hadir: number;
 }
 
+// ============ SELF SERVICE (PEGAWAI) ============
+
+export interface AbsensiSelf {
+  nama: string;
+  mata_pelajaran_id: string;
+  total_hadir: number;
+  total_tidak_hadir: number;
+  absensi: AbsensiDetailSelf[];
+}
+
+export interface AbsensiDetailSelf {
+  id: number;
+  hari: string;
+  status: 'hadir' | 'tidak hadir';
+}
+
 export interface CreateAbsensiResponse {
   id: number;
   guru_id: string;
   mata_pelajaran_id: string;
   hari: string;
-  status: "hadir" | "tidak hadir";
+  status: 'hadir' | 'tidak hadir';
   rekapitulasi: {
     hadir: number;
     tidak_hadir: number;
   };
+}
+
+export interface UserAbsensiInfo {
+  nama: string;
+  mata_pelajaran: string;
+  hari: string;
 }
