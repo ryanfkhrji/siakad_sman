@@ -31,7 +31,7 @@ class AbsensiPegawaiExport implements FromCollection, WithHeadings
             return [
                 $item->guru->nama,
                 $item->mataPelajaran->nama_pelajaran,
-                $item->tanggal,
+                $item->hari,
                 $item->status,
             ];
         });
@@ -39,6 +39,6 @@ class AbsensiPegawaiExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Nama Guru', 'Mata Pelajaran', 'Tanggal', 'Status'];
+        return ['Nama Guru', 'Mata Pelajaran', 'Hari', 'Status'];
     }
 }

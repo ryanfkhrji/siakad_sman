@@ -14,6 +14,7 @@ use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use App\Models\AbsensiPegawai;
+use App\Models\AbsensiPelajaran;
 use App\Models\Prestasi;
 use App\Models\Kelas;
 use App\Models\JadwalPelajaran;
@@ -306,15 +307,36 @@ class DatabaseSeeder extends Seeder
             [
                 'guru_id' => 5,
                 'mata_pelajaran_id' => 1,
-                'tanggal' => '2025-05-24',
+                'hari' => '2025-05-24',
                 'status' => 'hadir'
             ],
             [
                 'guru_id' => 6,
                 'mata_pelajaran_id' => 2,
-                'tanggal' => '2025-05-24',
+                'hari' => '2025-05-24',
                 'status' => 'tidak hadir'
             ],
+        ]);
+
+        // Seed Absensi Pelajaran
+        AbsensiPelajaran::insert([
+            [
+                'guru_pengajar_id' => 5,
+                'jadwal_pelajaran_id' => 1,
+                'kelas_id' => 1,
+                'hari' => '2025-05-24', // terisi tanggal nanti dikonvert jadi hari
+                'jam' => '07:50',
+                'status' => 'hadir'
+            ],
+            [
+                'guru_pengajar_id' => 6,
+                'jadwal_pelajaran_id' => 2,
+                'kelas_id' => 2,
+                'hari' => '2025-05-24', // terisi tanggal nanti dikonvert jadi hari
+                'jam' => '08:50',
+                'status' => 'tidak hadir'
+            ],
+            
         ]);
 
         // Seed Ekstrakurikuler

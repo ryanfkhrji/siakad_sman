@@ -20,6 +20,7 @@ use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\EkskulSiswaPivotController;
 use App\Http\Controllers\AbsensiPegawaiController;
+use App\Http\Controllers\AbsensiPelajaranController;
 use App\Http\Controllers\PsbController;
 use App\Http\Controllers\CacheCleanerController;
 
@@ -110,10 +111,16 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
 
-    // ✅ Absensi
-    Route::get('/spa/absensi/export', [AbsensiPegawaiController::class, 'export']);
-    Route::delete('/spa/absensi/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
-    Route::apiResource('/spa/absensi', AbsensiPegawaiController::class)->except('store', 'destroy');    
+    // ✅ Absensi Pegawai Ke Sekolah
+    Route::get('/spa/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
+    Route::delete('/spa/absensi/pegawai/sekolah/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
+    Route::apiResource('/spa/absensi/pegawai/sekolah', AbsensiPegawaiController::class)->except('store', 'destroy');  
+    
+    
+    // ! Absensi Pegawai ke Pelajaran
+    Route::apiResource('/spa/absensi/pegawai/pelajaran', AbsensiPelajaranController::class)->except('store', 'destroy');  
+
+
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
@@ -157,10 +164,16 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD peserta ekstrakurikuler oleh pegawai
     Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
 
-     // ✅ Absensi
+     // ✅ Absensi Sekolah
     Route::apiResource('/pegawai/absensi', AbsensiPegawaiController::class)->only('store');
     Route::get('/pegawai/absensi/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
     Route::get('/pegawai/absensi/export', [AbsensiPegawaiController::class, 'export']);
+    
+    
+    // ! Absensi Pelajaran
+    Route::apiResource('/pegawai/absensi/pelajaran', AbsensiPelajaranController::class)->only('store');
+
+
 
     // ! show gedung, ruangan, tahun akademik
     // -------------------------------------------------------------------------------------

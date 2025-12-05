@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\ApiResponse;
-use App\Exports\AbsensiPegawaiExport;
 use Illuminate\Support\Facades\Validator;
 use File;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Response;
+use App\Exports\AbsensiPegawaiExport;
 
 class AbsensiPegawaiController extends Controller
 {
@@ -23,7 +23,7 @@ class AbsensiPegawaiController extends Controller
     public function index()
     {
         $absen = AbsensiPegawai::with('mataPelajaran', 'guru')
-            ->orderBy('tanggal', 'desc')
+            ->orderBy('hari', 'desc')
             ->get();
     
         if ($absen->isEmpty()) {
@@ -43,7 +43,7 @@ class AbsensiPegawaiController extends Controller
                 'absensi' => $item->map(function ($abs) {
                     return [
                         'id' => $abs->id,
-                        'tanggal' => Carbon::parse($abs->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                        
+                        'hari' => Carbon::parse($abs->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                        
                         'status' => $abs->status,
                     ];
                 })->values()
@@ -74,11 +74,11 @@ class AbsensiPegawaiController extends Controller
             $mataPelajaran = JadwalPelajaran::where('guru_id', $pegawai->id)->first();
 
             // gabisa absen 2x pada hari yang sama
-            $tanggal = AbsensiPegawai::where('guru_id', $pegawai->id)
-            ->whereDate('tanggal', today())
+            $hari = AbsensiPegawai::where('guru_id', $pegawai->id)
+            ->whereDate('hari', today())
             ->first();
 
-            if ($tanggal) {
+            if ($hari) {
                 return ApiResponse::error('Gagal', ['pesan' => 'Anda sudah absen hari ini'], 422);
             }
 
@@ -86,7 +86,7 @@ class AbsensiPegawaiController extends Controller
                 [
                     'guru_id' => $pegawai->id,
                     'mata_pelajaran_id' => $mataPelajaran->id,
-                    'tanggal' => Carbon::today()->toDateString(),
+                    'hari' => Carbon::today()->toDateString(),
                     'status' => $validated['status']
                 ]
             );
@@ -105,8 +105,8 @@ class AbsensiPegawaiController extends Controller
                 'id' => $absensi->id ?? null,
                 'guru_id' => $absensi->guru->nama ?? null,                
                 'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
-                // 'tanggal' => Carbon::parse($absensi->tanggal)->translatedFormat('l, d-m-Y') ?? null,   // Senin, 24-06-2026
-                'tanggal' => Carbon::parse($absensi->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
+                // 'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d-m-Y') ?? null,   // Senin, 24-06-2026
+                'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
                 'status' => $absensi->status ?? null,       
                 'rekapitulasi' => [
                     'hadir' => $jumlahHadir,
@@ -148,7 +148,7 @@ class AbsensiPegawaiController extends Controller
             'absensi' => $absensi->map(function ($item) {
                 return [
                     'id' => $item->id ?? null,                    
-                    'tanggal' => Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                                
+                    'hari' => Carbon::parse($item->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                                
                     'status' => $item->status ?? null,
                 ];
             }),
@@ -194,7 +194,7 @@ class AbsensiPegawaiController extends Controller
             'id' => $absensi->id ?? null,
             'guru_id' => $absensi->guru->nama ?? null,                
             'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
-            'tanggal' => Carbon::parse($absensi->tanggal)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
+            'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
             'status' => $absensi->status ?? null,       
             'rekapitulasi' => [
                 'hadir' => $jumlahHadir,

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('guru_id')->constrained('kepegawaians')->onDelete('cascade'); // hapus jika guru dihapus
             $table->foreignId('mata_pelajaran_id')->nullable()->constrained('mata_pelajarans')->nullOnDelete(); // null jika matpel dihapus
-            $table->date('tanggal');
+            $table->date('hari');
             $table->enum('status', ['hadir', 'tidak hadir']);
             $table->timestamps();
         });

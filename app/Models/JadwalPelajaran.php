@@ -25,25 +25,17 @@ class JadwalPelajaran extends Model
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
-    }
-
-    // 1 siswa bisa ambil banyak jadwal
-    // public function siswas()
-    // {
-    //     return $this->belongsToMany(
-    //         Siswa::class,
-    //         'siswa_jadwal_pelajaran', // menentukan tabel pivot
-    //         'jadwal_pelajaran_id',
-    //         'siswa_id'
-    //     )
-    //     ->using(SiswaJadwalPelajaran::class)
-    //     ->withTimestamps();
-    // }
+    }   
 
     public function siswas()
     {
         return $this->belongsToMany(Siswa::class, 'siswa_jadwal_pelajaran')
             ->withPivot('id')
             ->withTimestamps();
+    }
+
+    public function absensiPelajaran()
+    {
+        return $this->hasMany(AbsensiPelajaran::class, 'jadwal_pelajaran_id');
     }
 }
