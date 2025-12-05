@@ -65,6 +65,7 @@ class AbsensiPelajaranController extends Controller
 
         try {
             $validated = $request->validate([                
+                'kelas_id' => 'required|in:kelas,id', // otomatis input (front)
                 'status' => 'required|in:hadir,tidak hadir'
             ],[
                 'status.required' => 'Status wajib diisi',
@@ -72,48 +73,53 @@ class AbsensiPelajaranController extends Controller
             ]);            
 
             // ambil id pada jadwal pelajaran
-            $mataPelajaran = JadwalPelajaran::where('guru_id', $pegawai->id)->first();
+            $mataPelajaran = JadwalPelajaran::with('mataPelajaran')->where('guru_pengajar_id', $pegawai->id)->first();
 
             // gabisa absen 2x pada hari yang sama
-            $hari = AbsensiPegawai::where('guru_id', $pegawai->id)
+            $hari = AbsensiPelajaran::where('guru_pengajar_id', $pegawai->id)
+            ->where('jadwal_pelajaran_id', $mataPelajaran->mata_pelajaran_id)
+            ->where('kelas_id', $validated['kelas_id'])
             ->whereDate('hari', today())
             ->first();
 
             if ($hari) {
-                return ApiResponse::error('Gagal', ['pesan' => 'Anda sudah absen hari ini'], 422);
+                return ApiResponse::error('Gagal', ['pesan' => 'Anda sudah absen mata pelajaran '.$mataPelajaran->mataPelajaran->nama_pelajaran.' hari ini'], 422);
             }
 
-            $absensi = AbsensiPegawai::create(
+            $absensi = AbsensiPelajaran::create(
                 [
-                    'guru_id' => $pegawai->id,
-                    'mata_pelajaran_id' => $mataPelajaran->id,
+                    'guru_pengajar_id' => $pegawai->id,
+                    'jadwal_pelajaran_id' => $mataPelajaran->mata_pelajaran_id,
+                    'kelas_id' => $validated['kelas_id'],
                     'hari' => Carbon::today()->toDateString(),
+                    'jam' => now()->format('H:i'),
                     'status' => $validated['status']
                 ]
             );
 
-            $absensi->load('mataPelajaran', 'guru');
+            $absensi->load('jadwalPelajaran.mataPelajaran', 'jadwalPelajaran.kelas','guru');
 
-            $jumlahHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
+            $jumlahHadir = AbsensiPelajaran::where('guru_pengajar_id', $absensi->guru_pengajar_id)
             ->where('status', 'hadir')
             ->count();
 
-            $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
+            $jumlahTidakHadir = AbsensiPelajaran::where('guru_pengajar_id', $absensi->guru_pengajar_id)
             ->where('status', 'tidak hadir')
             ->count();
 
             return ApiResponse::success([
                 'id' => $absensi->id ?? null,
-                'guru_id' => $absensi->guru->nama ?? null,                
-                'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
-                // 'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d-m-Y') ?? null,   // Senin, 24-06-2026
+                'guru_pengajar_id' => $absensi->guru->nama ?? null,                
+                'mata_pelajaran_id' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,               
+                'kelas' => $absensi->jadwalPelajaran->kelas->nama_kelas ?? null,
                 'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
+                'jam' => $absensi->jam,
                 'status' => $absensi->status ?? null,       
                 'rekapitulasi' => [
                     'hadir' => $jumlahHadir,
                     'tidak_hadir' => $jumlahTidakHadir
                 ]
-            ], 'Data absensi berhasil dibuat');
+            ], 'Data absensi pelajaran '.$absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran.' berhasil dibuat');
 
         } catch (ValidationException $e) {
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);

@@ -165,9 +165,9 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
 
      // ✅ Absensi Sekolah
-    Route::apiResource('/pegawai/absensi', AbsensiPegawaiController::class)->only('store');
-    Route::get('/pegawai/absensi/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
-    Route::get('/pegawai/absensi/export', [AbsensiPegawaiController::class, 'export']);
+    Route::apiResource('/pegawai/absensi/sekolah', AbsensiPegawaiController::class)->only('store');
+    Route::get('/pegawai/absensi/sekolah/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
+    Route::get('/pegawai/absensi/sekolah/export', [AbsensiPegawaiController::class, 'export']);
     
     
     // ! Absensi Pelajaran

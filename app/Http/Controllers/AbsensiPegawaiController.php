@@ -85,7 +85,7 @@ class AbsensiPegawaiController extends Controller
             $absensi = AbsensiPegawai::create(
                 [
                     'guru_id' => $pegawai->id,
-                    'mata_pelajaran_id' => $mataPelajaran->id,
+                    'mata_pelajaran_id' => $mataPelajaran->mata_pelajaran_id,
                     'hari' => Carbon::today()->toDateString(),
                     'status' => $validated['status']
                 ]
