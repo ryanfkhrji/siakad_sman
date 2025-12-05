@@ -126,7 +126,7 @@ export default function ResetPassword() {
       <PageTitle title="Reset Password" />
       <div className="flex justify-center items-center min-h-dvh bg-background px-4 md:px-0">
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-md shadow-sm max-w-lg w-full">
-          <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Reset Password {isSiswa ? "Siswa" : "Kepegawaian"}</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-5 text-center text-primary">Reset Password {isSiswa ? "Siswa" : "Kepegawaian"}</h2>
 
           <input type="hidden" {...register("token")} />
           <input type="hidden" {...register("email")} />

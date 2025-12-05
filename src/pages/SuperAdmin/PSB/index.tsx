@@ -12,6 +12,7 @@ import type { Psb } from "@/types/psb";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { psbService } from "@/services/psbService";
+import { PsbStatusToggle } from "@/components/PsbStatusToggle";
 
 const DataPsb = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -280,6 +281,11 @@ const DataPsb = () => {
         <PageTitle title="Data Penerimaan Siswa Baru" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Data Penerimaan Siswa Baru</h1>
+
+          {/* Toggle Status PSB */}
+          <div className="mb-6">
+            <PsbStatusToggle />
+          </div>
 
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-600">

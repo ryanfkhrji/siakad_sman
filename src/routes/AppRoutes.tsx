@@ -103,6 +103,9 @@ import DataPsb from "@/pages/SuperAdmin/PSB";
 import DetailPsb from "@/pages/SuperAdmin/PSB/DetailPsb";
 import CreatePsb from "@/pages/SuperAdmin/PSB/CreatePsb";
 import EditPsb from "@/pages/SuperAdmin/PSB/EditPsb";
+import HomePage from "@/pages/PublicPsb/HomePsbSiswa";
+import FormPsbPublic from "@/pages/PublicPsb/FormPsbSiswa";
+import PsbSuccess from "@/pages/PublicPsb/PsbSuccess";
 
 export default function AppRoutes() {
   return (
@@ -910,6 +913,11 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* ================= PUBLIC PSB SISWA ================= */}
+        <Route path="/public-psb/" element={<HomePage />} />
+        <Route path="/public-psb/form-psb-siswa" element={<FormPsbPublic />} />
+        <Route path="/public-psb/psb-success" element={<PsbSuccess />} />
 
         {/* ================= ERROR PAGE ================= */}
         <Route path="/unauthorized" element={<div>Akses tidak diizinkan</div>} />

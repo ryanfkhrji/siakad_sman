@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/PageTitle";
-import LogoSekolah from "@/assets/logo-sekolah.jpg";
+import LogoSekolah from "@/assets/logo-sekolah-42.png";
 import { endpoints } from "../../api/endpoints";
 import type { AxiosError } from "axios";
 import type { Kelas, Jurusan } from "@/types";
@@ -207,11 +207,15 @@ export default function RegisterSiswa() {
       <div className="flex justify-center items-center min-h-dvh my-3 bg-background px-4 md:px-0">
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-md shadow-sm max-w-lg w-full">
           {/* Logo */}
-          <div className="flex justify-center mb-4">
+          {/* <div className="flex justify-center mb-4">
             <img src={LogoSekolah} alt="Logo Sekolah" className="object-cover bg-no-repeat bg-center h-36" />
+          </div> */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-indigo-600/20 rounded-2xl blur-xl"></div>
+            <img src={LogoSekolah} alt="SMA Negeri 42 Jakarta" className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-4 border-white shadow-md mx-auto mb-6" />
           </div>
 
-          <h2 className="text-2xl font-bold mb-5 text-center text-foreground">Register Siswa</h2>
+          <h2 className="text-2xl font-bold mb-5 text-center text-primary">Register Siswa</h2>
 
           {/* NISN */}
           <div className="mb-6">
