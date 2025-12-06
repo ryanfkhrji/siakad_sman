@@ -324,10 +324,10 @@ const DataAbsensiPegawaiGuru = () => {
                     {hasAbsenToday ? "Sudah Absen Hari Ini" : "Absen Sekarang"}
                   </Button>
 
-                  <Button variant="outline" onClick={() => handleExportExcel(false)}>
+                  {/* <Button variant="outline" onClick={() => handleExportExcel(false)}>
                     <FileSpreadsheet size={18} />
                     Export Semua Excel
-                  </Button>
+                  </Button> */}
 
                   <Button variant="outline" onClick={() => handleExportExcel(true)} disabled={selectedIds.length === 0}>
                     <FileSpreadsheet size={18} />
