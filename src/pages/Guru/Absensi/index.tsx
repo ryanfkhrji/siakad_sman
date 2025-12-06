@@ -249,7 +249,7 @@ const DataAbsensiPegawaiGuru = () => {
     <SidebarProvider>
       <SidebarGuru isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
+      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}`}>
         <PageTitle title="Absensi Saya" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Absensi Saya</h1>

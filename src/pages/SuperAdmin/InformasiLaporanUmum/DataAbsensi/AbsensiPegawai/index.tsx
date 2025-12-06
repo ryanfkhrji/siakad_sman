@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PageTitle from "@/components/PageTitle";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2Icon, SearchIcon, Trash2Icon, FileSpreadsheet, PenBoxIcon, CircleXIcon, FilePlus, CalendarCheck, XCircle, UserCheck } from "lucide-react";
+import { Loader2Icon, SearchIcon, Trash2Icon, FileSpreadsheet, PenBoxIcon, CircleXIcon, FilePlus, CalendarCheck, XCircle, UserCheck, EyeIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import type { AbsensiPegawaiFlat } from "@/types/absensiPegawai";
 import Swal from "sweetalert2";
@@ -16,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 
 const DataAbsensiPegawai = () => {
+  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [dataAbsensi, setDataAbsensi] = useState<AbsensiPegawaiFlat[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -36,6 +38,9 @@ const DataAbsensiPegawai = () => {
   const [editStatus, setEditStatus] = useState<"hadir" | "tidak hadir">("hadir");
   const [editingData, setEditingData] = useState<AbsensiPegawaiFlat | null>(null);
 
+  // Store guru_id untuk setiap row
+  const [guruIdMap, setGuruIdMap] = useState<Map<number, number>>(new Map());
+
   // Fetch data
   useEffect(() => {
     fetchData();
@@ -49,9 +54,10 @@ const DataAbsensiPegawai = () => {
       if (response.status === "success") {
         // Flatten nested data structure
         const flatData: AbsensiPegawaiFlat[] = [];
+        const tempGuruIdMap = new Map<number, number>();
 
-        response.data.forEach((guru) => {
-          guru.absensi.forEach((abs) => {
+        response.data.forEach((guru: any) => {
+          guru.absensi.forEach((abs: any) => {
             flatData.push({
               id: abs.id,
               nama_guru: guru.nama_guru,
@@ -61,9 +67,12 @@ const DataAbsensiPegawai = () => {
               total_hadir: guru.total_hadir,
               total_tidak_hadir: guru.total_tidak_hadir,
             });
+            // Simpan mapping absensi id -> guru_id
+            tempGuruIdMap.set(abs.id, guru.guru_id);
           });
         });
 
+        setGuruIdMap(tempGuruIdMap);
         setDataAbsensi(flatData);
         setTotalHadir(flatData.reduce((total, item) => total + (item.status === "hadir" ? 1 : 0), 0));
         setTotalTidakHadir(flatData.reduce((total, item) => total + (item.status === "tidak hadir" ? 1 : 0), 0));
@@ -126,6 +135,14 @@ const DataAbsensiPegawai = () => {
       selectAllRef.current.indeterminate = isSomeSelected;
     }
   }, [isSomeSelected]);
+
+  // Navigate to detail
+  const handleViewDetail = (item: AbsensiPegawaiFlat) => {
+    const guruId = guruIdMap.get(item.id);
+    if (guruId) {
+      navigate(`/superadmin/informasi-laporan-umum/absensi-pegawai/detail/${guruId}`);
+    }
+  };
 
   // Edit handler
   const handleEdit = (item: AbsensiPegawaiFlat) => {
@@ -267,7 +284,7 @@ const DataAbsensiPegawai = () => {
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card>
-                  <CardContent>
+                  <CardContent className="p-5">
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-blue-100 rounded-full">
                         <UserCheck className="text-blue-600" size={24} />
@@ -281,7 +298,7 @@ const DataAbsensiPegawai = () => {
                 </Card>
 
                 <Card>
-                  <CardContent>
+                  <CardContent className="p-5">
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-red-100 rounded-full">
                         <XCircle className="text-red-600" size={24} />
@@ -295,7 +312,7 @@ const DataAbsensiPegawai = () => {
                 </Card>
 
                 <Card>
-                  <CardContent>
+                  <CardContent className="p-5">
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-green-100 rounded-full">
                         <CalendarCheck className="text-green-600" size={24} />
@@ -370,7 +387,10 @@ const DataAbsensiPegawai = () => {
                           <TableCell className="text-center">{item.total_hadir}</TableCell>
                           <TableCell className="text-center">{item.total_tidak_hadir}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
-                            <Button size="sm" onClick={() => handleEdit(item)}>
+                            <Button size="sm" variant="outline" onClick={() => handleViewDetail(item)} title="Lihat Detail">
+                              <EyeIcon size={16} />
+                            </Button>
+                            <Button size="sm" onClick={() => handleEdit(item)} title="Edit Status">
                               <PenBoxIcon size={16} />
                             </Button>
                           </TableCell>

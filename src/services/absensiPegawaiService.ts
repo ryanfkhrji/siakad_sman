@@ -14,6 +14,12 @@ export const absensiPegawaiService = {
     return response.data;
   },
 
+  // Get detail absensi by guru_id
+  getDetail: async (guruId: number) => {
+    const response = await api.get(`/spa/absensi/pegawai/sekolah/${guruId}`);
+    return response.data;
+  },
+
   // UPDATE status absensi
   update: async (id: number, data: { status: "hadir" | "tidak hadir" }): Promise<ApiResponse<any>> => {
     const response = await api.put(`/spa/absensi/pegawai/sekolah/${id}`, data);
