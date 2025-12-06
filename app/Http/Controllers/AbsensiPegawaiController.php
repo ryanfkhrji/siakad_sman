@@ -36,15 +36,16 @@ class AbsensiPegawaiController extends Controller
             $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
     
             return [
-                'nama_guru' => $namaGuru,
-                'mengajar' => $namaPelajaran,
+                'guru_id' => $item->first()->guru_id ?? null,
+                'nama_guru' => $namaGuru ?? null,
+                'mengajar' => $namaPelajaran ?? null,
                 'total_hadir' => $item->where('status', 'hadir')->count(),
                 'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
                 'absensi' => $item->map(function ($abs) {
                     return [
-                        'id' => $abs->id,
+                        'id' => $abs->id ?? null,
                         'hari' => Carbon::parse($abs->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                        
-                        'status' => $abs->status,
+                        'status' => $abs->status ?? null,
                     ];
                 })->values()
             ];
@@ -120,6 +121,45 @@ class AbsensiPegawaiController extends Controller
     }
 
 
+    // ✅ Untuk super admin
+    // show detail pegawai dan semua absennya
+    public function show($id) {
+        
+        $absen = AbsensiPegawai::with('mataPelajaran', 'guru')
+            ->where('guru_id', $id)
+            ->orderBy('hari', 'desc')
+            ->get();
+    
+        if (!$absen) {
+            return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
+        }            
+    
+        // Kelompokkan berdasarkan guru_id
+        $grouped = $absen->groupBy('guru_id')->map(function ($item) {
+            $namaGuru = $item->first()->guru->nama ?? null;
+            $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
+    
+            return [
+                'guru_id' => $item->first()->guru_id ?? null,
+                'nama_guru' => $namaGuru ?? null,
+                'mengajar' => $namaPelajaran ?? null,
+                'total_hadir' => $item->where('status', 'hadir')->count(),
+                'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
+                'absensi' => $item->map(function ($abs) {
+                    return [
+                        'id' => $abs->id ?? null,
+                        'hari' => Carbon::parse($abs->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                        
+                        'status' => $abs->status ?? null,
+                    ];
+                })->values()
+            ];
+        })->values();
+    
+        return ApiResponse::success($grouped, 'Detail absensi berhasil diambil');
+    }
+    
+
+
     // ✅ show all absen sendiri (untuk pegawai)
     public function showAbsenSendiri() {
         $user = Auth::guard('kepegawaian')->user();
@@ -141,6 +181,7 @@ class AbsensiPegawaiController extends Controller
         ->count();
 
         $formatted = [
+            'id' => $user->id ?? null,
             'nama' => $user->nama ?? null,
             'mata_pelajaran_id' => $matpel->mataPelajaran->nama_pelajaran ?? null,
             'total_hadir' => $jumlahHadir ?? null,

@@ -87,6 +87,14 @@ class JadwalPelajaranController extends Controller
                     ], 422);
                 }
             }
+
+            // bentrok jika hari dan jam_pelajaran sudah ada di db
+            $bentrok = JadwalPelajaran::where('hari', $validated['hari'])->where('jam_pelajaran', $validated['jam_pelajaran'])->first();
+            if ($bentrok) {
+                    return ApiResponse::error('Not allowed', [
+                        'pesan' => ['Hari dan jam sekian sudah ada sehingga bentrok']
+                    ], 422);
+            }
     
             $matpel = JadwalPelajaran::create($validated);
             

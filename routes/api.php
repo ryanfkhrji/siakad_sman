@@ -116,11 +116,9 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::delete('/spa/absensi/pegawai/sekolah/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/pegawai/sekolah', AbsensiPegawaiController::class)->except('store', 'destroy');  
     
-    
     // ! Absensi Pegawai ke Pelajaran
+    Route::delete('/spa/absensi/pegawai/pelajaran/destroy/{id?}', [AbsensiPelajaranController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/pegawai/pelajaran', AbsensiPelajaranController::class)->except('store', 'destroy');  
-
-
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
@@ -169,11 +167,11 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/pegawai/absensi/sekolah/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
     Route::get('/pegawai/absensi/sekolah/export', [AbsensiPegawaiController::class, 'export']);
     
-    
     // ! Absensi Pelajaran
     Route::apiResource('/pegawai/absensi/pelajaran', AbsensiPelajaranController::class)->only('store');
-
-
+    Route::get('/pegawai/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
+    // Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
+    
 
     // ! show gedung, ruangan, tahun akademik
     // -------------------------------------------------------------------------------------
