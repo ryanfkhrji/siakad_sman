@@ -109,6 +109,8 @@ import PsbSuccess from "@/pages/PublicPsb/PsbSuccess";
 import DataAbsensiPegawai from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPegawai";
 import DataAbsensiPegawaiGuru from "@/pages/Guru/Absensi";
 import DetailAbsensiPegawai from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPegawai/DetailAbsensiPegawai";
+import DataAbsensiPelajaran from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPelajaran";
+import DetailAbsensiPelajaran from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPelajaran/DetailAbsensiPelajaran";
 
 export default function AppRoutes() {
   return (
@@ -769,7 +771,7 @@ export default function AppRoutes() {
         />
 
         {/* INFORMASI LAPORAN UMUM */}
-        {/* Data Absensi */}
+        {/* Data Absensi Pegawai */}
         <Route
           path="/superadmin/informasi-laporan-umum/absensi-pegawai"
           element={
@@ -783,6 +785,24 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DetailAbsensiPegawai />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Absensi Pelajaran */}
+        <Route
+          path="/superadmin/informasi-laporan-umum/absensi-pelajaran"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataAbsensiPelajaran />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-laporan-umum/absensi-pelajaran/detail/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DetailAbsensiPelajaran />
             </ProtectedRoute>
           }
         />

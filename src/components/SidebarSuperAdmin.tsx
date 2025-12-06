@@ -382,6 +382,15 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                               <SidebarMenuSubItem>
                                 <SidebarMenuSubButton
                                   asChild
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-laporan-umum/absensi-pelajaran") && "bg-primary text-white font-medium")}
+                                >
+                                  <Link to="/superadmin/informasi-laporan-umum/absensi-pelajaran">Pelajaran</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  asChild
                                   className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-laporan-umum/absensi-siswa") && "bg-primary text-white font-medium")}
                                 >
                                   <Link to="/superadmin/informasi-laporan-umum/absensi-siswa">Siswa</Link>
