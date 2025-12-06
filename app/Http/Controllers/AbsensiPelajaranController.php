@@ -14,6 +14,7 @@ use File;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Response;
+use App\Exports\AbsensiPelajaranExport;
 
 class AbsensiPelajaranController extends Controller
 {
@@ -210,18 +211,55 @@ class AbsensiPelajaranController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * ✅ untuk super admin
      */
     public function update(Request $request, string $id)
     {
-        //
+        $absensi = AbsensiPelajaran::find($id);
+
+        if (!$absensi) {
+            return ApiResponse::error('Not found', ['id' => 'Data tidak ditemukan']);
+        }
+
+        $validated = $request->validate([            
+            'status' => 'sometimes|required|in:hadir,tidak hadir',
+        ], [            
+            'status.required' => 'Status wajib diisi',
+            'status.in' => 'Pilihan hanya hadir atau tidak hadir'
+        ]);        
+
+        $absensi->update($validated);
+        $absensi->load('jadwalPelajaran.mataPelajaran', 'guru', 'kelas');    
+
+        // hitung jumlah hadir/tidak hadir khusus guru ini
+        $jumlahHadir = AbsensiPelajaran::where('guru_pengajar_id', $absensi->guru_pengajar_id)
+        ->where('status', 'hadir')
+        ->count();
+
+        $jumlahTidakHadir = AbsensiPelajaran::where('guru_pengajar_id', $absensi->guru_pengajar_id)
+        ->where('status', 'tidak hadir')
+        ->count();        
+
+        return ApiResponse::success([
+            'id' => $absensi->id ?? null,
+            'guru_pengajar' => $absensi->guru->nama ?? null,                
+            'mata_pelajaran' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,                
+            'kelas' => $absensi->kelas->nama_kelas ?? null,                
+            'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,
+            'jam' => $absensi->jam ?? null,       
+            'status' => $absensi->status ?? null,       
+            'rekapitulasi' => [
+                'hadir' => $jumlahHadir,
+                'tidak_hadir' => $jumlahTidakHadir
+            ]
+        ], 'Data absensi berhasil diperbarui');
     }
 
     /**
-     * ! ✅ untuk super admin
+     * ✅ untuk super admin
      * Remove the specified resource from storage.
-     * Beberapa data = DELETE /absensi/destroy?ids[]=3&ids[]=5&ids[]=9
-     * Satu data = DELETE /absensi/destroy?ids=7
+     * Beberapa data = DELETE /absensi/pegawai/pelajaran/destroy?ids[]=3&ids[]=5&ids[]=9
+     * Satu data = DELETE /absensi/pegawai/pelajaran/destroy?ids=7
      */
     public function destroyData(Request $request)
     {
@@ -229,7 +267,7 @@ class AbsensiPelajaranController extends Controller
 
         // HAPUS BEBERAPA DATA
         if (is_array($ids)) {
-            $validIds = AbsensiPegawai::whereIn('id', $ids)->pluck('id')->toArray();
+            $validIds = AbsensiPelajaran::whereIn('id', $ids)->pluck('id')->toArray();
             $invalidIds = array_diff($ids, $validIds);
 
             // Jika terdapat id yang tidak ada
@@ -240,7 +278,7 @@ class AbsensiPelajaranController extends Controller
                 ], 404);
             }
 
-            AbsensiPegawai::whereIn('id', $validIds)->delete();
+            AbsensiPelajaran::whereIn('id', $validIds)->delete();
             return response()->json([
                 'message' => 'Beberapa data absensi pegawai berhasil dihapus.',
                 'deleted_ids' => $validIds
@@ -249,7 +287,7 @@ class AbsensiPelajaranController extends Controller
 
         // HAPUS SATU DATA
         if (is_numeric($ids)) {
-            $absensi = AbsensiPegawai::find($ids);
+            $absensi = AbsensiPelajaran::find($ids);
 
             if (!$absensi) {
                 return response()->json([
@@ -260,7 +298,7 @@ class AbsensiPelajaranController extends Controller
 
             $absensi->delete();
             return response()->json([
-                'message' => 'Data absensi pegawai berhasil dihapus.',
+                'message' => 'Data absensi berhasil dihapus.',
                 'deleted_id' => $ids
             ]);
         }
@@ -268,5 +306,33 @@ class AbsensiPelajaranController extends Controller
         return response()->json([
             'message' => 'Parameter ids tidak valid. Kirimkan satu id, atau array id.'
         ], 422);
+    }
+
+    // ✅ export data ke excel
+    /**
+     * php artisan make:export AbsensiPegawaiExport --model=AbsensiPegawai
+     * Semua data = GET /absensi/pegawai/pelajaran/export
+     * Beberapa data = GET /absensi/pegawai/pelajaran/export?ids[]=3&ids[]=5&ids[]=10
+     * Satu data = GET /absensi/pegawai/pelajaran/export?ids[]=7
+     */
+    public function export(Request $request)
+    {
+        $ids = $request->input('ids'); // bisa null atau array        
+
+         // Validasi ID jika ada
+         if ($ids) {
+            $validIds = AbsensiPelajaran::whereIn('id', $ids)->pluck('id')->toArray();
+            $missingIds = array_diff($ids, $validIds);
+
+            if (count($missingIds) > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Beberapa ID tidak ditemukan',
+                    'missing_ids' => array_values($missingIds),
+                ], 404);
+            }
+        }
+
+        return Excel::download(new AbsensiPelajaranExport($ids), 'absensi-pelajaran-guru.xlsx');
     }
 }

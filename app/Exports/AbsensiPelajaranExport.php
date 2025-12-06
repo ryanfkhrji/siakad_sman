@@ -2,13 +2,13 @@
 
 namespace App\Exports;
 
-use App\Models\AbsensiPegawai;
+use App\Models\AbsensiPelajaran;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Carbon\Carbon;
 
-class AbsensiPegawaiExport implements FromCollection, WithHeadings
+class AbsensiPelajaranExport implements FromCollection, WithHeadings
 {
     use Exportable;
 
@@ -18,21 +18,19 @@ class AbsensiPegawaiExport implements FromCollection, WithHeadings
         $this->ids = $ids;
     }
 
-    /**
-     * bawaan
-    * @return \Illuminate\Support\Collection
-    */
     public function collection()
     {
         $query = $this->ids
-            ? AbsensiPegawai::whereIn('id', $this->ids)->with('mataPelajaran', 'guru')->get()
-            : AbsensiPegawai::with('mataPelajaran', 'guru')->get();
+            ? AbsensiPelajaran::whereIn('id', $this->ids)->with('jadwalPelajaran.mataPelajaran', 'guru', 'kelas')->get()
+            : AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran', 'guru', 'kelas')->get();
 
         return $query->map(function($item) {
             return [
                 $item->guru->nama,
-                $item->mataPelajaran->nama_pelajaran,
+                $item->jadwalPelajaran->mataPelajaran->nama_pelajaran,
+                $item->kelas->nama_kelas,
                 Carbon::parse($item->hari)->translatedFormat('l, d F Y'),
+                $item->jam,
                 $item->status,
             ];
         });
@@ -40,6 +38,6 @@ class AbsensiPegawaiExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Nama Guru', 'Mata Pelajaran', 'Hari', 'Status'];
+        return ['Nama Guru', 'Mata Pelajaran', 'Kelas', 'Hari', 'Jam', 'Status'];
     }
 }

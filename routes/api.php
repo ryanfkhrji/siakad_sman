@@ -116,7 +116,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::delete('/spa/absensi/pegawai/sekolah/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/pegawai/sekolah', AbsensiPegawaiController::class)->except('store', 'destroy');  
     
-    // ! Absensi Pegawai ke Pelajaran
+    // ✅ Absensi Pegawai ke Pelajaran
+    Route::get('/spa/absensi/pegawai/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
     Route::delete('/spa/absensi/pegawai/pelajaran/destroy/{id?}', [AbsensiPelajaranController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/pegawai/pelajaran', AbsensiPelajaranController::class)->except('store', 'destroy');  
 
@@ -167,10 +168,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/pegawai/absensi/sekolah/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
     Route::get('/pegawai/absensi/sekolah/export', [AbsensiPegawaiController::class, 'export']);
     
-    // ! Absensi Pelajaran
+    // ✅ Absensi Pelajaran
     Route::apiResource('/pegawai/absensi/pelajaran', AbsensiPelajaranController::class)->only('store');
     Route::get('/pegawai/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
-    // Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
+    Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
     
 
     // ! show gedung, ruangan, tahun akademik
@@ -247,6 +248,7 @@ Route::middleware('auth:siswa')->group(function () {
     Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
 
     // ! absensi siswa
+    
     
     // ✅ Get detail jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/show/diri/{id}', [SiswaJadwalPelajaranController::class, 'showDetailJadwalSendiri']);

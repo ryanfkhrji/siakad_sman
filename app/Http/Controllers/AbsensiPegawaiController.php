@@ -52,8 +52,7 @@ class AbsensiPegawaiController extends Controller
         })->values();
     
         return ApiResponse::success($grouped, 'Absensi berhasil diambil');
-    }
-    
+    }    
 
     /**
      * ✅ Untuk pegawai
@@ -120,11 +119,10 @@ class AbsensiPegawaiController extends Controller
         }
     }
 
-
     // ✅ Untuk super admin
     // show detail pegawai dan semua absennya
     public function show($id) {
-        
+
         $absen = AbsensiPegawai::with('mataPelajaran', 'guru')
             ->where('guru_id', $id)
             ->orderBy('hari', 'desc')
@@ -157,8 +155,6 @@ class AbsensiPegawaiController extends Controller
     
         return ApiResponse::success($grouped, 'Detail absensi berhasil diambil');
     }
-    
-
 
     // ✅ show all absen sendiri (untuk pegawai)
     public function showAbsenSendiri() {
@@ -198,7 +194,6 @@ class AbsensiPegawaiController extends Controller
         return ApiResponse::success($formatted, 'Absensi berhasil diambil');
     }
 
-
     /**
      * ✅ Untuk super admin
      */
@@ -227,9 +222,7 @@ class AbsensiPegawaiController extends Controller
 
         $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
         ->where('status', 'tidak hadir')
-        ->count();
-
-        
+        ->count();    
 
         return ApiResponse::success([
             'id' => $absensi->id ?? null,
@@ -247,8 +240,8 @@ class AbsensiPegawaiController extends Controller
     /**
      * ✅ untuk super admin
      * Remove the specified resource from storage.
-     * Beberapa data = DELETE /absensi/destroy?ids[]=3&ids[]=5&ids[]=9
-     * Satu data = DELETE /absensi/destroy?ids=7
+     * Beberapa data = DELETE /absensi/pegawai/sekolah/destroy?ids[]=3&ids[]=5&ids[]=9
+     * Satu data = DELETE /absensi/pegawai/sekolah/destroy?ids=7
      */
     public function destroyData(Request $request)
     {
@@ -300,9 +293,9 @@ class AbsensiPegawaiController extends Controller
     // ✅ export data ke excel
     /**
      * php artisan make:export AbsensiPegawaiExport --model=AbsensiPegawai
-     * Semua data = GET /absensi/export
-     * Beberapa data = GET /absensi/export?ids[]=3&ids[]=5&ids[]=10
-     * Satu data = GET /absensi/export?ids[]=7
+     * Semua data = GET /absensi/pegawai/sekolah/export
+     * Beberapa data = GET /absensi/pegawai/sekolah/export?ids[]=3&ids[]=5&ids[]=10
+     * Satu data = GET /absensi/pegawai/sekolah/export?ids[]=7
      */
     public function export(Request $request)
     {
@@ -322,9 +315,8 @@ class AbsensiPegawaiController extends Controller
             }
         }
 
-        return Excel::download(new AbsensiPegawaiExport($ids), 'absensi-pegawai.xlsx');
+        return Excel::download(new AbsensiPegawaiExport($ids), 'absensi-guru-harian.xlsx');
     }
-
 
     // ! tidak ada import karena guru_id dan matpel_Id
 }
