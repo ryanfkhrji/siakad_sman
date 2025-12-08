@@ -23,7 +23,7 @@ class AbsensiPelajaranController extends Controller
      */
     public function index()
     {
-        $absen = AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran','jadwalPelajaran.kelas', 'guru')
+        $absen = AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran','jadwalPelajaran.kelas', 'guru', 'kelas')
             ->orderBy('hari', 'desc')
             ->get();
     
@@ -32,20 +32,23 @@ class AbsensiPelajaranController extends Controller
         }
     
         // Kelompokkan berdasarkan guru_id
-        $grouped = $absen->groupBy('jadwal_pelajaran_id')->map(function ($item) {
+        $grouped = $absen->groupBy('guru_pengajar_id')->map(function ($item) {
+            $guruId = $item->first()->guru->id ?? null;
             $namaGuru = $item->first()->guru->nama ?? null;
             $namaPelajaran = $item->first()->JadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
             $namaKelas = $item->first()->jadwalPelajaran->kelas->nama_kelas ?? null;
     
             return [
+                'guru_id' => $guruId,
+                'nama_guru' => $namaGuru,
+                'wali_kelas' => $namaKelas,
                 'mata_pelajaran' => $namaPelajaran,
-                'guru_pengajar' => $namaGuru,
-                'kelas' => $namaKelas,
                 'total_hadir' => $item->where('status', 'hadir')->count(),
                 'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
                 'absensi' => $item->map(function ($abs) {
                     return [
                         'id' => $abs->id,
+                        'kelas' => $abs->kelas->nama_kelas ?? null,
                         'hari' => Carbon::parse($abs->hari)->translatedFormat('l, d F Y') ?? null,
                         'jam' => $abs->jam,                       
                         'status' => $abs->status,

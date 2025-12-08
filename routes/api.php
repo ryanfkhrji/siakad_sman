@@ -247,7 +247,7 @@ Route::middleware('auth:siswa')->group(function () {
     // ✅ Get all jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
 
-    // ! absensi siswa
+    // ! absensi siswa (total hadir (masuk), izin, sakit, tidak hadir (alfa))
     
     
     // ✅ Get detail jadwal pelajaran sendiri
