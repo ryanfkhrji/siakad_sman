@@ -1,3 +1,4 @@
+// absensiPelajaranService.ts
 import api from "@/api/axios";
 import type { AbsensiPelajaran } from "@/types/absensiPelajaran";
 
@@ -41,16 +42,52 @@ export const absensiPelajaranService = {
   // EXPORT Excel (all, selected, or single)
   exportExcel: async (ids?: number[]): Promise<Blob> => {
     let url = "/spa/absensi/pegawai/pelajaran/export";
-
     if (ids && ids.length > 0) {
       const params = ids.map((id) => `ids[]=${id}`).join("&");
       url += `?${params}`;
     }
-
     const response = await api.get(url, {
       responseType: "blob",
     });
+    return response.data;
+  },
 
+  // ==================== PEGAWAI/GURU ENDPOINTS ====================
+
+  // CREATE absensi pelajaran
+  create: async (data: { kelas_id: number; status: "hadir" | "tidak hadir" }) => {
+    const response = await api.post("/pegawai/absensi/pelajaran", data);
+    return response.data;
+  },
+
+  // GET absensi guru sendiri
+  getAllSelf: async () => {
+    const response = await api.get("/pegawai/absensi/pelajaran/all/self");
+    return response.data;
+  },
+
+  // GET semua kelas
+  getKelas: async () => {
+    const response = await api.get("/spa/kelas");
+
+    // backend biasanya return: {status, message, data: [...] }
+    const items = response.data.data;
+
+    // Normalisasi agar menjadi {id, nama}
+    return items.map((k: any) => ({
+      id: k.id,
+      nama: k.nama_kelas, // sesuaikan field backend
+    }));
+  },
+
+  // Export absensi guru sendiri
+  exportSelf: async (ids?: number[]) => {
+    let url = "/pegawai/absensi/pelajaran/export";
+    if (ids && ids.length > 0) {
+      const params = ids.map((id) => `ids[]=${id}`).join("&");
+      url += `?${params}`;
+    }
+    const response = await api.get(url, { responseType: "blob" });
     return response.data;
   },
 };

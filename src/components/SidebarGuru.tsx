@@ -134,12 +134,28 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
 
                   {/* Data Absensi */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/absensi/data-absensi") && "bg-primary text-white font-medium")}>
-                      <Link to="/guru/absensi/data-absensi" className="flex items-center gap-2">
+                    <SidebarMenuButton onClick={() => toggleDropdown("data-absensi")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                      <span className="flex items-center gap-2">
                         <ClipboardCheck className="h-4 w-4" />
-                        {!isCollapsed && <span>Data Absensi</span>}
-                      </Link>
+                        {!isCollapsed && "Data Absensi"}
+                      </span>
+                      {!isCollapsed && <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === "data-absensi" && "rotate-180")} />}
                     </SidebarMenuButton>
+
+                    {!isCollapsed && openDropdown === "data-absensi" && (
+                      <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                        {[
+                          { to: "/guru/absensi/data-absensi/pegawai", label: "Pegawai" },
+                          { to: "/guru/absensi/data-absensi/pelajaran", label: "Pelajaran" },
+                        ].map((item) => (
+                          <SidebarMenuSubItem key={item.to}>
+                            <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes(item.to) && "bg-primary text-white font-medium")}>
+                              <Link to={item.to}>{item.label}</Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    )}
                   </SidebarMenuItem>
 
                   {/* Data Kebutuhan Siswa */}

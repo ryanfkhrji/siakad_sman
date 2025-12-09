@@ -174,7 +174,7 @@ const DetailAbsensiPelajaran = () => {
             <>
               {/* Info Card */}
               <Card className="mb-6 bg-white border-indigo-200">
-                <CardContent className="p-6">
+                <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Nama Guru</p>
@@ -195,7 +195,7 @@ const DetailAbsensiPelajaran = () => {
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card>
-                  <CardContent className="p-5">
+                  <CardContent>
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-blue-100 rounded-full">
                         <UserCheck className="text-blue-600" size={24} />
@@ -209,7 +209,7 @@ const DetailAbsensiPelajaran = () => {
                 </Card>
 
                 <Card>
-                  <CardContent className="p-5">
+                  <CardContent>
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-red-100 rounded-full">
                         <XCircle className="text-red-600" size={24} />
@@ -223,7 +223,7 @@ const DetailAbsensiPelajaran = () => {
                 </Card>
 
                 <Card>
-                  <CardContent className="p-5">
+                  <CardContent>
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-green-100 rounded-full">
                         <CalendarCheck className="text-green-600" size={24} />

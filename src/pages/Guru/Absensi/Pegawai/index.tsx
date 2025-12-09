@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import PageTitle from "@/components/PageTitle";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
+import { SidebarGuru } from "@/components/SidebarGuru";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2Icon, SearchIcon, Trash2Icon, FileSpreadsheet, PenBoxIcon, CircleXIcon, FilePlus, CalendarCheck, XCircle, UserCheck, EyeIcon } from "lucide-react";
+import { Loader2Icon, SearchIcon, FileSpreadsheet, CircleCheckBigIcon, CircleXIcon, FilePlus, CalendarCheck, UserCheck, XCircle } from "lucide-react";
 import Footer from "@/pages/Footer";
-import type { AbsensiPegawaiFlat } from "@/types/absensiPegawai";
+import type { AbsensiDetailSelf } from "@/types/absensiPegawai";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { absensiPegawaiService } from "@/services/absensiPegawaiService";
@@ -16,77 +15,86 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 
-const DataAbsensiPegawai = () => {
-  const navigate = useNavigate();
+const DataAbsensiPegawaiGuru = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [dataAbsensi, setDataAbsensi] = useState<AbsensiPegawaiFlat[]>([]);
+  const [dataAbsensi, setDataAbsensi] = useState<AbsensiDetailSelf[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<AbsensiPegawaiFlat[]>([]);
+  const [filteredData, setFilteredData] = useState<AbsensiDetailSelf[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const selectAllRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Summary data
+  // const [nama, setNama] = useState("");
+  // const [mataPelajaran, setMataPelajaran] = useState("");
   const [totalHadir, setTotalHadir] = useState(0);
   const [totalTidakHadir, setTotalTidakHadir] = useState(0);
 
-  // Dialog edit state
-  const [editDialog, setEditDialog] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editStatus, setEditStatus] = useState<"hadir" | "tidak hadir">("hadir");
-  const [editingData, setEditingData] = useState<AbsensiPegawaiFlat | null>(null);
-
-  // Store guru_id untuk setiap row
-  const [guruIdMap, setGuruIdMap] = useState<Map<number, number>>(new Map());
+  // Dialog create state
+  const [createDialog, setCreateDialog] = useState(false);
+  const [createStatus, setCreateStatus] = useState<"hadir" | "tidak hadir">("hadir");
+  const [currentDate, setCurrentDate] = useState("");
+  const [hasAbsenToday, setHasAbsenToday] = useState(false);
 
   // Fetch data
   useEffect(() => {
     fetchData();
+    checkTodayAbsen();
   }, []);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await absensiPegawaiService.getAll();
+      const response = await absensiPegawaiService.getAllSelf();
 
       if (response.status === "success") {
-        // Flatten nested data structure
-        const flatData: AbsensiPegawaiFlat[] = [];
-        const tempGuruIdMap = new Map<number, number>();
-
-        response.data.forEach((guru: any) => {
-          guru.absensi.forEach((abs: any) => {
-            flatData.push({
-              id: abs.id,
-              nama_guru: guru.nama_guru,
-              mengajar: guru.mengajar,
-              hari: abs.hari,
-              status: abs.status,
-              total_hadir: guru.total_hadir,
-              total_tidak_hadir: guru.total_tidak_hadir,
-            });
-            // Simpan mapping absensi id -> guru_id
-            tempGuruIdMap.set(abs.id, guru.guru_id);
-          });
-        });
-
-        setGuruIdMap(tempGuruIdMap);
-        setDataAbsensi(flatData);
-        setTotalHadir(flatData.reduce((total, item) => total + (item.status === "hadir" ? 1 : 0), 0));
-        setTotalTidakHadir(flatData.reduce((total, item) => total + (item.status === "tidak hadir" ? 1 : 0), 0));
+        // setNama(response.data.nama);
+        // setMataPelajaran(response.data.mata_pelajaran_id);
+        setTotalHadir(response.data.total_hadir);
+        setTotalTidakHadir(response.data.total_tidak_hadir);
+        setDataAbsensi(response.data.absensi);
       }
     } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Gagal memuat data!",
-        text: error.response?.data?.message || "Tidak dapat memuat data absensi pegawai.",
-      });
+      // Jika belum ada data absensi (404), tidak perlu error
+      if (error.response?.status === 404) {
+        setDataAbsensi([]);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal memuat data!",
+          text: error.response?.data?.message || "Tidak dapat memuat data absensi.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  // Check if already absen today
+  const checkTodayAbsen = () => {
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const formattedDate = today.toLocaleDateString("id-ID", options);
+    setCurrentDate(formattedDate);
+
+    // Check if there's absen for today
+    const todayAbsen = dataAbsensi.find((item) => item.hari === formattedDate);
+    setHasAbsenToday(!!todayAbsen);
+  };
+
+  useEffect(() => {
+    checkTodayAbsen();
+  }, [dataAbsensi]);
 
   // Search filtering
   useEffect(() => {
@@ -94,7 +102,7 @@ const DataAbsensiPegawai = () => {
       setFilteredData(dataAbsensi);
     } else {
       const lower = searchTerm.toLowerCase();
-      setFilteredData(dataAbsensi.filter((item) => item.nama_guru.toLowerCase().includes(lower) || item.mengajar.toLowerCase().includes(lower) || item.hari.toLowerCase().includes(lower)));
+      setFilteredData(dataAbsensi.filter((item) => item.hari.toLowerCase().includes(lower) || item.status.toLowerCase().includes(lower)));
     }
     setCurrentPage(1);
   }, [searchTerm, dataAbsensi]);
@@ -136,101 +144,71 @@ const DataAbsensiPegawai = () => {
     }
   }, [isSomeSelected]);
 
-  // Navigate to detail
-  const handleViewDetail = (item: AbsensiPegawaiFlat) => {
-    const guruId = guruIdMap.get(item.id);
-    if (guruId) {
-      navigate(`/superadmin/informasi-laporan-umum/absensi-pegawai/detail/${guruId}`);
-    }
-  };
-
-  // Edit handler
-  const handleEdit = (item: AbsensiPegawaiFlat) => {
-    setEditingId(item.id);
-    setEditStatus(item.status);
-    setEditingData(item);
-    setEditDialog(true);
-  };
-
-  const handleUpdateStatus = async () => {
-    if (!editingId) return;
-
-    try {
-      setLoading(true);
-      setIsLoading(true);
-      await absensiPegawaiService.update(editingId, { status: editStatus });
-
-      // Update local state
-      setDataAbsensi((prev) => prev.map((item) => (item.id === editingId ? { ...item, status: editStatus } : item)));
-
-      setEditDialog(false);
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
-        text: "Status absensi berhasil diperbarui.",
-        showConfirmButton: false,
-        timer: 1800,
-      });
-
-      // Refresh data to get updated totals
-      fetchData();
-    } catch (err: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Gagal memperbarui!",
-        text: err.response?.data?.message || "Terjadi kesalahan saat memperbarui status.",
-      });
-    } finally {
-      setLoading(false);
-      setIsLoading(false);
-    }
-  };
-
-  // Delete handler
-  const handleDeleteMultiple = async () => {
-    if (selectedIds.length === 0) {
+  // Open create dialog
+  const handleOpenCreateDialog = () => {
+    if (hasAbsenToday) {
       Swal.fire({
         icon: "warning",
-        title: "Tidak ada data dipilih",
-        text: "Pilih minimal 1 data untuk dihapus",
+        title: "Sudah Absen!",
+        text: "Anda sudah melakukan absensi hari ini.",
+        timer: 3000,
+        showConfirmButton: false,
       });
       return;
     }
+    setCreateDialog(true);
+  };
 
-    const result = await Swal.fire({
-      title: "Yakin ingin menghapus?",
-      text: `${selectedIds.length} data akan dihapus dan tidak dapat dikembalikan.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#4F46E5",
-      confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Batal",
-    });
-
-    if (!result.isConfirmed) return;
-
+  // Create absensi handler
+  const handleCreateAbsensi = async () => {
     try {
-      setLoading(true);
-      await absensiPegawaiService.deleteMultiple(selectedIds);
+      setIsLoading(true);
+      const response = await absensiPegawaiService.create({ status: createStatus });
 
-      setDataAbsensi((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
-      setSelectedIds([]);
+      if (response.status === "success") {
+        setCreateDialog(false);
 
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
-        text: "Data berhasil dihapus.",
-        showConfirmButton: false,
-        timer: 1800,
-      });
+        Swal.fire({
+          icon: "success",
+          title: "Absensi Berhasil!",
+          html: `
+            <div class="text-left">
+              <p><strong>Status:</strong> ${response.data.status}</p>
+              <p><strong>Hari:</strong> ${response.data.hari}</p>
+              <hr class="my-2">
+              <p><strong>Rekapitulasi:</strong></p>
+              <p>Hadir: ${response.data.rekapitulasi.hadir}</p>
+              <p>Tidak Hadir: ${response.data.rekapitulasi.tidak_hadir}</p>
+            </div>
+          `,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        // Refresh data
+        fetchData();
+      }
     } catch (err: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Gagal menghapus!",
-        text: err.response?.data?.message || "Terjadi kesalahan saat menghapus data.",
-      });
+      // Handle error 422 - sudah absen hari ini
+      if (err.response?.status === 422) {
+        Swal.fire({
+          icon: "warning",
+          title: "Gagal Absen!",
+          text: err.response?.data?.data?.pesan || "Anda sudah absen hari ini.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal Absen!",
+          text: err.response?.data?.message || "Terjadi kesalahan saat melakukan absensi.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -238,12 +216,12 @@ const DataAbsensiPegawai = () => {
   const handleExportExcel = async (selected: boolean = false) => {
     try {
       const ids = selected ? selectedIds : undefined;
-      const blob = await absensiPegawaiService.exportExcel(ids);
+      const blob = await absensiPegawaiService.exportSelf(ids);
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "absensi-pegawai.xlsx";
+      link.download = "absensi-saya.xlsx";
       link.click();
       window.URL.revokeObjectURL(url);
 
@@ -251,13 +229,15 @@ const DataAbsensiPegawai = () => {
         icon: "success",
         title: "Export berhasil!",
         showConfirmButton: false,
-        timer: 1500,
+        timer: 3000,
       });
     } catch (error: any) {
       Swal.fire({
         icon: "error",
         title: "Export gagal!",
         text: error.response?.data?.message || "Terjadi kesalahan saat mengekspor data.",
+        timer: 3000,
+        showConfirmButton: false,
       });
     }
   };
@@ -267,12 +247,12 @@ const DataAbsensiPegawai = () => {
 
   return (
     <SidebarProvider>
-      <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <SidebarGuru isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Data Absensi Pegawai" />
+      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[280px]"}`}>
+        <PageTitle title="Absensi Saya" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Data Absensi Pegawai</h1>
+          <h1 className="text-3xl font-bold mb-6">Absensi Saya</h1>
 
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-600">
@@ -324,30 +304,40 @@ const DataAbsensiPegawai = () => {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* <Card>
+                  <CardContent>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-2">Informasi</p>
+                      <p className="text-sm font-semibold">{nama}</p>
+                      <p className="text-xs text-gray-500">Mengajar: {mataPelajaran}</p>
+                    </div>
+                  </CardContent>
+                </Card> */}
               </div>
 
               {/* Action Buttons */}
               <div className="mb-6 flex flex-col gap-4">
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="destructive" onClick={handleDeleteMultiple} disabled={selectedIds.length === 0}>
-                    <Trash2Icon size={18} />
-                    Hapus Terpilih ({selectedIds.length})
+                  <Button className="bg-primary" onClick={handleOpenCreateDialog} disabled={hasAbsenToday}>
+                    <CircleCheckBigIcon size={18} />
+                    {hasAbsenToday ? "Sudah Absen Hari Ini" : "Absen Sekarang"}
                   </Button>
 
-                  <Button variant="outline" onClick={() => handleExportExcel(false)}>
+                  {/* <Button variant="outline" onClick={() => handleExportExcel(false)}>
                     <FileSpreadsheet size={18} />
                     Export Semua Excel
-                  </Button>
+                  </Button> */}
 
                   <Button variant="outline" onClick={() => handleExportExcel(true)} disabled={selectedIds.length === 0}>
                     <FileSpreadsheet size={18} />
-                    Export Terpilih Excel
+                    Export Terpilih Excel ({selectedIds.length})
                   </Button>
                 </div>
 
                 <div className="relative w-full md:w-1/3">
                   <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari nama guru/mata pelajaran/hari..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  <Input type="text" placeholder="Cari hari/status..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
                 </div>
               </div>
 
@@ -360,13 +350,8 @@ const DataAbsensiPegawai = () => {
                         <input type="checkbox" ref={selectAllRef} checked={isAllSelected} onChange={(e) => handleSelectAll(e.target.checked)} className="w-4 h-4 cursor-pointer" />
                       </TableHead>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Guru</TableHead>
-                      <TableHead className="font-semibold text-white">Mengajar</TableHead>
                       <TableHead className="font-semibold text-white">Hari</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
-                      <TableHead className="text-center font-semibold text-white">Total Hadir</TableHead>
-                      <TableHead className="text-center font-semibold text-white">Total Tidak Hadir</TableHead>
-                      <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
 
@@ -378,28 +363,16 @@ const DataAbsensiPegawai = () => {
                             <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => handleSelectOne(item.id, !!checked)} />
                           </TableCell>
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{item.nama_guru || "-"}</TableCell>
-                          <TableCell>{item.mengajar || "-"}</TableCell>
                           <TableCell>{item.hari || "-"}</TableCell>
                           <TableCell>
                             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${item.status === "hadir" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{item.status}</span>
-                          </TableCell>
-                          <TableCell className="text-center">{item.total_hadir}</TableCell>
-                          <TableCell className="text-center">{item.total_tidak_hadir}</TableCell>
-                          <TableCell className="flex gap-1 justify-center">
-                            <Button size="sm" variant="outline" onClick={() => handleViewDetail(item)} title="Lihat Detail">
-                              <EyeIcon size={16} />
-                            </Button>
-                            <Button size="sm" onClick={() => handleEdit(item)} title="Edit Status">
-                              <PenBoxIcon size={16} />
-                            </Button>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={9} className="text-center text-gray-500 py-4">
-                          Tidak ada data absensi yang ditemukan
+                        <TableCell colSpan={4} className="text-center text-gray-500 py-4">
+                          Belum ada data absensi
                         </TableCell>
                       </TableRow>
                     )}
@@ -445,56 +418,54 @@ const DataAbsensiPegawai = () => {
         <Footer />
       </main>
 
-      {/* Edit Dialog */}
-      <Dialog open={editDialog} onOpenChange={setEditDialog}>
+      {/* Create Dialog */}
+      <Dialog open={createDialog} onOpenChange={setCreateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Status Absensi</DialogTitle>
-            <DialogDescription>Ubah status kehadiran pegawai</DialogDescription>
+            <DialogTitle>Absensi Hari Ini</DialogTitle>
+            <DialogDescription>Lakukan absensi kehadiran Anda</DialogDescription>
           </DialogHeader>
 
-          {editingData && (
-            <div className="space-y-4 py-4">
-              {/* Detail Info */}
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-600">Nama Guru:</span>
-                  <span className="text-sm font-semibold text-gray-900">{editingData.nama_guru}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-600">Mengajar:</span>
-                  <span className="text-sm font-semibold text-gray-900">{editingData.mengajar}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-600">Hari:</span>
-                  <span className="text-sm font-semibold text-gray-900">{editingData.hari}</span>
-                </div>
+          <div className="space-y-4 py-4">
+            {/* Detail Info */}
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              {/* <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">Nama:</span>
+                <span className="text-sm font-semibold text-gray-900">{nama}</span>
               </div>
-
-              {/* Status Selection */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Status Kehadiran</label>
-                <Select value={editStatus} onValueChange={(value: "hadir" | "tidak hadir") => setEditStatus(value)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hadir">Hadir</SelectItem>
-                    <SelectItem value="tidak hadir">Tidak Hadir</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">Mengajar:</span>
+                <span className="text-sm font-semibold text-gray-900">{mataPelajaran}</span>
+              </div> */}
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">Hari:</span>
+                <span className="text-sm font-semibold text-gray-900">{currentDate}</span>
               </div>
             </div>
-          )}
+
+            {/* Status Selection */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Status Kehadiran</label>
+              <Select value={createStatus} onValueChange={(value: "hadir" | "tidak hadir") => setCreateStatus(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hadir">Hadir</SelectItem>
+                  <SelectItem value="tidak hadir">Tidak Hadir</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           <DialogFooter>
-            <Button className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90" onClick={() => setEditDialog(false)}>
+            <Button className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90" onClick={() => setCreateDialog(false)}>
               <CircleXIcon />
               Batal
             </Button>
-            <Button type="submit" className="bg-primary flex items-center gap-2" disabled={isLoading} onClick={handleUpdateStatus}>
+            <Button type="submit" className="bg-primary flex items-center gap-2" disabled={isLoading} onClick={handleCreateAbsensi}>
               <FilePlus size={18} />
-              {isLoading ? "Menyimpan..." : "Simpan Perubahan"}
+              {isLoading ? "Menyimpan..." : "Submit Absensi"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -503,4 +474,4 @@ const DataAbsensiPegawai = () => {
   );
 };
 
-export default DataAbsensiPegawai;
+export default DataAbsensiPegawaiGuru;

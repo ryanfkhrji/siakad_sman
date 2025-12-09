@@ -107,10 +107,11 @@ import HomePage from "@/pages/PublicPsb/HomePsbSiswa";
 import FormPsbPublic from "@/pages/PublicPsb/FormPsbSiswa";
 import PsbSuccess from "@/pages/PublicPsb/PsbSuccess";
 import DataAbsensiPegawai from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPegawai";
-import DataAbsensiPegawaiGuru from "@/pages/Guru/Absensi";
+import DataAbsensiPegawaiGuru from "@/pages/Guru/Absensi/Pegawai";
 import DetailAbsensiPegawai from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPegawai/DetailAbsensiPegawai";
 import DataAbsensiPelajaran from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPelajaran";
 import DetailAbsensiPelajaran from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPelajaran/DetailAbsensiPelajaran";
+import DataAbsensiPelajaranGuru from "@/pages/Guru/Absensi/Pelajaran";
 
 export default function AppRoutes() {
   return (
@@ -892,10 +893,18 @@ export default function AppRoutes() {
 
         {/* Data Absensi */}
         <Route
-          path="/guru/absensi/data-absensi"
+          path="/guru/absensi/data-absensi/pegawai"
           element={
             <ProtectedRoute roles={["guru"]}>
               <DataAbsensiPegawaiGuru />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guru/absensi/data-absensi/pelajaran"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <DataAbsensiPelajaranGuru />
             </ProtectedRoute>
           }
         />

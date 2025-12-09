@@ -50,7 +50,7 @@ const CreateJadwalPelajaran = () => {
   const navigate = useNavigate();
 
   // Daftar hari
-  const hariList = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
+  const hariList = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
   // Ambil data mata pelajaran, guru, dan kelas dari backend
   useEffect(() => {
@@ -152,14 +152,39 @@ const CreateJadwalPelajaran = () => {
         });
       }
     } catch (error: any) {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
+      // Tangani error 422 untuk validasi atau not allowed
+      if (error.response?.status === 422) {
+        const errorData = error.response.data;
+
+        // Set errors untuk tampilan form
+        if (errorData.errors) {
+          setErrors(errorData.errors);
+        }
+
+        // Cek apakah ada pesan khusus dari backend (Not allowed)
+        if (errorData.errors?.pesan) {
+          Swal.fire({
+            icon: "warning",
+            title: "Tidak Diizinkan!",
+            text: errorData.errors.pesan[0] || errorData.message,
+            confirmButtonColor: "#EAB308",
+          });
+        } else {
+          // Tampilkan error validasi biasa
+          Swal.fire({
+            icon: "error",
+            title: "Validasi Gagal!",
+            text: errorData.message || "Terjadi kesalahan validasi.",
+          });
+        }
+      } else {
+        // Error selain 422
+        Swal.fire({
+          icon: "error",
+          title: "Koneksi gagal!",
+          text: error.response?.data?.message || "Tidak dapat terhubung ke server.",
+        });
       }
-      Swal.fire({
-        icon: "error",
-        title: "Koneksi gagal!",
-        text: error.response?.data?.message || "Tidak dapat terhubung ke server.",
-      });
     } finally {
       setLoading(false);
     }

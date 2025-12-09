@@ -46,54 +46,48 @@ const DataAbsensiPelajaran = () => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await absensiPelajaranService.getAll();
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    const response = await absensiPelajaranService.getAll();
 
-      if (response.status === "success") {
-        // Flatten nested data structure
-        const flatData: AbsensiPelajaranFlat[] = [];
-        const tempGuruIdMap = new Map<number, number>();
+    if (response.status === "success") {
+      // Flatten nested data structure
+      const flatData: AbsensiPelajaranFlat[] = [];
 
-        response.data.forEach((pelajaran: any) => {
-          pelajaran.absensi.forEach((abs: any) => {
-            flatData.push({
-              id: abs.id,
-              mata_pelajaran: pelajaran.mata_pelajaran,
-              guru_pengajar: pelajaran.guru_pengajar,
-              kelas: pelajaran.kelas,
-              hari: abs.hari,
-              jam: abs.jam,
-              status: abs.status,
-              total_hadir: pelajaran.total_hadir,
-              total_tidak_hadir: pelajaran.total_tidak_hadir,
-            });
-            // Simpan mapping absensi id -> guru_pengajar_id (dari backend, ambil dari response pertama kali)
-            // Asumsi: response.data juga mengirim guru_pengajar_id atau bisa diambil dari struktur lain
-            if (!tempGuruIdMap.has(abs.id)) {
-              // Kita perlu guru_pengajar_id, jika backend mengirim di level pelajaran
-              // Sesuaikan dengan struktur response backend Anda
-              tempGuruIdMap.set(abs.id, pelajaran.guru_pengajar_id || abs.guru_pengajar_id);
-            }
+      response.data.forEach((pelajaran: any) => {
+        pelajaran.absensi.forEach((abs: any) => {
+          flatData.push({
+            id: abs.id,
+            guru_id: pelajaran.guru_id,
+            guru_pengajar_id: pelajaran.guru_id, // ✅ Gunakan guru_id dari pelajaran
+            mata_pelajaran: pelajaran.mata_pelajaran,
+            nama_guru: pelajaran.nama_guru,
+            kelas: abs.kelas,
+            hari: abs.hari,
+            jam: abs.jam,
+            status: abs.status,
+            total_hadir: pelajaran.total_hadir,
+            total_tidak_hadir: pelajaran.total_tidak_hadir,
           });
         });
-
-        setGuruIdMap(tempGuruIdMap);
-        setDataAbsensi(flatData);
-        setTotalHadir(flatData.reduce((total, item) => total + (item.status === "hadir" ? 1 : 0), 0));
-        setTotalTidakHadir(flatData.reduce((total, item) => total + (item.status === "tidak hadir" ? 1 : 0), 0));
-      }
-    } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Gagal memuat data!",
-        text: error.response?.data?.message || "Tidak dapat memuat data absensi pelajaran.",
       });
-    } finally {
-      setLoading(false);
+
+      setGuruIdMap(new Map(flatData.map((item) => [item.id, item.guru_id])));
+      setDataAbsensi(flatData);
+      setTotalHadir(flatData.reduce((total, item) => total + (item.status === "hadir" ? 1 : 0), 0));
+      setTotalTidakHadir(flatData.reduce((total, item) => total + (item.status === "tidak hadir" ? 1 : 0), 0));
     }
-  };
+  } catch (error: any) {
+    Swal.fire({
+      icon: "error",
+      title: "Gagal memuat data!",
+      text: error.response?.data?.message || "Tidak dapat memuat data absensi pelajaran.",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Search filtering
   useEffect(() => {
@@ -101,9 +95,7 @@ const DataAbsensiPelajaran = () => {
       setFilteredData(dataAbsensi);
     } else {
       const lower = searchTerm.toLowerCase();
-      setFilteredData(
-        dataAbsensi.filter((item) => item.guru_pengajar.toLowerCase().includes(lower) || item.mata_pelajaran.toLowerCase().includes(lower) || item.kelas.toLowerCase().includes(lower) || item.hari.toLowerCase().includes(lower))
-      );
+      setFilteredData(dataAbsensi.filter((item) => item.nama_guru.toLowerCase().includes(lower) || item.mata_pelajaran.toLowerCase().includes(lower) || item.kelas.toLowerCase().includes(lower) || item.hari.toLowerCase().includes(lower)));
     }
     setCurrentPage(1);
   }, [searchTerm, dataAbsensi]);
@@ -147,11 +139,13 @@ const DataAbsensiPelajaran = () => {
 
   // Navigate to detail
   const handleViewDetail = (item: AbsensiPelajaranFlat) => {
-    const guruId = guruIdMap.get(item.id);
+    const guruId = guruIdMap.get(Number(item.id));
+
     if (guruId) {
       navigate(`/superadmin/informasi-laporan-umum/absensi-pelajaran/detail/${guruId}`);
+    } else {
+      console.warn("guruId NOT FOUND untuk absensi id:", item.id);
     }
-    console.log(guruId);
   };
 
   // Edit handler
@@ -294,7 +288,7 @@ const DataAbsensiPelajaran = () => {
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card>
-                  <CardContent className="p-5">
+                  <CardContent>
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-blue-100 rounded-full">
                         <UserCheck className="text-blue-600" size={24} />
@@ -308,7 +302,7 @@ const DataAbsensiPelajaran = () => {
                 </Card>
 
                 <Card>
-                  <CardContent className="p-5">
+                  <CardContent>
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-red-100 rounded-full">
                         <XCircle className="text-red-600" size={24} />
@@ -322,7 +316,7 @@ const DataAbsensiPelajaran = () => {
                 </Card>
 
                 <Card>
-                  <CardContent className="p-5">
+                  <CardContent>
                     <div className="flex items-center gap-3">
                       <div className="p-3 bg-green-100 rounded-full">
                         <CalendarCheck className="text-green-600" size={24} />
@@ -390,7 +384,7 @@ const DataAbsensiPelajaran = () => {
                             <Checkbox checked={selectedIds.includes(item.id)} onCheckedChange={(checked) => handleSelectOne(item.id, !!checked)} />
                           </TableCell>
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{item.guru_pengajar || "-"}</TableCell>
+                          <TableCell>{item.nama_guru || "-"}</TableCell>
                           <TableCell>{item.mata_pelajaran || "-"}</TableCell>
                           <TableCell>{item.kelas || "-"}</TableCell>
                           <TableCell>{item.hari || "-"}</TableCell>
@@ -473,7 +467,7 @@ const DataAbsensiPelajaran = () => {
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-gray-600">Guru Pengajar:</span>
-                  <span className="text-sm font-semibold text-gray-900">{editingData.guru_pengajar}</span>
+                  <span className="text-sm font-semibold text-gray-900">{editingData.nama_guru}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-gray-600">Mata Pelajaran:</span>
