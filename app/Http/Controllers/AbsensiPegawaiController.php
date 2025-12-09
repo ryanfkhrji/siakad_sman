@@ -22,7 +22,7 @@ class AbsensiPegawaiController extends Controller
      */
     public function index()
     {
-        $absen = AbsensiPegawai::with('mataPelajaran', 'guru')
+        $absen = AbsensiPegawai::with('mataPelajaran', 'guru.kelas')
             ->orderBy('hari', 'desc')
             ->get();
     
@@ -34,11 +34,13 @@ class AbsensiPegawaiController extends Controller
         $grouped = $absen->groupBy('guru_id')->map(function ($item) {
             $namaGuru = $item->first()->guru->nama ?? null;
             $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
+            $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
     
             return [
                 'guru_id' => $item->first()->guru_id ?? null,
                 'nama_guru' => $namaGuru ?? null,
                 'mengajar' => $namaPelajaran ?? null,
+                'wali_kelas' => $kelas ?? null,
                 'total_hadir' => $item->where('status', 'hadir')->count(),
                 'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
                 'absensi' => $item->map(function ($abs) {
@@ -123,7 +125,7 @@ class AbsensiPegawaiController extends Controller
     // show detail pegawai dan semua absennya
     public function show($id) {
 
-        $absen = AbsensiPegawai::with('mataPelajaran', 'guru')
+        $absen = AbsensiPegawai::with('mataPelajaran', 'guru.kelas')
             ->where('guru_id', $id)
             ->orderBy('hari', 'desc')
             ->get();
@@ -136,11 +138,13 @@ class AbsensiPegawaiController extends Controller
         $grouped = $absen->groupBy('guru_id')->map(function ($item) {
             $namaGuru = $item->first()->guru->nama ?? null;
             $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
+            $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
     
             return [
                 'guru_id' => $item->first()->guru_id ?? null,
                 'nama_guru' => $namaGuru ?? null,
                 'mengajar' => $namaPelajaran ?? null,
+                'wali_kelas' => $kelas ?? null,
                 'total_hadir' => $item->where('status', 'hadir')->count(),
                 'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
                 'absensi' => $item->map(function ($abs) {
@@ -159,7 +163,7 @@ class AbsensiPegawaiController extends Controller
     // ✅ show all absen sendiri (untuk pegawai)
     public function showAbsenSendiri() {
         $user = Auth::guard('kepegawaian')->user();
-        $matpel = JadwalPelajaran::with('mataPelajaran')->where('guru_id', $user->id)->first();
+        $matpel = JadwalPelajaran::with('mataPelajaran', 'guru.kelas')->where('guru_id', $user->id)->first();
 
         $absensi = AbsensiPegawai::with('mataPelajaran')->where('guru_id', $user->id)->get();
 
@@ -179,6 +183,7 @@ class AbsensiPegawaiController extends Controller
         $formatted = [
             'id' => $user->id ?? null,
             'nama' => $user->nama ?? null,
+            'wali_kelas' => $user->kelas->nama_kelas ?? null,
             'mata_pelajaran_id' => $matpel->mataPelajaran->nama_pelajaran ?? null,
             'total_hadir' => $jumlahHadir ?? null,
             'total_tidak_hadir' => $jumlahTidakHadir ?? null,

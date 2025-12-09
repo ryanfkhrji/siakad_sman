@@ -30,4 +30,9 @@ class SiswaJadwalPelajaran extends Pivot
     {
         return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');
     }
+
+    public function absensiSiswas()
+    {
+        return $this->hasMany(AbsensiSiswa::class, 'siswa_id'); 
+    }
 }

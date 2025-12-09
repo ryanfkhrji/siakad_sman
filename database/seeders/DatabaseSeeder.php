@@ -15,6 +15,7 @@ use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use App\Models\AbsensiPegawai;
 use App\Models\AbsensiPelajaran;
+use App\Models\AbsensiSiswa;
 use App\Models\Prestasi;
 use App\Models\Kelas;
 use App\Models\JadwalPelajaran;
@@ -400,6 +401,38 @@ class DatabaseSeeder extends Seeder
             [
                 'siswa_id' => 2, // Rina
                 'jadwal_pelajaran_id' => 1 // IPA
+            ],
+        ]);
+
+        // Seed Absensi Siswa
+        AbsensiSiswa::insert([
+            [
+                'siswa_id' => 1, // Andi
+                'kelas_id' => 2, 
+                'mata_pelajaran_id' => 2, // B.Indonesia
+                'hari' => '2025-10-17', // B.Indonesia
+                'status' => 'hadir',
+            ],
+            [
+                'siswa_id' => 1, // Andi
+                'kelas_id' => 2, 
+                'mata_pelajaran_id' => 1, // IPA
+                'hari' => '2025-10-24', // IPA
+                'status' => 'sakit',
+            ],
+            [
+                'siswa_id' => 2, // Rina
+                'kelas_id' => 1, 
+                'mata_pelajaran_id' => 1, // IPA
+                'hari' => '2025-10-10', // IPA
+                'status' => 'alfa',
+            ],
+            [
+                'siswa_id' => 2, // Rina
+                'kelas_id' => 1, 
+                'mata_pelajaran_id' => 2, // B.Indonesia
+                'hari' => '2025-10-25', // B.Indonesia
+                'status' => 'izin',
             ],
         ]);
 

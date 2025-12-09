@@ -35,7 +35,7 @@ class AbsensiPelajaranController extends Controller
         $grouped = $absen->groupBy('guru_pengajar_id')->map(function ($item) {
             $guruId = $item->first()->guru->id ?? null;
             $namaGuru = $item->first()->guru->nama ?? null;
-            $namaPelajaran = $item->first()->JadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
+            $namaPelajaran = $item->first()->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
             $namaKelas = $item->first()->jadwalPelajaran->kelas->nama_kelas ?? null;
     
             return [
@@ -64,7 +64,7 @@ class AbsensiPelajaranController extends Controller
     // show detail pelajaran dan semua absennya
     public function show($id) {
         
-        $absen = AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran', 'guru', 'kelas')
+        $absen = AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran', 'guru.kelas', 'kelas')
             ->where('guru_pengajar_id', $id)
             ->orderBy('hari', 'desc')
             ->get();
@@ -77,10 +77,12 @@ class AbsensiPelajaranController extends Controller
         $grouped = $absen->groupBy('guru_pengajar_id')->map(function ($item) {
             $namaGuru = $item->first()->guru->nama ?? null;
             $namaPelajaran = $item->first()->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
+            $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
     
             return [
                 'guru_id' => $item->first()->guru_pengajar_id ?? null,
                 'nama_guru' => $namaGuru ?? null,
+                'wali_kelas' => $kelas ?? null,
                 'mengajar' => $namaPelajaran ?? null,
                 'total_hadir' => $item->where('status', 'hadir')->count(),
                 'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
@@ -191,11 +193,13 @@ class AbsensiPelajaranController extends Controller
         $grouped = $absen->groupBy('guru_pengajar_id')->map(function ($item) {
             $namaGuru = $item->first()->guru->nama ?? null;
             $namaPelajaran = $item->first()->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
+            $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
     
             return [
                 'guru_pengajar_id' => $item->first()->guru_pengajar_id ?? null,
                 'nama_guru' => $namaGuru ?? null,
                 'mengajar' => $namaPelajaran ?? null,
+                'wali_kelas' => $kelas ?? null,
                 'total_hadir' => $item->where('status', 'hadir')->count(),
                 'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
                 'absensi' => $item->map(function ($abs) {

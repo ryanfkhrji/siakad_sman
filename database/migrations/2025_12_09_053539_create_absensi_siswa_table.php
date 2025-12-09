@@ -13,21 +13,17 @@ return new class extends Migration
     {
         Schema::create('absensi_siswa', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_siswa');
+            $table->string('siswa_id');
             
-            $table->string('kelas');
+            $table->string('kelas_id');
             
-            $table->string('mata_pelajaran');        
+            $table->string('mata_pelajaran_id');        
 
-            $table->boolean('masuk')->default(false);
+            $table->date('hari');            
 
-            $table->boolean('izin')->default(false);
-            $table->string('bukti_izin')->nullable();
+            $table->enum('status', ['hadir', 'izin', 'sakit', 'alfa']);
 
-            $table->boolean('sakit')->default(false);
-            $table->string('bukti_sakit')->nullable();
-
-            $table->boolean('alfa')->default(false);
+            $table->string('bukti')->nullable();
 
             $table->timestamps();
         });

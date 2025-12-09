@@ -21,6 +21,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\EkskulSiswaPivotController;
 use App\Http\Controllers\AbsensiPegawaiController;
 use App\Http\Controllers\AbsensiPelajaranController;
+use App\Http\Controllers\AbsensiSiswaController;
 use App\Http\Controllers\PsbController;
 use App\Http\Controllers\CacheCleanerController;
 
@@ -120,6 +121,12 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/spa/absensi/pegawai/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
     Route::delete('/spa/absensi/pegawai/pelajaran/destroy/{id?}', [AbsensiPelajaranController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/pegawai/pelajaran', AbsensiPelajaranController::class)->except('store', 'destroy');  
+
+    // ✅ Absensi Siswa ke Pelajaran
+    Route::get('/spa/absensi/siswa/pelajaran/export', [AbsensiSiswaController::class, 'export']);
+    Route::get('/spa/absensi/siswa/pelajaran/zip', [AbsensiSiswaController::class, 'exportBerkasZip']);
+    Route::delete('/spa/absensi/siswa/pelajaran/destroy/{id?}', [AbsensiSiswaController::class, 'destroyData']);
+    Route::apiResource('/spa/absensi/siswa/pelajaran', AbsensiSiswaController::class)->except('store', 'destroy');  
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
@@ -247,8 +254,10 @@ Route::middleware('auth:siswa')->group(function () {
     // ✅ Get all jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
 
-    // ! absensi siswa (total hadir (masuk), izin, sakit, tidak hadir (alfa))
-    
+     // ✅ Absensi Pelajaran
+     Route::apiResource('/siswa/absensi/pelajaran', AbsensiSiswaController::class)->only('store');
+     Route::get('/siswa/absensi/pelajaran/all/self', [AbsensiSiswaController::class, 'showAbsenPelajaranSendiri']);
+     Route::get('/siswa/absensi/pelajaran/export', [AbsensiSiswaController::class, 'export']);         
     
     // ✅ Get detail jadwal pelajaran sendiri
     Route::get('/siswa/jadwal-pelajaran/show/diri/{id}', [SiswaJadwalPelajaranController::class, 'showDetailJadwalSendiri']);
