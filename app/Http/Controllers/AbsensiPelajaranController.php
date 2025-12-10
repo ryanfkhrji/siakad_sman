@@ -19,11 +19,11 @@ use App\Exports\AbsensiPelajaranExport;
 class AbsensiPelajaranController extends Controller
 {
     /**
-     * ✅ Untuk super admin
+     * ✅✅ Untuk super admin
      */
     public function index()
     {
-        $absen = AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran','jadwalPelajaran.kelas', 'guru', 'kelas')
+        $absen = AbsensiPelajaran::with('mataPelajaran', 'guru', 'kelas', 'guru.kelas')
             ->orderBy('hari', 'desc')
             ->get();
     
@@ -35,8 +35,8 @@ class AbsensiPelajaranController extends Controller
         $grouped = $absen->groupBy('guru_pengajar_id')->map(function ($item) {
             $guruId = $item->first()->guru->id ?? null;
             $namaGuru = $item->first()->guru->nama ?? null;
-            $namaPelajaran = $item->first()->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
-            $namaKelas = $item->first()->jadwalPelajaran->kelas->nama_kelas ?? null;
+            $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
+            $namaKelas = $item->first()->guru->kelas->nama_kelas ?? null;
     
             return [
                 'guru_id' => $guruId,
@@ -60,11 +60,11 @@ class AbsensiPelajaranController extends Controller
         return ApiResponse::success($grouped, 'Absensi berhasil diambil');
     }
 
-     // ✅ Untuk super admin
+     // ✅✅ Untuk super admin
     // show detail pelajaran dan semua absennya
     public function show($id) {
         
-        $absen = AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran', 'guru.kelas', 'kelas')
+        $absen = AbsensiPelajaran::with('mataPelajaran', 'guru.kelas', 'kelas')
             ->where('guru_pengajar_id', $id)
             ->orderBy('hari', 'desc')
             ->get();
@@ -76,7 +76,7 @@ class AbsensiPelajaranController extends Controller
         // Kelompokkan berdasarkan mata_pelajaran_id
         $grouped = $absen->groupBy('guru_pengajar_id')->map(function ($item) {
             $namaGuru = $item->first()->guru->nama ?? null;
-            $namaPelajaran = $item->first()->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
+            $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
             $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
     
             return [
@@ -102,13 +102,17 @@ class AbsensiPelajaranController extends Controller
     }
 
     /**
-     * ✅ Untuk pegawai
+     * ✅✅ Untuk pegawai
      */
     public function store(Request $request)
     {
         Carbon::setLocale('id');
 
         $pegawai = Auth::guard('kepegawaian')->user();
+
+        if ($pegawai->role != 'guru') {
+            return ApiResponse::error('Tidak valid', ['pesan' => 'Anda bukan guru']);
+        }
 
         try {
             $validated = $request->validate([                
@@ -121,6 +125,10 @@ class AbsensiPelajaranController extends Controller
 
             // ambil id pada jadwal pelajaran
             $mataPelajaran = JadwalPelajaran::with('mataPelajaran')->where('guru_id', $pegawai->id)->first();
+
+            if ($mataPelajaran == null) {
+                return ApiResponse::error('Tidak valid', ['pesan' => 'Anda belum memiliki jadwal pelajaran']);
+            }
 
             $kelas = Kelas::where('id', $validated['kelas_id'])->first();
 
@@ -146,7 +154,7 @@ class AbsensiPelajaranController extends Controller
                 ]
             );
 
-            $absensi->load('jadwalPelajaran.mataPelajaran', 'jadwalPelajaran.kelas','guru');
+            $absensi->load('jadwalPelajaran.mataPelajaran', 'kelas', 'guru');
 
             $jumlahHadir = AbsensiPelajaran::where('guru_pengajar_id', $absensi->guru_pengajar_id)
             ->where('status', 'hadir')
@@ -159,8 +167,8 @@ class AbsensiPelajaranController extends Controller
             return ApiResponse::success([
                 'id' => $absensi->id ?? null,
                 'guru_pengajar_id' => $absensi->guru->nama ?? null,                
-                'mata_pelajaran_id' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,               
-                'kelas' => $absensi->jadwalPelajaran->kelas->nama_kelas ?? null,
+                'mata_pelajaran_id' => $mataPelajaran->mataPelajaran->nama_pelajaran ?? null,               
+                'kelas' => $kelas->nama_kelas ?? null,
                 'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
                 'jam' => $absensi->jam,
                 'status' => $absensi->status ?? null,       
@@ -168,22 +176,22 @@ class AbsensiPelajaranController extends Controller
                     'hadir' => $jumlahHadir,
                     'tidak_hadir' => $jumlahTidakHadir
                 ]
-            ], 'Data absensi pelajaran '.$absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran.' berhasil dibuat');
+            ], 'Data absensi pelajaran '.$mataPelajaran->mataPelajaran->nama_pelajaran.' berhasil dibuat');
 
         } catch (ValidationException $e) {
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);
         }
     }
 
-    // ✅ show all absen sendiri (untuk pegawai)
+    // ✅✅ show all absen sendiri (untuk pegawai)
     public function showAbsenPelajaranSendiri() {
         // ambil id user sekarang
         $user = Auth::guard('kepegawaian')->user();
 
-        $absen = AbsensiPelajaran::with('jadwalPelajaran.mataPelajaran', 'guru', 'kelas')
+        $absen = AbsensiPelajaran::with('mataPelajaran', 'guru', 'kelas')
             ->where('guru_pengajar_id', $user->id)
             ->orderBy('hari', 'desc')
-            ->get();
+            ->get();        
 
         if ($absen->isEmpty()) {
             return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
@@ -192,8 +200,8 @@ class AbsensiPelajaranController extends Controller
         // Kelompokkan berdasarkan kelas_id
         $grouped = $absen->groupBy('guru_pengajar_id')->map(function ($item) {
             $namaGuru = $item->first()->guru->nama ?? null;
-            $namaPelajaran = $item->first()->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null;
             $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
+            $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
     
             return [
                 'guru_pengajar_id' => $item->first()->guru_pengajar_id ?? null,
@@ -218,7 +226,7 @@ class AbsensiPelajaranController extends Controller
     }
 
     /**
-     * ✅ untuk super admin
+     * ✅✅ untuk super admin
      */
     public function update(Request $request, string $id)
     {
@@ -236,7 +244,7 @@ class AbsensiPelajaranController extends Controller
         ]);        
 
         $absensi->update($validated);
-        $absensi->load('jadwalPelajaran.mataPelajaran', 'guru', 'kelas');    
+        $absensi->load('mataPelajaran', 'guru', 'guru.kelas');    
 
         // hitung jumlah hadir/tidak hadir khusus guru ini
         $jumlahHadir = AbsensiPelajaran::where('guru_pengajar_id', $absensi->guru_pengajar_id)
@@ -250,8 +258,8 @@ class AbsensiPelajaranController extends Controller
         return ApiResponse::success([
             'id' => $absensi->id ?? null,
             'guru_pengajar' => $absensi->guru->nama ?? null,                
-            'mata_pelajaran' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,                
-            'kelas' => $absensi->kelas->nama_kelas ?? null,                
+            'mata_pelajaran' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
+            'kelas' => $absensi->guru->kelas->nama_kelas ?? null,                
             'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,
             'jam' => $absensi->jam ?? null,       
             'status' => $absensi->status ?? null,       

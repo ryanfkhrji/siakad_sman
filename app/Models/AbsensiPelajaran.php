@@ -17,6 +17,11 @@ class AbsensiPelajaran extends Model
         return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');
     }
 
+    public function mataPelajaran()
+    {
+        return $this->belongsTo(MataPelajaran::class, 'jadwal_pelajaran_id');
+    }
+
     public function guru()
     {
         return $this->belongsTo(Kepegawaian::class, 'guru_pengajar_id');

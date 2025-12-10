@@ -75,6 +75,11 @@ class AbsensiPegawaiController extends Controller
 
             $mataPelajaran = JadwalPelajaran::where('guru_id', $pegawai->id)->first();
 
+            // cek apakah sudah memiliki jadwal
+            if ($mataPelajaran == null && $pegawai->role == 'guru') {
+                return ApiResponse::error('Not valid', ['pesan' => 'Anda belum memiliki jadwal pelajaran']);
+            }
+
             // gabisa absen 2x pada hari yang sama
             $hari = AbsensiPegawai::where('guru_id', $pegawai->id)
             ->whereDate('hari', today())
@@ -87,7 +92,7 @@ class AbsensiPegawaiController extends Controller
             $absensi = AbsensiPegawai::create(
                 [
                     'guru_id' => $pegawai->id,
-                    'mata_pelajaran_id' => $mataPelajaran->mata_pelajaran_id,
+                    'mata_pelajaran_id' => $mataPelajaran->mata_pelajaran_id ?? null,
                     'hari' => Carbon::today()->toDateString(),
                     'status' => $validated['status']
                 ]

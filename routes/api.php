@@ -175,7 +175,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/pegawai/absensi/sekolah/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
     Route::get('/pegawai/absensi/sekolah/export', [AbsensiPegawaiController::class, 'export']);
     
-    // ✅ Absensi Pelajaran
+    // ! ✅ Absensi Pelajaran (baca readme)
     Route::apiResource('/pegawai/absensi/pelajaran', AbsensiPelajaranController::class)->only('store');
     Route::get('/pegawai/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
     Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
