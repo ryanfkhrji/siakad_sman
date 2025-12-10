@@ -112,6 +112,9 @@ import DetailAbsensiPegawai from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAb
 import DataAbsensiPelajaran from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPelajaran";
 import DetailAbsensiPelajaran from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiPelajaran/DetailAbsensiPelajaran";
 import DataAbsensiPelajaranGuru from "@/pages/Guru/Absensi/Pelajaran";
+import DataAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiSiswa";
+import DetailAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiSiswa/DetailAbsensiSiswa";
+import EditAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiSiswa/EditAbsensiSiswa";
 
 export default function AppRoutes() {
   return (
@@ -804,6 +807,32 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DetailAbsensiPelajaran />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Absensi Siswa */}
+        <Route
+          path="/superadmin/informasi-laporan-umum/absensi-siswa"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataAbsensiSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-laporan-umum/absensi-siswa/detail/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DetailAbsensiSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-laporan-umum/absensi-siswa/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditAbsensiSiswa />
             </ProtectedRoute>
           }
         />
