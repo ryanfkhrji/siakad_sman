@@ -29,4 +29,10 @@ class Prestasi extends Model
     {
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
+
+    public function nilaiSiswa()
+    {
+        return $this->hasMany(DataNilaiSiswa::class, 'prestasi_id');
+    }
+
 }

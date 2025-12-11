@@ -26,6 +26,7 @@ use App\Models\Ekstrakurikuler;
 use App\Models\Siswa;
 use App\Models\SiswaJadwalPelajaran;
 use App\Models\EkskulSiswaPivot;
+use App\Models\DataNilaiSiswa;
 
 class DatabaseSeeder extends Seeder
 {
@@ -480,7 +481,40 @@ class DatabaseSeeder extends Seeder
                 'kelas_id' => 2,
                 'jurusan_id' => 2,
                 'prestasi_diraih' => 'Juara 2 lomba renang tingkat kabupaten',
+            ],
+            [
+                'siswa_id' => 2,
+                'kelas_id' => 1,
+                'jurusan_id' => 1,
+                'prestasi_diraih' => 'Rangking satu umum angkatan 2021',
             ]
         ]);
+        
+        // Seed Data Nilai Siswa
+        DataNilaiSiswa::insert([
+            [
+                'siswa_id' => 1,
+                'kelas_id' => 2,
+                'jurusan_id' => 2,
+                'prestasi_id' => 1,
+                'point_absensi' => 78.5,
+                'point_tugas' => 80.0,
+                'point_uts' => 90.5,
+                'point_uas' => 88.5,
+                'point_ekskul' => 78.5,
+            ],
+            [
+                'siswa_id' => 2,
+                'kelas_id' => 1,
+                'jurusan_id' => 1,
+                'prestasi_id' => 2,
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 88,
+                'point_ekskul' => 78,
+            ]
+        ]);
+
     }
 }

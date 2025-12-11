@@ -130,7 +130,7 @@ class AbsensiSiswaController extends Controller
                     'mata_pelajaran_id' => $validated['mata_pelajaran_id'],
                     'hari' => Carbon::today()->toDateString(),
                     'status' => $validated['status'],
-                    'bukti' => $validated['bukti']
+                    'bukti' => $validated['bukti'] ?? null
                 ]
             );
 

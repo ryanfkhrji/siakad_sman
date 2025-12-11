@@ -112,6 +112,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
+    
+    // ! ✅ Data Nilai Siswa
+    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class);   
+
 
     // ✅ Absensi Pegawai Ke Sekolah
     Route::get('/spa/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
