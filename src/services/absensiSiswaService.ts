@@ -192,9 +192,7 @@ export const absensiSiswaService = {
 getMataPelajaran: async (): Promise<ApiResponse<MataPelajaran[]>> => {
   try {
     const response = await api.get("/siswa/jadwal-pelajaran/all/diri");
-
-    console.log("🔍 Full Response:", response.data);
-
+    
     if (response.data.status === "success" && Array.isArray(response.data.data)) {
       // Validasi dan filter data
       const validData = response.data.data
