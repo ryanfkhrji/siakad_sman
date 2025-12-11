@@ -21,6 +21,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\EkskulSiswaPivotController;
 use App\Http\Controllers\AbsensiPegawaiController;
 use App\Http\Controllers\AbsensiPelajaranController;
+use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\AbsensiSiswaController;
 use App\Http\Controllers\PsbController;
 use App\Http\Controllers\CacheCleanerController;
@@ -127,6 +128,11 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/spa/absensi/siswa/pelajaran/zip', [AbsensiSiswaController::class, 'exportBerkasZip']);
     Route::delete('/spa/absensi/siswa/pelajaran/destroy/{id?}', [AbsensiSiswaController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/siswa/pelajaran', AbsensiSiswaController::class)->except('store', 'destroy');  
+    
+    // ✅ Keuangan
+    Route::delete('/spa/keuangan/destroy/{id?}', [KeuanganController::class, 'destroyData']);
+    Route::get('/spa/keuangan/export', [KeuanganController::class, 'exportExcel']);
+    Route::apiResource('/spa/keuangan', KeuanganController::class)->except('destroy');  
 
     // ✅ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
@@ -175,7 +181,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/pegawai/absensi/sekolah/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
     Route::get('/pegawai/absensi/sekolah/export', [AbsensiPegawaiController::class, 'export']);
     
-    // ! ✅ Absensi Pelajaran (baca readme)
+    // ✅ Absensi Pelajaran (baca readme)
     Route::apiResource('/pegawai/absensi/pelajaran', AbsensiPelajaranController::class)->only('store');
     Route::get('/pegawai/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
     Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);

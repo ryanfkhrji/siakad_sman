@@ -15,6 +15,7 @@ use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use App\Models\AbsensiPegawai;
 use App\Models\AbsensiPelajaran;
+use App\Models\Keuangan;
 use App\Models\AbsensiSiswa;
 use App\Models\Prestasi;
 use App\Models\Kelas;
@@ -338,6 +339,22 @@ class DatabaseSeeder extends Seeder
                 'status' => 'tidak hadir'
             ],
             
+        ]);
+
+        // Keuangan
+        Keuangan::insert([
+            [
+                'nama_akun' => 'TU',
+                'debit' => 0, // nambah
+                'kredit' => 20000, // ngurang
+                'keterangan' => 'Beli ATK'
+            ],
+            [
+                'nama_akun' => 'Rina',
+                'debit' => 50000,
+                'kredit' => 0,
+                'keterangan' => 'Bayaran SPP'
+            ],
         ]);
 
         // Seed Ekstrakurikuler
