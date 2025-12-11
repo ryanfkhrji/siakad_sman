@@ -115,6 +115,8 @@ import DataAbsensiPelajaranGuru from "@/pages/Guru/Absensi/Pelajaran";
 import DataAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiSiswa";
 import DetailAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiSiswa/DetailAbsensiSiswa";
 import EditAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiSiswa/EditAbsensiSiswa";
+import DataAbsensiPelajaranSiswa from "@/pages/Siswa/Absensi/Pelajaran";
+import CreateAbsensiPelajaranSiswa from "@/pages/Siswa/Absensi/Pelajaran/CreateAbsensiPelajaranSiswa";
 
 export default function AppRoutes() {
   return (
@@ -1000,6 +1002,24 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["siswa"]}>
               <EditProfileSiswa />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Absensi Pelajaran */}
+        <Route
+          path="/siswa/data-absensi/pelajaran"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <DataAbsensiPelajaranSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/siswa/data-absensi/pelajaran/create"
+          element={
+            <ProtectedRoute roles={["siswa"]}>
+              <CreateAbsensiPelajaranSiswa />
             </ProtectedRoute>
           }
         />

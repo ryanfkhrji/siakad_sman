@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import LogoSekolah from "@/assets/logo-sekolah.jpg";
+import LogoSekolah from "@/assets/logo-sekolah-42.png";
 import { useAuthStore } from "@/store/authStore";
 import Swal from "sweetalert2";
 
@@ -121,8 +121,8 @@ export function SidebarSiswa({ isCollapsed, setIsCollapsed }: { isCollapsed: boo
 
                   {/* Data Absensi */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/siswa/data-absensi") && "bg-primary text-white font-medium")}>
-                      <Link to="/siswa/data-absensi" className="flex items-center gap-2">
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/siswa/data-absensi/pelajaran") && "bg-primary text-white font-medium")}>
+                      <Link to="/siswa/data-absensi/pelajaran" className="flex items-center gap-2">
                         <CalendarCheck className="h-4 w-4" />
                         {!isCollapsed && <span>Data Absensi</span>}
                       </Link>

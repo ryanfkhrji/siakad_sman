@@ -46,33 +46,32 @@ const DataAbsensiPelajaranGuru = () => {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
-      const response = await absensiPelajaranService.getAllSelf();
+        setLoading(true);
 
-      if (response.status === "success" && response.data.length > 0) {
-        const firstData = response.data[0];
-        setNamaGuru(firstData.nama_guru);
-        setMengajar(firstData.mengajar);
-        setWaliKelas(firstData.wali_kelas || "-");
-        setTotalHadir(firstData.total_hadir);
-        setTotalTidakHadir(firstData.total_tidak_hadir);
-        setDataAbsensi(firstData.absensi);
+        // Fetch kelas dulu (independent)
+        const kelasData = await absensiPelajaranService.getKelas();
+        setAvailableKelas(kelasData);
 
-        const kelas = await absensiPelajaranService.getKelas();
-        setAvailableKelas(kelas);
-      }
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        setDataAbsensi([]);
-        // Jika belum ada absensi, set wali kelas sebagai satu-satunya pilihan
-        if (waliKelas && waliKelas !== "-") {
-          setAvailableKelas([{ id: 1, nama: waliKelas }]);
+        // Fetch absensi
+        const response = await absensiPelajaranService.getAllSelf();
+
+        if (response.status === "success" && response.data.length > 0) {
+            const firstData = response.data[0];
+            setNamaGuru(firstData.nama_guru);
+            setMengajar(firstData.mengajar);
+            setWaliKelas(firstData.wali_kelas || "-");
+            setTotalHadir(firstData.total_hadir);
+            setTotalTidakHadir(firstData.total_tidak_hadir);
+            setDataAbsensi(firstData.absensi);
         }
-      }
+    } catch (error: any) {
+        if (error.response?.status === 404) {
+            setDataAbsensi([]);
+        }
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   // Set current date
   useEffect(() => {

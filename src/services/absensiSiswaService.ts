@@ -1,5 +1,6 @@
 import api from "@/api/axios";
-import type { AbsensiSiswa } from "@/types/absensiSiswa";
+import type { MataPelajaran } from "@/types";
+import type { AbsensiSiswa, CreateAbsensiSiswaRequest, CreateAbsensiSiswaResponse, AbsensiSiswaSelf } from "@/types/absensiSiswa";
 
 interface ApiResponse<T> {
   status: string;
@@ -155,4 +156,98 @@ export const absensiSiswaService = {
   },
 
   // ========== SISWA SELF SERVICE ==========
+  /**
+   * Mengambil semua absensi pelajaran siswa yang sedang login
+   * GET /siswa/absensi/pelajaran/all/self
+   */
+  getAllSelf: async (): Promise<ApiResponse<AbsensiSiswaSelf>> => {
+    const response = await api.get("/siswa/absensi/pelajaran/all/self");
+    return response.data;
+  },
+
+  /**
+   * Membuat absensi pelajaran baru (siswa)
+   * POST /siswa/absensi/pelajaran
+   * Body: mata_pelajaran_id, status, bukti (file, optional)
+   */
+  create: async (data: CreateAbsensiSiswaRequest): Promise<ApiResponse<CreateAbsensiSiswaResponse>> => {
+    const formData = new FormData();
+
+    formData.append("mata_pelajaran_id", data.mata_pelajaran_id.toString());
+    formData.append("status", data.status);
+
+    if (data.bukti) {
+      formData.append("bukti", data.bukti);
+    }
+
+    const response = await api.post("/siswa/absensi/pelajaran", formData);
+    return response.data;
+  },
+
+  /**
+   * ✅ UPDATED: Ambil mata pelajaran dari endpoint yang sudah ada
+   * GET /siswa/jadwal-pelajaran/all/diri
+   */
+    // services/absensiSiswaService.ts
+getMataPelajaran: async (): Promise<ApiResponse<MataPelajaran[]>> => {
+  try {
+    const response = await api.get("/siswa/jadwal-pelajaran/all/diri");
+
+    console.log("🔍 Full Response:", response.data);
+
+    if (response.data.status === "success" && Array.isArray(response.data.data)) {
+      // Validasi dan filter data
+      const validData = response.data.data
+        .filter((item: any) => {
+          if (!item.mata_pelajaran_id) {
+            console.warn("⚠️ Missing mata_pelajaran_id:", item);
+            return false;
+          }
+          return true;
+        })
+        .map((item: any) => ({
+          pivot_id: item.pivot_id,
+          mata_pelajaran_id: item.mata_pelajaran_id,
+          nama_pelajaran: item.nama_pelajaran,
+        }));
+
+      if (validData.length === 0) {
+        throw new Error("Tidak ada mata pelajaran dengan ID valid. Silakan hubungi admin untuk memastikan jadwal sudah diatur dengan benar.");
+      }
+
+      return {
+        status: response.data.status,
+        message: response.data.message,
+        data: validData
+      };
+    }
+
+    throw new Error("Invalid response structure");
+  } catch (error: any) {
+    console.error("❌ Error fetching mata pelajaran:", error);
+    throw error;
+  }
+},
+
+  /**
+   * Export absensi sendiri ke Excel
+   * GET /siswa/absensi/pelajaran/export
+   * Query params: SELALU gunakan format ids[] (array)
+   * - Semua data: tanpa query params
+   * - Beberapa data: ?ids[]=3&ids[]=5&ids[]=10
+   * - Satu data: ?ids[]=7
+   */
+  exportSelf: async (ids?: number[]): Promise<Blob> => {
+    let url = "/siswa/absensi/pelajaran/export";
+
+    if (ids && ids.length > 0) {
+      const params = ids.map((id) => `ids[]=${id}`).join("&");
+      url += `?${params}`;
+    }
+
+    const response = await api.get(url, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
 };
