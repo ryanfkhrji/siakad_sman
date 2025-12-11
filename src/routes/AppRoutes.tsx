@@ -117,6 +117,10 @@ import DetailAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbse
 import EditAbsensiSiswa from "@/pages/SuperAdmin/InformasiLaporanUmum/DataAbsensi/AbsensiSiswa/EditAbsensiSiswa";
 import DataAbsensiPelajaranSiswa from "@/pages/Siswa/Absensi/Pelajaran";
 import CreateAbsensiPelajaranSiswa from "@/pages/Siswa/Absensi/Pelajaran/CreateAbsensiPelajaranSiswa";
+import DataKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan";
+import CreateKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/CreateKeuangan";
+import EditKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/EditKeuangan";
+import DetailKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/DetailKeuangan";
 
 export default function AppRoutes() {
   return (
@@ -835,6 +839,40 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditAbsensiSiswa />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Keuangan */}
+        <Route
+          path="/superadmin/informasi-laporan-umum/data-keuangan"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataKeuangan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-laporan-umum/data-keuangan/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateKeuangan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-laporan-umum/data-keuangan/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditKeuangan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-laporan-umum/data-keuangan/detail/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DetailKeuangan />
             </ProtectedRoute>
           }
         />
