@@ -180,52 +180,51 @@ export const absensiSiswaService = {
       formData.append("bukti", data.bukti);
     }
 
-    const response = await api.post("/siswa/absensi/pelajaran", formData);
+    const response = await api.post("/siswa/absensi/pelajaran", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   },
 
-  /**
-   * ✅ UPDATED: Ambil mata pelajaran dari endpoint yang sudah ada
-   * GET /siswa/jadwal-pelajaran/all/diri
-   */
-    // services/absensiSiswaService.ts
-getMataPelajaran: async (): Promise<ApiResponse<MataPelajaran[]>> => {
-  try {
-    const response = await api.get("/siswa/jadwal-pelajaran/all/diri");
-    
-    if (response.data.status === "success" && Array.isArray(response.data.data)) {
-      // Validasi dan filter data
-      const validData = response.data.data
-        .filter((item: any) => {
-          if (!item.mata_pelajaran_id) {
-            console.warn("⚠️ Missing mata_pelajaran_id:", item);
-            return false;
-          }
-          return true;
-        })
-        .map((item: any) => ({
-          pivot_id: item.pivot_id,
-          mata_pelajaran_id: item.mata_pelajaran_id,
-          nama_pelajaran: item.nama_pelajaran,
-        }));
+  getMataPelajaran: async (): Promise<ApiResponse<MataPelajaran[]>> => {
+    try {
+      const response = await api.get("/siswa/jadwal-pelajaran/all/diri");
 
-      if (validData.length === 0) {
-        throw new Error("Tidak ada mata pelajaran dengan ID valid. Silakan hubungi admin untuk memastikan jadwal sudah diatur dengan benar.");
+      if (response.data.status === "success" && Array.isArray(response.data.data)) {
+        // Validasi dan filter data
+        const validData = response.data.data
+          .filter((item: any) => {
+            if (!item.mata_pelajaran_id) {
+              console.warn("⚠️ Missing mata_pelajaran_id:", item);
+              return false;
+            }
+            return true;
+          })
+          .map((item: any) => ({
+            pivot_id: item.pivot_id,
+            mata_pelajaran_id: item.mata_pelajaran_id,
+            nama_pelajaran: item.nama_pelajaran,
+          }));
+
+        if (validData.length === 0) {
+          throw new Error("Tidak ada mata pelajaran dengan ID valid. Silakan hubungi admin untuk memastikan jadwal sudah diatur dengan benar.");
+        }
+
+        return {
+          status: response.data.status,
+          message: response.data.message,
+          data: validData,
+        };
       }
 
-      return {
-        status: response.data.status,
-        message: response.data.message,
-        data: validData
-      };
+      throw new Error("Invalid response structure");
+    } catch (error: any) {
+      console.error("❌ Error fetching mata pelajaran:", error);
+      throw error;
     }
-
-    throw new Error("Invalid response structure");
-  } catch (error: any) {
-    console.error("❌ Error fetching mata pelajaran:", error);
-    throw error;
-  }
-},
+  },
 
   /**
    * Export absensi sendiri ke Excel
