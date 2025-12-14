@@ -196,15 +196,18 @@ class DatabaseSeeder extends Seeder
         MataPelajaran::insert([
             [
                 'nama_pelajaran' => 'IPA',
-                'status' => 'jurusan'
+                'status' => 'jurusan',
+                'nilai_kkm' => 85.5
             ],
             [
                 'nama_pelajaran' => 'Bahasa Indonesia',
-                'status' => 'wajib'
+                'status' => 'wajib',
+                'nilai_kkm' => 75.5
             ],
             [
                 'nama_pelajaran' => 'Bahasa Sunda',
-                'status' => 'pilihan'
+                'status' => 'pilihan',
+                'nilai_kkm' => 90.80
             ],
         ]);        
 
@@ -459,18 +462,22 @@ class DatabaseSeeder extends Seeder
             [
                 'siswa_id' => 1,
                 'ekstrakurikuler_id' => 3,
+                'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 2,
                 'ekstrakurikuler_id' => 1,
+                'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 2,
                 'ekstrakurikuler_id' => 2,
+                'sikap' => 'Cukup'
             ],
             [
                 'siswa_id' => 2,
                 'ekstrakurikuler_id' => 3,
+                'sikap' => 'Kurang'
             ],
         ]);
 
@@ -487,6 +494,12 @@ class DatabaseSeeder extends Seeder
                 'kelas_id' => 1,
                 'jurusan_id' => 1,
                 'prestasi_diraih' => 'Rangking satu umum angkatan 2021',
+            ],
+            [
+                'siswa_id' => 2,
+                'kelas_id' => 1,
+                'jurusan_id' => 1,
+                'prestasi_diraih' => 'Rangking satu kelas',
             ]
         ]);
         
@@ -494,9 +507,6 @@ class DatabaseSeeder extends Seeder
         DataNilaiSiswa::insert([
             [
                 'siswa_id' => 1,
-                'kelas_id' => 2,
-                'jurusan_id' => 2,
-                'prestasi_id' => 1,
                 'point_absensi' => 78.5,
                 'point_tugas' => 80.0,
                 'point_uts' => 90.5,
@@ -505,9 +515,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'siswa_id' => 2,
-                'kelas_id' => 1,
-                'jurusan_id' => 1,
-                'prestasi_id' => 2,
                 'point_absensi' => 90,
                 'point_tugas' => 80,
                 'point_uts' => 70,

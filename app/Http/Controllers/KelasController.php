@@ -278,7 +278,11 @@ class KelasController extends Controller
             }
         }
 
-        $kelas->update($validated);
+        $kelas->update([
+            'nama_kelas' => $validated['nama_kelas'] ?? null,
+            'jam_masuk' => $validated['jam_masuk'] ?? null,
+            'wali_kelas' => $pegawai->id ?? null,
+        ]);
         
         return ApiResponse::success(
             [

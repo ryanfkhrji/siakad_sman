@@ -21,6 +21,9 @@ return new class extends Migration
             $table->foreignId('ekstrakurikuler_id')->constrained('ekstrakurikulers')->onDelete('cascade');
 
             $table->unique(['siswa_id', 'ekstrakurikuler_id']); // mencegah daftar ekskul yang sama > 1x
+
+            $table->enum('sikap', ['Sangat Baik','Baik','Cukup','Kurang'])->nullable();
+
             $table->timestamps();
         });
     }

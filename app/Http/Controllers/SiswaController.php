@@ -317,7 +317,7 @@ class SiswaController extends Controller
     // ✅ get all siswa untuk pegawai
     public function index()
     {
-        $siswa = Siswa::with('kelas.wali', 'ekstrakurikulers', 'jurusan', 'jadwalPelajarans.mataPelajaran')->get();
+        $siswa = Siswa::with('kelas.wali', 'ekstrakurikulers', 'jurusan', 'prestasis','jadwalPelajarans.mataPelajaran')->get();
 
         $formatted = $siswa->map(function ($item) {
             return [
@@ -357,6 +357,12 @@ class SiswaController extends Controller
                         'link_opsional' => $items->link_opsional ?? null,
                     ];
                 }), 
+                'prestasi' => $item->prestasis->map(function ($items) {
+                    return [
+                        'id' => $items->id,
+                        'prestasi_diraih' => $items->prestasis->prestasi_diraih ?? null,
+                    ];
+                }), 
             ];
         });
 
@@ -366,7 +372,7 @@ class SiswaController extends Controller
     // ✅ show siswa untuk pegawai
     public function show($id)
     {
-        $siswa = Siswa::with('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($id);
+        $siswa = Siswa::with('kelas.wali', 'jurusan', 'prestasis','ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($id);
         if (!$siswa) {
             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
@@ -408,6 +414,12 @@ class SiswaController extends Controller
                     'link_opsional' => $item->link_opsional ?? null,
                 ];
             }),  
+            'prestasi' => $item->prestasis->map(function ($items) {
+                return [
+                    'id' => $items->id,
+                    'prestasi_diraih' => $items->prestasis->prestasi_diraih ?? null,
+                ];
+            }), 
         ];
 
         return ApiResponse::success($formatted, 'Detail siswa berhasil diambil');

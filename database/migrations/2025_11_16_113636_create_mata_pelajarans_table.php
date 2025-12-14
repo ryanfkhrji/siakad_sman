@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_pelajaran');
             $table->enum('status', ['wajib', 'pilihan', 'jurusan']);
+            $table->decimal('nilai_kkm', 5, 2)->nullable()->default(0);
             $table->timestamps();
         });
     }

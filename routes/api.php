@@ -18,6 +18,7 @@ use App\Http\Controllers\IdentitasSekolahController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\DataNilaiSiswaController;
 use App\Http\Controllers\EkskulSiswaPivotController;
 use App\Http\Controllers\AbsensiPegawaiController;
 use App\Http\Controllers\AbsensiPelajaranController;
@@ -105,7 +106,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
 
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
-    Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
+    Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class);
     
     // ✅ Tahun Akademik
     Route::apiResource('/spa/tahun-akademik', TahunAkademikController::class);
@@ -113,9 +114,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
     
-    // ! ✅ Data Nilai Siswa
+    // ✅ Data Nilai Siswa
     Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class);   
-
 
     // ✅ Absensi Pegawai Ke Sekolah
     Route::get('/spa/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
@@ -178,7 +178,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/pegawai/ekskul/show/diri', [EkstrakurikulerController::class, 'showEkskulSendiri']);
 
     // ✅ CRUD peserta ekstrakurikuler oleh pegawai
-    Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class)->only(['store', 'destroy']);
+    Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class);
+
+    // ✅ CRUD kompetensi dasar
+    Route::apiResource('/pegawai/kompetensi-dasar', KompetensiDasarController::class)->only(['index', 'show']);
 
      // ✅ Absensi Sekolah
     Route::apiResource('/pegawai/absensi/sekolah', AbsensiPegawaiController::class)->only('store');
@@ -190,8 +193,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/pegawai/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
     Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
     
-
-    // ! show gedung, ruangan, tahun akademik
+    // ✅ Data Nilai Siswa
+    Route::apiResource('/pegawai/data-nilai-siswa', DataNilaiSiswaController::class);   
     // -------------------------------------------------------------------------------------
      
 
@@ -283,7 +286,4 @@ Route::middleware('auth:siswa')->group(function () {
 
     // ✅ siswa hapus diri sendiri dari ekskul
     Route::delete('/siswa/ekstrakurikuler/keluar/{id}', [EkskulSiswaPivotController::class, 'destroySiswa']);
-
-    // ! show gedung, ruangan, tahun akademik
-
 });

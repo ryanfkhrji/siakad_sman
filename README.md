@@ -19,3 +19,14 @@ Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (Res
 
 <!-- done sampe tu -->
 
+SPA
+
+-   Siswa - Ekstrakurikuler (kolom sikap, function update)
+-   Data Nilai Siswa (function CRUD)
+-   Mata Pelajaran (kolom nilai_kkm)
+
+Pegawai
+
+-   Siswa - Ekstrakurikuler (kolom sikap, function update)
+-   Data Nilai Siswa (function CRUD)
+-   Kompetensi Dasar (function show all, detail)

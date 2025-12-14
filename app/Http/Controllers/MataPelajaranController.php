@@ -18,9 +18,10 @@ class MataPelajaranController extends Controller
 
         $formatted = $matpel->map(function ($item) {
             return [
-                'id' => $item->id,
-                'nama_pelajaran' => $item->nama_pelajaran,
-                'status' => $item->status,
+                'id' => $item->id ?? null,
+                'nama_pelajaran' => $item->nama_pelajaran ?? null,
+                'status' => $item->status ?? null,
+                'nilai_kkm' => $item->nilai_kkm ?? null,
             ];
         });
 
@@ -36,19 +37,22 @@ class MataPelajaranController extends Controller
             $validated = $request->validate([
                 'nama_pelajaran' => 'required|string|unique:mata_pelajarans,nama_pelajaran',
                 'status' => 'required|in:wajib,pilihan,jurusan',
+                'nilai_kkm' => 'nullable|numeric',
             ], [
                 'nama_pelajaran.required' => 'Mata pelajaran wajib diisi',
                 'nama_pelajaran.unique' => 'Mata pelajaran sudah ada',
                 'status.required' => 'Status wajib diisi',
                 'status.in' => 'Hanya diantara wajib, pilihan, dan jurusan',
+                'nilai_kkm.numeric' => 'Wajib diisi angka'
             ]);
     
             $matpel = MataPelajaran::create($validated);
             
             return ApiResponse::success([
-                'id' => $matpel->id,
-                'nama_pelajaran' => $matpel->nama_pelajaran,
-                'status' => $matpel->status,
+                'id' => $matpel->id ?? null,
+                'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
+                'status' => $matpel->status ?? null,
+                'nilai_kkm' => $matpel->nilai_kkm ?? null,
             ], 'Mata Pelajaran Berhasil Dibuat');
     
         } catch (ValidationException $e) {
@@ -68,9 +72,10 @@ class MataPelajaranController extends Controller
         }
 
         $formatted = [
-                'id' => $matpel->id,
-                'nama_pelajaran' => $matpel->nama_pelajaran,
-                'status' => $matpel->status,                
+                'id' => $matpel->id ?? null,
+                'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
+                'status' => $matpel->status ?? null,                
+                'nilai_kkm' => $matpel->nilai_kkm ?? null,                
             ];
 
         return ApiResponse::success($formatted, 'Detail mata pelajaran berhasil diambil');
@@ -93,18 +98,24 @@ class MataPelajaranController extends Controller
                 Rule::unique('mata_pelajarans')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
             ],
             'status' => 'sometimes|required',
+            'nilai_kkm' => 'sometimes|numeric',
         ],[
             'nama_pelajaran.required' => 'Nama pelajaran wajib diisi',
             'nama_pelajaran.unique' => 'Nama pelajaran sudah ada',
+
+            'status.required' => 'Status wajib diisi',
+
+            'nilai_kkm.numeric' => 'Wajib diisi angka',
         ]);
 
         $matpel->update($validated);
         
         return ApiResponse::success(
             [
-                'id' => $matpel->id,
-                'nama_pelajaran' => $matpel->nama_pelajaran,
-                'status' => $matpel->status,
+                'id' => $matpel->id ?? null,
+                'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
+                'status' => $matpel->status ?? null,
+                'nilai_kkm' => $matpel->nilai_kkm ?? null,
             ], 'Mata pelajaran berhasil diperbarui');
     }
 

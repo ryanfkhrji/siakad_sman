@@ -15,18 +15,21 @@ return new class extends Migration
             $table->id();
 
             // Relasi
-            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
+            $table->foreignId('siswa_id')->unique()->constrained('siswas')->onDelete('cascade');
 
-            $table->foreignId('kelas_id')->nullable()->constrained('kelas')->nullOnDelete();
-            $table->foreignId('jurusan_id')->nullable()->constrained('jurusans')->nullOnDelete();
-            $table->foreignId('prestasi_id')->nullable()->constrained('prestasi')->onDelete('set null');
+            // karna nilainya tetap per siswa, bisa ambil dari tabel langsung
+            // $table->foreignId('kelas_id')->nullable()->constrained('kelas')->nullOnDelete();
+            // $table->foreignId('jurusan_id')->nullable()->constrained('jurusans')->nullOnDelete();
+
+            // tidak diadakan karna hanya view langsung dari tabel prestasi
+            // $table->foreignId('prestasi_id')->nullable()->constrained('prestasi')->onDelete('set null');
 
             // Point nilai
             $table->decimal('point_absensi', 5, 2)->default(0);
             $table->decimal('point_tugas', 5, 2)->default(0);
             $table->decimal('point_uts', 5, 2)->default(0);
             $table->decimal('point_uas', 5, 2)->default(0);
-            $table->decimal('point_ekskul', 5, 2)->default(0);
+            $table->decimal('point_ekskul', 5, 2)->nullable()->default(0);
 
             $table->timestamps();
         });

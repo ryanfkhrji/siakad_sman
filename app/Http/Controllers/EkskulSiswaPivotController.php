@@ -38,6 +38,7 @@ class EkskulSiswaPivotController extends Controller
                         'nama_siswa' => $sis->nama,
                         'jurusan' => $sis->jurusan->nama_jurusan ?? null,
                         'kelas' => $sis->kelas->nama_kelas ?? null,
+                        'sikap' => $sis->sikap ?? null,
                     ];
                 }), 
             ];
@@ -52,7 +53,7 @@ class EkskulSiswaPivotController extends Controller
     }
 
 
-    // ✅ mendaftarkan siswa oleh super admin
+    // ✅ mendaftarkan siswa oleh spa/guru
     public function store(Request $request)
     {
         try {
@@ -100,7 +101,30 @@ class EkskulSiswaPivotController extends Controller
         }
     }
 
-    // ! tidak ada update
+    // ✅ untuk spa/guru
+    public function update(Request $request, string $id)
+    {
+        $ekskul = EkskulSiswaPivot::with('ekstrakurikuler', 'siswa')->find($id);
+
+        if (!$ekskul) {
+            return ApiResponse::error('Not found', ['id', 'Data tidak ditemukan']);
+        }
+
+        $validated = $request->validate([
+            'sikap' => 'sometimes|nullable|in:Sangat Baik,Baik,Cukup,Kurang',            
+        ],[
+            'sikap.in' => 'Pilihan hanya Sangat Baik, Baik, Cukup, Kurang'
+        ]);       
+
+        $ekskul->update($validated);
+
+        return ApiResponse::success([
+            'ekskul_siswa_pivot_id' => $ekskul->id ?? null,
+            'nama_siswa' => $ekskul->siswa->nama ?? null,
+            'nama_ekskul' => $ekskul->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+            'sikap' => $ekskul->sikap ?? null,
+        ], 'Data berhasil diperbarui');
+    }
 
     // ✅ destroy buat pegawai/pembina oleh super admim
     public function destroy($id)

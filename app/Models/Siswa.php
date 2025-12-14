@@ -53,9 +53,8 @@ class Siswa extends Authenticatable
      *  */ 
     public function ekstrakurikulers()
     {
-        return $this->belongsToMany(Ekstrakurikuler::class, 'ekskul_siswa_pivot');
+        return $this->belongsToMany(Ekstrakurikuler::class, 'ekskul_siswa_pivot')->withPivot('id', 'sikap');
     }
-
 
     // 1 siswa = 1 jurusan
     public function jurusan()
@@ -90,7 +89,11 @@ class Siswa extends Authenticatable
 
     public function nilaiSiswa()
     {
-        return $this->hasMany(DataNilaiSiswa::class, 'siswa_id');
+        return $this->hasOne(DataNilaiSiswa::class, 'siswa_id');
     }
 
+    public function prestasis()
+    {
+        return $this->hasMany(Prestasi::class, 'siswa_id');
+    }
 }
