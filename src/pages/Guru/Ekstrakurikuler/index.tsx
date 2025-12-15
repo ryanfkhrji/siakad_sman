@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import PageTitle from "@/components/PageTitle";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Loader2Icon, UsersIcon, DollarSignIcon, SearchIcon, TrophyIcon, TagIcon, Trash2Icon, UserPlusIcon, CircleXIcon, FilePlus } from "lucide-react";
+import { Loader2Icon, UsersIcon, DollarSignIcon, SearchIcon, TrophyIcon, TagIcon, Trash2Icon, UserPlusIcon, CircleXIcon, FilePlus, PenBoxIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,15 @@ import Footer from "@/pages/Footer";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { SidebarGuru } from "@/components/SidebarGuru";
+import { Link } from "react-router-dom";
 
 interface Peserta {
-  id_pivot: number;
-  id: number;
+  pivot_id: number | null;
+  siswa_id: number;
   nama_siswa: string;
-  jurusan: string;
-  kelas: string;
+  jurusan: string | null;
+  kelas: string | null;
+  sikap: string | null;
 }
 
 interface DataEkskul {
@@ -130,7 +132,7 @@ const DetailEkskulGuru = () => {
   };
 
   // Handle delete peserta
-  const handleDelete = async (idPivot: number, namaSiswa: string) => {
+  const handleDelete = async (pivot_id: number, namaSiswa: string) => {
     const result = await Swal.fire({
       title: "Konfirmasi Hapus",
       text: `Apakah Anda yakin ingin menghapus ${namaSiswa} dari ekstrakurikuler ini?`,
@@ -144,7 +146,7 @@ const DetailEkskulGuru = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await api.delete(`/pegawai/siswa/ekskul/${idPivot}`);
+      const res = await api.delete(`/pegawai/siswa/ekskul/${pivot_id}`);
 
       if (res.data.status === "success") {
         Swal.fire({
@@ -160,7 +162,7 @@ const DetailEkskulGuru = () => {
           if (!prev) return prev;
           return {
             ...prev,
-            peserta: prev.peserta.filter((p) => p.id_pivot !== idPivot),
+            peserta: prev.peserta.filter((p) => p.pivot_id !== pivot_id),
             jumlah_peserta: prev.jumlah_peserta - 1,
           };
         });
@@ -388,6 +390,7 @@ const DetailEkskulGuru = () => {
                         <TableHead className="font-semibold text-white">Nama Siswa</TableHead>
                         <TableHead className="font-semibold text-white">Jurusan</TableHead>
                         <TableHead className="font-semibold text-white">Kelas</TableHead>
+                        <TableHead className="font-semibold text-white">Sikap</TableHead>
                         <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -395,13 +398,30 @@ const DetailEkskulGuru = () => {
                     <TableBody>
                       {paginated.length > 0 ? (
                         paginated.map((peserta, index) => (
-                          <TableRow key={peserta.id_pivot} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                          <TableRow key={peserta.pivot_id || index} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                             <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                             <TableCell>{peserta.nama_siswa ?? "-"}</TableCell>
                             <TableCell>{peserta.jurusan ?? "-"}</TableCell>
                             <TableCell>{peserta.kelas ?? "-"}</TableCell>
-                            <TableCell className="flex justify-center">
-                              <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(peserta.id_pivot, peserta.nama_siswa)}>
+                            <TableCell>{peserta.sikap ?? "-"}</TableCell>
+                            <TableCell className="flex justify-center gap-1">
+                              <Link
+                                to={`/guru/ekstrakurikuler/edit-siswa/${peserta.pivot_id}`}
+                                state={{
+                                  siswaData: {
+                                    ekskul_siswa_pivot_id: peserta.pivot_id ?? null,
+                                    siswa_id: peserta.siswa_id,
+                                    nama_siswa: peserta.nama_siswa,
+                                    sikap: peserta.sikap ?? null,
+                                  },
+                                }}
+                              >
+                                <Button size={"sm"}>
+                                  <PenBoxIcon size={16} />
+                                </Button>
+                              </Link>
+
+                              <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(peserta.pivot_id || 0, peserta.nama_siswa)}>
                                 <Trash2Icon size={16} />
                               </Button>
                             </TableCell>

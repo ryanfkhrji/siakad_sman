@@ -123,6 +123,7 @@ import EditKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/EditK
 import DetailKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/DetailKeuangan";
 import EditEkskulSiswaSikap from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/EditEkskulSiswaSikap";
 import KompetensiDasar from "@/pages/Guru/KompetensiDasar";
+import EditEkskulSikapSiswaPegawai from "@/pages/Guru/Ekstrakurikuler/EditEkskulSikapSiswaPegawai";
 
 export default function AppRoutes() {
   return (
@@ -966,6 +967,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["guru"]}>
               <DetailEkskulGuru />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guru/ekstrakurikuler/edit-siswa/:id"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <EditEkskulSikapSiswaPegawai />
             </ProtectedRoute>
           }
         />
