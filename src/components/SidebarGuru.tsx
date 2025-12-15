@@ -1,5 +1,5 @@
 import { SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@/components/ui/sidebar";
-import { Home, GraduationCap, ClipboardList, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Menu, Users, CalendarDays, BookOpen, DoorOpen, ClipboardCheck, IdCard, ChevronDown, TrophyIcon } from "lucide-react";
+import { Home, GraduationCap, ClipboardList, Settings, LogOut, PanelLeftClose, PanelLeftOpen, Menu, Users, CalendarDays, BookOpen, DoorOpen, ClipboardCheck, IdCard, ChevronDown, TrophyIcon, Layers } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -128,6 +128,16 @@ export function SidebarGuru({ isCollapsed, setIsCollapsed }: { isCollapsed: bool
                       <Link to="/guru/informasi-akademik/data-akademik" className="flex items-center gap-2">
                         <GraduationCap className="h-4 w-4" />
                         {!isCollapsed && <span>Data Akademik</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  {/* Data Kompetensi Dasar */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={cn("hover:bg-primary rounded-md py-2 px-3", location.pathname.includes("/guru/kompetensi-dasar") && "bg-primary text-white font-medium")}>
+                      <Link to="/guru/kompetensi-dasar" className="flex items-center gap-2">
+                        <Layers className="h-4 w-4" />
+                        {!isCollapsed && <span>Kompetensi Dasar</span>}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

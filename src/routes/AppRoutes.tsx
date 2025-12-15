@@ -122,6 +122,7 @@ import CreateKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/Cre
 import EditKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/EditKeuangan";
 import DetailKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/DetailKeuangan";
 import EditEkskulSiswaSikap from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/EditEkskulSiswaSikap";
+import KompetensiDasar from "@/pages/Guru/KompetensiDasar";
 
 export default function AppRoutes() {
   return (
@@ -983,6 +984,16 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["guru"]}>
               <DataAbsensiPelajaranGuru />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Kompetensi Dasar */}
+        <Route
+          path="/guru/kompetensi-dasar"
+          element={
+            <ProtectedRoute roles={["guru"]}>
+              <KompetensiDasar />
             </ProtectedRoute>
           }
         />
