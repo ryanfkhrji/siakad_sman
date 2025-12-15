@@ -15,7 +15,9 @@ interface FormErrors {
 }
 
 interface SiswaEkskulData {
-  ekskul_siswa_pivot_id: number;
+  ekskul_siswa_pivot_id?: number | null;
+  siswa_id: number;
+  ekstrakurikuler_id: string;
   nama_siswa: string;
   nama_ekskul: string;
   sikap: string | null;
@@ -24,11 +26,13 @@ interface SiswaEkskulData {
 const EditEkskulSiswaSikap = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = useParams();
+  const { id: siswa_id } = useParams();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pivotId, setPivotId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 🔥 Ambil data siswa dari navigation state
+  // Ambil data siswa dari navigation state
   const siswaData = location.state?.siswaData as SiswaEkskulData | null;
 
   const [formData, setFormData] = useState({
@@ -37,25 +41,63 @@ const EditEkskulSiswaSikap = () => {
 
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // 🔥 Validasi jika data tidak ada (user akses langsung via URL)
+  // Fetch pivot ID berdasarkan siswa_id dan ekstrakurikuler_id
   useEffect(() => {
-    if (!siswaData || !id) {
-      Swal.fire({
-        icon: "error",
-        title: "Data Tidak Ditemukan",
-        text: "Silakan kembali ke halaman daftar siswa",
-      }).then(() => {
-        navigate("/superadmin/informasi-akademik/ekstrakurikuler");
-      });
-    }
-  }, [siswaData, id, navigate]);
+    const fetchPivotId = async () => {
+      if (!siswaData || !siswa_id) {
+        Swal.fire({
+          icon: "error",
+          title: "Data Tidak Ditemukan",
+          text: "Silakan kembali ke halaman daftar siswa",
+        }).then(() => {
+          navigate("/superadmin/informasi-akademik/ekstrakurikuler");
+        });
+        return;
+      }
 
-  // 🔥 Handle submit untuk update sikap
+      // Jika pivot_id sudah ada dari state, gunakan langsung
+      if (siswaData.ekskul_siswa_pivot_id) {
+        setPivotId(siswaData.ekskul_siswa_pivot_id);
+        setIsLoading(false);
+        return;
+      }
+
+      // Jika pivot_id tidak ada, fetch dari API
+      try {
+        setIsLoading(true);
+
+        const res = await api.get(`/spa/ekstrakurikuler/${siswaData.ekstrakurikuler_id}`);
+
+        if (res.data.status === "success") {
+          const peserta = res.data.data.peserta.find((p: any) => p.siswa_id === Number(siswa_id));
+
+          if (peserta?.id_pivot) {
+            setPivotId(peserta.id_pivot);
+          } else {
+            Swal.fire({
+              icon: "warning",
+              title: "Data Tidak Lengkap",
+              text: "Pivot ID tidak ditemukan. Silakan hubungi administrator.",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching pivot ID:", error);
+        Swal.fire("Error", "Gagal mengambil data. Silakan coba lagi.", "error");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPivotId();
+  }, [siswaData, siswa_id, navigate]);
+
+  // Handle submit untuk update sikap
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!id) {
-      Swal.fire("Error", "ID tidak valid", "error");
+    if (!siswa_id || !siswaData) {
+      Swal.fire("Error", "Data tidak valid", "error");
       return;
     }
 
@@ -64,12 +106,16 @@ const EditEkskulSiswaSikap = () => {
       return;
     }
 
+    if (!pivotId) {
+      Swal.fire("Error", "Pivot ID tidak ditemukan. Hubungi administrator.", "error");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrors({});
 
     try {
-      // 🔥 Endpoint PUT untuk update sikap
-      const res = await api.put(`/spa/siswa/ekskul/${id}`, {
+      const res = await api.put(`/spa/siswa/ekskul/${pivotId}`, {
         sikap: formData.sikap,
       });
 
@@ -81,16 +127,12 @@ const EditEkskulSiswaSikap = () => {
           timer: 2000,
           showConfirmButton: false,
         });
-
-        // Kembali ke halaman sebelumnya
         navigate(-1);
       } else {
         Swal.fire("Gagal!", res.data.message || "Gagal memperbarui data", "error");
       }
     } catch (err: any) {
       console.error("Error updating data:", err);
-
-      // Handle validation errors dari backend
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors);
       } else {
@@ -101,8 +143,8 @@ const EditEkskulSiswaSikap = () => {
     }
   };
 
-  // 🔥 Jika data tidak ada, tampilkan loading (akan redirect oleh useEffect)
-  if (!siswaData) {
+  // 🔥 Loading state
+  if (isLoading || !siswaData) {
     return (
       <SidebarProvider>
         <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
@@ -166,9 +208,12 @@ const EditEkskulSiswaSikap = () => {
                 {errors.sikap && <p className="text-red-500 text-sm mt-1">{errors.sikap[0]}</p>}
               </div>
 
+              {/* Info Pivot ID (Optional - for debugging) */}
+              {!pivotId && <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm text-yellow-800">⚠️ Pivot ID tidak ditemukan. Pastikan backend mengirim id_pivot.</div>}
+
               {/* Tombol */}
               <div className="flex gap-2">
-                <Button type="submit" disabled={isSubmitting} className="bg-primary flex items-center gap-2">
+                <Button type="submit" disabled={isSubmitting || !pivotId} className="bg-primary flex items-center gap-2">
                   {isSubmitting ? (
                     <>
                       <Loader2Icon className="animate-spin" size={18} />

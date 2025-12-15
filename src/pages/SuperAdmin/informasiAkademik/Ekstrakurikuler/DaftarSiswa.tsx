@@ -13,8 +13,8 @@ import api from "@/api/axios";
 import Swal from "sweetalert2";
 
 interface Peserta {
-  id_pivot: number | null;
-  id: number;
+  pivot_id: number | null;
+  siswa_id: number;
   nama_siswa: string;
   jurusan: string | null;
   kelas: string | null;
@@ -46,6 +46,7 @@ const DaftarSiswa = () => {
 
       // Ambil detail ekskul berdasarkan ID dari URL
       const resEkskul = await api.get(`/spa/ekstrakurikuler/${id}`);
+
       if (resEkskul.data.status !== "success") {
         Swal.fire({
           icon: "error",
@@ -60,12 +61,14 @@ const DaftarSiswa = () => {
       // 🔸 Langsung mapping dari response backend (id_pivot sudah ada dari backend)
       const pesertaData =
         selectedEkskul?.peserta?.map((p: any) => ({
-          id_pivot: p.id_pivot ?? null,
-          id: p.id,
+          pivot_id: p.pivot_id ?? null,
+          siswa_id: p.siswa_id, // ✅ TAMBAHKAN fallback ke p.id
           nama_siswa: p.nama_siswa ?? "-",
           jurusan: p.jurusan ?? "-",
           kelas: p.kelas ?? "-",
+          sikap: p.sikap ?? null,
         })) || [];
+
 
       const formattedData: SiswaEkskul = {
         id: selectedEkskul.id,
@@ -238,7 +241,7 @@ const DaftarSiswa = () => {
                   <TableBody>
                     {paginated.length > 0 ? (
                       paginated.map((siswa, index) => (
-                        <TableRow key={siswa.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                        <TableRow key={siswa.siswa_id || siswa.pivot_id || `siswa-${index}`} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{siswa.nama_siswa}</TableCell>
                           <TableCell>{siswa.jurusan}</TableCell>
@@ -246,13 +249,14 @@ const DaftarSiswa = () => {
                           <TableCell>{siswa.sikap || "-"}</TableCell>
                           <TableCell className="flex justify-center gap-1">
                             <Link
-                              to={`/superadmin/informasi-akademik/ekstrakurikuler/edit-siswa/${siswa.id_pivot}`}
+                              to={`/superadmin/informasi-akademik/ekstrakurikuler/edit-siswa/${siswa.pivot_id}`}
                               state={{
                                 siswaData: {
-                                  ekskul_siswa_pivot_id: siswa.id_pivot,
+                                  ekskul_siswa_pivot_id: siswa.pivot_id ?? null,
+                                  siswa_id: siswa.siswa_id,
                                   nama_siswa: siswa.nama_siswa,
-                                  nama_ekskul: ekskul?.nama_ekskul,
-                                  sikap: siswa.sikap,
+                                  nama_ekskul: ekskul?.nama_ekskul ?? "",
+                                  sikap: siswa.sikap ?? null,
                                 },
                               }}
                             >
@@ -261,7 +265,7 @@ const DaftarSiswa = () => {
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.id_pivot)}>
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.pivot_id)} disabled={!siswa.pivot_id}>
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>
