@@ -17,7 +17,7 @@ class EkskulSiswaPivot extends Model
 
     public function ekstrakurikuler()
     {
-        return $this->belongsTo(Ekstrakurikuler::class);
+        return $this->belongsTo(Ekstrakurikuler::class, 'ekstrakurikuler_id');
     }
     
     public function siswa()

@@ -15,7 +15,7 @@ class EkstrakurikulerController extends Controller
     // ✅ get all ekskul
     public function index()
     {
-        $ekskul = Ekstrakurikuler::with('siswas.pengajar')->withCount('siswas')->get();
+        $ekskul = Ekstrakurikuler::with('siswas.pengajar', 'peserta', 'siswas.ekstrakurikulers')->withCount('siswas')->get();
 
         $formatted = $ekskul->map(function ($item) {
             return [
@@ -25,12 +25,18 @@ class EkstrakurikulerController extends Controller
                 'anggaran' => $item->anggaran,
                 'status' => $item->status,
                 'jumlah_peserta' => $item->siswas->count(),
-                'peserta' => $item->siswas->map(function ($siswa) {
+                'peserta' => $item->siswas->map(function ($siswa) use ($item) {
+                    // ambil ekstrakurikuler yg sesuai
+                    $ekskulSiswa = $siswa->ekstrakurikulers
+                    ->where('id', $item->id)
+                    ->first();
                     return [
-                        'id' => $siswa->id,
+                        'siswa_id' => $siswa->id,
+                        'pivot_id' => $ekskulSiswa?->pivot?->id,
                         'nama_siswa' => $siswa->nama,
                         'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
                         'kelas' => $siswa->kelas->nama_kelas ?? null,
+                        'sikap' => $ekskulSiswa?->pivot?->sikap
                     ];
                 }),
 
@@ -45,7 +51,7 @@ class EkstrakurikulerController extends Controller
     {
         $pegawai = Auth::guard('kepegawaian')->user();
 
-        $ekskul = Ekstrakurikuler::with(['siswas','peserta'])
+        $ekskul = Ekstrakurikuler::with(['siswas','peserta', 'siswas.ekstrakurikulers'])
             ->where('pengajar_id', $pegawai->id)
             ->withCount('siswas')
             ->first();
@@ -60,13 +66,17 @@ class EkstrakurikulerController extends Controller
             'jumlah_peserta' => $ekskul->siswas_count,
             'anggaran' => $ekskul->anggaran,
             'status' => $ekskul->status,
-            'peserta' => $ekskul->siswas->map(function ($siswa) {
+            'peserta' => $ekskul->siswas->map(function ($siswa) use ($ekskul) {
+                $ekskulSiswa = $siswa->ekstrakurikulers
+                    ->where('id', $ekskul->id)
+                    ->first();
                 return [
-                    'id_pivot' => $siswa->pivot->id,
-                    'id' => $siswa->id,
+                    'siswa_id' => $siswa->id,
+                    'pivot_id' => $ekskulSiswa?->pivot?->id,
                     'nama_siswa' => $siswa->nama,
                     'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
                     'kelas' => $siswa->kelas->nama_kelas ?? null,
+                    'sikap' => $ekskulSiswa?->pivot?->sikap
                 ];
             }),
 
@@ -78,7 +88,7 @@ class EkstrakurikulerController extends Controller
     // ✅ show detail ekskul untuk pegawai
     public function show($id)
     {
-        $ekskul = Ekstrakurikuler::with('siswas.pengajar')
+        $ekskul = Ekstrakurikuler::with('siswas.pengajar', 'peserta', 'siswas.ekstrakurikulers')
             ->withCount('siswas')
             ->find($id);
 
@@ -93,13 +103,17 @@ class EkstrakurikulerController extends Controller
             'jumlah_peserta' => $ekskul->siswas_count,
             'anggaran' => $ekskul->anggaran,
             'status' => $ekskul->status,
-            'peserta' => $ekskul->siswas->map(function ($siswa) {
+            'peserta' => $ekskul->siswas->map(function ($siswa) use ($ekskul) {
+                $ekskulSiswa = $siswa->ekstrakurikulers
+                    ->where('id', $ekskul->id)
+                    ->first();
                 return [
-                    'id_pivot' => $siswa->pivot->id,
-                    'id' => $siswa->id,
+                    'siswa_d' => $siswa->id,
+                    'pivot_id' => $ekskulSiswa?->pivot?->id,
                     'nama_siswa' => $siswa->nama,
                     'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
                     'kelas' => $siswa->kelas->nama_kelas ?? null,
+                    'sikap' => $ekskulSiswa?->pivot?->sikap
                 ];
             }),
 

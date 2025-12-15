@@ -34,6 +34,6 @@ class Ekstrakurikuler extends Model
     // untuk menampilkan anggota ekskul pada pivotcontroller
     public function peserta()
     {
-        return $this->hasMany(EkskulSiswaPivot::class);
+        return $this->hasMany(EkskulSiswaPivot::class, 'ekstrakurikuler_id');
     }
 }
