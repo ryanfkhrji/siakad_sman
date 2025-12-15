@@ -83,6 +83,7 @@ export interface Ekskul {
   anggaran: number;
   status: string;
   jumlah_peserta: number;
+  sikap: string | null;
   peserta: Siswa[];
 }
 

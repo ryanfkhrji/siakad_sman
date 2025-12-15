@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon, SearchIcon, Loader2Icon, ArrowLeft } from "lucide-react";
+import { Trash2Icon, SearchIcon, Loader2Icon, ArrowLeft, PenBoxIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ interface Peserta {
   nama_siswa: string;
   jurusan: string | null;
   kelas: string | null;
+  sikap: string | null;
 }
 
 interface SiswaEkskul {
@@ -230,6 +231,7 @@ const DaftarSiswa = () => {
                       <TableHead className="font-semibold text-white">Nama Siswa</TableHead>
                       <TableHead className="font-semibold text-white">Jurusan</TableHead>
                       <TableHead className="font-semibold text-white">Kelas</TableHead>
+                      <TableHead className="font-semibold text-white">Sikap</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -241,7 +243,24 @@ const DaftarSiswa = () => {
                           <TableCell>{siswa.nama_siswa}</TableCell>
                           <TableCell>{siswa.jurusan}</TableCell>
                           <TableCell>{siswa.kelas}</TableCell>
-                          <TableCell className="flex justify-center">
+                          <TableCell>{siswa.sikap || "-"}</TableCell>
+                          <TableCell className="flex justify-center gap-1">
+                            <Link
+                              to={`/superadmin/informasi-akademik/ekstrakurikuler/edit-siswa/${siswa.id_pivot}`}
+                              state={{
+                                siswaData: {
+                                  ekskul_siswa_pivot_id: siswa.id_pivot,
+                                  nama_siswa: siswa.nama_siswa,
+                                  nama_ekskul: ekskul?.nama_ekskul,
+                                  sikap: siswa.sikap,
+                                },
+                              }}
+                            >
+                              <Button size={"sm"}>
+                                <PenBoxIcon size={16} />
+                              </Button>
+                            </Link>
+
                             <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.id_pivot)}>
                               <Trash2Icon size={16} />
                             </Button>

@@ -121,6 +121,7 @@ import DataKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan";
 import CreateKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/CreateKeuangan";
 import EditKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/EditKeuangan";
 import DetailKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/DetailKeuangan";
+import EditEkskulSiswaSikap from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/EditEkskulSiswaSikap";
 
 export default function AppRoutes() {
   return (
@@ -610,6 +611,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DaftarSiswa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/ekstrakurikuler/edit-siswa/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditEkskulSiswaSikap />
             </ProtectedRoute>
           }
         />
