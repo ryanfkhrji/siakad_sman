@@ -108,7 +108,7 @@ class EkstrakurikulerController extends Controller
                     ->where('id', $ekskul->id)
                     ->first();
                 return [
-                    'siswa_d' => $siswa->id,
+                    'siswa_id' => $siswa->id,
                     'pivot_id' => $ekskulSiswa?->pivot?->id,
                     'nama_siswa' => $siswa->nama,
                     'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
