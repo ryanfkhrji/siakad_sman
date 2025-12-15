@@ -156,6 +156,7 @@ const DataMataPelajaran = () => {
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">Nama Mata Pelajaran</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
+                      <TableHead className="font-semibold text-white">Nilai KKM</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -167,6 +168,7 @@ const DataMataPelajaran = () => {
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{mapel.nama_pelajaran}</TableCell>
                           <TableCell>{mapel.status}</TableCell>
+                          <TableCell>{mapel.nilai_kkm}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
                             {/* <DialogDetailJurusan jurusanId={jurusan.id} /> */}

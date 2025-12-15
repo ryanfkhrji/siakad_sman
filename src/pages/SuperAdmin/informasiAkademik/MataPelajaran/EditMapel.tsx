@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 interface FormErrors {
   nama_pelajaran: string;
   status: string;
+  nilai_kkm?: string[];
 }
 
 const EditMataPelajaran = () => {
@@ -22,11 +23,13 @@ const EditMataPelajaran = () => {
   const [formData, setFormData] = useState({
     nama_pelajaran: "",
     status: "",
+    nilai_kkm: 0,
   });
 
   const [errors, setErrors] = useState<FormErrors>({
     nama_pelajaran: "",
     status: "",
+    nilai_kkm: [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -41,6 +44,7 @@ const EditMataPelajaran = () => {
       setFormData({
         nama_pelajaran: data.nama_pelajaran,
         status: data.status,
+        nilai_kkm: data.nilai_kkm,
       });
     } catch {
       Swal.fire({
@@ -58,7 +62,7 @@ const EditMataPelajaran = () => {
   // HANDLE SUBMIT UPDATE
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors({ nama_pelajaran: "", status: "" });
+    setErrors({ nama_pelajaran: "", status: "", nilai_kkm: [] });
     setLoading(true);
 
     try {
@@ -189,6 +193,22 @@ const EditMataPelajaran = () => {
                 </Select>
 
                 {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
+              </div>
+
+              {/* Nilai KKM */}
+              <div className="mb-6">
+                <label htmlFor="nilai_kkm" className="block font-semibold text-foreground">
+                  Nilai KKM
+                </label>
+                <input
+                  type="number"
+                  name="nilai_kkm"
+                  placeholder="cth: 75"
+                  value={formData.nilai_kkm}
+                  onChange={(e) => setFormData({ ...formData, nilai_kkm: Number(e.target.value) })}
+                  className="border p-2 w-full mt-2 rounded"
+                />
+                {errors.nilai_kkm && <p className="text-red-500 text-sm mt-1">{errors.nilai_kkm[0]}</p>}
               </div>
 
               {/* Tombol Aksi */}

@@ -41,6 +41,7 @@ export interface MataPelajaran {
   id: number;
   nama_pelajaran: string;
   status: string;
+  nilai_kkm: number;
 }
 
 export interface JadwalPelajaran {
