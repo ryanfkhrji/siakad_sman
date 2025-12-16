@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
 
             // Relasi
-            $table->foreignId('siswa_id')->unique()->constrained('siswas')->onDelete('cascade');
+            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
+            $table->foreignId('mata_pelajaran_id')->constrained('mata_pelajarans');
 
             // karna nilainya tetap per siswa, bisa ambil dari tabel langsung
             // $table->foreignId('kelas_id')->nullable()->constrained('kelas')->nullOnDelete();
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->decimal('point_uts', 5, 2)->default(0);
             $table->decimal('point_uas', 5, 2)->default(0);
             $table->decimal('point_ekskul', 5, 2)->nullable()->default(0);
+            $table->enum('sikap', ['Sangat Baik','Baik','Cukup','Kurang'])->nullable();
 
             $table->timestamps();
         });

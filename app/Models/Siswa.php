@@ -81,7 +81,6 @@ class Siswa extends Authenticatable
         return $this->belongsToMany(JadwalPelajaran::class, 'siswa_jadwal_pelajaran');
     }
 
-
     public function absensis()
     {
         return $this->hasMany(AbsensiSiswa::class, 'siswa_id'); 

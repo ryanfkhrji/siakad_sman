@@ -25,6 +25,11 @@ class Kelas extends Model
         return $this->belongsTo(Kepegawaian::class, 'wali_kelas');
     }
 
+    public function jurusan()
+    {
+        return $this->belongsTo(Jurusan::class, 'jurusan_id');
+    }
+
     /**
      * Satu kelas = banyak siswa
      * id = kelas_id pada tabel kelas

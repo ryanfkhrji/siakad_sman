@@ -26,6 +26,11 @@ class SiswaJadwalPelajaran extends Pivot
         return $this->belongsTo(Siswa::class, 'siswa_id');
     }
 
+    public function jurusan()
+    {
+        return $this->belongsTo(Jurusan::class, 'jurusan_id');
+    }   
+
     public function jadwal()
     {
         return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');

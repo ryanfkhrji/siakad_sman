@@ -15,14 +15,15 @@ class KelasController extends Controller
     // ✅ show all kelas oleh super admin
     public function index()
     {
-        $kelas = Kelas::with('wali')->withCount('siswa')->get();
+        $kelas = Kelas::with('wali', 'jurusan')->withCount('siswa')->get();
 
         $formatted = $kelas->map(function ($item) {
             return [
-                'id' => $item->id,
-                'nama_kelas' => $item->nama_kelas,
-                'jam_masuk' => $item->jam_masuk,
-                'jumlah_siswa' => $item->siswa_count,
+                'id' => $item->id ?? null,
+                'nama_kelas' => $item->nama_kelas ?? null,
+                'nama_jurusan' => $item->jurusan->nama_jurusan ?? null,
+                'jam_masuk' => $item->jam_masuk ?? null,
+                'jumlah_siswa' => $item->siswa_count ?? null,
                 'wali_kelas' => [
                     'id' => $item->wali->id ?? null,
                     'nama' => $item->wali->nama ?? null,
@@ -38,7 +39,7 @@ class KelasController extends Controller
     // ✅ show kelas oleh super admin
     public function show($id)
     {
-        $kelas = Kelas::with('siswa.jurusan', 'wali')
+        $kelas = Kelas::with('siswa.jurusan', 'wali', 'jurusan')
             ->withCount('siswa')
             ->find($id);
 
@@ -49,6 +50,7 @@ class KelasController extends Controller
         $formatted = [
                 'id' => $kelas->id,
                 'nama_kelas' => $kelas->nama_kelas,
+                'jurusan' => $kelas->jurusan->nama_jurusan,
                 'jam_masuk' => $kelas->jam_masuk,                
                 'jumlah_siswa' => $kelas->siswa_count,                
                 'wali' => [
@@ -75,7 +77,7 @@ class KelasController extends Controller
     {
         $siswa = Auth::guard('siswa')->user();
 
-        $kelas = Kelas::with('siswa.jurusan', 'wali')
+        $kelas = Kelas::with('siswa.jurusan', 'wali', 'jurusan')
             ->withCount('siswa')
             ->find($siswa->kelas_id);
 
@@ -84,10 +86,11 @@ class KelasController extends Controller
         }
 
         $formatted = [
-                'id' => $kelas->id,
-                'nama_kelas' => $kelas->nama_kelas,
-                'jam_masuk' => $kelas->jam_masuk,                
-                'jumlah_siswa' => $kelas->siswa_count,                
+                'id' => $kelas->id ?? null,
+                'nama_kelas' => $kelas->nama_kelas ?? null,
+                'nama_jurusan' => $kelas->jurusan->nama_jurusan ?? null,
+                'jam_masuk' => $kelas->jam_masuk ?? null,                
+                'jumlah_siswa' => $kelas->siswa_count ?? null,                
                 'wali' => [
                     'id' => $kelas->wali->id ?? null,
                     'nama' => $kelas->wali->nama ?? null,
@@ -103,7 +106,7 @@ class KelasController extends Controller
     {
         $pegawai = Auth::guard('kepegawaian')->user();
 
-        $kelas = Kelas::with('siswa.jurusan', 'wali')
+        $kelas = Kelas::with('siswa.jurusan', 'wali', 'jurusan')
             ->withCount('siswa')
             ->where('wali_kelas', $pegawai->id)
             ->first();
@@ -113,10 +116,11 @@ class KelasController extends Controller
         }
 
         $formatted = [
-            'id' => $kelas->id,
-            'nama_kelas' => $kelas->nama_kelas,
-            'jam_masuk' => $kelas->jam_masuk,
-            'jumlah_siswa' => $kelas->siswa_count,
+            'id' => $kelas->id ?? null,
+            'nama_kelas' => $kelas->nama_kelas ?? null,
+            'nama_jurusan' => $kelas->jurusan->nama_jurusan ?? null,
+            'jam_masuk' => $kelas->jam_masuk ?? null,
+            'jumlah_siswa' => $kelas->siswa_count ?? null,
             'wali' => [
                 'id' => $kelas->wali->id ?? null,
                 'nama' => $kelas->wali->nama ?? null,
@@ -145,10 +149,12 @@ class KelasController extends Controller
         try {
             $validated = $request->validate([
                 'nama_kelas' => 'required|string',
+                'jurusan_id' => 'nullable|exists:jurusans,id',
                 'jam_masuk' => 'required|string',
                 'wali_kelas' => 'required|exists:kepegawaians,id|unique:kelas,wali_kelas',
             ], [
                 'nama_kelas.required' => 'Nama kelas wajib diisi',
+                'jurusan_id.exists' => 'Jurusan tidak ditemukan',
                 'jam_masuk.required' => 'Jam masuk wajib diisi',
                 'wali_kelas.required' => 'Wali kelas wajib diisi id guru',
                 'wali_kelas.unique' => 'Tidak bisa, guru ini sudah menjadi wali kelas',
@@ -166,11 +172,12 @@ class KelasController extends Controller
             }
     
             $kelas = Kelas::create($validated);
-            $kelas->load('wali');
+            $kelas->load('wali', 'jurusan');
             
             return ApiResponse::success([
                 'id' => $kelas->id,
                 'nama_kelas' => $kelas->nama_kelas,
+                'nama_jurusan' => $kelas->jurusan->nama_jurusan,
                 'jam_masuk' => $kelas->jam_masuk,
                 'wali_kelas' => $kelas->wali_kelas,
                 'wali' => [
@@ -199,6 +206,7 @@ class KelasController extends Controller
                 'required',
                 Rule::unique('kelas')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
             ],
+            'jurusan_id' => 'sometimes|nullable',
             'jam_masuk' => 'sometimes|required',
             'wali_kelas' => [
                 'sometimes',
@@ -224,13 +232,15 @@ class KelasController extends Controller
         }
 
         $kelas->update($validated);
+        $kelas->load('jurusan');
         
         return ApiResponse::success(
             [
-                'id' => $kelas->id,
-                'nama_kelas' => $kelas->nama_kelas,
-                'jam_masuk' => $kelas->jam_masuk,
-                'wali_kelas' => $kelas->wali_kelas,
+                'id' => $kelas->id ?? null,
+                'nama_kelas' => $kelas->nama_kelas ?? null,
+                'nama_jurusan' => $kelas->jurusan->nama_jurusan ?? null,
+                'jam_masuk' => $kelas->jam_masuk ?? null,
+                'wali_kelas' => $kelas->wali_kelas ?? null,
             ], 'Kelas berhasil diperbarui');
     }
 
@@ -254,6 +264,7 @@ class KelasController extends Controller
                 'required',
                 Rule::unique('kelas')->ignore($pegawai->id) // Periksa semua unik kecuali yang sedang diedit
             ],
+            'jurusan_id' => 'sometimes|nullable',
             'jam_masuk' => 'sometimes|required',
             'wali_kelas' => [
                 'sometimes',
@@ -280,16 +291,20 @@ class KelasController extends Controller
 
         $kelas->update([
             'nama_kelas' => $validated['nama_kelas'] ?? null,
+            'jurusan_id' => $validated['jurusan_id'] ?? null,
             'jam_masuk' => $validated['jam_masuk'] ?? null,
             'wali_kelas' => $pegawai->id ?? null,
         ]);
+
+        $kelas->load('jurusan');
         
         return ApiResponse::success(
             [
-                'id' => $kelas->id,
-                'nama_kelas' => $kelas->nama_kelas,
-                'jam_masuk' => $kelas->jam_masuk,
-                'wali_kelas' => $kelas->wali->nama,
+                'id' => $kelas->id ?? null,
+                'nama_kelas' => $kelas->nama_kelas ?? null,
+                'nama_jurusan' => $kelas->jurusan->nama_jurusan ?? null,
+                'jam_masuk' => $kelas->jam_masuk ?? null,
+                'wali_kelas' => $kelas->wali->nama ?? null,
             ], 'Kelas berhasil diperbarui');
     }
 

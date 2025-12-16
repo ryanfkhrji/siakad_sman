@@ -16,7 +16,7 @@ class SiswaJadwalPelajaranController extends Controller
      */
     public function index()
     {
-        $jadwal = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas', 'siswas'])->get();
+        $jadwal = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas', 'siswas', 'jurusan'])->get();
 
         $formatted = $jadwal->map(function ($item) {
             return [
@@ -50,7 +50,7 @@ class SiswaJadwalPelajaranController extends Controller
         try {
             $validated = $request->validate([
                 'siswa_id' => 'required|exists:siswas,id',
-                'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajarans,id'
+                'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajarans,id',
             ],[
                 'siswa_id.required' => 'Siswa wajib diisi',
                 'siswa_id.exists' => 'Siswa tidak ditemukan',
@@ -71,7 +71,7 @@ class SiswaJadwalPelajaranController extends Controller
 
             $jadwalPivot = SiswaJadwalPelajaran::create($validated);
 
-            $jadwalPivot->load('siswa', 'jadwal.mataPelajaran');
+            $jadwalPivot->load('siswa', 'jadwal.mataPelajaran', 'jurusan');
             
             return ApiResponse::success([
                 'id' => $jadwalPivot->id ?? null,

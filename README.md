@@ -18,3 +18,17 @@ Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (Res
 ## Cara Penggunaan Frontend
 
 <!-- done sampe tu -->
+
+<!-- Untuk SPA dan Pegawai -->
+
+-   Kelas (kolom jurusan_id)
+-   guru - pelajaran atau jadwal-pelajaran (kolom jurusan_id)
+-   dataNilaiSiswa (CRUD)
+-   Penambahan mata_pelajaran_id dan sikap pada create dataNilaiSiswa
+
+
+
+
+1 guru = 1 matpel
+1 matpel = 2 jurusan => B.Indo ada di jurusan IPA dan IPS
+1 matpel = banyak kelas => B.Indo di kelas X, XI, XII

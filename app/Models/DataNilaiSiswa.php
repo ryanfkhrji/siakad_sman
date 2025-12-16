@@ -34,4 +34,11 @@ class DataNilaiSiswa extends Model
      {
          return $this->belongsTo(Prestasi::class, 'prestasi_id');
      }
+
+     // Prestasi (opsional)
+     public function mataPelajaran()
+     {
+         return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
+     }     
+     
 }

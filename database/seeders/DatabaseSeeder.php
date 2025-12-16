@@ -276,11 +276,13 @@ class DatabaseSeeder extends Seeder
         Kelas::insert([
             [
                 'nama_kelas' => 'X IPA',
+                'jurusan_id' => 1,
                 'jam_masuk' => '07:00',
                 'wali_kelas' => 5, // ID dari kepegawaian guru
             ],
             [
                 'nama_kelas' => 'X IPS',
+                'jurusan_id' => 2,
                 'jam_masuk' => '07:00',
                 'wali_kelas' => 6,
             ],
@@ -290,6 +292,7 @@ class DatabaseSeeder extends Seeder
         JadwalPelajaran::insert([
             [
                 'mata_pelajaran_id' => 1,
+                'jurusan_id' => 1,
                 'hari' => 'Senin',
                 'guru_id' => 5,
                 'kelas_id' => 1,
@@ -299,6 +302,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'mata_pelajaran_id' => 2,
+                'jurusan_id' => 2,
                 'hari' => 'Selasa',
                 'guru_id' => 6,
                 'kelas_id' => 2,
@@ -417,11 +421,11 @@ class DatabaseSeeder extends Seeder
         SiswaJadwalPelajaran::insert([
             [
                 'siswa_id' => 1, // Andi
-                'jadwal_pelajaran_id' => 2 // B.Indonesia
+                'jadwal_pelajaran_id' => 2, // B.Indonesia
             ],
             [
                 'siswa_id' => 2, // Rina
-                'jadwal_pelajaran_id' => 1 // IPA
+                'jadwal_pelajaran_id' => 1, // IPA
             ],
         ]);
 
@@ -506,20 +510,24 @@ class DatabaseSeeder extends Seeder
         // Seed Data Nilai Siswa
         DataNilaiSiswa::insert([
             [
+                'mata_pelajaran_id' => 1,
                 'siswa_id' => 1,
                 'point_absensi' => 78.5,
                 'point_tugas' => 80.0,
                 'point_uts' => 90.5,
                 'point_uas' => 88.5,
                 'point_ekskul' => 78.5,
+                'sikap' => 'Sangat Baik'
             ],
             [
+                'mata_pelajaran_id' => 2,
                 'siswa_id' => 2,
                 'point_absensi' => 90,
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 88,
                 'point_ekskul' => 78,
+                'sikap' => 'Cukup'
             ]
         ]);
 

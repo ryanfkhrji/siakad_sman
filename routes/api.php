@@ -114,8 +114,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
     
-    // ✅ Data Nilai Siswa
-    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class);   
+    // ! ✅ Data Nilai Siswa
+    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');   
 
     // ✅ Absensi Pegawai Ke Sekolah
     Route::get('/spa/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
@@ -193,8 +193,9 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/pegawai/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
     Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
     
-    // ✅ Data Nilai Siswa
-    Route::apiResource('/pegawai/data-nilai-siswa', DataNilaiSiswaController::class);   
+    // ! ✅ Data Nilai Siswa
+    Route::apiResource('/pegawai/data-nilai-siswa', DataNilaiSiswaController::class)->except('destroy');   
+    Route::delete('/pegawai/data-nilai-siswa/destroy/{id?}', [DataNilaiSiswaController::class, 'destroyData']);
     // -------------------------------------------------------------------------------------
      
 

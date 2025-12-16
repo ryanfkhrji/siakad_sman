@@ -19,6 +19,9 @@ return new class extends Migration
                 ->constrained('mata_pelajarans')
                 ->cascadeOnDelete(); // hapus ini jika mata_pelajaran dihapus
 
+            $table->foreignId('jurusan_id')->nullable()->constrained('jurusans')->nullOnDelete();
+            
+            
             $table->string('hari');
 
             // relasi ke tabel kepegawaians (guru)

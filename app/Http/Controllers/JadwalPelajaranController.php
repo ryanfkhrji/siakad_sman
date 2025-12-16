@@ -15,18 +15,19 @@ class JadwalPelajaranController extends Controller
      */
     public function index()
     {
-        $jadwal = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas', 'siswas'])->get();
+        $jadwal = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas', 'siswas', 'jurusan'])->get();
 
         $formatted = $jadwal->map(function ($item) {
             return [
-                'id' => $item->id,
-                'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran,
-                'hari' => $item->hari,
-                'guru' => $item->guru->nama,
-                'kelas' => $item->kelas->nama_kelas,
-                'jam_pelajaran' => $item->jam_pelajaran,
-                'ruangan' => $item->ruangan,
-                'link_opsional' => $item->link_opsional,
+                'id' => $item->id ?? null,
+                'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                'jurusan_pelajaran' => $item->jurusan->nama_jurusan ?? null,
+                'hari' => $item->hari ?? null,
+                'guru' => $item->guru->nama ?? null,
+                'kelas' => $item->kelas->nama_kelas ?? null,
+                'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                'ruangan' => $item->ruangan ?? null,
+                'link_opsional' => $item->link_opsional ?? null,
                 'peserta' => $item->siswas->map(function ($siswa) {
                     return [
                         'id' => $siswa->id,
@@ -49,6 +50,7 @@ class JadwalPelajaranController extends Controller
         try {
             $validated = $request->validate([
                 'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
+                'jurusan_id' => 'nullable|exists:jurusans,id',
                 'hari' => 'required',
                 'guru_id' => 'required|exists:kepegawaians,id',
                 'kelas_id' => 'required|exists:kelas,id',
@@ -58,6 +60,7 @@ class JadwalPelajaranController extends Controller
             ], [
                 'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
                 'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
+                'jurusan_id.exists' => 'Jurusan tidak ditemukan',
                 'hari.required' => 'Hari wajib diisi',
                 'guru_id.required' => 'Guru wajib diisi',
                 'guru_id.exists' => 'Guru tidak ditemukan',
@@ -98,17 +101,18 @@ class JadwalPelajaranController extends Controller
     
             $matpel = JadwalPelajaran::create($validated);
             
-            $matpel->load('mataPelajaran', 'guru', 'kelas');
+            $matpel->load('mataPelajaran', 'guru', 'kelas', 'jurusan');
             
             return ApiResponse::success([
-                'id' => $matpel->id,
-                'mata_pelajaran' => $matpel->mataPelajaran->nama_pelajaran,
-                'hari' => $matpel->hari,
-                'guru' => $matpel->guru->nama,
-                'kelas' => $matpel->kelas->nama_kelas,
-                'jam_pelajaran' => $matpel->jam_pelajaran,
-                'ruangan' => $matpel->ruangan,
-                'link_opsional' => $matpel->link_opsional,
+                'id' => $matpel->id ?? null,
+                'mata_pelajaran' => $matpel->mataPelajaran->nama_pelajaran ?? null,
+                'jurusan_pelajaran' => $matpel->jurusan->nama_jurusan ?? null,
+                'hari' => $matpel->hari ?? null,
+                'guru' => $matpel->guru->nama ?? null,
+                'kelas' => $matpel->kelas->nama_kelas ?? null,
+                'jam_pelajaran' => $matpel->jam_pelajaran ?? null,
+                'ruangan' => $matpel->ruangan ?? null,
+                'link_opsional' => $matpel->link_opsional ?? null,
             ], 'Jadwal Pelajaran Berhasil Dibuat');
     
         } catch (ValidationException $e) {
@@ -121,25 +125,27 @@ class JadwalPelajaranController extends Controller
      */
     public function show(string $id)
     {
-        $matpel = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas', 'siswas'])->find($id);
+        $matpel = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas', 'siswas', 'jurusan'])->find($id);
 
         if (!$matpel) {
             return ApiResponse::error('Jadwal pelajaran tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
         $formatted = [
-            'id' => $matpel->id,
-            'mata_pelajaran' => $matpel->mataPelajaran->nama_pelajaran,
-            'hari' => $matpel->hari,
-            'guru' => $matpel->guru->nama,
-            'kelas' => $matpel->kelas->nama_kelas,
-            'jam_pelajaran' => $matpel->jam_pelajaran,
-            'ruangan' => $matpel->ruangan,
-            'link_opsional' => $matpel->link_opsional,    
+            'id' => $matpel->id ?? null,
+            'mata_pelajaran_id' => $matpel->mataPelajaran->id ?? null,
+            'mata_pelajaran' => $matpel->mataPelajaran->nama_pelajaran ?? null,
+            'jurusan_pelajaran' => $matpel->jurusan->nama_jurusan ?? null,
+            'hari' => $matpel->hari ?? null,
+            'guru' => $matpel->guru->nama ?? null,
+            'kelas' => $matpel->kelas->nama_kelas ?? null,
+            'jam_pelajaran' => $matpel->jam_pelajaran ?? null,
+            'ruangan' => $matpel->ruangan ?? null,
+            'link_opsional' => $matpel->link_opsional ?? null,    
             'peserta' => $matpel->siswas->map(function ($siswa) {
                 return [
-                    'id' => $siswa->id,
-                    'nama_siswa' => $siswa->nama,
+                    'id' => $siswa->id ?? null,
+                    'nama_siswa' => $siswa->nama ?? null,
                     'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
                     'kelas' => $siswa->kelas->nama_kelas ?? null,
                 ];
@@ -154,7 +160,7 @@ class JadwalPelajaranController extends Controller
     {
         $pegawai = Auth::guard('kepegawaian')->user();
 
-        $jadwal = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas'])
+        $jadwal = JadwalPelajaran::with(['mataPelajaran', 'guru', 'kelas', 'jurusan'])
             ->where('guru_id', $pegawai->id)
             ->get(); // pakai get kalau guru punya banyak jadwal
 
@@ -166,13 +172,14 @@ class JadwalPelajaranController extends Controller
             'nama' => $pegawai->nama,
             'jadwal' => $jadwal->map(function ($item) {
                 return [
-                    'id' => $item->id,
-                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran,
-                    'hari' => $item->hari,
-                    'kelas' => $item->kelas->nama_kelas,
-                    'jam_pelajaran' => $item->jam_pelajaran,
-                    'ruangan' => $item->ruangan,
-                    'link_opsional' => $item->link_opsional,
+                    'id' => $item->id ?? null,
+                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
+                    'jurusan_pelajaran' => $item->jurusan->nama_jurusan ?? null,
+                    'hari' => $item->hari ?? null,
+                    'kelas' => $item->kelas->nama_kelas ?? null,
+                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
+                    'ruangan' => $item->ruangan ?? null,
+                    'link_opsional' => $item->link_opsional ?? null,
                 ];
             }),
         ];
@@ -192,12 +199,14 @@ class JadwalPelajaranController extends Controller
         }
 
         $validated = $request->validate([
+            'jurusan_id' => 'sometimes|nullable|exists:jurusans,id',
             'hari' => 'sometimes|required',
             'kelas_id' => 'sometimes|required|exists:kelas,id',
             'jam_pelajaran' => 'sometimes|required',
             'ruangan' => 'sometimes|nullable',
             'link_opsional' => 'sometimes|nullable',
         ],[
+            'jurusan_id.exists' => 'Jurusan tidak ditemukan',
             'hari.required' => 'Hari wajib diisi',
             'kelas_id.required' => 'Kelas wajib diisi',
             'kelas_id.exists' => 'Kelas tidak ditemukan',
@@ -206,19 +215,21 @@ class JadwalPelajaranController extends Controller
 
        // guru_id dan mata_pelajaran_id tidak boleh diupdate (karna harus sama)
         $matpel->update([        
-            'hari' => $validated['hari'],
-            'kelas_id' => $validated['kelas_id'],
-            'jam_pelajaran' => $validated['jam_pelajaran'],
-            'ruangan' => $validated['ruangan'],
-            'link_opsional' => $validated['link_opsional'],
+            'jurusan_id' => $validated['jurusan_id'] ?? null,
+            'hari' => $validated['hari'] ?? null,
+            'kelas_id' => $validated['kelas_id'] ?? null,
+            'jam_pelajaran' => $validated['jam_pelajaran'] ?? null,
+            'ruangan' => $validated['ruangan'] ?? null,
+            'link_opsional' => $validated['link_opsional'] ?? null,
         ]);
 
-        $matpel->load(['mataPelajaran', 'guru', 'kelas']);
+        $matpel->load(['mataPelajaran', 'guru', 'kelas', 'jurusan']);
         
         return ApiResponse::success(
             [
                 'id' => $matpel->id,
                 'mata_pelajaran' => $matpel->mataPelajaran->nama_pelajaran,
+                'jurusan_pelajaran' => $matpel->jurusan->nama_jurusan,
                 'hari' => $matpel->hari,
                 'guru' => $matpel->guru->nama,
                 'kelas' => $matpel->kelas->nama_kelas,

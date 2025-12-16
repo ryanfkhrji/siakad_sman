@@ -21,5 +21,4 @@ class MataPelajaran extends Model
     {
         return $this->hasMany(AbsensiPegawai::class, 'mata_pelajaran_id');
     }
-
 }
