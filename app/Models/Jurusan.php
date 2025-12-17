@@ -22,7 +22,7 @@ class Jurusan extends Model
 
     public function nilaiSiswa()
     {
-        return $this->hasMany(DataNilaiSiswa::class, 'jurusan_id');
+        return $this->hasMany(DataNilaiSiswa::class, 'jurusan_pelajaran_id');
     }
 
     public function kelas()

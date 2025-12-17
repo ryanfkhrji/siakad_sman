@@ -26,7 +26,7 @@ class DataNilaiSiswa extends Model
      // Data nilai dimiliki oleh jurusan
      public function jurusan()
      {
-         return $this->belongsTo(Jurusan::class, 'jurusan_id');
+         return $this->belongsTo(Jurusan::class, 'jurusan_pelajaran_id');
      }
  
      // Prestasi (opsional)
@@ -40,5 +40,9 @@ class DataNilaiSiswa extends Model
      {
          return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
      }     
-     
+
+     public function guru()
+     {
+         return $this->belongsTo(Kepegawaian::class, 'guru_id');
+     }     
 }

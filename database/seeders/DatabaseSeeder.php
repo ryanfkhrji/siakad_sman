@@ -292,7 +292,7 @@ class DatabaseSeeder extends Seeder
         JadwalPelajaran::insert([
             [
                 'mata_pelajaran_id' => 1,
-                'jurusan_id' => 1,
+                'jurusan_pelajaran_id' => 1,
                 'hari' => 'Senin',
                 'guru_id' => 5,
                 'kelas_id' => 1,
@@ -302,10 +302,20 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'mata_pelajaran_id' => 2,
-                'jurusan_id' => 2,
+                'jurusan_pelajaran_id' => 2,
                 'hari' => 'Selasa',
                 'guru_id' => 6,
                 'kelas_id' => 2,
+                'jam_pelajaran' => '07:30',
+                'ruangan' => '7.5.6',
+                'link_opsional' => ''
+            ],
+            [
+                'mata_pelajaran_id' => 2,
+                'jurusan_pelajaran_id' => 1,
+                'hari' => 'Rabu',
+                'guru_id' => 6,
+                'kelas_id' => 1,
                 'jam_pelajaran' => '07:30',
                 'ruangan' => '7.5.6',
                 'link_opsional' => ''
@@ -391,7 +401,7 @@ class DatabaseSeeder extends Seeder
         Siswa::insert([
             [
                 'nisn' => '123451',
-                'nama' => 'Andi Siswa IPS Kelas X IPS',
+                'nama' => 'Bagas',
                 'email' => 'andi@gmail.com',
                 'nis' => '123451',
                 'jurusan_id' => 2,
@@ -404,7 +414,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'nisn' => '123452',
-                'nama' => 'Rina Siswa IPA Kelas X IPA',
+                'nama' => 'Winton',
                 'email' => 'rina@gmail.com',
                 'nis' => '123452',
                 'jurusan_id' => 1,
@@ -510,24 +520,40 @@ class DatabaseSeeder extends Seeder
         // Seed Data Nilai Siswa
         DataNilaiSiswa::insert([
             [
-                'mata_pelajaran_id' => 1,
                 'siswa_id' => 1,
+                'mata_pelajaran_id' => 1, // IPA
+                'jurusan_pelajaran_id' => 1,
+                'guru_id' => 5,
                 'point_absensi' => 78.5,
                 'point_tugas' => 80.0,
                 'point_uts' => 90.5,
                 'point_uas' => 88.5,
                 'point_ekskul' => 78.5,
-                'sikap' => 'Sangat Baik'
+                'sikap' => 'Cukup'
             ],
             [
-                'mata_pelajaran_id' => 2,
-                'siswa_id' => 2,
+                'siswa_id' => 2, // Winton
+                'mata_pelajaran_id' => 2, // B. Indo
+                'jurusan_pelajaran_id' => 2,
+                'guru_id' => 6,
                 'point_absensi' => 90,
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 88,
                 'point_ekskul' => 78,
-                'sikap' => 'Cukup'
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 2,
+                'mata_pelajaran_id' => 1,
+                'jurusan_pelajaran_id' => 1,
+                'guru_id' => 5,
+                'point_absensi' => 90,
+                'point_tugas' => 90,
+                'point_uts' => 90,
+                'point_uas' => 90,
+                'point_ekskul' => 90,
+                'sikap' => 'Sangat Baik'
             ]
         ]);
 

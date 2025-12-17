@@ -17,6 +17,8 @@ return new class extends Migration
             // Relasi
             $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
             $table->foreignId('mata_pelajaran_id')->constrained('mata_pelajarans');
+            $table->foreignId('jurusan_pelajaran_id')->constrained('jurusans');
+            $table->foreignId('guru_id')->constrained('kepegawaians');
 
             // karna nilainya tetap per siswa, bisa ambil dari tabel langsung
             // $table->foreignId('kelas_id')->nullable()->constrained('kelas')->nullOnDelete();

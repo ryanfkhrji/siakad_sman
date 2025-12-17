@@ -19,16 +19,18 @@ Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (Res
 
 <!-- done sampe tu -->
 
-<!-- Untuk SPA dan Pegawai -->
+Perbaikan
 
--   Kelas (kolom jurusan_id)
--   guru - pelajaran atau jadwal-pelajaran (kolom jurusan_id)
--   dataNilaiSiswa (CRUD)
--   Penambahan mata_pelajaran_id dan sikap pada create dataNilaiSiswa
+1. Guru - JadwalPelajaran
 
+    - kolom jurusan_id menjadi jurusan_pelajaran_id
+    - penambahan kolom jurusan_pelajaran_id pada create dan update
 
+2. DataNilaiSiswa
+    - Penambahan kolom jurusan_pelajaran_id dan guru_id
+    - Hilangkan kolom mata_pelajaran_id pada create dan tambahkan kolom jurusan_pelajaran_id pada create dan update
 
+Todo
 
-1 guru = 1 matpel
-1 matpel = 2 jurusan => B.Indo ada di jurusan IPA dan IPS
-1 matpel = banyak kelas => B.Indo di kelas X, XI, XII
+1. export dataNilaiSiswa
+2. buat cadangan grouping datanilaisiswa all milik pegawai agar di group berdasarkan jurusan_pelajaran_id (kaya si all punya spa)

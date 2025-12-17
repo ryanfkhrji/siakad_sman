@@ -14,7 +14,68 @@ use Illuminate\Support\Facades\Auth;
 
 class DataNilaiSiswaController extends Controller
 {
-    // ! ✅ filter hanya matpel tertentu
+    // ✅ untuk spa
+    public function All() 
+    {
+        $nilai = DataNilaiSiswa::with('siswa.kelas', 'jurusan', 'siswa.jurusan', 'siswa.prestasis', 'mataPelajaran', 'guru')->get();
+
+        if ($nilai->isEmpty()) {
+            return ApiResponse::error('Not found', ['Data tidak ditemukan']);
+        }
+        
+        $formatted = $nilai
+            ->groupBy(function ($item) {
+                return $item->mata_pelajaran_id . '-' . $item->jurusan_pelajaran_id;
+            })
+            ->map(function ($data) {
+
+                $first = $data->first();
+
+                return [
+                    'mata_pelajaran_id'      => $first->mataPelajaran->id,
+                    'nama_pelajaran'         => $first->mataPelajaran->nama_pelajaran,
+
+                    'jurusan_pelajaran_id'   => $first->jurusan->id,
+                    'nama_jurusan_pelajaran' => $first->jurusan->nama_jurusan,
+
+                    'guru_id'                => $first->guru->id,
+                    'nama_guru'              => $first->guru->nama,
+
+                    'nilai' => $data->map(function ($item) {
+                        return [
+                            'data_nilai_id' => $item->id,
+
+                            'siswa_id'      => $item->siswa->id,
+                            'nama_siswa'    => $item->siswa->nama,
+
+                            'jurusan_siswa_id'   => $item->siswa->jurusan->id,
+                            'nama_jurusan_siswa' => $item->siswa->jurusan->nama_jurusan,
+
+                            'kelas_siswa_id' => $item->siswa->kelas->id,
+                            'nama_kelas_siswa' => $item->siswa->kelas->nama_kelas,
+
+                            'point_absensi' => $item->point_absensi,
+                            'point_tugas'   => $item->point_tugas,
+                            'point_uts'     => $item->point_uts,
+                            'point_uas'     => $item->point_uas,
+                            'point_ekskul'  => $item->point_ekskul,
+                            'sikap'         => $item->sikap,
+
+                            'prestasi' => $item->siswa->prestasis->map(function ($prestasi) {
+                                return [
+                                    'prestasi_id'   => $prestasi->id,
+                                    'nama_prestasi' => $prestasi->prestasi_diraih,
+                                ];
+                            })->values(),
+                        ];
+                    })->values()
+                ];
+            })->values();
+
+        return ApiResponse::success($formatted, ['Data nilai berhasil ditampilkan']);
+    }
+
+    // ✅ filter hanya milik guru tertentu (untuk guru)
     public function index() {
 
         $user = Auth::guard('kepegawaian')->user();
@@ -29,22 +90,28 @@ class DataNilaiSiswaController extends Controller
         
         $formatted = $nilai->map(function ($data) {
             return [
-                'data_nilai_id'     => $data->id ?? null,
-                'siswa_id'          => $data->siswa->id ?? null,
-                'nama_siswa'        => $data->siswa->nama ?? null,
-                'mata_pelajaran_id' => $data->mataPelajaran->id ?? null,
-                'nama_pelajaran'    => $data->mataPelajaran->nama_pelajaran ?? null,
-                'kelas_id'          => $data->siswa->kelas->id ?? null,
-                'nama_kelas'        => $data->siswa->kelas->nama_kelas ?? null,
-                'jurusan_id'        => $data->siswa->jurusan->id ?? null,
-                'nama_jurusan'        => $data->siswa->jurusan->nama_jurusan ?? null,
-        
-                'point_absensi' => $data->point_absensi ?? null,
-                'point_tugas'   => $data->point_tugas ?? null,
-                'point_uts'     => $data->point_uts ?? null,
-                'point_uas'     => $data->point_uas ?? null,
-                'point_ekskul'  => $data->point_ekskul ?? null,
-                'sikap'         => $data->sikap ?? null,
+                'data_nilai_id'     => $data->id,
+
+                'siswa_id'          => $data->siswa->id,
+                'nama_siswa'        => $data->siswa->nama,
+                'jurusan_siswa_id'  => $data->siswa->jurusan->id,
+                'nama_jurusan_siswa'  => $data->siswa->jurusan->nama_jurusan,
+                'kelas_siswa_id'    => $data->siswa->kelas->id,
+                'nama_kelas_siswa'  => $data->siswa->kelas->nama_kelas,
+
+                'mata_pelajaran_id' => $data->mataPelajaran->id,
+                'nama_pelajaran'    => $data->mataPelajaran->nama_pelajaran,
+                'jurusan_pelajaran_id' => $data->jurusan_pelajaran_id,
+                'nama_jurusan_pelajaran' => $data->jurusan->nama_jurusan,
+                'guru_id'           => $data->guru_id,
+                'nama_guru'         => $data->guru->nama,
+
+                'point_absensi' => $data->point_absensi,
+                'point_tugas'   => $data->point_tugas,
+                'point_uts'     => $data->point_uts,
+                'point_uas'     => $data->point_uas,
+                'point_ekskul'  => $data->point_ekskul,
+                'sikap'         => $data->sikap,
 
                 'prestasi' => $data->siswa->prestasis->map(function ($prestasi) {
                     return [
@@ -58,18 +125,19 @@ class DataNilaiSiswaController extends Controller
         return ApiResponse::success($formatted, ['Data nilai berhasil ditampilkan']);
     }
 
-
     /**
-     * ✅ untuk spa/guru
+     * ✅ untuk guru
      */
     public function store(Request $request)
     {
         $user = Auth::guard('kepegawaian')->user();
 
+        $matpel = JadwalPelajaran::where('guru_id', $user->id)->first();
+
         try {
             $validated = $request->validate([
-                'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
                 'siswa_id' => 'required|exists:siswas,id',
+                'jurusan_pelajaran_id' => 'required|exists:jurusans,id',
                 'point_absensi' => 'required|numeric',
                 'point_tugas' => 'required|numeric',
                 'point_uts' => 'required|numeric',
@@ -77,11 +145,11 @@ class DataNilaiSiswaController extends Controller
                 'point_ekskul' => 'required|numeric',
                 'sikap' => 'nullable|in:Sangat Baik,Baik,Cukup,Kurang',
             ], [
-                'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-                'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
-
                 'siswa_id.required' => 'Siswa wajib diisi',
                 'siswa_id.exists' => 'Siswa tidak ditemukan',
+
+                'jurusan_pelajaran_id.required' => 'Jurusan pelajaran wajib diisi',
+                'jurusan_pelajaran_id.exists' => 'Jurusan pelajaran tidak ditemukan',
                 
                 'point_absensi.required' => 'Point absensi wajib diisi',
                 'point_absensi.numeric' => 'Wajib diisi angka',
@@ -107,24 +175,44 @@ class DataNilaiSiswaController extends Controller
             ], 403);
         }            
 
-        $sama = DataNilaiSiswa::where('mata_pelajaran_id', $validated['mata_pelajaran_id'])
+        $sama = DataNilaiSiswa::where('mata_pelajaran_id', $matpel->mata_pelajaran_id)
             ->where('siswa_id', $validated['siswa_id'])
+            ->where('jurusan_pelajaran_id', $validated['jurusan_pelajaran_id'])
             ->first();
 
         if ($sama != null) {
-            return ApiResponse::error('Duplicated', ['Pesan' => 'Siswa dengan mata pelajaran ini sudah ada']);
+            return ApiResponse::error('Duplicated', ['Pesan' => 'Siswa dengan mata pelajaran dan jurusan ini sudah ada']);
         }
     
-        $nilai = DataNilaiSiswa::create($validated);
+        $nilai = DataNilaiSiswa::create([
+            'siswa_id' => $validated['siswa_id'],
+            'jurusan_pelajaran_id' => $validated['jurusan_pelajaran_id'],
+            'mata_pelajaran_id' => $matpel->mata_pelajaran_id,
+            'guru_id' => $user->id,
+            'point_absensi' => $validated['point_absensi'],
+            'point_tugas' => $validated['point_tugas'],
+            'point_uts' => $validated['point_uts'],
+            'point_uas' => $validated['point_uas'],
+            'point_ekskul' => $validated['point_ekskul'],
+            'sikap' => $validated['sikap'],
+        ]);
 
-        $nilai->load('siswa:id,nama', 'mataPelajaran:id,nama_pelajaran');
+        $nilai->load('siswa.prestasis', 'siswa.kelas', 'siswa.jurusan', 'mataPelajaran', 'jurusan', 'guru');
 
         $formatted = [
             'data_nilai_id'     => $nilai->id,
             'siswa_id'          => $nilai->siswa->id,
             'nama_siswa'        => $nilai->siswa->nama,
+            'jurusan_siswa_id'  => $nilai->siswa->jurusan->id,
+            'nama_jurusan_siswa'  => $nilai->siswa->jurusan->nama_jurusan,
+            'kelas_siswa_id'    => $nilai->siswa->kelas->id,
+            'nama_kelas_siswa'  => $nilai->siswa->kelas->nama_kelas,
             'mata_pelajaran_id' => $nilai->mataPelajaran->id,
             'nama_pelajaran'    => $nilai->mataPelajaran->nama_pelajaran,
+            'jurusan_pelajaran_id' => $nilai->jurusan_pelajaran_id,
+            'nama_jurusan_pelajaran' => $nilai->jurusan->nama_jurusan,
+            'guru_id'           => $user->id,
+            'nama_guru'         => $nilai->guru->nama,
 
             'point_absensi' => $nilai->point_absensi,
             'point_tugas'   => $nilai->point_tugas,
@@ -132,6 +220,13 @@ class DataNilaiSiswaController extends Controller
             'point_uas'     => $nilai->point_uas,
             'point_ekskul'  => $nilai->point_ekskul,
             'sikap'         => $nilai->sikap,
+
+            'prestasi' => $nilai->siswa->prestasis->map(function ($prestasi) {
+                return [
+                    'prestasi_id' => $prestasi->id ?? null,
+                    'nama_prestasi' => $prestasi->prestasi_diraih ?? null,
+                ];
+            }),
         ];
 
         return ApiResponse::success($formatted, 'Data nilai berhasil dibuat');
@@ -146,22 +241,31 @@ class DataNilaiSiswaController extends Controller
      */
     public function show(Request $request, string $siswaId)
     {
+        // ambil request di params, masukkan ke body
+        $request->merge($request->query());
+
         $request->validate([
             'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
+            'jurusan_pelajaran_id' => 'required|exists:jurusans,id',
         ], [
             'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-            'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan'
+            'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
+            'jurusan_pelajaran_id.required' => 'Jurusan pelajaran wajib diisi',
+            'jurusan_pelajaran_id.exists' => 'Jurusan pelajaran tidak ditemukan'
         ]);
     
         $data = DataNilaiSiswa::with([
-                'mataPelajaran:id,nama_pelajaran',
-                'siswa.kelas',
-                'siswa.jurusan',
-                'siswa.prestasis'
-            ])
-            ->where('siswa_id', $siswaId)
-            ->where('mata_pelajaran_id', $request->mata_pelajaran_id)
-            ->first();
+            'siswa.prestasis',
+            'siswa.kelas',
+            'siswa.jurusan',
+            'mataPelajaran',
+            'jurusan',
+            'guru'
+        ])
+        ->where('siswa_id', $siswaId)
+        ->where('mata_pelajaran_id', $request->mata_pelajaran_id)
+        ->where('jurusan_pelajaran_id', $request->jurusan_pelajaran_id)
+        ->first();
 
         if (!$data) {
             return ApiResponse::error(
@@ -173,15 +277,21 @@ class DataNilaiSiswaController extends Controller
     
         $formatted = [
             'data_nilai_id'     => $data->id,
+
             'siswa_id'          => $data->siswa->id,
             'nama_siswa'        => $data->siswa->nama,
+            'jurusan_siswa_id'  => $data->siswa->jurusan->id,
+            'nama_jurusan_siswa'  => $data->siswa->jurusan->nama_jurusan,
+            'kelas_siswa_id'    => $data->siswa->kelas->id,
+            'nama_kelas_siswa'  => $data->siswa->kelas->nama_kelas,
+
             'mata_pelajaran_id' => $data->mataPelajaran->id,
             'nama_pelajaran'    => $data->mataPelajaran->nama_pelajaran,
-            'kelas_id'          => $data->siswa->kelas->id ?? null,
-            'nama_kelas'        => $data->siswa->kelas->nama_kelas ?? null,
-            'jurusan_id'        => $data->siswa->jurusan->id ?? null,
-            'nama_jurusan'        => $data->siswa->jurusan->nama_jurusan ?? null,
-    
+            'jurusan_pelajaran_id' => $data->jurusan_pelajaran_id,
+            'nama_jurusan_pelajaran' => $data->jurusan->nama_jurusan,
+            'guru_id'           => $data->guru_id,
+            'nama_guru'         => $data->guru->nama,
+
             'point_absensi' => $data->point_absensi,
             'point_tugas'   => $data->point_tugas,
             'point_uts'     => $data->point_uts,
@@ -202,17 +312,20 @@ class DataNilaiSiswaController extends Controller
     
 
     /**
-     * ✅ untuk spa/guru
+     * ✅ untuk guru
      */
     public function update(Request $request, string $id)
     {
         $nilai = DataNilaiSiswa::find($id);
+
+        $user = Auth::guard('kepegawaian')->user();
 
         if (!$nilai) {
             return ApiResponse::error('Not found', ['id', 'Data tidak ditemukan']);
         }
 
         $validated = $request->validate([
+            'jurusan_pelajaran_id' => 'sometimes|required|exists:jurusans,id',            
             'point_absensi' => 'sometimes|required|numeric',            
             'point_tugas' => 'sometimes|required|numeric',            
             'point_uts' => 'sometimes|required|numeric',            
@@ -220,6 +333,8 @@ class DataNilaiSiswaController extends Controller
             'point_ekskul' => 'sometimes|required|numeric',            
             'sikap' => 'nullable|in:Sangat Baik,Baik,Cukup,Kurang',
         ], [
+            'jurusan_pelajaran_id.exists' => 'Jurusan tidak ditemukan',
+
             'point_absensi.required' => 'Point absensi wajib diisi',
             'point_absensi.numeric' => 'Wajib diisi angka',
 
@@ -238,10 +353,28 @@ class DataNilaiSiswaController extends Controller
             'sikap.in' => 'Pilihan hanya Sangat Baik, Baik, Cukup, Kurang'
         ]);
 
+        if (!in_array($user->role, ['guru', 'super_admin'])) {
+            return ApiResponse::error('Kesalahan', [
+                'pesan' => ['Anda tidak berhak menentukan nilai siswa']
+            ], 403);
+        }            
+
+        $sama = DataNilaiSiswa::where('mata_pelajaran_id', $nilai->mata_pelajaran_id)
+            ->where('siswa_id', $nilai->siswa_id)
+            ->where('jurusan_pelajaran_id', $validated['jurusan_pelajaran_id'])
+            ->first();
+
+        if ($sama != null) {
+            return ApiResponse::error('Duplicated', ['Pesan' => 'Siswa dengan mata pelajaran dan jurusan ini sudah ada']);
+        }
+
+        // yang tidak boleh diubah: siswa_id, mata_pelajaran_id, guru_id
         $nilai->update(
             [
                 'siswa_id' => $nilai->siswa_id ?? null,
                 'mata_pelajaran_id' => $nilai->mata_pelajaran_id ?? null,
+                'guru_id' => $nilai->guru_id ?? null,
+                'jurusan_pelajaran_id' => $validated['jurusan_pelajaran_id'] ?? null,
                 'point_absensi' => $validated['point_absensi'] ?? null,
                 'point_tugas' => $validated['point_tugas'] ?? null,
                 'point_uts' => $validated['point_uts'] ?? null,
@@ -251,14 +384,22 @@ class DataNilaiSiswaController extends Controller
             ]
         );
         
-        $nilai->load('siswa:id,nama', 'mataPelajaran:id,nama_pelajaran');
+        $nilai->load('siswa.prestasis', 'siswa.kelas', 'siswa.jurusan', 'mataPelajaran', 'jurusan', 'guru');
 
         $formatted = [
             'data_nilai_id'     => $nilai->id,
             'siswa_id'          => $nilai->siswa->id,
             'nama_siswa'        => $nilai->siswa->nama,
+            'jurusan_siswa_id'  => $nilai->siswa->jurusan->id,
+            'nama_jurusan_siswa'  => $nilai->siswa->jurusan->nama_jurusan,
+            'kelas_siswa_id'    => $nilai->siswa->kelas->id,
+            'nama_kelas_siswa'  => $nilai->siswa->kelas->nama_kelas,
             'mata_pelajaran_id' => $nilai->mataPelajaran->id,
             'nama_pelajaran'    => $nilai->mataPelajaran->nama_pelajaran,
+            'jurusan_pelajaran_id' => $nilai->jurusan_pelajaran_id,
+            'nama_jurusan_pelajaran' => $nilai->jurusan->nama_jurusan,
+            'guru_id'           => $nilai->guru_id,
+            'nama_guru'         => $nilai->guru->nama,
 
             'point_absensi' => $nilai->point_absensi,
             'point_tugas'   => $nilai->point_tugas,
@@ -266,6 +407,13 @@ class DataNilaiSiswaController extends Controller
             'point_uas'     => $nilai->point_uas,
             'point_ekskul'  => $nilai->point_ekskul,
             'sikap'         => $nilai->sikap,
+
+            'prestasi' => $nilai->siswa->prestasis->map(function ($prestasi) {
+                return [
+                    'prestasi_id' => $prestasi->id ?? null,
+                    'nama_prestasi' => $prestasi->prestasi_diraih ?? null,
+                ];
+            }),
         ];
 
         return ApiResponse::success($formatted, 'Data nilai berhasil diupdate');
@@ -325,4 +473,5 @@ class DataNilaiSiswaController extends Controller
     }
 
 
+    // ! tinggal export data ke excel
 }

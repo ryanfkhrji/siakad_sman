@@ -21,6 +21,11 @@ class JadwalPelajaran extends Model
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }    
 
+    public function jurusanPelajaran()
+    {
+        return $this->belongsTo(Jurusan::class, 'jurusan_pelajaran_id');
+    }    
+
     public function guru()
     {
         return $this->belongsTo(Kepegawaian::class, 'guru_id');
