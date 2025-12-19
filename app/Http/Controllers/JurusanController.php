@@ -20,6 +20,7 @@ class JurusanController extends Controller
             return [
                 'id' => $item->id,
                 'nama_jurusan' => $item->nama_jurusan,
+                'kode_jurusan' => $item->kode_jurusan,
                 'jumlah_siswa' => $item->siswas_count,                
             ];
         });
@@ -40,6 +41,7 @@ class JurusanController extends Controller
         $data = [
             'id' => $jurusan->id,
             'nama_jurusan' => $jurusan->nama_jurusan,
+            'kode_jurusan' => $jurusan->kode_jurusan,
             'jumlah_siswa' => $jurusan->siswas_count,
             'siswa' => $jurusan->siswas->map(function ($siswa) {
                 return [
@@ -60,10 +62,12 @@ class JurusanController extends Controller
     {
         try {
             $validated = $request->validate([
-                'nama_jurusan' => 'required|unique:jurusans,nama_jurusan',
+                'nama_jurusan' => 'required',
+                'kode_jurusan' => 'required|unique:jurusans,kode_jurusan',
             ], [
                 'nama_jurusan.required' => 'Nama jurusan wajib diisi',
-                'nama_jurusan.unique' => 'Jurusan sudah ada',
+                'kode_jurusan.required' => 'Kode jurusan wajib diisi',
+                'kode_jurusan.unique' => 'Kode jurusan sudah ada',
             ]);
 
             // cek apakah super admin atau bukan
@@ -80,6 +84,7 @@ class JurusanController extends Controller
             return ApiResponse::success([
                 'id' => $jurusan->id,
                 'nama_jurusan' => $jurusan->nama_jurusan,
+                'kode_jurusan' => $jurusan->kode_jurusan,
             ], 201);
     
         } catch (ValidationException $e) {
@@ -98,11 +103,16 @@ class JurusanController extends Controller
             'nama_jurusan' => [
                 'sometimes',
                 'required',
+            ],
+            'kode_jurusan' => [
+                'sometimes',
+                'required',
                 Rule::unique('jurusans')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
             ],
         ],[
             'nama_jurusan.required' => 'Nama jurusan wajib diisi',
-            'nama_jurusan.unique' => 'Jurusan sudah ada',
+            'kode_jurusan.required' => 'Kode jurusan wajib diisi',
+            'kode_jurusan.unique' => 'kode jurusan sudah ada',
         ]);
 
         // cek apakah super admin atau bukan
@@ -120,6 +130,7 @@ class JurusanController extends Controller
             [
                 'id' => $jurusan->id,
                 'nama_jurusan' => $jurusan->nama_jurusan,
+                'kode_jurusan' => $jurusan->kode_jurusan,
             ], 'Jurusan berhasil diperbarui');
     }
 

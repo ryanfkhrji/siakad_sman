@@ -194,8 +194,18 @@ class DatabaseSeeder extends Seeder
 
         // Seed Jurusan
         Jurusan::insert([
-            ['nama_jurusan' => 'IPA'],
-            ['nama_jurusan' => 'IPS'],
+            [
+                'nama_jurusan' => 'IPA',
+                'kode_jurusan' => '1',
+            ],
+            [
+                'nama_jurusan' => 'IPS',
+                'kode_jurusan' => '2',
+            ],
+            [
+                'nama_jurusan' => 'Bahasa',
+                'kode_jurusan' => '3',
+            ],
         ]);
 
         // Seed Mata Pelajaran
@@ -218,7 +228,9 @@ class DatabaseSeeder extends Seeder
         Kurikulum::insert([
             [
                 'nama_kurikulum' => 'Kurikulum Tingkat Satuan Pendidikan (KTSP)',
-                'tahun_berlaku' => 2006,
+                'kode_kurikulum' => '2006',
+                'tahun_mulai' => 2006,
+                'tahun_selesai' => 2012,
                 'status' => 'tidak aktif',
                 'deskripsi' => '
                 - Sekolah Bebas Menentukan Kurikulum
@@ -226,7 +238,9 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'nama_kurikulum' => 'Kurikulum 2013',
-                'tahun_berlaku' => 2013,
+                'kode_kurikulum' => '2013',
+                'tahun_mulai' => 2013,
+                'tahun_selesai' => 2021,
                 'status' => 'tidak aktif',
                 'deskripsi' => '
                 - Ada Kompetensi Inti (KI) dan Kompetensi Dasar (KD)
@@ -242,7 +256,9 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'nama_kurikulum' => 'Kurikulum Merdeka',
-                'tahun_berlaku' => 2022,
+                'kode_kurikulum' => '2022',
+                'tahun_mulai' => 2022,
+                'tahun_selesai' => 2025,
                 'status' => 'aktif',
                 'deskripsi' => '
                 - Tidak ada lagi KI & KD, diganti Capaian Pembelajaran (CP)

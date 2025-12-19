@@ -23,38 +23,42 @@ Perbaikan
 
 1. Kepegawaian
     - Backend:
-          - ✅ nambah nuptk (nullable)
-          - ✅ nip menjadi nullable
+          - ✅ (Seeder, Migrasi, Controller) nambah nuptk (nullable)
+          - ✅ (Seeder, Migrasi, Controller) nip menjadi nullable
     - Frontend: 
           - tambahin kolom nuptk pada register (tapi nullable)
           - NIP pada regsiter ubah jadi nullable
 2. Mata Pelajaran:
     - Backend:
-          - ✅ Nambah kolom kode_mapel_diknas
-          - ✅ hapus kolom status
-          - ✅ hapus kolom nilai_kkm
+          - ✅ (Seeder, Migrasi, Controller) Nambah kolom kode_mapel_diknas
+          - ✅ (Seeder, Migrasi, Controller) hapus kolom status
+          - ✅ (Seeder, Migrasi, Controller) hapus kolom nilai_kkm
     - Frontend:
           - Nambah inputan kode_mapel_diknas
           - hilangkan inputan status
           - hilangkan inputan nilai_kkm
 3. Kurikulum:
     - Backend:
-          - (Seeder, Migrasi, Controller) Nambah kode_kurikulum
-          - (Seeder, Migrasi, Controller) nama_kurikulum tidak unique lagi
-          - (Seeder, Migrasi, controller) tahun_berlaku diubah jadi tahun_mulai
-          - (Seeder, Migrasi, controller) menambah kolom tahun_selesai
+          - ✅ (Seeder, Migrasi, Controller) nama_kurikulum tidak unique lagi
+          - ✅ (Seeder, Migrasi, Controller) Nambah kode_kurikulum (unik)
+          - ✅ (Seeder, Migrasi, controller) tahun_berlaku diubah jadi tahun_mulai
+          - ✅ (Seeder, Migrasi, controller) menambah kolom tahun_selesai
     - Frontend:
           - Nambah inputan kode_kurikulum
           - ubah inputan tahun_berlaku menjadi tahun_mulai
           - nambah inputan tahun_selesai
 4. Jurusan:
-    - Nambah kode_jurusan
-    - nama_jurusan tidak unique lagi
+    - Backend: 
+          - ✅ (Seeder, Migrasi, Controller) nama_jurusan tidak unique lagi
+          - ✅ (Seeder, Migrasi, Controller) Nambah kode_jurusan
+    - Frontend
+          - Nambah inputan kode_jurusan          
 5. Kelas
-    - nama_kelas tidak unique lagi
-    - nambah kolom tingkat
-    - nambah kolom kurikulum_id
-    - kolom jam_masuk dihapus
+    - Backend:
+          - (Seeder, Migrasi, Controller) nama_kelas tidak unique lagi
+          - (Seeder, Migrasi, Controller) nambah kolom tingkat
+          - (Seeder, Migrasi, Controller) nambah kolom kurikulum_id
+          - (Seeder, Migrasi, Controller) kolom jam_masuk dihapus
 6. Membuat pivot kurikulum_mata_pelajaran
 7. data_nilai_siswa:
     - ganti mata_pelajaran_id dan jurusan_pelajaran_id dengan kurikulum_mata_pelajaran_id
