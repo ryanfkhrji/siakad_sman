@@ -16,8 +16,12 @@ return new class extends Migration
 
             // Relasi
             $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-            $table->foreignId('mata_pelajaran_id')->constrained('mata_pelajarans');
-            $table->foreignId('jurusan_pelajaran_id')->constrained('jurusans');
+
+            // $table->foreignId('mata_pelajaran_id')->constrained('mata_pelajarans');
+            // $table->foreignId('jurusan_pelajaran_id')->constrained('jurusans');
+            $table->foreignId('kurikulum_mata_pelajaran_id')->constrained('kurikulum_mata_pelajaran'); // sudah memuat mata_pelajaran_id dan jurusan_pelajaran_id
+            
+
             $table->foreignId('guru_id')->constrained('kepegawaians');
 
             // karna nilainya tetap per siswa, bisa ambil dari tabel langsung
@@ -28,12 +32,21 @@ return new class extends Migration
             // $table->foreignId('prestasi_id')->nullable()->constrained('prestasi')->onDelete('set null');
 
             // Point nilai
+            // butuh jabarin total absen
             $table->decimal('point_absensi', 5, 2)->default(0);
+
             $table->decimal('point_tugas', 5, 2)->default(0);
             $table->decimal('point_uts', 5, 2)->default(0);
             $table->decimal('point_uas', 5, 2)->default(0);
+
+            // butuh jabarin ekskul
             $table->decimal('point_ekskul', 5, 2)->nullable()->default(0);
             $table->enum('sikap', ['Sangat Baik','Baik','Cukup','Kurang'])->nullable();
+
+            $table->unique([
+                'siswa_id',
+                'kurikulum_mata_pelajaran_id'
+            ]);            
 
             $table->timestamps();
         });

@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('kurikulum', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kurikulum')->unique();
-            $table->year('tahun_berlaku')->nullable();
+            $table->string('nama_kurikulum');
+            $table->string('kode_kurikulum')->unique();
+            $table->year('tahun_mulai')->nullable();
+            $table->year('tahun_selesai')->nullable();
             $table->enum('status', ['aktif', 'tidak aktif'])->default('tidak aktif')->nullable();
             $table->text('deskripsi')->nullable();
             $table->timestamps();

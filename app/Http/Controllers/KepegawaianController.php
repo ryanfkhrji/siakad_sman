@@ -22,7 +22,8 @@ class KepegawaianController extends Controller
             $validated = $request->validate([
                 'nama' => 'required|string',
                 'email' => ['required', 'unique:kepegawaians,email', 'email'],
-                'nip' => ['required', 'digits_between:5,50', 'unique:kepegawaians,nip', 'regex:/^[0-9]+$/'],
+                'nuptk' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nuptk', 'numeric'],
+                'nip' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nip', 'numeric'],
                 'password' => [
                     'required',
                     'string',
@@ -38,9 +39,11 @@ class KepegawaianController extends Controller
             ], [
                 'email.required' => 'Email wajib diisi.',
                 'email.unique' => 'Email sudah terdaftar.',
-                'email.email' => 'Email tidak valid.',
-                'nip.regex' => 'NIP hanya boleh berisi angka.',
+                'email.email' => 'Email tidak valid.',            
                 'nip.unique' => 'NIP sudah terdaftar.',
+                'nip.numeric' => 'NIP hanya boleh berisi angka.',
+                'nuptk.unique' => 'NUPTK sudah terdaftar.',
+                'nuptk.numeric' => 'NUPTK hanya boleh berisi angka.',
                 'password.min' => 'Password minimal 5 karakter.',
                 'password.confirmed' => 'Konfirmasi password tidak cocok.',
                 'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
@@ -60,13 +63,14 @@ class KepegawaianController extends Controller
 
             // Simpan baru
             $kepegawaian = Kepegawaian::create([
-                'nama' => $validated['nama'],
-                'email' => $validated['email'],
-                'status' => $request['status'],
-                'nip' => $validated['nip'],
-                'keterangan' => $request['keterangan'],
-                'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
+                'nama' => $validated['nama'] ?? null,
+                'email' => $validated['email'] ?? null,
+                'status' => $request['status'] ?? null,
+                'nip' => $validated['nip'] ?? null,
+                'nuptk' => $validated['nuptk'] ?? null,
+                'keterangan' => $request['keterangan'] ?? null,
+                'password' => Hash::make($validated['password']) ?? null,
+                'role' => $validated['role'] ?? null,
             ]);
 
             // Response sukses
@@ -79,6 +83,7 @@ class KepegawaianController extends Controller
                     'email' => $kepegawaian->email,
                     'status' => $kepegawaian->status,
                     'nip' => $kepegawaian->nip,
+                    'nuptk' => $kepegawaian->nuptk,
                     'keterangan' => $kepegawaian->keterangan,
                     'role' => $kepegawaian->role,
                 ]
@@ -98,7 +103,7 @@ class KepegawaianController extends Controller
         }
     }
 
-    // ✅ store pegawai
+    // ✅ store pegawai untuk spa
     public function store(Request $request)
     {
         try {
@@ -106,7 +111,8 @@ class KepegawaianController extends Controller
             $validated = $request->validate([
                 'nama' => 'required|string',
                 'email' => ['required', 'unique:kepegawaians,email', 'email'],
-                'nip' => ['required', 'digits_between:5,50', 'unique:kepegawaians,nip', 'regex:/^[0-9]+$/'],
+                'nip' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nip', 'numeric'],
+                'nuptk' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nuptk', 'numeric'],
                 'password' => [
                     'required',
                     'string',
@@ -123,7 +129,9 @@ class KepegawaianController extends Controller
                 'email.required' => 'Email wajib diisi.',
                 'email.unique' => 'Email sudah terdaftar.',
                 'email.email' => 'Email tidak valid.',
-                'nip.regex' => 'NIP hanya boleh berisi angka.',
+                'nip.numeric' => 'NIP hanya boleh berisi angka.',
+                'nuptk.unique' => 'NUPTK sudah terdaftar.',
+                'nuptk.numeric' => 'NUPTK hanya boleh berisi angka.',
                 'nip.unique' => 'NIP sudah terdaftar.',
                 'password.min' => 'Password minimal 5 karakter.',
                 'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -144,13 +152,14 @@ class KepegawaianController extends Controller
 
             // Simpan baru
             $kepegawaian = Kepegawaian::create([
-                'nama' => $validated['nama'],
-                'email' => $validated['email'],
-                'status' => $request['status'],
-                'nip' => $validated['nip'],
-                'keterangan' => $request['keterangan'],
-                'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
+                'nama' => $validated['nama'] ?? null,
+                'email' => $validated['email'] ?? null,
+                'status' => $request['status'] ?? null,
+                'nip' => $validated['nip'] ?? null,
+                'nuptk' => $validated['nuptk'] ?? null,
+                'keterangan' => $request['keterangan'] ?? null,
+                'password' => Hash::make($validated['password']) ?? null,
+                'role' => $validated['role'] ?? null,
             ]);
 
             // Response sukses
@@ -163,6 +172,7 @@ class KepegawaianController extends Controller
                     'email' => $kepegawaian->email,
                     'status' => $kepegawaian->status,
                     'nip' => $kepegawaian->nip,
+                    'nuptk' => $kepegawaian->nuptk,
                     'keterangan' => $kepegawaian->keterangan,
                     'role' => $kepegawaian->role,
                 ]
@@ -223,14 +233,15 @@ class KepegawaianController extends Controller
 
             // Response sukses
             return ApiResponse::success([
-                'id' => $kepegawaian->id,
-                'nama' => $kepegawaian->nama,
-                'email' => $kepegawaian->email,
-                'status' => $kepegawaian->status,
-                'nip' => $kepegawaian->nip,
-                'keterangan' => $kepegawaian->keterangan,
-                'role' => $kepegawaian->role,
-                'token' => $token,
+                'id' => $kepegawaian->id ?? null,
+                'nama' => $kepegawaian->nama ?? null,
+                'email' => $kepegawaian->email ?? null,
+                'status' => $kepegawaian->status ?? null,
+                'nip' => $kepegawaian->nip ?? null,
+                'nuptk' => $kepegawaian->nuptk ?? null,
+                'keterangan' => $kepegawaian->keterangan ?? null,
+                'role' => $kepegawaian->role ?? null,
+                'token' => $token ?? null,
             ], 'Login berhasil.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -291,6 +302,7 @@ class KepegawaianController extends Controller
                 'email' => $item->email ?? null,
                 'status' => $item->status ?? null,
                 'nip' => $item->nip ?? null,
+                'nuptk' => $item->nuptk ?? null,
                 'keterangan' => $item->keterangan ?? null,
                 'role' => $item->role ?? null,
                 'kelas' => [
@@ -318,6 +330,7 @@ class KepegawaianController extends Controller
             'email' => $pegawai->email ?? null,
             'status' => $pegawai->status ?? null,
             'nip' => $pegawai->nip ?? null,
+            'nuptk' => $pegawai->nuptk ?? null,
             'keterangan' => $pegawai->keterangan ?? null,
             'role' => $pegawai->role ?? null,
             'kelas' => [
@@ -364,6 +377,7 @@ class KepegawaianController extends Controller
             'email' => $pegawai->email ?? null,
             'status' => $pegawai->status ?? null,
             'nip' => $pegawai->nip ?? null,
+            'nuptk' => $pegawai->nuptk ?? null,
             'keterangan' => $pegawai->keterangan ?? null,
             'role' => $pegawai->role ?? null,
             'kelas' => [
@@ -415,7 +429,12 @@ class KepegawaianController extends Controller
             'status' => 'sometimes',
             'nip' => [
                 'sometimes',
-                'required',
+                'nullable',
+                Rule::unique('kepegawaians')->ignore($id)
+            ],
+            'nuptk' => [
+                'sometimes',
+                'nullable',
                 Rule::unique('kepegawaians')->ignore($id)
             ],
             'keterangan' => 'sometimes',
@@ -423,9 +442,9 @@ class KepegawaianController extends Controller
         ], [
             'nama.required' => 'Nama wajib diisi',
             'email.required' => 'Email wajib diisi',
-            'email.unique' => 'Terdeteksi email ganda',
-            'nip.required' => 'NIP wajib diisi',
+            'email.unique' => 'Terdeteksi email ganda',            
             'nip.unique' => 'Terdeteksi NIP ganda',
+            'nuptk.unique' => 'Terdeteksi NUPTK ganda',
             'role.required' => 'Role wajib diisi',
         ]);
 
@@ -453,6 +472,7 @@ class KepegawaianController extends Controller
             'email' => $validated['email'],
             'status' => $request['status'],
             'nip' => $validated['nip'],
+            'nuptk' => $validated['nuptk'],
             'keterangan' => $request['keterangan'],
             'role' => $validated['role'],
         ]);
@@ -465,6 +485,7 @@ class KepegawaianController extends Controller
                 'email' => $pegawai->email ?? null,
                 'status' => $pegawai->status ?? null,
                 'nip' => $pegawai->nip ?? null,
+                'nuptk' => $pegawai->nuptk ?? null,
                 'keterangan' => $pegawai->keterangan ?? null,
                 'role' => $pegawai->role ?? null,
                 'kelas' => [
@@ -496,7 +517,12 @@ class KepegawaianController extends Controller
              'status' => 'sometimes',
              'nip' => [
                  'sometimes',
-                 'required',
+                 'nullable',
+                 Rule::unique('kepegawaians')->ignore($pegawai->id)
+             ],
+             'nuptk' => [
+                 'sometimes',
+                 'nullable',
                  Rule::unique('kepegawaians')->ignore($pegawai->id)
              ],
              'keterangan' => 'sometimes',
@@ -508,9 +534,9 @@ class KepegawaianController extends Controller
         ], [
             'nama.required' => 'Nama wajib diisi',
             'email.required' => 'Email wajib diisi',
-            'email.unique' => 'Terdeteksi email ganda',
-            'nip.required' => 'NIP wajib diisi',
+            'email.unique' => 'Terdeteksi email ganda',            
             'nip.unique' => 'Terdeteksi NIP ganda',
+            'nuptk.unique' => 'Terdeteksi NUPTK ganda',
             'role.required' => 'Role wajib diisi',
         ]);
 
@@ -553,12 +579,13 @@ class KepegawaianController extends Controller
         }
         
         $pegawai->update([
-            'nama' => $validated['nama'],
-            'email' => $validated['email'],
-            'status' => $validated['status'],
-            'nip' => $validated['nip'],
-            'keterangan' => $validated['keterangan'],
-            'role' => $validated['role'],
+            'nama' => $validated['nama'] ?? null,
+            'email' => $validated['email'] ?? null,
+            'status' => $validated['status'] ?? null,
+            'nip' => $validated['nip'] ?? null,
+            'nuptk' => $validated['nuptk'] ?? null,
+            'keterangan' => $validated['keterangan'] ?? null,
+            'role' => $validated['role'] ?? null,
         ]);
 
         $pegawai->load('kelas','ekstrakurikuler');
@@ -570,6 +597,7 @@ class KepegawaianController extends Controller
                 'email' => $pegawai->email ?? null,
                 'status' => $pegawai->status ?? null,
                 'nip' => $pegawai->nip ?? null,
+                'nuptk' => $pegawai->nuptk ?? null,
                 'keterangan' => $pegawai->keterangan ?? null,
                 'role' => $pegawai->role ?? null,
                 'kelas' => [

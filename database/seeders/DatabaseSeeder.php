@@ -129,6 +129,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'sp@gmail.com',
                 'status' => 'honorer',
                 'nip' => '123450',
+                'nuptk' => '0123450',
                 'keterangan' => 'Super Admin',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'super_admin',
@@ -139,6 +140,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'kepsek@gmail.com',
                 'status' => 'pns',
                 'nip' => '123451',
+                'nuptk' => '0123451',
                 'keterangan' => 'Kepala Sekolah',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'kepsek',
@@ -149,6 +151,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'tu@gmail.com',
                 'status' => 'honorer',
                 'nip' => '123452',
+                'nuptk' => '0123452',
                 'keterangan' => 'Staff TU',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'tu',
@@ -159,6 +162,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'staff@gmail.com',
                 'status' => 'honorer',
                 'nip' => '123453',
+                'nuptk' => '0123453',
                 'keterangan' => 'Staff Kebersihan',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'staff',
@@ -169,6 +173,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'guruipa@gmail.com',
                 'status' => 'pns',
                 'nip' => '123454',
+                'nuptk' => '0123454',
                 'keterangan' => 'Guru IPA',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'guru',
@@ -179,6 +184,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'guruips@gmail.com',
                 'status' => 'honorer',
                 'nip' => '123455',
+                'nuptk' => '0123455',
                 'keterangan' => 'Guru IPS',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'guru',
@@ -195,19 +201,16 @@ class DatabaseSeeder extends Seeder
         // Seed Mata Pelajaran
         MataPelajaran::insert([
             [
-                'nama_pelajaran' => 'IPA',
-                'status' => 'jurusan',
-                'nilai_kkm' => 85.5
+                'nama_pelajaran' => 'Fisika',
+                'kode_mapel_diknas' => '013',                
             ],
             [
                 'nama_pelajaran' => 'Bahasa Indonesia',
-                'status' => 'wajib',
-                'nilai_kkm' => 75.5
+                'kode_mapel_diknas' => '156',                
             ],
             [
                 'nama_pelajaran' => 'Bahasa Sunda',
-                'status' => 'pilihan',
-                'nilai_kkm' => 90.80
+                'kode_mapel_diknas' => '224',                
             ],
         ]);        
 

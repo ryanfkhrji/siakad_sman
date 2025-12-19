@@ -20,8 +20,7 @@ class MataPelajaranController extends Controller
             return [
                 'id' => $item->id ?? null,
                 'nama_pelajaran' => $item->nama_pelajaran ?? null,
-                'status' => $item->status ?? null,
-                'nilai_kkm' => $item->nilai_kkm ?? null,
+                'kode_mapel_diknas' => $item->kode_mapel_diknas ?? null,
             ];
         });
 
@@ -35,15 +34,12 @@ class MataPelajaranController extends Controller
     {
         try {
             $validated = $request->validate([
-                'nama_pelajaran' => 'required|string|unique:mata_pelajarans,nama_pelajaran',
-                'status' => 'required|in:wajib,pilihan,jurusan',
-                'nilai_kkm' => 'nullable|numeric',
+                'nama_pelajaran' => 'required|string',
+                'kode_mapel_diknas' => 'required|unique:mata_pelajarans,kode_mapel_diknas',                
             ], [
                 'nama_pelajaran.required' => 'Mata pelajaran wajib diisi',
-                'nama_pelajaran.unique' => 'Mata pelajaran sudah ada',
-                'status.required' => 'Status wajib diisi',
-                'status.in' => 'Hanya diantara wajib, pilihan, dan jurusan',
-                'nilai_kkm.numeric' => 'Wajib diisi angka'
+                'kode_mapel_diknas.required' => 'Kode mapel wajib diisi',                
+                'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',
             ]);
     
             $matpel = MataPelajaran::create($validated);
@@ -51,8 +47,7 @@ class MataPelajaranController extends Controller
             return ApiResponse::success([
                 'id' => $matpel->id ?? null,
                 'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
-                'status' => $matpel->status ?? null,
-                'nilai_kkm' => $matpel->nilai_kkm ?? null,
+                'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                
             ], 'Mata Pelajaran Berhasil Dibuat');
     
         } catch (ValidationException $e) {
@@ -74,8 +69,7 @@ class MataPelajaranController extends Controller
         $formatted = [
                 'id' => $matpel->id ?? null,
                 'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
-                'status' => $matpel->status ?? null,                
-                'nilai_kkm' => $matpel->nilai_kkm ?? null,                
+                'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                                
             ];
 
         return ApiResponse::success($formatted, 'Detail mata pelajaran berhasil diambil');
@@ -94,18 +88,17 @@ class MataPelajaranController extends Controller
         $validated = $request->validate([
             'nama_pelajaran' => [
                 'sometimes',
+                'required',                
+            ],
+            'kode_mapel_diknas' => [
+                'sometimes',
                 'required',
                 Rule::unique('mata_pelajarans')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
-            ],
-            'status' => 'sometimes|required',
-            'nilai_kkm' => 'sometimes|numeric',
+            ],            
         ],[
             'nama_pelajaran.required' => 'Nama pelajaran wajib diisi',
-            'nama_pelajaran.unique' => 'Nama pelajaran sudah ada',
-
-            'status.required' => 'Status wajib diisi',
-
-            'nilai_kkm.numeric' => 'Wajib diisi angka',
+            'kode_mapel_diknas.required' => 'Kode mapel wajib diisi',
+            'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',            
         ]);
 
         $matpel->update($validated);
@@ -114,8 +107,7 @@ class MataPelajaranController extends Controller
             [
                 'id' => $matpel->id ?? null,
                 'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
-                'status' => $matpel->status ?? null,
-                'nilai_kkm' => $matpel->nilai_kkm ?? null,
+                'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                
             ], 'Mata pelajaran berhasil diperbarui');
     }
 

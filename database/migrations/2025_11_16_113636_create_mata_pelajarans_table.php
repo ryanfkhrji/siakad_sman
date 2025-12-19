@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('mata_pelajarans', function (Blueprint $table) {
             $table->id();
             $table->string('nama_pelajaran');
-            $table->enum('status', ['wajib', 'pilihan', 'jurusan']);
-            $table->decimal('nilai_kkm', 5, 2)->nullable()->default(0);
+            $table->string('kode_mapel_diknas')->unique();
+            // $table->enum('status', ['wajib', 'pilihan', 'jurusan']); // karna wajib di IPA belum tentu wajib di IPS
+            // $table->decimal('nilai_kkm', 5, 2)->nullable()->default(0); // KKM IPA dan IPS berbeda
             $table->timestamps();
         });
     }

@@ -29,6 +29,12 @@ return new class extends Migration
                   ->constrained('jurusans')
                   ->onDelete('restrict');
 
+            $table->foreignId('tahun_akademik_id')
+                ->nullable()
+                ->constrained('tahun_akademik')
+                ->onDelete('restrict');
+
+
             $table->text('prestasi_diraih');
 
             $table->timestamps();

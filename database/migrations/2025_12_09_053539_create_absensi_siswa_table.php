@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('absensi_siswa', function (Blueprint $table) {
             $table->id();
-            $table->string('siswa_id');
+            $table->foreignId('siswa_id')->constrained('siswas')->cascadeOnDelete();
             
-            $table->string('kelas_id');
+            $table->foreignId('kelas_id')->constrained('kelas');
             
-            $table->string('mata_pelajaran_id');        
+            $table->foreignId('jadwal_pelajaran_id')->constrained('jadwal_pelajarans')->cascadeOnDelete();
 
             $table->date('hari');            
 
@@ -25,7 +25,18 @@ return new class extends Migration
 
             $table->string('bukti')->nullable();
 
+            $table->foreignId('tahun_akademik_id')
+                ->nullable()
+                ->constrained('tahun_akademik')
+                ->restrictOnDelete();
+
             $table->timestamps();
+
+            $table->unique([
+                'siswa_id',
+                'jadwal_pelajaran_id',
+                'tanggal'
+            ]);
         });
     }
 

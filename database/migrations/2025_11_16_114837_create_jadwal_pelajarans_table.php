@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('jadwal_pelajarans', function (Blueprint $table) {
             $table->id();
 
-            // relasi ke tabel mata_pelajarans
-            $table->foreignId('mata_pelajaran_id')
-                ->constrained('mata_pelajarans')
+            // relasi ke tabel pivot kurikulum_pelajaras
+            $table->foreignId('kurikulum_mata_pelajaran_id')
+                ->constrained('kurikulum_mata_pelajaran')
                 ->cascadeOnDelete(); // hapus ini jika mata_pelajaran dihapus
 
             $table->foreignId('jurusan_pelajaran_id')->nullable()->constrained('jurusans')->nullOnDelete();
@@ -35,8 +35,9 @@ return new class extends Migration
                 ->constrained('kelas')
                 ->nullOnDelete();
 
-            // jam pelajaran (bisa pakai time atau string)
-            $table->string('jam_pelajaran'); // contoh: "07:00 - 08:30"
+            // $table->string('jam_pelajaran'); // contoh: "07:00 - 08:30"
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
 
             // ruangan opsional
             $table->string('ruangan')->nullable();

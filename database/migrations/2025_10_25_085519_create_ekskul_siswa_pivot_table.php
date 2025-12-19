@@ -22,6 +22,8 @@ return new class extends Migration
 
             $table->unique(['siswa_id', 'ekstrakurikuler_id']); // mencegah daftar ekskul yang sama > 1x
 
+            $table->foreignId('tahun_akademik_id')->nullable()->constrained('tahun_akademik');
+
             $table->enum('sikap', ['Sangat Baik','Baik','Cukup','Kurang'])->nullable();
 
             $table->timestamps();

@@ -20,6 +20,8 @@ return new class extends Migration
                 ->cascadeOnDelete(); // hapus ini jika mata_pelajaran dihapus
 
             $table->string('judul_kompetensi_dasar');
+
+            $table->unsignedTinyInteger('tingkat'); // 10, 11, 12
             
             $table->text('deskripsi')->nullable();
 

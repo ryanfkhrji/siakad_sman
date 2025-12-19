@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('absensi_pelajaran', function (Blueprint $table) {
-            $table->id();
+            $table->id();    
 
             // Foreign keys
-            $table->unsignedBigInteger('guru_pengajar_id');
-            $table->unsignedBigInteger('jadwal_pelajaran_id'); // mata_pelajaran
-            $table->unsignedBigInteger('kelas_id');            
+            $table->foreignId('guru_pengajar_id')->constrained('kepegawaians')->onDelete('cascade');;
+            $table->foreignId('jadwal_pelajaran_id')->constrained('jadwal_pelajarans')->onDelete('cascade');;
+            $table->foreignId('kelas_id')->constrained('kelas');
 
             // Kolom lainnya
             $table->date('hari');
-            $table->time('jam'); // ga disii otomatis
+            $table->time('jam');
             $table->enum('status', ['hadir', 'tidak hadir']);
  
             $table->timestamps();             

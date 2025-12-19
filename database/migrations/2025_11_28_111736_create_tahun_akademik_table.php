@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('semester', ['Ganjil', 'Genap']);
             $table->date('tanggal_mulai')->nullable(); // 2024-07-15
             $table->date('tanggal_selesai')->nullable(); // 2024-12-20
-            $table->enum('status', ['aktif', 'nonaktif'])->default('nonaktif');
+            $table->enum('status', ['aktif', 'tidak aktif'])->default('tidak aktif');
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });        

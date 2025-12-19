@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama_ekstrakurikuler');
             $table->foreignId('pengajar_id')->nullable()->constrained('kepegawaians')->onDelete('restrict');
             $table->decimal('anggaran', 15, 2);
-            $table->string('status')->nullable();
+            $table->enum('status', ['aktif', 'tidak aktif'])->default('aktif');
             $table->timestamps();
         });
     }
