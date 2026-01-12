@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->string('email')->unique();
-            $table->string('status')->nullable();
             $table->string('nip')->nullable()->unique();
             $table->string('nuptk')->nullable();
             $table->text('keterangan')->nullable();
             $table->string('password');
             $table->enum('role', ['super_admin', 'kepsek', 'guru', 'staff', 'tu'])->default('staff');
+            $table->enum('status', ['aktif', 'tidak aktif'])->default('aktif');
             $table->rememberToken();
             $table->timestamps();
         });

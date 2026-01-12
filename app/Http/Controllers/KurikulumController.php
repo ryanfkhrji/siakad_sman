@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Kurikulum;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class KurikulumController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * ✅ untuk spa
      */
     public function index()
     {
@@ -21,10 +23,11 @@ class KurikulumController extends Controller
                 'id' => $item->id ?? null,
                 'nama_kurikulum' => $item->nama_kurikulum ?? null,
                 'kode_kurikulum' => $item->kode_kurikulum ?? null,
+                'tipe' => $item->tipe ?? null,
                 'tahun_mulai' => $item->tahun_mulai ?? null,
                 'tahun_selesai' => $item->tahun_selesai ?? null,
-                'status' => $item->status ?? null,
                 'deskripsi' => $item->deskripsi ?? null,
+                'status' => $item->status ?? null,
             ];
         });
 
@@ -32,7 +35,7 @@ class KurikulumController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ✅ untuk spa
      */
     public function store(Request $request)
     {
@@ -40,27 +43,29 @@ class KurikulumController extends Controller
             $validated = $request->validate([
                 'nama_kurikulum' => 'required',
                 'kode_kurikulum' => 'required|unique:kurikulum,kode_kurikulum',
+                'tipe' => 'required|in:K13,MERDEKA',
                 'tahun_mulai' => 'nullable',
                 'tahun_selesai' => 'nullable',
-                'status' => 'nullable|in:aktif,tidak aktif',
                 'deskripsi' => 'nullable',
             ], [
                 'nama_kurikulum.required' => 'Nama kurikulum wajib diisi',
                 'kode_kurikulum.required' => 'Kode kurikulum wajib diisi',
                 'kode_kurikulum.unique' => 'Kode kurikulum sudah ada',
-                'status.in' => 'Pilihan hanya aktif dan tidak aktif'
+                'tipe.required' => 'Tipe wajib diisi',
+                'tipe.in' => 'Pilihan hanya K13 atau MERDEKA'
             ]);
 
             $kurikulum = Kurikulum::create($validated);
 
             return ApiResponse::success([
-                'id' => $kurikulum['id'] ?? null,
-                'nama_kurikulum' => $kurikulum['nama_kurikulum'] ?? null,
-                'kode_kurikulum' => $kurikulum['kode_kurikulum'] ?? null,
-                'tahun_mulai' => $kurikulum['tahun_mulai'] ?? null,
-                'tahun_selesai' => $kurikulum['tahun_selesai'] ?? null,
-                'status' => $kurikulum['status'] ?? null,
-                'deskripsi' => $kurikulum['deskripsi'] ?? null,
+                'id' => $kurikulum->id ?? null,
+                'nama_kurikulum' => $kurikulum->nama_kurikulum ?? null,
+                'kode_kurikulum' => $kurikulum->kode_kurikulum ?? null,
+                'tipe' => $kurikulum->tipe ?? null,
+                'tahun_mulai' => $kurikulum->tahun_mulai ?? null,
+                'tahun_selesai' => $kurikulum->tahun_selesai ?? null,
+                'deskripsi' => $kurikulum->deskripsi ?? null,
+                'status' => 'aktif',
             ], 'Data kurikulum berhasil dibuat');
         } catch (ValidationException $e)  {
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);
@@ -68,7 +73,7 @@ class KurikulumController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * ✅ untuk spa
      */
     public function show(string $id)
     {
@@ -79,20 +84,21 @@ class KurikulumController extends Controller
         }
 
         $formatted = [
-            'id' => $find['id'] ?? null,
-            'nama_kurikulum' => $find['nama_kurikulum'] ?? null,
-            'kode_kurikulum' => $find['kode_kurikulum'] ?? null,
-            'tahun_mulai' => $find['tahun_mulai'] ?? null,
-            'tahun_selesai' => $find['tahun_selesai'] ?? null,
-            'status' => $find['status'] ?? null,
-            'deskripsi' => $find['deskripsi'] ?? null,
+            'id' => $find->id ?? null,
+            'nama_kurikulum' => $find->nama_kurikulum ?? null,
+            'kode_kurikulum' => $find->kode_kurikulum ?? null,
+            'tipe' => $find->tipe ?? null,
+            'tahun_mulai' => $find->tahun_mulai ?? null,
+            'tahun_selesai' => $find->tahun_selesai ?? null,
+            'deskripsi' => $find->deskripsi ?? null,
+            'status' => $find->status ?? null,
         ];
 
         return ApiResponse::success($formatted, 'Detail kurikulum berhasil diambil');
     }
 
     /**
-     * Update the specified resource in storage.
+     * ✅ untuk spa
      */
     public function update(Request $request, string $id)
     {
@@ -112,15 +118,19 @@ class KurikulumController extends Controller
                 'required',
                 Rule::unique('kurikulum')->ignore($id)
             ],
-            'tahun_mulai' => 'nullable',
-            'tahun_selesai' => 'nullable',
-            'status' => 'nullable|in:aktif,tidak aktif',
-            'deskripsi' => 'nullable',
+            'tipe' => 'sometimes|required|in:K13,MERDEKA',
+            'tahun_mulai' => 'sometimes|nullable',
+            'tahun_selesai' => 'sometimes|nullable',
+            'deskripsi' => 'sometimes|nullable',
+            'status' => 'sometimes|required|in:aktif,arsip',
         ], [
             'nama_kurikulum.required' => 'Nama kurikulum wajib diisi',
             'kode_kurikulum.required' => 'Kode kurikulum wajib diisi',
             'kode_kurikulum.unique' => 'Kode kurikulum sudah ada',
-            'status.in' => 'Pilihan hanya aktif dan tidak aktif'
+            'tipe.required' => 'Tipe kurikulum wajib diisi',
+            'tipe.in' => 'Pilihan tipe hanya K13 atau MERDEKA',
+            'status.required' => 'Status kurikulum wajib diisi',
+            'status.in' => 'Pilihan hanya aktif atau arsip'
         ]);
 
         $kurikulum->update($validated);
@@ -130,17 +140,18 @@ class KurikulumController extends Controller
                 'id' => $kurikulum->id ?? null,
                 'nama_kurikulum' => $kurikulum->nama_kurikulum ?? null,
                 'kode_kurikulum' => $kurikulum->kode_kurikulum ?? null,
+                'tipe' => $kurikulum->tipe ?? null,
                 'tahun_mulai' => $kurikulum->tahun_mulai ?? null,
                 'tahun_selesai' => $kurikulum->tahun_selesai ?? null,
-                'status' => $kurikulum->status ?? null,
                 'deskripsi' => $kurikulum->deskripsi ?? null,
+                'status' => $kurikulum->status ?? null,
             ], 
             'Kurikulum berhasil diperbarui'
         );
     }
 
     /**
-     * Remove the specified resource from storage.
+     * ✅ untuk spa
      */
     public function destroy(string $id)
     {
@@ -150,10 +161,17 @@ class KurikulumController extends Controller
             return ApiResponse::error('Kurikulum tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
-        // Cek apakah kurikulum sedang digunaka oleh kompetensi dasar
+        // Cek apakah kurikulum sedang digunakan oleh kompetensi dasar
         if ($kurikulum->kompetensiDasars()->exists()) {
             return ApiResponse::error('Kurikulum tidak bisa dihapus karena masih digunakan pada kompetensi dasar', [
-                'nama_kurikulum' => ['Kurikulum ini masih digunakan pada kompetensi dasar']
+                'nama_kurikulum' => ['Kurikulum ini masih digunakan pada kompetensi']
+            ], 422);
+        }
+        
+        // Cek apakah kurikulum sedang digunakan oleh kurmap
+        if ($kurikulum->kurikulumMataPelajaran()->exists()) {
+            return ApiResponse::error('Kurikulum tidak bisa dihapus karena masih digunakan pada kurikulum mata pelajaran', [
+                'nama_kurikulum' => ['Kurikulum masih digunakan']
             ], 422);
         }
 

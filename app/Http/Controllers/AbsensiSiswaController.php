@@ -24,41 +24,95 @@ class AbsensiSiswaController extends Controller
      */
     public function index()
     {
-        $absen = AbsensiSiswa::with('siswaJadwalPelajaran.jadwal.mataPelajaran', 'siswa.kelas', 'mataPelajaran')
-            ->orderBy('hari', 'desc')
-            ->get();
-    
-        if ($absen->isEmpty()) {
-            return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
+        $absensi = AbsensiSiswa::with([
+            'siswa.kelas',
+            'jadwalPelajaran.mataPelajaran',
+            'tahunAkademik'
+        ])
+        ->orderBy('hari')
+        ->get();
+
+        if ($absensi->isEmpty()) {
+            return ApiResponse::error('Not found', [
+                'data' => 'Data absensi tidak ditemukan'
+            ]);
         }
-    
-        // Kelompokkan berdasarkan guru_id
-        $grouped = $absen->groupBy('siswa_id')->map(function ($item) {
-            $siswaId = $item->first()->siswa->id ?? null;
-            $namaSiswa = $item->first()->siswa->nama ?? null;
-            $namaKelas = $item->first()->siswa->kelas->nama_kelas ?? null;
-    
-            return [
-                'siswa_id' => $siswaId ?? null,
-                'nama_siswa' => $namaSiswa ?? null,
-                'kelas' => $namaKelas ?? null,
-                'total_hadir' => $item->where('status', 'hadir')->count() ?? null,
-                'total_izin' => $item->where('status', 'izin')->count() ?? null,
-                'total_sakit' => $item->where('status', 'sakit')->count() ?? null,
-                'total_alfa' => $item->where('status', 'alfa')->count() ?? null,
-                'absensi' => $item->map(function ($abs) {
-                    return [
-                        'id' => $abs->id ?? null,
-                        'mata_pelajaran' => $abs->mataPelajaran->nama_pelajaran ?? null,
-                        'hari' => Carbon::parse($abs->hari)->translatedFormat('l, d F Y') ?? null,
-                        'status' => $abs->status ?? null,
-                        'bukti' => $abs->bukti ? asset(str_replace('public/', 'storage/', $abs->bukti)) : null,
-                    ];
-                })->values()
-            ];
-        })->values();
-    
-        return ApiResponse::success($grouped, 'Semua absensi berhasil diambil');
+
+        $result = $absensi
+            ->groupBy('siswa_id')
+            ->map(function ($absenSiswa) {
+
+                $siswa = $absenSiswa->first()->siswa;
+
+                return [
+                    'siswa_id'   => $siswa->id,
+                    'nama_siswa' => $siswa->nama,
+                    'kelas'      => $siswa->kelas->nama_kelas ?? null,
+
+                    // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK
+                    'absensi' => $absenSiswa
+                        ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
+                        ->map(function ($absenPerTahun, $tahunAkademik) {
+
+                            // 🔹 GROUP PER SEMESTER
+                            $semester = $absenPerTahun
+                                ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
+                                ->map(function ($absenSemester, $semester) {
+
+                                    return [
+                                        'semester' => $semester,
+
+                                        // TOTAL PER SEMESTER
+                                        'total' => [
+                                            'hadir' => $absenSemester->where('status', 'hadir')->count(),
+                                            'izin'  => $absenSemester->where('status', 'izin')->count(),
+                                            'sakit' => $absenSemester->where('status', 'sakit')->count(),
+                                            'alfa'  => $absenSemester->where('status', 'alfa')->count(),
+                                        ],
+
+                                        // 🔹 RINCIAN PER MAPEL
+                                        'rincian' => $absenSemester
+                                            ->groupBy('jadwal_pelajaran_id')
+                                            ->map(function ($absenMapel) {
+
+                                                $mapel = $absenMapel->first()
+                                                    ->jadwalPelajaran
+                                                    ->mataPelajaran;
+
+                                                return [
+                                                    'mata_pelajaran' =>
+                                                        $mapel->nama_pelajaran ?? null,
+
+                                                    'detail' => $absenMapel->map(function ($abs) {
+                                                        return [
+                                                            'hari' => Carbon::parse($abs->hari)
+                                                                ->translatedFormat('l, d F Y'),
+                                                            'status' => $abs->status,
+                                                            'bukti' => $abs->bukti
+                                                                ? asset(str_replace(
+                                                                    'public/',
+                                                                    'storage/',
+                                                                    $abs->bukti
+                                                                ))
+                                                                : null,
+                                                        ];
+                                                    })->values(),
+                                                ];
+                                            })->values(),
+                                    ];
+                                })->values();
+
+                            return [
+                                'tahun_akademik' => $tahunAkademik,
+                                'status_tahun_akademik' => $absenPerTahun->first()->tahunAkademik->status ?? null,
+                                'semester' => $semester,
+                                'status_semester' => $absenPerTahun->first()->tahunAkademik->status ?? null,
+                            ];
+                        })->values(),
+                ];
+            })->values();
+
+        return ApiResponse::success($result, 'Semua absensi berhasil diambil');
     }
 
 
@@ -90,29 +144,38 @@ class AbsensiSiswaController extends Controller
         $siswa = Auth::guard('siswa')->user();
 
         try {
-            $validated = $request->validate([                
-                'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
+            $validated = $request->validate([          
+                // @Ryan...Yang kelas, jadwal pelajaran, dan tahun akademik terisi otomatis
+                'kelas_id' => 'required|exists:kelas,id', // dari SiswaJadwalPelajaranController::showAllJadwalSendiri
+                'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajarans,id', // dari SiswaJadwalPelajaranController::showAllJadwalSendiri
                 'status' => 'required|in:hadir,izin,sakit,alfa',
-                'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+                'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'tahun_akademik_id' => 'required|exists:tahun_akademik,id' // dari SiswaJadwalPelajaranController::showAllJadwalSendiri
+                
             ],[
-                'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-                'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
                 'status.required' => 'Status wajib diisi',
                 'status.in' => 'Pilihan hanya hadir, izin, sakit, alfa',
                 'bukti.image' => 'Format bukti wajib berupa gambar atau foto',                
                 'bukti.mimes' => 'Format bukti wajib berupa jpeg, png, jpg',                
                 'bukti.max' => 'Ukuran foto bukti maksimal 2 MB',                
+                'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',                
+                'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
             ]);                                
             
             // gabisa absen 2x pada hari yang sama
-            $hari = AbsensiSiswa::with('mataPelajaran')->where('siswa_id', $siswa->id)
-            ->where('mata_pelajaran_id', $validated['mata_pelajaran_id'])
-            ->where('kelas_id', $siswa->kelas_id)
+            $hari = AbsensiSiswa::with(
+                'siswa.kelas',
+                'jadwalPelajaran.mataPelajaran',
+                'tahunAkademik'
+            )
+            ->where('siswa_id', $siswa->id)
+            ->where('jadwal_pelajaran_id', $validated['jadwal_pelajaran_id'])
+            ->where('kelas_id', $validated['kelas_id'])
             ->whereDate('hari', today())
-            ->first();
+            ->exists();
 
             if ($hari) {
-                return ApiResponse::error('Gagal', ['pesan' => 'Anda sudah absen pelajaran '.$hari->mataPelajaran->nama_pelajaran.' hari ini'], 422);
+                return ApiResponse::error('Gagal', ['pesan' => 'Anda sudah absen pelajaran '.$hari->jadwalPelajaran->mataPelajaran->nama_pelajaran.' hari ini'], 422);
             }
            
             if ($request->hasFile('bukti')) {
@@ -123,130 +186,302 @@ class AbsensiSiswaController extends Controller
                 );
             }   
 
+            $tahunAkademikAktif = TahunAkademik::where('status', 'aktif')->first();
+
+            $siswaKelas = SiswaKelas::with('kelas', 'tahunAkademik')
+            ->where('siswa_id', $siswa->id)
+            ->where('tahun_akademik_id', $tahunAkademikAktif)
+            ->first();
+
             $absensi = AbsensiSiswa::create(
                 [
-                    'siswa_id' => $siswa->id,
-                    'kelas_id' => $siswa->kelas_id,
-                    'mata_pelajaran_id' => $validated['mata_pelajaran_id'],
-                    'hari' => Carbon::today()->toDateString(),
-                    'status' => $validated['status'],
-                    'bukti' => $validated['bukti'] ?? null
+                    'siswa_id' => $siswa->id ?? null,
+                    'kelas_id' => $validated['kelas_id'] ?? null,
+                    'jadwal_pelajaran_id' => $validated['jadwal_pelajaran_id'] ?? null,
+                    'hari' => Carbon::today()->toDateString() ?? null,
+                    'status' => $validated['status'] ?? null,
+                    'bukti' => $validated['bukti'] ?? null,
+                    'tahun_akademik_id' => $validated['tahun_akademik_id'] ?? null
                 ]
             );
 
-            $absensi->load('mataPelajaran', 'siswa.kelas');        
+            $absensi->load('jadwalPelajaran.mataPelajaran', 'siswa.kelas', 'tahunAkademik');        
 
             return ApiResponse::success([
                 'id' => $absensi->id ?? null,
                 'siswa' => $absensi->siswa->nama ?? null,                
                 'kelas' => $absensi->siswa->kelas->nama_kelas ?? null,
-                'mata_pelajaran' => $absensi->mataPelajaran->nama_pelajaran ?? null,               
+                'mata_pelajaran' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,               
                 'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,
-                'status' => $absensi->status ?? null,       
-                'bukti' => $absensi->status ? asset(str_replace('public/', 'storage/', $absensi->bukti)) : null,       
-                'rekapitulasi' => [
-                    'hadir' => $absensi::where('status', 'hadir')->where('siswa_id', $siswa->id)->count(),
-                    'izin' => $absensi::where('status', 'izin')->where('siswa_id', $siswa->id)->count(),
-                    'sakit' => $absensi::where('status', 'sakit')->where('siswa_id', $siswa->id)->count(),
-                    'alfa' => $absensi::where('status', 'alfa')->where('siswa_id', $siswa->id)->count(),
-                ]
-            ], 'Data absensi pelajaran '.$absensi->mataPelajaran->nama_pelajaran.' berhasil dibuat');
+                'status_kehadiran' => $absensi->status ?? null,       
+                'bukti' => $absensi->bukti ? asset(str_replace('public/', 'storage/', $absensi->bukti)) : null,                
+                'tahun_akademik_id' => $absensi->tahunAkademik->id ?? null,               
+                'tahun_akademik' => $absensi->tahunAkademik->tahun_akademik ?? null,               
+                'status_tahun_akademik' => $absensi->tahunAkademik->status ?? null,               
+                'semester' => $absensi->tahunAkademik->semester ?? null,               
+                'status_semester' => $absensi->tahunAkademik->status ?? null,               
+            ], 'Data absensi pelajaran '.$absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran.' berhasil dibuat');
 
         } catch (ValidationException $e) {
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);
         }
     }
 
+
+    // ✅ guru bisa absenkan siswa
+    public function guruAbsenkanSiswa(Request $request)
+    {
+        Carbon::setLocale('id');
+
+        try {
+            $validated = $request->validate([          
+                // semua inputan otomatis terisi kecuali siswa_id, status, dan bukti
+                'siswa_id' => 'required|exists:siswa,id', // ini manual dipilih oleh guru
+                'kelas_id' => 'required|exists:kelas,id', // otomatis
+                'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajarans,id', // otomatis
+                'status' => 'required|in:hadir,izin,sakit,alfa', // Ini manual dipilih oleh guru
+                'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // ini juga manual
+                'tahun_akademik_id' => 'required|exists:tahun_akademik,id' // otomatis
+                
+            ],[
+                'siswa_id.required' => 'Siswa wajib diisi',
+                'siswa_id.exists' => 'Siswa tidak ditemukan',
+                'kelas_id.required' => 'Kelas wajib diisi',
+                'kelas_id.exists' => 'Kelas tidak ditemukan',
+                'jadwal_pelajaran_id.required' => 'Jadwal pelajaran wajib diisi',
+                'jadwal_pelajaran_id.exists' => 'Jadwal pelajaran tidak ditemukan',
+                'status.required' => 'Status wajib diisi',
+                'status.in' => 'Pilihan hanya hadir, izin, sakit, alfa',
+                'bukti.image' => 'Format bukti wajib berupa gambar atau foto',                
+                'bukti.mimes' => 'Format bukti wajib berupa jpeg, png, jpg',                
+                'bukti.max' => 'Ukuran foto bukti maksimal 2 MB',                
+                'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',                
+                'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
+            ]);                                
+            
+            // gabisa absen 2x pada hari yang sama
+            $hari = AbsensiSiswa::with(
+                'siswa.kelas',
+                'jadwalPelajaran.mataPelajaran',
+                'tahunAkademik'
+            )
+            ->where('siswa_id', $validated['siswa_id'])
+            ->where('jadwal_pelajaran_id', $validated['jadwal_pelajaran_id'])
+            ->where('kelas_id', $validated['kelas_id'])
+            ->whereDate('hari', today())
+            ->exists();
+
+            if ($hari) {
+                return ApiResponse::error('Gagal', ['pesan' => 'Siswa ini sudah absen pelajaran '.$hari->jadwalPelajaran->mataPelajaran->nama_pelajaran.' hari ini'], 422);
+            }
+           
+            if ($request->hasFile('bukti')) {
+                $validated['bukti'] = $this->simpanFoto(
+                    $request->file('bukti'),
+                    'bukti', // folder penyimpanan
+                    $siswa->nama
+                );
+            }              
+
+            $absensi = AbsensiSiswa::create(
+                [
+                    'siswa_id' => $validated['siswa_id'] ?? null,
+                    'kelas_id' => $validated['kelas_id'] ?? null,
+                    'jadwal_pelajaran_id' => $validated['jadwal_pelajaran_id'] ?? null,
+                    'hari' => Carbon::today()->toDateString() ?? null,
+                    'status' => $validated['status'] ?? null,
+                    'bukti' => $validated['bukti'] ?? null,
+                    'tahun_akademik_id' => $validated['tahun_akademik_id'] ?? null
+                ]
+            );
+
+            $absensi->load('jadwalPelajaran.mataPelajaran', 'siswa.kelas', 'tahunAkademik');        
+
+            return ApiResponse::success([
+                'id' => $absensi->id ?? null,
+                'siswa' => $absensi->siswa->nama ?? null,                
+                'kelas' => $absensi->siswa->kelas->nama_kelas ?? null,
+                'mata_pelajaran' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,               
+                'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,
+                'status_kehadiran' => $absensi->status ?? null,       
+                'bukti' => $absensi->bukti ? asset(str_replace('public/', 'storage/', $absensi->bukti)) : null,                
+                'tahun_akademik_id' => $absensi->tahunAkademik->id ?? null,               
+                'tahun_akademik' => $absensi->tahunAkademik->tahun_akademik ?? null,               
+                'status_tahun_akaemik' => $absensi->tahunAkademik->status ?? null,               
+                'semester' => $absensi->tahunAkademik->semester ?? null,               
+                'status_semester' => $absensi->tahunAkademik->status ?? null,               
+            ], 'Data absensi pelajaran '.$absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran.' berhasil dibuat');
+
+        } catch (ValidationException $e) {
+            return ApiResponse::error('Validasi gagal', $e->errors(), 422);
+        }
+    }
+
+
     /**
      * ✅ untuk spa
-     */
-    public function show(string $id)
-    {
+     * get siswa dan semua absennya
+     */   
+    public function show($id)
+    {        
         $absen = AbsensiSiswa::with([
-                'siswaJadwalPelajaran.jadwal.mataPelajaran',
-                'mataPelajaran',
-                'siswa.kelas'
-            ])
-            ->where('siswa_id', $id)
-            ->orderBy('hari', 'desc')
-            ->get();
+            'jadwalPelajaran.mataPelajaran',
+            'siswa.kelas',
+            'tahunAkademik'
+        ])
+        ->where('siswa_id', $id)
+        ->orderBy('hari', 'desc')
+        ->get();
     
         if ($absen->isEmpty()) {
-            return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
+            return ApiResponse::error('Not found', [
+                'data' => 'Data absensi tidak ditemukan'
+            ]);
         }
     
-        $grouped = $absen->groupBy('siswa_id')->map(function ($items) {
+        $siswa = $absen->first()->siswa;
     
-            $first = $items->first();
+        $result = [
+            'siswa_id'   => $siswa->id,
+            'nama_siswa' => $siswa->nama,
+            'kelas_id'   => $siswa->kelas->id ?? null,
+            'kelas'      => $siswa->kelas->nama_kelas ?? null,
     
-            return [
-                'siswa_id'      => $first->siswa->id ?? null,
-                'nama_siswa'    => $first->siswa->nama ?? null,
-                'kelas'         => $first->siswa->kelas->nama_kelas ?? null,
+            // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK
+            'tahun_akademik' => $absen
+                ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
+                ->map(function ($absenPerTahun, $tahunAkademik) {
     
-                'total_hadir'   => $items->where('status', 'hadir')->count(),
-                'total_izin'    => $items->where('status', 'izin')->count(),
-                'total_sakit'   => $items->where('status', 'sakit')->count(),
-                'total_alfa'    => $items->where('status', 'alfa')->count(),
+                    // 🔹 GROUP PER SEMESTER
+                    $semester = $absenPerTahun
+                        ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
+                        ->map(function ($itemsSemester, $semester) {
     
-                'absensi' => $items->map(function ($abs) {
+                            return [
+                                'semester' => $semester,
+    
+                                'total' => [
+                                    'hadir' => $itemsSemester->where('status', 'hadir')->count(),
+                                    'izin'  => $itemsSemester->where('status', 'izin')->count(),
+                                    'sakit' => $itemsSemester->where('status', 'sakit')->count(),
+                                    'alfa'  => $itemsSemester->where('status', 'alfa')->count(),
+                                ],
+    
+                                'absensi' => $itemsSemester->map(function ($abs) {
+                                    return [
+                                        'id' => $abs->id,
+                                        'mata_pelajaran' =>
+                                            $abs->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,
+                                        'hari' => Carbon::parse($abs->hari)
+                                            ->translatedFormat('l, d F Y'),
+                                        'status_kehadiran' => $abs->status,
+                                        'bukti' => $abs->bukti
+                                            ? asset(str_replace(
+                                                'public/',
+                                                'storage/',
+                                                $abs->bukti
+                                            ))
+                                            : null,
+                                    ];
+                                })->values(),
+                            ];
+                        })->values();
+    
                     return [
-                        'id'              => $abs->id ?? null,
-                        'mata_pelajaran'  => $abs->mataPelajaran->nama_pelajaran ?? null,
-                        'hari'            => Carbon::parse($abs->hari)->translatedFormat('l, d F Y'),
-                        'status'          => $abs->status ?? null,
-                        'bukti'           => $abs->bukti ? asset(str_replace('public/', 'storage/', $abs->bukti)) : null,
+                        'tahun_akademik' => $tahunAkademik,
+                        'status_tahun_akademik' => $absenPerTahun->first()->tahunAkademik->status ?? null,
+                        'semester' => $semester,
+                        'status_semester' => $absenPerTahun->first()->tahunAkademik->status ?? null,
                     ];
-                })->values()
-            ];
-        })->values();
+                })->values(),
+        ];
     
-        return ApiResponse::success($grouped, 'Detail absensi berhasil diambil');
+        return ApiResponse::success($result, 'Absensi berhasil diambil');
     }
+    
     
 
     // ✅ show all absen sendiri (untuk siswa)
     public function showAbsenPelajaranSendiri()
     {
         $user = Auth::guard('siswa')->user();
-
+    
         $absen = AbsensiSiswa::with([
-            'mataPelajaran',
-            'siswa.kelas'
+            'jadwalPelajaran.mataPelajaran',
+            'siswa.kelas',
+            'tahunAkademik'
         ])
         ->where('siswa_id', $user->id)
         ->orderBy('hari', 'desc')
         ->get();
-        
+    
         if ($absen->isEmpty()) {
-            return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
+            return ApiResponse::error('Not found', [
+                'data' => 'Data absensi tidak ditemukan'
+            ]);
         }
-
-        $first = $absen->first();
-
+    
+        $siswa = $absen->first()->siswa;
+    
         $result = [
-            'siswa_id'   => $first->siswa->id ?? null,
-            'nama_siswa' => $first->siswa->nama ?? null,
-            'kelas'      => $first->siswa->kelas->nama_kelas ?? null,
-
-            'total_hadir' => $absen->where('status', 'hadir')->count(),
-            'total_izin'  => $absen->where('status', 'izin')->count(),
-            'total_sakit' => $absen->where('status', 'sakit')->count(),
-            'total_alfa'  => $absen->where('status', 'alfa')->count(),
-
-            'absensi' => $absen->map(function ($abs) {
-                return [
-                    'id'                 => $abs->id,
-                    'mata_pelajaran'    => $abs->mataPelajaran->nama_pelajaran ?? null,
-                    'hari'               => Carbon::parse($abs->hari)->translatedFormat('l, d F Y'),
-                    'status'             => $abs->status,
-                    'bukti'              => $abs->bukti ? asset(str_replace('public/', 'storage/', $abs->bukti)) : null,
-                ];
-            })->values()
+            'siswa_id'   => $siswa->id,
+            'nama_siswa' => $siswa->nama,
+            'kelas_id'   => $siswa->kelas->id ?? null,
+            'kelas'      => $siswa->kelas->nama_kelas ?? null,
+    
+            // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK
+            'tahun_akademik' => $absen
+                ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
+                ->map(function ($absenPerTahun, $tahunAkademik) {
+    
+                    // 🔹 GROUP PER SEMESTER
+                    $semester = $absenPerTahun
+                        ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
+                        ->map(function ($itemsSemester, $semester) {
+    
+                            return [
+                                'semester' => $semester,
+    
+                                'total' => [
+                                    'hadir' => $itemsSemester->where('status', 'hadir')->count(),
+                                    'izin'  => $itemsSemester->where('status', 'izin')->count(),
+                                    'sakit' => $itemsSemester->where('status', 'sakit')->count(),
+                                    'alfa'  => $itemsSemester->where('status', 'alfa')->count(),
+                                ],
+    
+                                'absensi' => $itemsSemester->map(function ($abs) {
+                                    return [
+                                        'id' => $abs->id,
+                                        'mata_pelajaran' =>
+                                            $abs->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,
+                                        'hari' => Carbon::parse($abs->hari)
+                                            ->translatedFormat('l, d F Y'),
+                                        'status_kehadiran' => $abs->status,
+                                        'bukti' => $abs->bukti
+                                            ? asset(str_replace(
+                                                'public/',
+                                                'storage/',
+                                                $abs->bukti
+                                            ))
+                                            : null,
+                                    ];
+                                })->values(),
+                            ];
+                        })->values();
+    
+                    return [
+                        'tahun_akademik' => $tahunAkademik,
+                        'status_tahun_akademik' => $absenPerTahun->first()->tahunAkademik->status ?? null,
+                        'semester' => $semester,
+                        'status_semester' => $absenPerTahun->first()->tahunAkademik->status ?? null,
+                    ];
+                })->values(),
         ];
-
+    
         return ApiResponse::success($result, 'Absensi berhasil diambil');
     }
+    
+
 
     /**
      * ✅ untuk spa
@@ -259,13 +494,10 @@ class AbsensiSiswaController extends Controller
             return ApiResponse::error('Not found', ['id' => 'Data tidak ditemukan']);
         }
 
-        $validated = $request->validate([    
-            'mata_pelajaran_id' => 'sometimes|required|exists:mata_pelajarans,id',        
+        $validated = $request->validate([                
             'status' => 'sometimes|required|in:hadir,izin,sakit,alfa',
             'bukti' => 'sometimes|nullable|image|mimes:jpeg,png,jpg|max:2048'
-        ], [            
-            'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-            'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
+        ], [                        
             'status.required' => 'Status wajib diisi',
             'status.in' => 'Pilihan hanya hadir, izin, sakit, alfa',
             'bukti.image' => 'Format bukti wajib berupa gambar atau foto',                
@@ -301,20 +533,22 @@ class AbsensiSiswaController extends Controller
 
         $absensi->update($validated);
 
+        $absensi->load('jadwalPelajaran.mataPelajaran', 'siswa.kelas', 'tahunAkademik');        
+
+
         return ApiResponse::success([
             'id' => $absensi->id ?? null,
             'siswa' => $absensi->siswa->nama ?? null,                
             'kelas' => $absensi->siswa->kelas->nama_kelas ?? null,
-            'mata_pelajaran' => $absensi->mataPelajaran->nama_pelajaran ?? null,               
+            'mata_pelajaran' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,               
             'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,
-            'status' => $absensi->status ?? null,       
-            'bukti' => $absensi->status ? asset(str_replace('public/', 'storage/', $absensi->bukti)) : null,       
-            'rekapitulasi' => [
-                'hadir' => $absensi::where('status', 'hadir')->where('siswa_id', $absensi->siswa_id)->count(),
-                'izin' => $absensi::where('status', 'izin')->where('siswa_id', $absensi->siswa_id)->count(),
-                'sakit' => $absensi::where('status', 'sakit')->where('siswa_id', $absensi->siswa_id)->count(),
-                'alfa' => $absensi::where('status', 'alfa')->where('siswa_id', $absensi->siswa_id)->count(),
-            ]
+            'status_kehadiran' => $absensi->status ?? null,       
+            'bukti' => $absensi->bukti ? asset(str_replace('public/', 'storage/', $absensi->bukti)) : null,                
+            'tahun_akademik_id' => $absensi->tahunAkademik->id ?? null,               
+            'tahun_akademik' => $absensi->tahunAkademik->tahun_akademik ?? null,               
+            'status_tahun_akademik' => $absensi->tahunAkademik->status ?? null,          
+            'semester' => $absensi->tahunAkademik->semester ?? null,               
+            'status_semester' => $absensi->tahunAkademik->status ?? null,          
         ], 'Data absensi pelajaran berhasil diperbarui');
     }
 

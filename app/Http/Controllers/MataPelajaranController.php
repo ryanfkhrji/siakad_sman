@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Helpers\ApiResponse;
 use App\Models\MataPelajaran;
+use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class MataPelajaranController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * ✅ untuk spa
      */
     public function index()
     {
@@ -21,6 +23,7 @@ class MataPelajaranController extends Controller
                 'id' => $item->id ?? null,
                 'nama_pelajaran' => $item->nama_pelajaran ?? null,
                 'kode_mapel_diknas' => $item->kode_mapel_diknas ?? null,
+                'status' => $item->status ?? null,
             ];
         });
 
@@ -28,7 +31,7 @@ class MataPelajaranController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ✅ untuk spa
      */
     public function store(Request $request)
     {
@@ -42,12 +45,17 @@ class MataPelajaranController extends Controller
                 'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',
             ]);
     
-            $matpel = MataPelajaran::create($validated);
+            $matpel = MataPelajaran::create([
+                'nama_pelajaran' => $validated['nama_pelajaran'],
+                'kode_mapel_diknas' => $validated['kode_mapel_diknas'],
+                'status' => 'aktif'
+            ]);
             
             return ApiResponse::success([
                 'id' => $matpel->id ?? null,
                 'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
                 'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                
+                'status' => $matpel->status ?? null
             ], 'Mata Pelajaran Berhasil Dibuat');
     
         } catch (ValidationException $e) {
@@ -56,31 +64,33 @@ class MataPelajaranController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * ✅ untuk spa
      */
     public function show(string $id)
     {
-        $matpel = MataPelajaran::find($id);
+        $find = MataPelajaran::where('id', $id)->first();
 
-        if (!$matpel) {
-            return ApiResponse::error('Mata pelajaran tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        if (!$find) {
+            return ApiResponse::error('Data tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
         $formatted = [
-                'id' => $matpel->id ?? null,
-                'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
-                'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                                
-            ];
+            'id' => $find->id ?? null,
+            'nama_pelajaran' => $find->nama_pelajaran ?? null,
+            'kode_mapel_diknas' => $find->kode_mapel_diknas ?? null,
+            'status' => $find->status ?? null,
+        ];
 
         return ApiResponse::success($formatted, 'Detail mata pelajaran berhasil diambil');
     }
 
     /**
-     * Update the specified resource in storage.
+     * ✅ untuk spa
      */
     public function update(Request $request, $id)
     {
         $matpel = MataPelajaran::find($id);
+
         if (!$matpel) {
             return ApiResponse::error('Mata pelajaran tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
@@ -95,10 +105,17 @@ class MataPelajaranController extends Controller
                 'required',
                 Rule::unique('mata_pelajarans')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
             ],            
+            'status' => [
+                'sometimes',
+                'required',                
+                'in:aktif,arsip'
+            ],
         ],[
             'nama_pelajaran.required' => 'Nama pelajaran wajib diisi',
             'kode_mapel_diknas.required' => 'Kode mapel wajib diisi',
             'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',            
+            'status.required' => 'Status wajib diisi',
+            'status.in' => 'Pilihan status hanya aktif dan arsip',
         ]);
 
         $matpel->update($validated);
@@ -108,20 +125,46 @@ class MataPelajaranController extends Controller
                 'id' => $matpel->id ?? null,
                 'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
                 'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                
+                'status' => $matpel->status ?? null,                
             ], 'Mata pelajaran berhasil diperbarui');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * ✅ untuk spa
      */
     public function destroy($id)
     {
         $matpel = MataPelajaran::find($id);
-        if (!$matpel) {
-            return ApiResponse::error('Mata pelajaran tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+
+        if (! $matpel) {
+            return ApiResponse::error(
+                'Mata pelajaran tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
+        }
+
+        // Cek apakah sudah digunakan di jadwal
+        $dipakaiJadwal = $matpel->jadwalPelajarans()->exists();
+
+        // Cek apakah sudah digunakan di absensi
+        $dipakaiAbsensi = $matpel->absensiKepegawaians()->exists();
+
+        if ($dipakaiJadwal || $dipakaiAbsensi) {
+            return ApiResponse::error(
+                'Mata pelajaran tidak dapat dihapus',
+                [
+                    'mata_pelajaran' => [
+                        'Mata pelajaran sudah digunakan pada jadwal atau absensi'
+                    ]
+                ],
+                422
+            );
         }
 
         $matpel->delete();
+
         return ApiResponse::success(null, 'Mata pelajaran berhasil dihapus');
     }
+
 }

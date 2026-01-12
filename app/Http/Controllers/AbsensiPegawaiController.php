@@ -22,39 +22,83 @@ class AbsensiPegawaiController extends Controller
      */
     public function index()
     {
-        $absen = AbsensiPegawai::with('mataPelajaran', 'guru.kelas')
-            ->orderBy('hari', 'desc')
-            ->get();
-    
+        $absen = AbsensiPegawai::with([
+            'mataPelajaran',
+            'guru.kelas',
+            'tahunAkademik'
+        ])
+        ->orderBy('hari', 'desc')
+        ->get();
+
         if ($absen->isEmpty()) {
-            return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
+            return ApiResponse::error(
+                'Not found',
+                ['data' => 'Data absensi tidak ditemukan']
+            );
         }
-    
-        // Kelompokkan berdasarkan guru_id
-        $grouped = $absen->groupBy('guru_id')->map(function ($item) {
-            $namaGuru = $item->first()->guru->nama ?? null;
-            $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
-            $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
-    
-            return [
-                'guru_id' => $item->first()->guru_id ?? null,
-                'nama_guru' => $namaGuru ?? null,
-                'mengajar' => $namaPelajaran ?? null,
-                'wali_kelas' => $kelas ?? null,
-                'total_hadir' => $item->where('status', 'hadir')->count(),
-                'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
-                'absensi' => $item->map(function ($abs) {
-                    return [
-                        'id' => $abs->id ?? null,
-                        'hari' => Carbon::parse($abs->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                        
-                        'status' => $abs->status ?? null,
-                    ];
-                })->values()
-            ];
-        })->values();
-    
-        return ApiResponse::success($grouped, 'Absensi berhasil diambil');
-    }    
+
+        $result = $absen
+            ->groupBy('guru_id')
+            ->map(function ($items) {
+
+                $first = $items->first();
+
+                // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK (2025/2026)
+                $perTahun = $items
+                    ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
+                    ->map(function ($tahunItems, $tahunAkademik) {
+
+                        // total per tahun (gabungan ganjil + genap)
+                        $totalHadir = $tahunItems->where('status', 'hadir')->count();
+                        $totalTidakHadir = $tahunItems->where('status', 'tidak hadir')->count();
+
+                        // 🔹 GROUP PER SEMESTER DARI DATABASE
+                        $perSemester = $tahunItems
+                            ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
+                            ->map(function ($semesterItems, $semester) {
+
+                                return [
+                                    'semester' => $semester,
+                                    'rincian' => $semesterItems->map(function ($abs) {
+                                        return [
+                                            'absensi_id' => $abs->id,
+                                            'hari' => Carbon::parse($abs->hari)
+                                                ->translatedFormat('l, d F Y'),
+                                            'status' => $abs->status,
+                                        ];
+                                    })->values(),
+                                ];
+                            })
+                            ->values();
+
+                        return [
+                            'tahun_akademik' => $tahunAkademik,
+                            'status_tahun_akademik' => $tahunItems->first()->tahunAkademik->status ?? null,
+                            
+                            'total_hadir' => $totalHadir,
+                            'total_tidak_hadir' => $totalTidakHadir,
+                            'semester' => $perSemester,
+                            'status_semester' => $tahunItems->first()->tahunAkademik->status ?? null,
+                        ];
+                    })
+                    ->values();
+
+                return [
+                    'guru_id' => $first->guru_id,
+                    'nama_guru' => $first->guru->nama ?? null,
+                    'mengajar' => $first->mataPelajaran->nama_pelajaran ?? null,
+                    'wali_kelas' => $first->guru->kelas->nama_kelas ?? null,
+                    'absensi' => $perTahun,
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success(
+            $result,
+            'Absensi berhasil diambil'
+        );
+    }
+
 
     /**
      * ✅ Untuk pegawai
@@ -67,18 +111,15 @@ class AbsensiPegawaiController extends Controller
 
         try {
             $validated = $request->validate([
-                'status' => 'required|in:hadir,tidak hadir'
+                // ini untuk inputan create absensi pegawai @Ryan
+                'status' => 'required|in:hadir,tidak hadir',
             ],[
                 'status.required' => 'Status wajib diisi',
                 'status.in' => 'Pilihan hanya hadir atau tidak hadir'
             ]);            
 
-            $mataPelajaran = JadwalPelajaran::where('guru_id', $pegawai->id)->first();
-
-            // cek apakah sudah memiliki jadwal
-            if ($mataPelajaran == null && $pegawai->role == 'guru') {
-                return ApiResponse::error('Not valid', ['pesan' => 'Anda belum memiliki jadwal pelajaran']);
-            }
+            $mataPelajaran = JadwalPelajaran::where('guru_id', $pegawai->id)->first();            
+            $tahunAkademik = TahunAkademik::where('status', 'aktif')->first();            
 
             // gabisa absen 2x pada hari yang sama
             $hari = AbsensiPegawai::where('guru_id', $pegawai->id)
@@ -94,31 +135,24 @@ class AbsensiPegawaiController extends Controller
                     'guru_id' => $pegawai->id,
                     'mata_pelajaran_id' => $mataPelajaran->mata_pelajaran_id ?? null,
                     'hari' => Carbon::today()->toDateString(),
+                    'tahun_akademik_id' => $tahunAkademik->id ?? null,
                     'status' => $validated['status']
                 ]
             );
 
-            $absensi->load('mataPelajaran', 'guru');
-
-            $jumlahHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
-            ->where('status', 'hadir')
-            ->count();
-
-            $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
-            ->where('status', 'tidak hadir')
-            ->count();
+            $absensi->load('mataPelajaran', 'guru', 'tahunAkademik');            
 
             return ApiResponse::success([
                 'id' => $absensi->id ?? null,
                 'guru_id' => $absensi->guru->nama ?? null,                
                 'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
-                // 'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d-m-Y') ?? null,   // Senin, 24-06-2026
                 'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
-                'status' => $absensi->status ?? null,       
-                'rekapitulasi' => [
-                    'hadir' => $jumlahHadir,
-                    'tidak_hadir' => $jumlahTidakHadir
-                ]
+                'status' => $absensi->status ?? null,                       
+                'tahun_akademik_id' => $absensi->tahunAkademik->id ?? null,       
+                'tahun_akademik' => $absensi->tahunAkademik->tahun_akademik ?? null,       
+                'status_tahun_akademik' => $absensi->tahunAkademik->status ?? null,       
+                'semester' => $absensi->tahunAkademik->semester ?? null,       
+                'status_semester' => $absensi->tahunAkademik->status ?? null,       
             ], 'Data absensi berhasil dibuat');
 
         } catch (ValidationException $e) {
@@ -126,83 +160,157 @@ class AbsensiPegawaiController extends Controller
         }
     }
 
+
     // ✅ Untuk super admin
     // show detail pegawai dan semua absennya
     public function show($id) {
 
-        $absen = AbsensiPegawai::with('mataPelajaran', 'guru.kelas')
+        $absensi = AbsensiPegawai::with('mataPelajaran', 'guru.kelas', 'tahunAkademik')
             ->where('guru_id', $id)
             ->orderBy('hari', 'desc')
             ->get();
     
         if (!$absen) {
             return ApiResponse::error('Not found', ['data' => 'Data absensi tidak ditemukan']);
-        }            
-    
-        // Kelompokkan berdasarkan guru_id
-        $grouped = $absen->groupBy('guru_id')->map(function ($item) {
-            $namaGuru = $item->first()->guru->nama ?? null;
-            $namaPelajaran = $item->first()->mataPelajaran->nama_pelajaran ?? null;
-            $kelas = $item->first()->guru->kelas->nama_kelas ?? null;
-    
-            return [
-                'guru_id' => $item->first()->guru_id ?? null,
-                'nama_guru' => $namaGuru ?? null,
-                'mengajar' => $namaPelajaran ?? null,
-                'wali_kelas' => $kelas ?? null,
-                'total_hadir' => $item->where('status', 'hadir')->count(),
-                'total_tidak_hadir' => $item->where('status', 'tidak hadir')->count(),
-                'absensi' => $item->map(function ($abs) {
-                    return [
-                        'id' => $abs->id ?? null,
-                        'hari' => Carbon::parse($abs->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                        
-                        'status' => $abs->status ?? null,
-                    ];
-                })->values()
-            ];
-        })->values();
-    
-        return ApiResponse::success($grouped, 'Detail absensi berhasil diambil');
+        }                    
+
+        $first = $absensi->first();
+
+        // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK (contoh: 2025/2026)
+        $groupedByYear = $absensi
+            ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
+            ->map(function ($itemsYear, $tahunAkademik) {
+
+                // total per tahun (gabungan ganjil + genap)
+                $totalHadir = $itemsYear->where('status', 'hadir')->count();
+                $totalTidakHadir = $itemsYear->where('status', 'tidak hadir')->count();
+
+                // 🔹 GROUP PER SEMESTER (AMBIL DARI DB)
+                $semester = $itemsYear
+                    ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
+                    ->map(function ($itemsSemester, $semester) {
+
+                        return [
+                            'semester' => $semester,
+                            'rincian' => $itemsSemester->map(function ($abs) {
+                                return [
+                                    'absensi_id' => $abs->id,
+                                    'hari' => Carbon::parse($abs->hari)
+                                        ->translatedFormat('l, d F Y'),
+                                    'status' => $abs->status,
+                                ];
+                            })->values(),
+                        ];
+                    })
+                    ->values();
+
+                return [
+                    'tahun_akademik' => $tahunAkademik,
+                    'status_tahun_akademik' => $itemsYear->first()->tahunAkademik->status ?? null,
+                    
+                    'total_hadir' => $totalHadir,
+                    'total_tidak_hadir' => $totalTidakHadir,
+                    'semester' => $semester,
+                    'status_semester' => $itemsYear->first()->tahunAkademik->status ?? null,
+                ];
+            })
+            ->values();
+
+        // 🔹 FINAL RESPONSE
+        $formatted = [
+            'guru_id' => $guru->id,
+            'nama' => $guru->nama ?? null,
+            'wali_kelas' => $guru->kelas->nama_kelas ?? null,
+            'mata_pelajaran_id' => $first->mataPelajaran->id ?? null,
+            'nama_mata_pelajaran' => $first->mataPelajaran->nama_pelajaran ?? null,
+            'absensi' => $groupedByYear,
+        ];
+
+        return ApiResponse::success(
+            [$formatted],
+            'Absensi guru berhasil diambil'
+        );
     }
 
     // ✅ show all absen sendiri (untuk pegawai)
-    public function showAbsenSendiri() {
-        $user = Auth::guard('kepegawaian')->user();
-        $matpel = JadwalPelajaran::with('mataPelajaran', 'guru.kelas')->where('guru_id', $user->id)->first();
+    public function showAbsenSendiri()
+    {
+        $guru = Auth::guard('kepegawaian')->user();
 
-        $absensi = AbsensiPegawai::with('mataPelajaran')->where('guru_id', $user->id)->get();
+        $absensi = AbsensiPegawai::with([
+            'mataPelajaran',
+            'tahunAkademik'
+        ])
+        ->where('guru_id', $guru->id)
+        ->orderBy('hari', 'desc')
+        ->get();
 
         if ($absensi->isEmpty()) {
-            return ApiResponse::error('Absensi tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error(
+                'Absensi tidak ditemukan',
+                ['data' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
-        // hitung jumlah hadir/tidak hadir khusus guru ini
-        $jumlahHadir = AbsensiPegawai::where('guru_id', $user->id)
-        ->where('status', 'hadir')
-        ->count();
+        $first = $absensi->first();
 
-        $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $user->id)
-        ->where('status', 'tidak hadir')
-        ->count();
+        // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK (contoh: 2025/2026)
+        $groupedByYear = $absensi
+            ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
+            ->map(function ($itemsYear, $tahunAkademik) {
 
-        $formatted = [
-            'id' => $user->id ?? null,
-            'nama' => $user->nama ?? null,
-            'wali_kelas' => $user->kelas->nama_kelas ?? null,
-            'mata_pelajaran_id' => $matpel->mataPelajaran->nama_pelajaran ?? null,
-            'total_hadir' => $jumlahHadir ?? null,
-            'total_tidak_hadir' => $jumlahTidakHadir ?? null,
-            'absensi' => $absensi->map(function ($item) {
+                // total per tahun (gabungan ganjil + genap)
+                $totalHadir = $itemsYear->where('status', 'hadir')->count();
+                $totalTidakHadir = $itemsYear->where('status', 'tidak hadir')->count();
+
+                // 🔹 GROUP PER SEMESTER (AMBIL DARI DB)
+                $semester = $itemsYear
+                    ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
+                    ->map(function ($itemsSemester, $semester) {
+
+                        return [
+                            'semester' => $semester,
+                            'rincian' => $itemsSemester->map(function ($abs) {
+                                return [
+                                    'absensi_id' => $abs->id,
+                                    'hari' => Carbon::parse($abs->hari)
+                                        ->translatedFormat('l, d F Y'),
+                                    'status' => $abs->status,
+                                ];
+                            })->values(),
+                        ];
+                    })
+                    ->values();
+
                 return [
-                    'id' => $item->id ?? null,                    
-                    'hari' => Carbon::parse($item->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026                                
-                    'status' => $item->status ?? null,
+                    'tahun_akademik' => $tahunAkademik,
+                    'status_tahun_akademik' => $itemsYear->first()->tahunAkademik->status ?? null,
+                    
+                    'total_hadir' => $totalHadir,
+                    'total_tidak_hadir' => $totalTidakHadir,
+                    'semester' => $semester,
+                    'status_semester' => $itemsYear->first()->tahunAkademik->status ?? null,
                 ];
-            }),
+            })
+            ->values();
+
+        // 🔹 FINAL RESPONSE
+        $formatted = [
+            'guru_id' => $guru->id,
+            'nama' => $guru->nama ?? null,
+            'wali_kelas' => $guru->kelas->nama_kelas ?? null,
+            'mata_pelajaran_id' => $first->mataPelajaran->id ?? null,
+            'nama_mata_pelajaran' => $first->mataPelajaran->nama_pelajaran ?? null,
+            'absensi' => $groupedByYear,
         ];
 
-        return ApiResponse::success($formatted, 'Absensi berhasil diambil');
+        return ApiResponse::success(
+            [$formatted],
+            'Absensi guru berhasil diambil'
+        );
     }
+
 
     /**
      * ✅ Untuk super admin
@@ -220,30 +328,22 @@ class AbsensiPegawaiController extends Controller
         ], [            
             'status.required' => 'Status wajib diisi',
             'status.in' => 'Pilihan hanya hadir atau tidak hadir'
-        ]);        
+        ]);                
 
         $absensi->update($validated);
-        $absensi->load('mataPelajaran', 'guru');    
-
-        // hitung jumlah hadir/tidak hadir khusus guru ini
-        $jumlahHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
-        ->where('status', 'hadir')
-        ->count();
-
-        $jumlahTidakHadir = AbsensiPegawai::where('guru_id', $absensi->guru_id)
-        ->where('status', 'tidak hadir')
-        ->count();    
+        $absensi->load('mataPelajaran', 'guru', 'tahunAkademik');           
 
         return ApiResponse::success([
             'id' => $absensi->id ?? null,
             'guru_id' => $absensi->guru->nama ?? null,                
             'mata_pelajaran_id' => $absensi->mataPelajaran->nama_pelajaran ?? null,                
             'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
-            'status' => $absensi->status ?? null,       
-            'rekapitulasi' => [
-                'hadir' => $jumlahHadir,
-                'tidak_hadir' => $jumlahTidakHadir
-            ]
+            'status' => $absensi->status ?? null,                   
+            'tahun_akademik_id' => $absensi->tahunAkademik->id ?? null,                   
+            'tahun_akademik' => $absensi->tahunAkademik->tahun_akademik ?? null,                   
+            'status_tahun_akademik' => $absensi->tahunAkademik->status ?? null,                   
+            'semester' => $absensi->tahunAkademik->semester ?? null,                   
+            'status_semester' => $absensi->tahunAkademik->status ?? null,                   
         ], 'Data absensi berhasil diperbarui');
     }
 

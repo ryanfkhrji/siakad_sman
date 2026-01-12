@@ -6,150 +6,161 @@ use Illuminate\Http\Request;
 use App\Models\DataNilaiSiswa;
 use App\Models\JadwalPelajaran;
 use App\Models\Siswa;
-use Illuminate\Validation\Rule;
 use App\Helpers\ApiResponse;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class DataNilaiSiswaController extends Controller
 {
     // ✅ untuk spa
-    public function All() 
+    public function index()
     {
-        $nilai = DataNilaiSiswa::with('siswa.kelas', 'jurusan', 'siswa.jurusan', 'siswa.prestasis', 'mataPelajaran', 'guru')->get();
+        $siswas = Siswa::with([
+            'kelas',
+            'jurusan',
+            'dataNilaiSiswas',
+            'jadwalPelajarans.guru',
+            'jadwalPelajarans.kelas',
+            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
+            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
+            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
+            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
+        ])->get();
 
-        if ($nilai->isEmpty()) {
-            return ApiResponse::error('Not found', ['Data tidak ditemukan']);
-        }
-        
-        $formatted = $nilai
-            ->groupBy(function ($item) {
-                return $item->mata_pelajaran_id . '-' . $item->jurusan_pelajaran_id;
-            })
-            ->map(function ($data) {
+        /**
+         * 🔹 STEP 1: Flatten ke level jadwal + siswa
+         */
+        $rows = $siswas->flatMap(function ($siswa) {
+            return $siswa->jadwalPelajarans->map(function ($jadwal) use ($siswa) {
 
-                $first = $data->first();
+                $kmp = $jadwal->kurikulumMataPelajaran;
+                $ta  = $kmp->tahunAkademik;
+
+                $nilai = $siswa->dataNilaiSiswas
+                    ->firstWhere('kurikulum_mata_pelajaran_id', $kmp->id);
 
                 return [
-                    'mata_pelajaran_id'      => $first->mataPelajaran->id,
-                    'nama_pelajaran'         => $first->mataPelajaran->nama_pelajaran,
+                    'tahun_akademik_id' => $ta->id,
+                    'tahun_akademik'    => $ta,
+                    'kurikulum_mapel'   => $kmp,
+                    'jadwal'            => $jadwal,
+                    'siswa'             => $siswa,
+                    'nilai'             => $nilai,
+                ];
+            });
+        });
 
-                    'jurusan_pelajaran_id'   => $first->jurusan->id,
-                    'nama_jurusan_pelajaran' => $first->jurusan->nama_jurusan,
+        /**
+         * 🔹 STEP 2: GROUP BY TAHUN AKADEMIK
+         */
+        $result = $rows
+            ->groupBy('tahun_akademik_id')
+            ->map(function ($perTahun) {
 
-                    'guru_id'                => $first->guru->id,
-                    'nama_guru'              => $first->guru->nama,
+                $ta = $perTahun->first()['tahun_akademik'];
 
-                    'nilai' => $data->map(function ($item) {
+                /**
+                 * 🔹 GROUP BY KURIKULUM MAPEL
+                 */
+                $kurikulum = $perTahun
+                    ->groupBy(fn ($i) => $i['kurikulum_mapel']->id)
+                    ->map(function ($perMapel) {
+
+                        $kmp = $perMapel->first()['kurikulum_mapel'];
+                        $jadwal = $perMapel->first()['jadwal'];
+
                         return [
-                            'data_nilai_id' => $item->id,
+                            'kurikulum_mata_pelajaran_id' => $kmp->id,
+                            'mata_pelajaran' => $kmp->mataPelajaran->nama_pelajaran ?? null,
+                            'kurikulum' => $kmp->kurikulum->nama_kurikulum ?? null,
+                            'jurusan' => $kmp->jurusan->nama_jurusan ?? null,
+                            'tingkat' => $kmp->tingkat,
+                            'nilai_kkm' => $kmp->nilai_kkm,
 
-                            'siswa_id'      => $item->siswa->id,
-                            'nama_siswa'    => $item->siswa->nama,
+                            /**
+                             * 🔹 SATU KURIKULUM = SATU JADWAL
+                             */
+                            'jadwal_pelajaran' => [
+                                'hari' => $jadwal->hari,
+                                'jam_mulai' => $jadwal->jam_mulai,
+                                'jam_selesai' => $jadwal->jam_selesai,
+                                'kelas' => $jadwal->kelas->nama_kelas ?? null,
+                                'guru' => [
+                                    'id' => $jadwal->guru->id ?? null,
+                                    'nama' => $jadwal->guru->nama ?? null,
+                                ],
 
-                            'jurusan_siswa_id'   => $item->siswa->jurusan->id,
-                            'nama_jurusan_siswa' => $item->siswa->jurusan->nama_jurusan,
+                                /**
+                                 * 🔹 BANYAK SISWA
+                                 */
+                                'siswa' => $perMapel->map(function ($row) {
 
-                            'kelas_siswa_id' => $item->siswa->kelas->id,
-                            'nama_kelas_siswa' => $item->siswa->kelas->nama_kelas,
+                                    $siswa = $row['siswa'];
+                                    $nilai = $row['nilai'];
 
-                            'point_absensi' => $item->point_absensi,
-                            'point_tugas'   => $item->point_tugas,
-                            'point_uts'     => $item->point_uts,
-                            'point_uas'     => $item->point_uas,
-                            'point_ekskul'  => $item->point_ekskul,
-                            'sikap'         => $item->sikap,
+                                    return [
+                                        'siswa_id' => $siswa->id,
+                                        'nis' => $siswa->nis,
+                                        'nama' => $siswa->nama,
+                                        'kelas' => $siswa->kelas->nama_kelas ?? null,
 
-                            'prestasi' => $item->siswa->prestasis->map(function ($prestasi) {
-                                return [
-                                    'prestasi_id'   => $prestasi->id,
-                                    'nama_prestasi' => $prestasi->prestasi_diraih,
-                                ];
-                            })->values(),
+                                        'nilai' => $nilai ? [
+                                            'point_absensi' => $nilai->point_absensi,
+                                            'point_tugas'   => $nilai->point_tugas,
+                                            'point_uts'     => $nilai->point_uts,
+                                            'point_uas'     => $nilai->point_uas,
+                                            'point_ekskul'  => $nilai->point_ekskul,
+                                            'sikap'         => $nilai->sikap,
+                                        ] : null,
+                                    ];
+                                })->values(),
+                            ],
                         ];
-                    })->values()
+                    })->values();
+
+                return [
+                    'tahun_akademik_id' => $ta->id,
+                    'tahun_akademik' => $ta->tahun_akademik,
+                    'semester' => $ta->semester,
+                    'status' => $ta->status,
+                    'kurikulum_mata_pelajaran' => $kurikulum,
                 ];
             })->values();
 
-        return ApiResponse::success($formatted, ['Data nilai berhasil ditampilkan']);
+        return ApiResponse::success($result, 'Data nilai berhasil ditampilkan');
     }
 
-    // ✅ filter hanya milik guru tertentu (untuk guru)
-    public function index() {
-
-        $user = Auth::guard('kepegawaian')->user();
-
-        $matpel = JadwalPelajaran::where('guru_id', $user->id)->first();
-
-        $nilai = DataNilaiSiswa::with('siswa.kelas', 'siswa.jurusan', 'siswa.prestasis')->where('mata_pelajaran_id', $matpel->mata_pelajaran_id)->get();
-
-        if ($nilai == null) {
-            return ApiResponse::error('Not found', ['Data tidak ditemukan']);
-        }
-        
-        $formatted = $nilai->map(function ($data) {
-            return [
-                'data_nilai_id'     => $data->id,
-
-                'siswa_id'          => $data->siswa->id,
-                'nama_siswa'        => $data->siswa->nama,
-                'jurusan_siswa_id'  => $data->siswa->jurusan->id,
-                'nama_jurusan_siswa'  => $data->siswa->jurusan->nama_jurusan,
-                'kelas_siswa_id'    => $data->siswa->kelas->id,
-                'nama_kelas_siswa'  => $data->siswa->kelas->nama_kelas,
-
-                'mata_pelajaran_id' => $data->mataPelajaran->id,
-                'nama_pelajaran'    => $data->mataPelajaran->nama_pelajaran,
-                'jurusan_pelajaran_id' => $data->jurusan_pelajaran_id,
-                'nama_jurusan_pelajaran' => $data->jurusan->nama_jurusan,
-                'guru_id'           => $data->guru_id,
-                'nama_guru'         => $data->guru->nama,
-
-                'point_absensi' => $data->point_absensi,
-                'point_tugas'   => $data->point_tugas,
-                'point_uts'     => $data->point_uts,
-                'point_uas'     => $data->point_uas,
-                'point_ekskul'  => $data->point_ekskul,
-                'sikap'         => $data->sikap,
-
-                'prestasi' => $data->siswa->prestasis->map(function ($prestasi) {
-                    return [
-                        'prestasi_id' => $prestasi->id ?? null,
-                        'nama_prestasi' => $prestasi->prestasi_diraih ?? null,
-                    ];
-                }),
-            ];
-        });
-
-        return ApiResponse::success($formatted, ['Data nilai berhasil ditampilkan']);
-    }
+    
 
     /**
      * ✅ untuk guru
      */
     public function store(Request $request)
     {
-        $user = Auth::guard('kepegawaian')->user();
-
-        $matpel = JadwalPelajaran::where('guru_id', $user->id)->first();
+        $user = Auth::guard('kepegawaian')->user();        
 
         try {
             $validated = $request->validate([
                 'siswa_id' => 'required|exists:siswas,id',
-                'jurusan_pelajaran_id' => 'required|exists:jurusans,id',
+                'kurikulum_mata_pelajaran_id' => 'required|exists:kurikulum_mata_pelajaran,id',
+                'guru_id' => 'required|exists:kepegawaians,id', // otomatis (gaperlu dibuat inputannya)
                 'point_absensi' => 'required|numeric',
                 'point_tugas' => 'required|numeric',
                 'point_uts' => 'required|numeric',
                 'point_uas' => 'required|numeric',
-                'point_ekskul' => 'required|numeric',
+                'point_ekskul' => 'nullable|numeric',
                 'sikap' => 'nullable|in:Sangat Baik,Baik,Cukup,Kurang',
             ], [
                 'siswa_id.required' => 'Siswa wajib diisi',
                 'siswa_id.exists' => 'Siswa tidak ditemukan',
 
-                'jurusan_pelajaran_id.required' => 'Jurusan pelajaran wajib diisi',
-                'jurusan_pelajaran_id.exists' => 'Jurusan pelajaran tidak ditemukan',
+                'kurikulum_mata_pelajaran_id.required' => 'Kurikulum mata pelajaran wajib diisi',
+                'kurikulum_mata_pelajaran_id.exists' => 'Kurikulum mata pelajaran tidak ditemukan',
+
+                'guru_id.required' => 'Guru wajib diisi',                
+                'guru_id.exists' => 'Guru tidak ditemukan',
                 
                 'point_absensi.required' => 'Point absensi wajib diisi',
                 'point_absensi.numeric' => 'Wajib diisi angka',
@@ -163,7 +174,6 @@ class DataNilaiSiswaController extends Controller
                 'point_uas.required' => 'Point uas wajib diisi',
                 'point_uas.numeric' => 'Wajib diisi angka',
                 
-                'point_ekskul.required' => 'Point ekskul wajib diisi',
                 'point_ekskul.numeric' => 'Wajib diisi angka',
 
                 'sikap.in' => 'Pilihan hanya Sangat Baik, Baik, Cukup, Kurang'
@@ -175,43 +185,38 @@ class DataNilaiSiswaController extends Controller
             ], 403);
         }            
 
-        $sama = DataNilaiSiswa::where('mata_pelajaran_id', $matpel->mata_pelajaran_id)
+        $sama = DataNilaiSiswa::where('kurikulum_mata_pelajaran_id', $validated['kurikulum_mata_pelajaran_id'])
             ->where('siswa_id', $validated['siswa_id'])
-            ->where('jurusan_pelajaran_id', $validated['jurusan_pelajaran_id'])
-            ->first();
+            ->exists();
 
-        if ($sama != null) {
-            return ApiResponse::error('Duplicated', ['Pesan' => 'Siswa dengan mata pelajaran dan jurusan ini sudah ada']);
+        if ($sama) {
+            return ApiResponse::error('Duplicated', ['Pesan' => 'Data Nilai Siswa sudah ada']);
         }
     
         $nilai = DataNilaiSiswa::create([
             'siswa_id' => $validated['siswa_id'],
-            'jurusan_pelajaran_id' => $validated['jurusan_pelajaran_id'],
-            'mata_pelajaran_id' => $matpel->mata_pelajaran_id,
+            'kurikulum_mata_pelajaran_id' => $validated['kurikulum_mata_pelajaran_id'],
             'guru_id' => $user->id,
             'point_absensi' => $validated['point_absensi'],
             'point_tugas' => $validated['point_tugas'],
             'point_uts' => $validated['point_uts'],
             'point_uas' => $validated['point_uas'],
             'point_ekskul' => $validated['point_ekskul'],
-            'sikap' => $validated['sikap'],
+            'sikap' => $validated['sikap'] ?? null,
         ]);
 
-        $nilai->load('siswa.prestasis', 'siswa.kelas', 'siswa.jurusan', 'mataPelajaran', 'jurusan', 'guru');
+        $nilai->load('siswa.kelas', 'siswa.jurusan', 'kurikulumMataPelajaran.mataPelajaran', 'jurusan', 'guru');
 
         $formatted = [
             'data_nilai_id'     => $nilai->id,
             'siswa_id'          => $nilai->siswa->id,
             'nama_siswa'        => $nilai->siswa->nama,
-            'jurusan_siswa_id'  => $nilai->siswa->jurusan->id,
             'nama_jurusan_siswa'  => $nilai->siswa->jurusan->nama_jurusan,
-            'kelas_siswa_id'    => $nilai->siswa->kelas->id,
             'nama_kelas_siswa'  => $nilai->siswa->kelas->nama_kelas,
-            'mata_pelajaran_id' => $nilai->mataPelajaran->id,
-            'nama_pelajaran'    => $nilai->mataPelajaran->nama_pelajaran,
-            'jurusan_pelajaran_id' => $nilai->jurusan_pelajaran_id,
-            'nama_jurusan_pelajaran' => $nilai->jurusan->nama_jurusan,
-            'guru_id'           => $user->id,
+            'kurikulum_mata_pelajaran_id' => $nilai->kurikulumMataPelajaran->id,
+            'nama_pelajaran'    => $nilai->kurikulumMataPelajaran->mataPelajaran->nama_pelajaran,
+            'jurusan_pelajaran' => $nilai->kurikulumMataPelajaran->jurusan->nama_jurusan,
+            'guru_id'           => $nilai->guru_id,
             'nama_guru'         => $nilai->guru->nama,
 
             'point_absensi' => $nilai->point_absensi,
@@ -219,14 +224,7 @@ class DataNilaiSiswaController extends Controller
             'point_uts'     => $nilai->point_uts,
             'point_uas'     => $nilai->point_uas,
             'point_ekskul'  => $nilai->point_ekskul,
-            'sikap'         => $nilai->sikap,
-
-            'prestasi' => $nilai->siswa->prestasis->map(function ($prestasi) {
-                return [
-                    'prestasi_id' => $prestasi->id ?? null,
-                    'nama_prestasi' => $prestasi->prestasi_diraih ?? null,
-                ];
-            }),
+            'sikap'         => $nilai->sikap ?? null,            
         ];
 
         return ApiResponse::success($formatted, 'Data nilai berhasil dibuat');
@@ -238,76 +236,213 @@ class DataNilaiSiswaController extends Controller
 
     /**
      * ✅ untuk spa/guru
-     */
-    public function show(Request $request, string $siswaId)
-    {
-        // ambil request di params, masukkan ke body
-        $request->merge($request->query());
-
-        $request->validate([
-            'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
-            'jurusan_pelajaran_id' => 'required|exists:jurusans,id',
-        ], [
-            'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
-            'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',
-            'jurusan_pelajaran_id.required' => 'Jurusan pelajaran wajib diisi',
-            'jurusan_pelajaran_id.exists' => 'Jurusan pelajaran tidak ditemukan'
-        ]);
-    
-        $data = DataNilaiSiswa::with([
-            'siswa.prestasis',
-            'siswa.kelas',
-            'siswa.jurusan',
-            'mataPelajaran',
+     */    
+    public function show($id)
+    {        
+        $siswa = Siswa::with([
+            'kelas',
             'jurusan',
-            'guru'
-        ])
-        ->where('siswa_id', $siswaId)
-        ->where('mata_pelajaran_id', $request->mata_pelajaran_id)
-        ->where('jurusan_pelajaran_id', $request->jurusan_pelajaran_id)
-        ->first();
-
-        if (!$data) {
-            return ApiResponse::error(
-                'Not found',
-                ['data' => ['Data nilai siswa tidak ditemukan']],
-                404
-            );
+            'dataNilaiSiswas',
+            'jadwalPelajarans.guru',
+            'jadwalPelajarans.kelas',
+            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
+            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
+            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
+            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
+        ])->find($id);
+    
+        if (!$siswa) {
+            return ApiResponse::error('Not found', ['Data siswa tidak ditemukan']);
         }
     
-        $formatted = [
-            'data_nilai_id'     => $data->id,
-
-            'siswa_id'          => $data->siswa->id,
-            'nama_siswa'        => $data->siswa->nama,
-            'jurusan_siswa_id'  => $data->siswa->jurusan->id,
-            'nama_jurusan_siswa'  => $data->siswa->jurusan->nama_jurusan,
-            'kelas_siswa_id'    => $data->siswa->kelas->id,
-            'nama_kelas_siswa'  => $data->siswa->kelas->nama_kelas,
-
-            'mata_pelajaran_id' => $data->mataPelajaran->id,
-            'nama_pelajaran'    => $data->mataPelajaran->nama_pelajaran,
-            'jurusan_pelajaran_id' => $data->jurusan_pelajaran_id,
-            'nama_jurusan_pelajaran' => $data->jurusan->nama_jurusan,
-            'guru_id'           => $data->guru_id,
-            'nama_guru'         => $data->guru->nama,
-
-            'point_absensi' => $data->point_absensi,
-            'point_tugas'   => $data->point_tugas,
-            'point_uts'     => $data->point_uts,
-            'point_uas'     => $data->point_uas,
-            'point_ekskul'  => $data->point_ekskul,
-            'sikap'         => $data->sikap,
-
-            'prestasi' => $data->siswa->prestasis->map(function ($prestasi) {
-                return [
-                    'prestasi_id' => $prestasi->id ?? null,
-                    'nama_prestasi' => $prestasi->prestasi_diraih ?? null,
-                ];
-            }),
-        ];
+        /**
+         * 🔹 Flatten jadwal → group by tahun akademik
+         */
+        $tahunAkademik = $siswa->jadwalPelajarans
+            ->groupBy(fn ($jadwal) =>
+                $jadwal->kurikulumMataPelajaran->tahunAkademik->id
+            )
+            ->map(function ($jadwalPerTahun) use ($siswa) {
     
-        return ApiResponse::success($formatted, 'Detail nilai berhasil diambil');
+                $ta = $jadwalPerTahun->first()
+                    ->kurikulumMataPelajaran
+                    ->tahunAkademik;
+    
+                return [
+                    'tahun_akademik_id' => $ta->id,
+                    'tahun_akademik'    => $ta->tahun_akademik,
+                    'semester'          => $ta->semester,
+                    'status'            => $ta->status,
+    
+                    'kurikulum_mata_pelajaran' => $jadwalPerTahun
+                        ->groupBy(fn ($jadwal) =>
+                            $jadwal->kurikulum_mata_pelajaran_id
+                        )
+                        ->map(function ($jadwalPerKmp) use ($siswa) {
+    
+                            $jadwal = $jadwalPerKmp->first();
+                            $kmp    = $jadwal->kurikulumMataPelajaran;
+    
+                            $nilai = $siswa->dataNilaiSiswas
+                                ->firstWhere(
+                                    'kurikulum_mata_pelajaran_id',
+                                    $kmp->id
+                                );
+    
+                            return [
+                                'kurikulum_mata_pelajaran_id' => $kmp->id,
+                                'kurikulum' => $kmp->kurikulum->nama_kurikulum ?? null,
+                                'mata_pelajaran' => $kmp->mataPelajaran->nama_pelajaran ?? null,
+                                'jurusan_pelajaran' => $kmp->jurusan->nama_jurusan ?? null,
+                                'tingkat' => $kmp->tingkat,
+                                'nilai_kkm' => $kmp->nilai_kkm,
+                                'status_mata_pelajaran' => $kmp->status_mata_pelajaran,
+    
+                                'jadwal_pelajaran' => [
+                                    'hari'        => $jadwal->hari,
+                                    'jam_mulai'   => $jadwal->jam_mulai,
+                                    'jam_selesai' => $jadwal->jam_selesai,
+                                    'ruangan'     => $jadwal->ruangan,
+                                    'link_opsional' => $jadwal->link_opsional,
+    
+                                    'guru' => [
+                                        'guru_id'   => $jadwal->guru->id ?? null,
+                                        'nama_guru' => $jadwal->guru->nama ?? null,
+                                    ],
+    
+                                    'kelas' => $jadwal->kelas->nama_kelas ?? null,
+                                ],
+    
+                                'nilai_siswa' => $nilai ? [
+                                    'point_absensi' => $nilai->point_absensi,
+                                    'point_tugas'   => $nilai->point_tugas,
+                                    'point_uts'     => $nilai->point_uts,
+                                    'point_uas'     => $nilai->point_uas,
+                                    'point_ekskul'  => $nilai->point_ekskul,
+                                    'sikap'         => $nilai->sikap,
+                                ] : null,
+                            ];
+                        })->values(),
+                ];
+            })->values();
+    
+        return ApiResponse::success([
+            'siswa' => [
+                'siswa_id' => $siswa->id,
+                'nisn'     => $siswa->nisn,
+                'nis'      => $siswa->nis,
+                'nama'     => $siswa->nama,
+                'kelas'    => $siswa->kelas->nama_kelas ?? null,
+                'jurusan'  => $siswa->jurusan->nama_jurusan ?? null,
+            ],
+            'tahun_akademik' => $tahunAkademik
+        ], 'Data nilai siswa berhasil diambil');
+    }
+    
+
+    // ✅ get all data nilai siswa sendiri (untuk guru)
+    public function getAllDataNilaiSendiri()
+    {
+        $user = Auth::guard('kepegawaian')->user();
+    
+        $siswa = Siswa::with([
+            'kelas',
+            'jurusan',
+            'dataNilaiSiswas',
+            'jadwalPelajarans.guru',
+            'jadwalPelajarans.kelas',
+            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
+            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
+            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
+            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
+        ])->find($user->id);
+    
+        if (!$siswa) {
+            return ApiResponse::error('Not found', ['Data siswa tidak ditemukan']);
+        }
+    
+        /**
+         * 🔹 Flatten jadwal → group by tahun akademik
+         */
+        $tahunAkademik = $siswa->jadwalPelajarans
+            ->groupBy(fn ($jadwal) =>
+                $jadwal->kurikulumMataPelajaran->tahunAkademik->id
+            )
+            ->map(function ($jadwalPerTahun) use ($siswa) {
+    
+                $ta = $jadwalPerTahun->first()
+                    ->kurikulumMataPelajaran
+                    ->tahunAkademik;
+    
+                return [
+                    'tahun_akademik_id' => $ta->id,
+                    'tahun_akademik'    => $ta->tahun_akademik,
+                    'semester'          => $ta->semester,
+                    'status'            => $ta->status,
+    
+                    'kurikulum_mata_pelajaran' => $jadwalPerTahun
+                        ->groupBy(fn ($jadwal) =>
+                            $jadwal->kurikulum_mata_pelajaran_id
+                        )
+                        ->map(function ($jadwalPerKmp) use ($siswa) {
+    
+                            $jadwal = $jadwalPerKmp->first();
+                            $kmp    = $jadwal->kurikulumMataPelajaran;
+    
+                            $nilai = $siswa->dataNilaiSiswas
+                                ->firstWhere(
+                                    'kurikulum_mata_pelajaran_id',
+                                    $kmp->id
+                                );
+    
+                            return [
+                                'kurikulum_mata_pelajaran_id' => $kmp->id,
+                                'kurikulum' => $kmp->kurikulum->nama_kurikulum ?? null,
+                                'mata_pelajaran' => $kmp->mataPelajaran->nama_pelajaran ?? null,
+                                'jurusan_pelajaran' => $kmp->jurusan->nama_jurusan ?? null,
+                                'tingkat' => $kmp->tingkat,
+                                'nilai_kkm' => $kmp->nilai_kkm,
+                                'status_mata_pelajaran' => $kmp->status_mata_pelajaran,
+    
+                                'jadwal_pelajaran' => [
+                                    'hari'        => $jadwal->hari,
+                                    'jam_mulai'   => $jadwal->jam_mulai,
+                                    'jam_selesai' => $jadwal->jam_selesai,
+                                    'ruangan'     => $jadwal->ruangan,
+                                    'link_opsional' => $jadwal->link_opsional,
+    
+                                    'guru' => [
+                                        'guru_id'   => $jadwal->guru->id ?? null,
+                                        'nama_guru' => $jadwal->guru->nama ?? null,
+                                    ],
+    
+                                    'kelas' => $jadwal->kelas->nama_kelas ?? null,
+                                ],
+    
+                                'nilai_siswa' => $nilai ? [
+                                    'point_absensi' => $nilai->point_absensi,
+                                    'point_tugas'   => $nilai->point_tugas,
+                                    'point_uts'     => $nilai->point_uts,
+                                    'point_uas'     => $nilai->point_uas,
+                                    'point_ekskul'  => $nilai->point_ekskul,
+                                    'sikap'         => $nilai->sikap,
+                                ] : null,
+                            ];
+                        })->values(),
+                ];
+            })->values();
+    
+        return ApiResponse::success([
+            'siswa' => [
+                'siswa_id' => $siswa->id,
+                'nisn'     => $siswa->nisn,
+                'nis'      => $siswa->nis,
+                'nama'     => $siswa->nama,
+                'kelas'    => $siswa->kelas->nama_kelas ?? null,
+                'jurusan'  => $siswa->jurusan->nama_jurusan ?? null,
+            ],
+            'tahun_akademik' => $tahunAkademik
+        ], 'Data nilai siswa berhasil diambil');
     }
     
 
@@ -325,16 +460,13 @@ class DataNilaiSiswaController extends Controller
         }
 
         $validated = $request->validate([
-            'jurusan_pelajaran_id' => 'sometimes|required|exists:jurusans,id',            
             'point_absensi' => 'sometimes|required|numeric',            
             'point_tugas' => 'sometimes|required|numeric',            
             'point_uts' => 'sometimes|required|numeric',            
             'point_uas' => 'sometimes|required|numeric',            
-            'point_ekskul' => 'sometimes|required|numeric',            
+            'point_ekskul' => 'sometimes|numeric',            
             'sikap' => 'nullable|in:Sangat Baik,Baik,Cukup,Kurang',
         ], [
-            'jurusan_pelajaran_id.exists' => 'Jurusan tidak ditemukan',
-
             'point_absensi.required' => 'Point absensi wajib diisi',
             'point_absensi.numeric' => 'Wajib diisi angka',
 
@@ -347,7 +479,6 @@ class DataNilaiSiswaController extends Controller
             'point_uas.required' => 'Point uas wajib diisi',
             'point_uas.numeric' => 'Wajib diisi angka',
                 
-            'point_ekskul.required' => 'Point ekskul wajib diisi',
             'point_ekskul.numeric' => 'Wajib diisi angka',
 
             'sikap.in' => 'Pilihan hanya Sangat Baik, Baik, Cukup, Kurang'
@@ -359,9 +490,8 @@ class DataNilaiSiswaController extends Controller
             ], 403);
         }            
 
-        $sama = DataNilaiSiswa::where('mata_pelajaran_id', $nilai->mata_pelajaran_id)
+        $sama = DataNilaiSiswa::where('kurikulum_mata_pelajaran_id', $nilai->kurikulum_mata_pelajaran_id)
             ->where('siswa_id', $nilai->siswa_id)
-            ->where('jurusan_pelajaran_id', $validated['jurusan_pelajaran_id'])
             ->first();
 
         if ($sama != null) {
@@ -372,9 +502,8 @@ class DataNilaiSiswaController extends Controller
         $nilai->update(
             [
                 'siswa_id' => $nilai->siswa_id ?? null,
-                'mata_pelajaran_id' => $nilai->mata_pelajaran_id ?? null,
+                'kurikulum_mata_pelajaran_id' => $nilai->kurikulum_mata_pelajaran_id ?? null,
                 'guru_id' => $nilai->guru_id ?? null,
-                'jurusan_pelajaran_id' => $validated['jurusan_pelajaran_id'] ?? null,
                 'point_absensi' => $validated['point_absensi'] ?? null,
                 'point_tugas' => $validated['point_tugas'] ?? null,
                 'point_uts' => $validated['point_uts'] ?? null,
@@ -384,20 +513,17 @@ class DataNilaiSiswaController extends Controller
             ]
         );
         
-        $nilai->load('siswa.prestasis', 'siswa.kelas', 'siswa.jurusan', 'mataPelajaran', 'jurusan', 'guru');
+        $nilai->load('siswa.kelas', 'siswa.jurusan', 'kurikulumMataPelajaran.mataPelajaran', 'jurusan', 'guru');
 
         $formatted = [
             'data_nilai_id'     => $nilai->id,
             'siswa_id'          => $nilai->siswa->id,
             'nama_siswa'        => $nilai->siswa->nama,
-            'jurusan_siswa_id'  => $nilai->siswa->jurusan->id,
             'nama_jurusan_siswa'  => $nilai->siswa->jurusan->nama_jurusan,
-            'kelas_siswa_id'    => $nilai->siswa->kelas->id,
             'nama_kelas_siswa'  => $nilai->siswa->kelas->nama_kelas,
-            'mata_pelajaran_id' => $nilai->mataPelajaran->id,
-            'nama_pelajaran'    => $nilai->mataPelajaran->nama_pelajaran,
-            'jurusan_pelajaran_id' => $nilai->jurusan_pelajaran_id,
-            'nama_jurusan_pelajaran' => $nilai->jurusan->nama_jurusan,
+            'kurikulum_mata_pelajaran_id' => $nilai->kurikulumMataPelajaran->id,
+            'nama_pelajaran'    => $nilai->kurikulumMataPelajaran->mataPelajaran->nama_pelajaran,
+            'jurusan_pelajaran' => $nilai->kurikulumMataPelajaran->jurusan->nama_jurusan,
             'guru_id'           => $nilai->guru_id,
             'nama_guru'         => $nilai->guru->nama,
 
@@ -406,14 +532,7 @@ class DataNilaiSiswaController extends Controller
             'point_uts'     => $nilai->point_uts,
             'point_uas'     => $nilai->point_uas,
             'point_ekskul'  => $nilai->point_ekskul,
-            'sikap'         => $nilai->sikap,
-
-            'prestasi' => $nilai->siswa->prestasis->map(function ($prestasi) {
-                return [
-                    'prestasi_id' => $prestasi->id ?? null,
-                    'nama_prestasi' => $prestasi->prestasi_diraih ?? null,
-                ];
-            }),
+            'sikap'         => $nilai->sikap ?? null,            
         ];
 
         return ApiResponse::success($formatted, 'Data nilai berhasil diupdate');
@@ -470,8 +589,6 @@ class DataNilaiSiswaController extends Controller
         return response()->json([
             'message' => 'Parameter ids tidak valid. Kirimkan satu id, atau array id.'
         ], 422);
-    }
+    }    
 
-
-    // ! tinggal export data ke excel
 }

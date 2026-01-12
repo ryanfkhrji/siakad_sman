@@ -10,6 +10,7 @@ use App\Models\IdentitasSekolah;
 use App\Models\Gedung;
 use App\Models\Ruangan;
 use App\Models\TahunAkademik;
+use App\Models\Semester;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
@@ -19,14 +20,21 @@ use App\Models\Keuangan;
 use App\Models\AbsensiSiswa;
 use App\Models\Prestasi;
 use App\Models\Kelas;
+use App\Models\Rombel;
 use App\Models\JadwalPelajaran;
 use App\Models\Kurikulum;
-use App\Models\KompetensiDasar;
+use App\Models\KurikulumMataPelajaran;
+use App\Models\Kompetensi;
+use App\Models\AlurTujuanPembelajaran;
 use App\Models\Ekstrakurikuler;
+use App\Models\PembinaEkskul;
+use App\Models\PelatihEkskul;
 use App\Models\Siswa;
+use App\Models\SiswaRombel;
 use App\Models\SiswaJadwalPelajaran;
 use App\Models\EkskulSiswaPivot;
 use App\Models\DataNilaiSiswa;
+use App\Models\DataBerkas;
 
 class DatabaseSeeder extends Seeder
 {
@@ -35,12 +43,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed Identitas Sekolah
+        /**
+         * 🎯✅ spa: CRUD 
+         * tu: CRUD
+         * kepsek: Index
+         * ✅ guru: Index
+         * ✅ staff: Index (samakan dengan guru)
+         * ✅ siswa: Index
+         * 
+        */
         IdentitasSekolah::insert([
             'npsn' => 'SMA/001/2020',
             'nama_sekolah' => 'SMA Negeri',
             'status_sekolah' => 'Negeri',
             'jenjang' => 'SMA',
+            'akreditasi' => 'A',
             'alamat' => 'Jl. Raya Bogor',
             'desa_kelurahan' => 'Abadijaya',
             'kecamatan' => 'Sukmajaya',
@@ -56,7 +73,10 @@ class DatabaseSeeder extends Seeder
             'logo' => 'public/logo/sma.png'
         ]);
 
-        // Seed Gedung
+        /**
+         * 🎯✅ spa: CRUD
+         * tu: CRUD
+         *  */ 
         Gedung::insert([
             [
                 'foto_gedung' => 'gedung1.jpg',
@@ -82,7 +102,10 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // Seed Ruangan
+        /**
+         * 🎯✅ spa: CRUD
+         * tu: CRUD
+         *  */ 
         Ruangan::insert([
            [
             'gedung_id' => 1, // GD_01
@@ -98,7 +121,7 @@ class DatabaseSeeder extends Seeder
            ],
            [
             'gedung_id' => 2, // GD_02
-            'kode_ruangan' => '2.2.2', // gedung, lantai, ruangan
+            'kode_ruangan' => '2.2.1', // gedung, lantai, ruangan
             'nama_ruangan' => 'Kantor Kepala Sekolah',
             'jenis_ruangan' => 'Kantor',
             'lantai' => 2,
@@ -107,278 +130,842 @@ class DatabaseSeeder extends Seeder
             'kondisi' => 'Baik',
             'fasilitas' => 'ATK, Dispenser, Rak Buku',
             'keterangan' => 'Tutup saat jam makan siang'
+           ],
+           [
+            'gedung_id' => 2, // GD_02
+            'kode_ruangan' => '2.2.2', // gedung, lantai, ruangan
+            'nama_ruangan' => 'Lab Komputer',
+            'jenis_ruangan' => 'Kantor',
+            'lantai' => 2,
+            'kapasitas' => 42,
+            'luas_ruangan' => 30,
+            'kondisi' => 'Baik',
+            'fasilitas' => 'Komputer',
+            'keterangan' => 'Khusus praktik dan ujian'
            ]
         ]);
 
-        // Seed Tahun Akademik
-        TahunAkademik::insert([
-            [
-                'tahun_akademik' => '2024/2025',
-                'semester' => 'Genap',
-                'tanggal_mulai' => '2024-07-24',
-                'tanggal_selesai' => '2025-07-25',
-                'status' => 'aktif',
-                'keterangan' => 'Kurikulum Merdeka'
-            ]
-        ]);        
-
-        // Seed Kepegawaian
+         /**
+          * 🎯✅ spa: CRUD
+          * tu: CRUD          
+          * kepsek : GET, SHOW
+          * guru: 
+          *
+        */ 
         Kepegawaian::insert([
             [
                 'nama' => 'Super Admin',
                 'email' => 'sp@gmail.com',
-                'status' => 'honorer',
                 'nip' => '123450',
                 'nuptk' => '0123450',
                 'keterangan' => 'Super Admin',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'super_admin',
                 'remember_token' => Str::random(10),
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'Kepsek',
                 'email' => 'kepsek@gmail.com',
-                'status' => 'pns',
                 'nip' => '123451',
                 'nuptk' => '0123451',
                 'keterangan' => 'Kepala Sekolah',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'kepsek',
                 'remember_token' => Str::random(10),
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'TU',
                 'email' => 'tu@gmail.com',
-                'status' => 'honorer',
                 'nip' => '123452',
                 'nuptk' => '0123452',
                 'keterangan' => 'Staff TU',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'tu',
                 'remember_token' => Str::random(10),
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'Staff Kebersihan Pengajar Pramuka',
                 'email' => 'staff@gmail.com',
-                'status' => 'honorer',
                 'nip' => '123453',
                 'nuptk' => '0123453',
                 'keterangan' => 'Staff Kebersihan',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'staff',
                 'remember_token' => Str::random(10),
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'Guru IPA Pengajar Paskibra',
                 'email' => 'guruipa@gmail.com',
-                'status' => 'pns',
                 'nip' => '123454',
                 'nuptk' => '0123454',
                 'keterangan' => 'Guru IPA',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'guru',
                 'remember_token' => Str::random(10),
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'Guru IPS Pengajar Tari',
                 'email' => 'guruips@gmail.com',
-                'status' => 'honorer',
                 'nip' => '123455',
                 'nuptk' => '0123455',
                 'keterangan' => 'Guru IPS',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'guru',
                 'remember_token' => Str::random(10),
+                'status' => 'aktif',
             ],
         ]);
 
-        // Seed Jurusan
+        /**
+         * 🎯✅ SPA: CRUD
+         */
+        // Penerimaan Siswa Baru
+
+        /**
+         * 🎯✅ spa: CRUD
+         * tu:
+         * kepsek: GET, SHOW
+         * guru: GET, SHOW
+         */
+        Siswa::insert([
+            [
+                'nisn' => '123451',
+                'nama' => 'Bagas',
+                'nis' => '123451',                
+                'email' => 'bagas@gmail.com',
+                'password' => Hash::make('K3ps3k.'),
+                'role' => 'siswa',
+                'remember_token' => Str::random(10),
+            ],
+            [
+                'nisn' => '123452',
+                'nama' => 'Winton',
+                'nis' => '123452',                
+                'email' => 'winton@gmail.com',
+                'password' => Hash::make('K3ps3k.'),
+                'role' => 'siswa',
+                'remember_token' => Str::random(10),
+            ],
+            [
+                'nisn' => '123453',
+                'nama' => 'Sanita',
+                'nis' => '123453',                
+                'email' => 'sanita@gmail.com',
+                'password' => Hash::make('K3ps3k.'),
+                'role' => 'siswa',
+                'remember_token' => Str::random(10),
+            ],
+        ]);
+
+        /**
+         * 🎯✅ spa: CRUD
+         */
         Jurusan::insert([
             [
                 'nama_jurusan' => 'IPA',
                 'kode_jurusan' => '1',
+                'status' => 'aktif',
             ],
             [
                 'nama_jurusan' => 'IPS',
                 'kode_jurusan' => '2',
+                'status' => 'aktif',
             ],
             [
                 'nama_jurusan' => 'Bahasa',
                 'kode_jurusan' => '3',
+                'status' => 'aktif',
             ],
         ]);
 
-        // Seed Mata Pelajaran
-        MataPelajaran::insert([
+        /**
+         * 🎯✅ spa: CRUD
+         * tu: CRUD 
+         * kepsek: GET, SHOW
+         * guru:
+         * **/
+        Kelas::insert([
             [
-                'nama_pelajaran' => 'Fisika',
-                'kode_mapel_diknas' => '013',                
+                'nama_kelas' => 'IX IPA',
+                'kode_kelas' => 'K12-IPA',                
+                'tingkat' => 11,                
+                'jurusan_id' => null, // IPA                                                                            
             ],
             [
-                'nama_pelajaran' => 'Bahasa Indonesia',
-                'kode_mapel_diknas' => '156',                
+                'nama_kelas' => 'IX IPS',
+                'kode_kelas' => 'K22.IPS',                
+                'tingkat' => 11,                
+                'jurusan_id' => null, // IPS                                                                            
             ],
             [
-                'nama_pelajaran' => 'Bahasa Sunda',
-                'kode_mapel_diknas' => '224',                
+                'nama_kelas' => 'X IPA',
+                'kode_kelas' => 'K11-IPA',                
+                'tingkat' => 10,                
+                'jurusan_id' => 1, // IPA                                                                            
             ],
-        ]);        
+            [
+                'nama_kelas' => 'X IPS',
+                'kode_kelas' => 'K21.IPS',                
+                'tingkat' => 10,                
+                'jurusan_id' => 2, // IPS                                                                            
+            ],
+        ]);
 
-        // Seed Kurikulum
+        /**
+         * 🎯✅ spa: CRUD
+         * tu (tidak berubah sampe ada kurikulum baru): CRUD
+         *  */ 
         Kurikulum::insert([
             [
                 'nama_kurikulum' => 'Kurikulum Tingkat Satuan Pendidikan (KTSP)',
                 'kode_kurikulum' => '2006',
+                'tipe' => 'K13',
                 'tahun_mulai' => 2006,
                 'tahun_selesai' => 2012,
-                'status' => 'tidak aktif',
                 'deskripsi' => '
                 - Sekolah Bebas Menentukan Kurikulum
-                - Ada Standar Kompetensi (SK) dan Kompetensi Dasar (KD)'
+                - Ada Standar Kompetensi (SK) dan Kompetensi Dasar (KD)',
+                'status' => 'arsip',
             ],
             [
                 'nama_kurikulum' => 'Kurikulum 2013',
                 'kode_kurikulum' => '2013',
+                'tipe' => 'K13',
                 'tahun_mulai' => 2013,
                 'tahun_selesai' => 2021,
-                'status' => 'tidak aktif',
                 'deskripsi' => '
                 - Ada Kompetensi Inti (KI) dan Kompetensi Dasar (KD)
-                    1. KI 1: Sikap Spriritual
-                    2. KI 2: Sikap Sosial
-                    3. KI 3: Pengetahuan
-                    4. KI 4: Keterampilan
+                1. KI 1: Sikap Spriritual
+                2. KI 2: Sikap Sosial
+                3. KI 3: Pengetahuan
+                4. KI 4: Keterampilan
                 - Banyak Penilaian Formatif
                 - Buku Tematik untuk SD
                 - SMA Terbagi Menjadi:
-                    1. Mata Pelajaran Wajib
-                    2. Peminatan'
+                1. Mata Pelajaran Wajib
+                2. Peminatan',
+                'status' => 'arsip',
             ],
             [
                 'nama_kurikulum' => 'Kurikulum Merdeka',
                 'kode_kurikulum' => '2022',
+                'tipe' => 'MERDEKA',
                 'tahun_mulai' => 2022,
                 'tahun_selesai' => 2025,
-                'status' => 'aktif',
                 'deskripsi' => '
                 - Tidak ada lagi KI & KD, diganti Capaian Pembelajaran (CP)
                 - Lebih fleksibel
                 - Terdapat Projek Penguatan Profil Pelajar Pancasila (P5)
                 - Mata Pelajaran Informatika Menjadi Wajib
-                - SMA Kembali ke Umum Tanpa Jurusan (IPA/IPS dihapus)'
+                - SMA Kembali ke Umum Tanpa Jurusan (IPA/IPS dihapus)',
+                'status' => 'aktif',
             ],
         ]);
 
-        // Seed Kompetensi Dasar
-        KompetensiDasar::insert([
+        /**
+         * 🎯✅ spa: CRUD
+         * tu: CRUD
+         * Kepsek: GET, SHOW
+         * guru: GET, SHOW
+         * */ 
+        MataPelajaran::insert([
             [
-                'mata_pelajaran_id' => 1, // IPA
-                'judul_kompetensi_dasar' => 'Memahami Tumbuhan Alam',
-                'deskripsi' => 'Belajar biologi pohon mangga',
-                'kurikulum_id' => 3
+                'nama_pelajaran' => 'Matematika',
+                'kode_mapel_diknas' => '013',                
+                'status' => 'aktif',                
             ],
             [
-                'mata_pelajaran_id' => 2, // Bahasa Indonesia
-                'judul_kompetensi_dasar' => 'Menulis Sesuai KBBI',
-                'deskripsi' => 'Belajar menulis sesuai KBBI',
-                'kurikulum_id' => 1
+                'nama_pelajaran' => 'Bahasa Indonesia',
+                'kode_mapel_diknas' => '156',                
+                'status' => 'aktif',                
             ],
             [
-                'mata_pelajaran_id' => 2, // Bahasa Sunda
-                'judul_kompetensi_dasar' => 'Cerita Kabayan',
-                'deskripsi' => 'Mengenal tokoh Kabayan',
-                'kurikulum_id' => 3
+                'nama_pelajaran' => 'Bahasa Sunda',
+                'kode_mapel_diknas' => '224',                
+                'status' => 'aktif',                
+            ],
+        ]);  
+
+        /**
+         * 🎯✅ spa: CRUD
+         * tu: CRUD
+         * 
+         */
+        TahunAkademik::insert([
+            [
+                'tahun_akademik' => '2013/2023',                
+                'keterangan' => 'Kurikulum 2013',
+                'status' => 'arsip',
+            ],
+            [
+                'tahun_akademik' => '2024/2025',                
+                'keterangan' => 'Kurikulum Merdeka',
+                'status' => 'aktif',
+            ]
+        ]);  
+    
+        /**
+         * 🎯✅ spa: CRUD
+         */
+        Semester::insert([
+            [
+                'tahun_akademik_id' => 1,
+                'semester' => 'Ganjil',
+                'status' => 'arsip'
+            ],
+            [
+                'tahun_akademik_id' => 1,
+                'semester' => 'Genap',
+                'status' => 'arsip'
+            ],
+            [
+                'tahun_akademik_id' => 2,
+                'semester' => 'Ganjil',
+                'status' => 'arsip'
+            ],
+            [
+                'tahun_akademik_id' => 2,
+                'semester' => 'Genap',
+                'status' => 'aktif'
+            ],
+        ]);
+    
+        /**
+         * Dibuat tiap tahun
+         * 🎯✅ spa: CRUD
+         */
+        KurikulumMataPelajaran::insert([
+            [
+                'kurikulum_id' => 2, // Kurtilas
+                'mata_pelajaran_id' => 1, // Fisika
+                'jurusan_pelajaran_id' => 1, // IPA
+                'tahun_akademik_id' => 1, // 2013/2023
+                'tingkat' => 11, // 2013/2023
+                'nilai_kkm' => 75.55, // 2013/2023
+                'status_mata_pelajaran' => 'jurusan', // 2013/2023                
+            ],
+            [
+                'kurikulum_id' => 3, // Merdeka
+                'mata_pelajaran_id' => 2, // B. Indo
+                'jurusan_pelajaran_id' => 1, // IPA
+                'tahun_akademik_id' => 2, // 2024/2025
+                'tingkat' => 10, // 2024/2025
+                'nilai_kkm' => 80, // 2024/2025
+                'status_mata_pelajaran' => 'wajib', // 2024/2025                
+            ],
+            [
+                'kurikulum_id' => 3, // Merdeka
+                'mata_pelajaran_id' => 2, // B. Indo
+                'jurusan_pelajaran_id' => 2, // IPS
+                'tahun_akademik_id' => 2, // 2024/2025
+                'tingkat' => 10, // 2024/2025
+                'nilai_kkm' => 75.55, // 2024/2025
+                'status_mata_pelajaran' => 'wajib', // 2024/2025                
+            ],
+            [
+                'kurikulum_id' => 3, // Merdeka
+                'mata_pelajaran_id' => 3, // B. Sunda
+                'jurusan_pelajaran_id' => 2, // IPS
+                'tahun_akademik_id' => 2, // 2024/2025
+                'tingkat' => 10, // 2024/2025
+                'nilai_kkm' => 70, // 2024/2025
+                'status_mata_pelajaran' => 'pilihan', // 2024/2025                
+            ]
+        ]);
+
+        /**
+         * tidak berubah selama kurikulum sama
+         * 🎯✅ spa: CRUD
+         * tu: CRUD
+         * Kepsek: GET, SHOW
+         * guru: GET, SHOW
+         * */  
+        Kompetensi::insert([
+            [
+                'kurikulum_id' => 2, // K13
+                'mata_pelajaran_id' => 1, // Matematika
+                'judul_kompetensi' => 'Memahami konsep persamaan linear satu variabel',
+                'jenis' => 'KD',                
+                'kode' => 'KD-1.1',
+                'tingkat' => '10',
+                'aspek' => 'pengetahuan',
+                'fase' => null,
+                'deskripsi' => 'Memahami konsep persamaan linear satu variabel dan penerapannya di kehidupan sehari-hari',                
+                'status' => 'arsip'
+            ],
+            [
+                'kurikulum_id' => 2, // K13
+                'mata_pelajaran_id' => 1, // Matematika
+                'judul_kompetensi' => 'Menyelesaikan persamaan linear satu variabel',
+                'jenis' => 'KD',                
+                'kode' => 'KD-1.2',
+                'tingkat' => '10',
+                'aspek' => 'keterampilan',
+                'fase' => null,
+                'deskripsi' => 'Menyelesaikan masalah yanng berkaitan dengan persamaan satu variabel',                
+                'status' => 'arsip'
+            ],
+            [
+                'kurikulum_id' => 2, // K13
+                'mata_pelajaran_id' => 1, // Matematika
+                'judul_kompetensi' => 'Menunjukkan sikap teliti dan jujur dalam menyelesaikan masalah matematika',
+                'jenis' => 'KD',
+                'kode' => 'KD-1.3',
+                'tingkat' => '10',
+                'aspek' => 'sikap',
+                'fase' => null,
+                'deskripsi' => 'Menunjukkan sikap teliti, jujur, dan bertanggung jawab dalam proses pembelajaran matematika',                
+                'status' => 'arsip'
+            ],            
+            [
+                'kurikulum_id' => 3, // MERDEKA
+                'mata_pelajaran_id' => 1, // Matematika
+                'judul_kompetensi' => 'Bernalar menggunakan persamaan dan pertidaksamaan linear',
+                'jenis' => 'CP',                
+                'kode' => 'CP-MAT-E1',
+                'tingkat' => null,
+                'aspek' => null,
+                'fase' => 'E',
+                'deskripsi' => 'Peserta didik mampu bernalar dan memecahkan masalah kontekstual matematika',                
+                'status' => 'aktif'
+            ],
+            [
+                'kurikulum_id' => 3, // MERDEKA
+                'mata_pelajaran_id' => 1, // Matematika
+                'judul_kompetensi' => 'Menganalisis hubungan antar variabel dalam bentuk aljabar',
+                'jenis' => 'CP',                
+                'kode' => 'CP-MAT-E2',
+                'tingkat' => null,
+                'aspek' => null,
+                'fase' => 'E',
+                'deskripsi' => 'Peserta didik mampu menganalisis hubungan antar variabel dan menyelesaikannya',                
+                'status' => 'aktif'
+            ],
+            [
+                'kurikulum_id' => 3, // MERDEKA
+                'mata_pelajaran_id' => 1, // Matematika
+                'judul_kompetensi' => 'Mengomunikasikan solusi matematis secara logis',
+                'jenis' => 'CP',
+                'kode' => 'CP-MAT-E3',
+                'tingkat' => null,
+                'aspek' => null,
+                'fase' => 'E',
+                'deskripsi' => 'Peserta didik mampu mengomunikasikan solusi matematika secara logis',                
+                'status' => 'aktif'
+            ],            
+        ]);
+
+        // guru (tiap awal tahun akademik/ganjil)
+        /**
+         * ! 🎯 spa: CRUD
+         */
+        AlurTujuanPembelajaran::insert([            
+            [
+                'kompetensi_id' => 4, // MERDEKA || Matematika || CP
+                'tahun_akademik_id' => 2, // 2024/2025
+                'semester' => 'Ganjil',
+                'tujuan_pembelajaran' => 'Peserta didik mampu menjelaskan pengertian persamaan linear satu variabel melalui contoh kontekstual',
+                'urutan' => 1,
+                'approval_status' => 'draft',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],
+            [
+                'kompetensi_id' => 4, // MERDEKA || Matematika || CP
+                'tahun_akademik_id' => 2, // 2024/2025
+                'semester' => 'Ganjil',
+                'tujuan_pembelajaran' => 'Peserta didik mampu menyusun dan menyelesaikan persamaan linear satu variabel dari masalah kontekstual',
+                'urutan' => 2,
+                'approval_status' => 'draft',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],
+            [
+                'kompetensi_id' => 4, // MERDEKA || Matematika || CP
+                'tahun_akademik_id' => 2, // 2024/2025
+                'semester' => 'Genap',
+                'tujuan_pembelajaran' => 'Peserta didik mampu mengevaluasi kebenarsan solusi persamaan linear dan mengomunikasikannya secara lisan maupun tertulis',
+                'urutan' => 3,
+                'approval_status' => 'draft',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],
+        ]);        
+
+        // modul_ajar
+
+        // asesmen
+
+        /**
+         * spa: CREATE, DELETE
+         * tu: CREATE, DELETE
+         * kepsek:
+         * guru: READ, SHOW, UPDATE
+         */
+        Rombel::insert([
+            [
+                'kelas_id' => 3, // X IPA
+                'tahun_akademik_id' => 2, // 2024/2025
+                'nama_rombel' => 'X-1A', // X IPA
+                'wali_rombel_id' => 5, // Guru IPA
+            ],
+            [
+                'kelas_id' => 4, // X IPS
+                'tahun_akademik_id' => 2, // 2024/2025
+                'nama_rombel' => 'X-1B', // X IPS
+                'wali_rombel_id' => 6, // Guru IPS
+            ],            
+        ]);
+
+        // siswa mengambil kelas
+        SiswaRombel::insert([
+            [
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1, // X-1A - J.IPA                
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-1B - J.IPS                
+            ],
+            [
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-1B - J.IPS                
             ],
         ]);
 
-        // Seed Kelas
-        Kelas::insert([
-            [
-                'nama_kelas' => 'X IPA',
-                'jurusan_id' => 1,
-                'jam_masuk' => '07:00',
-                'wali_kelas' => 5, // ID dari kepegawaian guru
-            ],
-            [
-                'nama_kelas' => 'X IPS',
-                'jurusan_id' => 2,
-                'jam_masuk' => '07:00',
-                'wali_kelas' => 6,
-            ],
-        ]);
-
-        // Seed Jadwal Pelajaran Guru
+        /** 
+         * 🎯 spa: CRUD
+         * tu: GET, SHOW
+         * guru: GET/SHOW
+         * Kepsek: GET, SHOW
+         * */ 
         JadwalPelajaran::insert([
             [
-                'mata_pelajaran_id' => 1,
-                'jurusan_pelajaran_id' => 1,
+                'kurikulum_mata_pelajaran_id' => 1, // Kurtilas, Fisika, J.IPA, 2013/2023                
+                'semester_id' => 1, // Kurtilas, Fisika, J.IPA, 2013/2023                
                 'hari' => 'Senin',
-                'guru_id' => 5,
-                'kelas_id' => 1,
-                'jam_pelajaran' => '07:30',
-                'ruangan' => 'Lab Komputer',
-                'link_opsional' => 'www.youtube.com'
+                'guru_id' => 5, // Guru IPA
+                'rombel_id' => 1, // IX IPA
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan' => 'Lab Komputer',                
+                'link_opsional' => 'www.youtube.com',                
             ],
             [
-                'mata_pelajaran_id' => 2,
-                'jurusan_pelajaran_id' => 2,
+                'kurikulum_mata_pelajaran_id' => 2, // Merdeka, B.Indo, J.IPS, 2024/2025                
+                'semester_id' => 1, // Merdeka, B.Indo, J.IPS, 2024/2025                
                 'hari' => 'Selasa',
-                'guru_id' => 6,
-                'kelas_id' => 2,
-                'jam_pelajaran' => '07:30',
-                'ruangan' => '7.5.6',
-                'link_opsional' => ''
+                'guru_id' => 6, // Guru IPS
+                'rombel_id' => 1,
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan' => '7.5.6',                
+                'link_opsional' => '',                
             ],
             [
-                'mata_pelajaran_id' => 2,
-                'jurusan_pelajaran_id' => 1,
+                'kurikulum_mata_pelajaran_id' => 2, // Merdeka, B.Indo, J.IPS, 2024/2025                
+                'semester_id' => 2, // Merdeka, B.Indo, J.IPS, 2024/2025                
                 'hari' => 'Rabu',
                 'guru_id' => 6,
-                'kelas_id' => 1,
-                'jam_pelajaran' => '07:30',
-                'ruangan' => '7.5.6',
-                'link_opsional' => ''
+                'rombel_id' => 2,
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan' => '7.5.6',                
+                'link_opsional' => '',                
             ]
         ]);      
         
-        // Seed Absensi Pegawai
+        // siswa mengambil jadwal
+        SiswaJadwalPelajaran::insert([
+            [
+                'siswa_id' => 1, // Andi
+                'jadwal_pelajaran_id' => 2, // B.Indonesia                
+            ],
+            [
+                'siswa_id' => 2, // Rina
+                'jadwal_pelajaran_id' => 1, // IPA                
+            ],
+        ]);
+
+        /**
+         * 🎯 spa: CRUD
+         * kepsek: GET, SHOW
+         * guru: CREATE
+         */
         AbsensiPegawai::insert([
             [
                 'guru_id' => 5,
                 'mata_pelajaran_id' => 1,
                 'hari' => '2025-05-24',
-                'status' => 'hadir'
+                'status' => 'hadir',
+                'tahun_akademik_id' => 1,
             ],
             [
                 'guru_id' => 6,
-                'mata_pelajaran_id' => 2,
+                'mata_pelajaran_id' => null,
                 'hari' => '2025-05-24',
-                'status' => 'tidak hadir'
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2,
             ],
         ]);
 
-        // Seed Absensi Pelajaran
+        /**
+         * 🎯 spa: CRUD
+         * kepsek: GET, SHOW
+         * guru: CREATE
+         */
         AbsensiPelajaran::insert([
             [
                 'guru_pengajar_id' => 5,
-                'jadwal_pelajaran_id' => 1,
-                'kelas_id' => 1,
-                'hari' => '2025-05-24', // terisi tanggal nanti dikonvert jadi hari
-                'jam' => '07:50',
-                'status' => 'hadir'
+                'jadwal_pelajaran_id' => 1,                
+                'hari' => '2025-05-24',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
             ],
             [
                 'guru_pengajar_id' => 6,
-                'jadwal_pelajaran_id' => 2,
-                'kelas_id' => 2,
-                'hari' => '2025-05-24', // terisi tanggal nanti dikonvert jadi hari
-                'jam' => '08:50',
-                'status' => 'tidak hadir'
+                'jadwal_pelajaran_id' => 2,                
+                'hari' => '2025-05-24',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2,
             ],
             
         ]);
 
-        // Keuangan
+        /**
+         * 🎯 spa: CRUD
+         * kepsek: GET, SHOW
+         * guru: CRUD
+         */
+        AbsensiSiswa::insert([
+            [
+                'siswa_id' => 1, // Andi
+                'kelas_id' => 2, 
+                'jadwal_pelajaran_id' => 2, // B.Indonesia
+                'hari' => '2025-10-17', // B.Indonesia
+                'status' => 'hadir',
+                'bukti' => null,                                
+            ],
+            [
+                'siswa_id' => 1, // Andi
+                'kelas_id' => 2, 
+                'jadwal_pelajaran_id' => 1, // IPA
+                'hari' => '2025-10-24', // IPA
+                'status' => 'sakit',
+                'bukti' => 'sakit.jpg',                                
+            ],
+            [
+                'siswa_id' => 2, // Rina
+                'kelas_id' => 1, 
+                'jadwal_pelajaran_id' => 1, // IPA
+                'hari' => '2025-10-10', // IPA
+                'status' => 'alfa',
+                'bukti' => 'alfa.jpg',                                
+            ],
+            [
+                'siswa_id' => 2, // Rina
+                'kelas_id' => 1, 
+                'jadwal_pelajaran_id' => 2, // B.Indonesia
+                'hari' => '2025-10-25', // B.Indonesia
+                'status' => 'izin',
+                'bukti' => 'izin.jpg',                                
+            ],
+        ]);        
+
+        /**
+         * 🎯 SPA: CRUD
+         *  */ 
+        Ekstrakurikuler::insert([
+            [
+                'nama_ekstrakurikuler' => 'Pramuka',                
+                'anggaran' => 1500000,
+                'status' => 'wajib',
+            ],
+            [
+                'nama_ekstrakurikuler' => 'Paskibra',                
+                'anggaran' => 2000000,
+                'status' => 'pilihan',
+            ],
+            [
+                'nama_ekstrakurikuler' => 'Tari',                
+                'anggaran' => 5000000,
+                'status' => 'jurusan',
+            ],
+        ]);
+
+        // seed pembina ekskul
+        PembinaEkskul::insert([
+            [
+                'pembina_id' => 3, // staff tu
+                'ekstrakurikuler_id' => 2, // PASKIB
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
+            [
+                'pembina_id' => 4, // staff kebersihan
+                'ekstrakurikuler_id' => 3, // Tari
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
+        ]);
+
+        // seed pelatih ekskul
+        PelatihEkskul::insert([
+            [
+                'pelatih_id' => 5, // Guru IPA pengajar PASKIB
+                'ekstrakurikuler_id' => 2, // PASKIB
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
+            [
+                'pelatih_id' => 6, // Guru IPS pengajar Tari
+                'ekstrakurikuler_id' => 3, // Tari
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
+        ]);                    
+
+        // Seed Siswa daftar ke ekstrakurikuler
+        EkskulSiswaPivot::insert([
+            [
+                'siswa_id' => 1,
+                'ekstrakurikuler_id' => 3,
+                'tahun_akademik_id' => 2,
+                'sikap' => 'Sangat Baik',
+                'status' => 'Aktif'
+            ],
+            [
+                'siswa_id' => 2,
+                'ekstrakurikuler_id' => 1,
+                'tahun_akademik_id' => 2,
+                'sikap' => 'Baik',
+                'status' => 'Cukup Aktif'
+            ],
+            [
+                'siswa_id' => 2,
+                'ekstrakurikuler_id' => 2,
+                'tahun_akademik_id' => 1,
+                'sikap' => 'Cukup',
+                'status' => 'Kurang Aktif'
+            ],
+            [
+                'siswa_id' => 2,
+                'ekstrakurikuler_id' => 3,
+                'tahun_akademik_id' => 2,
+                'sikap' => 'Kurang',
+                'status' => 'Tidak Aktif'
+            ],
+        ]);
+
+        /**
+         * 🎯 spa: CRUD
+         * kepsek: GET, SHOW
+         * guru
+         */
+        Prestasi::insert([
+            [
+                'siswa_id' => 1, // Bagas                                
+                'tahun_akademik_id' => 2, // 2024/2025 (Merdeka)
+                'prestasi_diraih' => 'Juara 2 lomba renang tingkat kabupaten',
+            ],
+            [
+                'siswa_id' => 2, // Winton                                
+                'tahun_akademik_id' => 1, // 
+                'prestasi_diraih' => 'Rangking satu umum angkatan 2021',
+            ],
+            [
+                'siswa_id' => 3, // Sanita                                
+                'tahun_akademik_id' => 1,
+                'prestasi_diraih' => 'Rangking satu kelas',
+            ]
+        ]);
+        
+        /**
+         * 🎯 spa: CRUD
+         * kepsek:
+         * guru: CRUD
+         */
+        DataNilaiSiswa::insert([
+            [
+                'siswa_id' => 1, // Bagas jurusan IPA
+                'kurikulum_mata_pelajaran_id' => 2, // Fisika jurusan IPA                           
+                'semester_id' => 3, // Fisika jurusan IPA           
+                'guru_id' => 5, // Guru IPA
+                'point_absensi' => 78.5,
+                'point_tugas' => 80.0,
+                'point_uts' => 90.5,
+                'point_uas' => 88.5,                
+                'sikap' => 'Cukup'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'kurikulum_mata_pelajaran_id' => 3, // B.Indo jurusan IPS                
+                'semester_id' => 3, // B.Indo jurusan IPS
+                'guru_id' => 6, // Guru IPS
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 88,                
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'kurikulum_mata_pelajaran_id' => 4, // Sunda jurusan IPS                
+                'semester_id' => 4, // Sunda jurusan IPS
+                'guru_id' => 6, // Guru IPS
+                'point_absensi' => 90,
+                'point_tugas' => 90,
+                'point_uts' => 90,
+                'point_uas' => 90,                
+                'sikap' => 'Sangat Baik'
+            ]
+        ]);
+
+        /**
+         * 🎯 SPA: CRUD
+         */
+        // rapor_nilai_siswa
+
+        /**
+         * 🎯 SPA: CRUD
+         */
+        // projek_p5
+
+        /**
+         * 🎯 SPA: CRUD
+         */
+        // data_nilai_p5
+
+        /**
+         * 🎯 SPA: CRUD
+         */
+        // rapor
+
+        /** 
+         * 🎯 SPA: CRUD
+         * tu: CRUD
+         * */ 
+        DataBerkas::insert([
+            [
+                'nama_berkas' => 'Bayaran SPP Budi',
+                'berkas' => 'berkas-budi.jpg',
+                'tahun_akademik_id' => 2, // 2024/2025
+                'semester_id' => 2 // Genap
+            ],
+        ]);
+
+        /**
+         * SPA: CRUD
+         * tu: CRUD
+         * Kepsek: GET, SHOW
+         *  */ 
         Keuangan::insert([
             [
                 'nama_akun' => 'TU',
@@ -394,187 +981,25 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // Seed Ekstrakurikuler
-        Ekstrakurikuler::insert([
-            [
-                'nama_ekstrakurikuler' => 'Pramuka',
-                'pengajar_id' => 4,
-                'anggaran' => 1500000,
-                'status' => 'wajib',
-            ],
-            [
-                'nama_ekstrakurikuler' => 'Paskibra',
-                'pengajar_id' => 5,
-                'anggaran' => 2000000,
-                'status' => 'pilihan',
-            ],
-            [
-                'nama_ekstrakurikuler' => 'Tari',
-                'pengajar_id' => 6,
-                'anggaran' => 5000000,
-                'status' => 'jurusan',
-            ],
-        ]);
+        /**
+         * 🎯 SPA: CRUD
+         */
+        // jurnal_kbm
 
-        // Seed Siswa
-        Siswa::insert([
-            [
-                'nisn' => '123451',
-                'nama' => 'Bagas',
-                'email' => 'andi@gmail.com',
-                'nis' => '123451',
-                'jurusan_id' => 2,
-                'kelas_id' => 2,
-                'email' => 'andiswa@example.com',
-                'status' => 'aktif',
-                'password' => Hash::make('K3ps3k.'),
-                'role' => 'siswa',
-                'remember_token' => Str::random(10),
-            ],
-            [
-                'nisn' => '123452',
-                'nama' => 'Winton',
-                'email' => 'rina@gmail.com',
-                'nis' => '123452',
-                'jurusan_id' => 1,
-                'kelas_id' => 1,
-                'email' => 'rinasiswa@example.com',
-                'status' => 'aktif',
-                'password' => Hash::make('K3ps3k.'),
-                'role' => 'siswa',
-                'remember_token' => Str::random(10),
-            ],
-        ]);
+        /**
+         * 🎯 SPA: CRUD
+         */
+        // forum_diskusi
 
-        // siswa mengambil jadwal
-        SiswaJadwalPelajaran::insert([
-            [
-                'siswa_id' => 1, // Andi
-                'jadwal_pelajaran_id' => 2, // B.Indonesia
-            ],
-            [
-                'siswa_id' => 2, // Rina
-                'jadwal_pelajaran_id' => 1, // IPA
-            ],
-        ]);
+        /**
+         * 🎯 SPA: CRUD
+         */
+        // lms
 
-        // Seed Absensi Siswa
-        AbsensiSiswa::insert([
-            [
-                'siswa_id' => 1, // Andi
-                'kelas_id' => 2, 
-                'mata_pelajaran_id' => 2, // B.Indonesia
-                'hari' => '2025-10-17', // B.Indonesia
-                'status' => 'hadir',
-            ],
-            [
-                'siswa_id' => 1, // Andi
-                'kelas_id' => 2, 
-                'mata_pelajaran_id' => 1, // IPA
-                'hari' => '2025-10-24', // IPA
-                'status' => 'sakit',
-            ],
-            [
-                'siswa_id' => 2, // Rina
-                'kelas_id' => 1, 
-                'mata_pelajaran_id' => 1, // IPA
-                'hari' => '2025-10-10', // IPA
-                'status' => 'alfa',
-            ],
-            [
-                'siswa_id' => 2, // Rina
-                'kelas_id' => 1, 
-                'mata_pelajaran_id' => 2, // B.Indonesia
-                'hari' => '2025-10-25', // B.Indonesia
-                'status' => 'izin',
-            ],
-        ]);
-
-        // Seed Siswa daftar ke ekstrakurikuler
-        EkskulSiswaPivot::insert([
-            [
-                'siswa_id' => 1,
-                'ekstrakurikuler_id' => 3,
-                'sikap' => 'Sangat Baik'
-            ],
-            [
-                'siswa_id' => 2,
-                'ekstrakurikuler_id' => 1,
-                'sikap' => 'Baik'
-            ],
-            [
-                'siswa_id' => 2,
-                'ekstrakurikuler_id' => 2,
-                'sikap' => 'Cukup'
-            ],
-            [
-                'siswa_id' => 2,
-                'ekstrakurikuler_id' => 3,
-                'sikap' => 'Kurang'
-            ],
-        ]);
-
-        // Seed Prestasi
-        Prestasi::insert([
-            [
-                'siswa_id' => 1,
-                'kelas_id' => 2,
-                'jurusan_id' => 2,
-                'prestasi_diraih' => 'Juara 2 lomba renang tingkat kabupaten',
-            ],
-            [
-                'siswa_id' => 2,
-                'kelas_id' => 1,
-                'jurusan_id' => 1,
-                'prestasi_diraih' => 'Rangking satu umum angkatan 2021',
-            ],
-            [
-                'siswa_id' => 2,
-                'kelas_id' => 1,
-                'jurusan_id' => 1,
-                'prestasi_diraih' => 'Rangking satu kelas',
-            ]
-        ]);
-        
-        // Seed Data Nilai Siswa
-        DataNilaiSiswa::insert([
-            [
-                'siswa_id' => 1,
-                'mata_pelajaran_id' => 1, // IPA
-                'jurusan_pelajaran_id' => 1,
-                'guru_id' => 5,
-                'point_absensi' => 78.5,
-                'point_tugas' => 80.0,
-                'point_uts' => 90.5,
-                'point_uas' => 88.5,
-                'point_ekskul' => 78.5,
-                'sikap' => 'Cukup'
-            ],
-            [
-                'siswa_id' => 2, // Winton
-                'mata_pelajaran_id' => 2, // B. Indo
-                'jurusan_pelajaran_id' => 2,
-                'guru_id' => 6,
-                'point_absensi' => 90,
-                'point_tugas' => 80,
-                'point_uts' => 70,
-                'point_uas' => 88,
-                'point_ekskul' => 78,
-                'sikap' => 'Baik'
-            ],
-            [
-                'siswa_id' => 2,
-                'mata_pelajaran_id' => 1,
-                'jurusan_pelajaran_id' => 1,
-                'guru_id' => 5,
-                'point_absensi' => 90,
-                'point_tugas' => 90,
-                'point_uts' => 90,
-                'point_uas' => 90,
-                'point_ekskul' => 90,
-                'sikap' => 'Sangat Baik'
-            ]
-        ]);
+        /** 
+         * 🎯 SPA: CURD
+         */
+        // Kompetensi Inti
 
     }
 }

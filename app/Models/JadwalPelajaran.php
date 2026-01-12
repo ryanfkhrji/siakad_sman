@@ -9,12 +9,42 @@ class JadwalPelajaran extends Model
 {
     use HasFactory;
     protected $table = 'jadwal_pelajarans';
-    protected $guarded = ['id'];
+    protected $guarded = ['id'];        
 
-    public function mataPelajaran()
+    /**
+     * Jadwal ini milik 1 kurikulum_mata_pelajaran
+     */
+    public function kurikulumMataPelajaran()
     {
-        return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
-    }    
+        return $this->belongsTo(
+            KurikulumMataPelajaran::class,
+            'kurikulum_mata_pelajaran_id'
+        );
+    }
+
+    public function guru()
+    {
+        return $this->belongsTo(Kepegawaian::class, 'guru_id');
+    }
+
+
+    public function rombel()
+    {
+        return $this->belongsTo(
+            Rombel::class,
+            'rombel_id'
+        );
+    }
+
+    public function tahunAkademik()
+    {
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }   
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
 
     public function jurusan()
     {
@@ -26,21 +56,10 @@ class JadwalPelajaran extends Model
         return $this->belongsTo(Jurusan::class, 'jurusan_pelajaran_id');
     }    
 
-    public function guru()
-    {
-        return $this->belongsTo(Kepegawaian::class, 'guru_id');
-    }
-
-
-    public function kelas()
-    {
-        return $this->belongsTo(Kelas::class, 'kelas_id');
-    }   
-
     public function siswas()
     {
         return $this->belongsToMany(Siswa::class, 'siswa_jadwal_pelajaran')
-            ->withPivot('id')
+            ->withPivot('id', 'jadwal_pelajaran_id')
             ->withTimestamps();
     }
 

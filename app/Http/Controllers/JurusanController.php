@@ -5,23 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kepegawaian;
 use App\Models\Jurusan;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class JurusanController extends Controller
 {
     public function index()
     {
-        $jurusans = Jurusan::with('siswas.kelas')->withCount('siswas')->get();
+        $jurusans = Jurusan::get();
 
         $formatted = $jurusans->map(function ($item) {
             return [
-                'id' => $item->id,
-                'nama_jurusan' => $item->nama_jurusan,
-                'kode_jurusan' => $item->kode_jurusan,
-                'jumlah_siswa' => $item->siswas_count,                
+                'id' => $item->id ?? null,
+                'nama_jurusan' => $item->nama_jurusan ?? null,
+                'kode_jurusan' => $item->kode_jurusan ?? null,                
+                'status' => $item->status ?? null,
             ];
         });
 
@@ -30,31 +30,25 @@ class JurusanController extends Controller
 
     public function show($id)
     {
-        $jurusan = Jurusan::with('siswas.kelas')
-            ->withCount('siswas')
-            ->find($id);
+        $jurusan = Jurusan::with('kelas.tahunAkademik', 'kelas.siswas')->find($id);
 
         if (!$jurusan) {
             return ApiResponse::error('Jurusan tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
         $data = [
-            'id' => $jurusan->id,
-            'nama_jurusan' => $jurusan->nama_jurusan,
-            'kode_jurusan' => $jurusan->kode_jurusan,
-            'jumlah_siswa' => $jurusan->siswas_count,
-            'siswa' => $jurusan->siswas->map(function ($siswa) {
+            'id' => $jurusan->id ?? null,
+            'nama_jurusan' => $jurusan->nama_jurusan ?? null,
+            'kode_jurusan' => $jurusan->kode_jurusan ?? null,
+            'status' => $jurusan->status ?? null,
+            'kelas' => $jurusan->kelas->map(function ($kelas) {
                 return [
-                    'id' => $siswa->id,
-                    'nisn' => $siswa->nisn,
-                    'nama' => $siswa->nama,
-                    'nis' => $siswa->nis,
-                    'kelas' => $siswa->kelas->nama_kelas ?? null,
-                    'status' => $siswa->status,
+                    'kelas_id' => $kelas->id ?? null,
+                    'nama_kelas' => $kelas->nama_kelas ?? null,
+                    'tingkat' => $kelas->tingkat ?? null,                    
                 ];
             }),
         ];
-
         return ApiResponse::success($data, 'Detail jurusan berhasil diambil');
     }
 
@@ -85,6 +79,7 @@ class JurusanController extends Controller
                 'id' => $jurusan->id,
                 'nama_jurusan' => $jurusan->nama_jurusan,
                 'kode_jurusan' => $jurusan->kode_jurusan,
+                'status' => 'aktif',
             ], 201);
     
         } catch (ValidationException $e) {
@@ -109,10 +104,17 @@ class JurusanController extends Controller
                 'required',
                 Rule::unique('jurusans')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
             ],
+            'status' => [
+                'sometimes',
+                'required',
+                'in:aktif,arsip'
+            ],
         ],[
             'nama_jurusan.required' => 'Nama jurusan wajib diisi',
             'kode_jurusan.required' => 'Kode jurusan wajib diisi',
             'kode_jurusan.unique' => 'kode jurusan sudah ada',
+            'status.required' => 'Status wajib diisi',
+            'status.in' => 'Pilihan status hanya aktif atau arsip',
         ]);
 
         // cek apakah super admin atau bukan
@@ -131,6 +133,7 @@ class JurusanController extends Controller
                 'id' => $jurusan->id,
                 'nama_jurusan' => $jurusan->nama_jurusan,
                 'kode_jurusan' => $jurusan->kode_jurusan,
+                'status' => $jurusan->status,
             ], 'Jurusan berhasil diperbarui');
     }
 

@@ -17,13 +17,15 @@ class KepegawaianController extends Controller
     // ✅ register pegawai
     public function registerKepegawaian(Request $request)
     {
-        try {
-            // Validasi input
+        try {            
             $validated = $request->validate([
+                // samakan dengan ini
+                // -----------------------------------------------------------------------
                 'nama' => 'required|string',
                 'email' => ['required', 'unique:kepegawaians,email', 'email'],
-                'nuptk' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nuptk', 'numeric'],
                 'nip' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nip', 'numeric'],
+                'nuptk' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nuptk', 'numeric'],
+                'keterangan' => 'nullable',
                 'password' => [
                     'required',
                     'string',
@@ -36,6 +38,7 @@ class KepegawaianController extends Controller
                     'required',
                     'in:super_admin,kepsek,guru,tu,staff',
                 ]
+                // -----------------------------------------------------------------------
             ], [
                 'email.required' => 'Email wajib diisi.',
                 'email.unique' => 'Email sudah terdaftar.',
@@ -65,12 +68,12 @@ class KepegawaianController extends Controller
             $kepegawaian = Kepegawaian::create([
                 'nama' => $validated['nama'] ?? null,
                 'email' => $validated['email'] ?? null,
-                'status' => $request['status'] ?? null,
                 'nip' => $validated['nip'] ?? null,
                 'nuptk' => $validated['nuptk'] ?? null,
-                'keterangan' => $request['keterangan'] ?? null,
+                'keterangan' => $validated['keterangan'] ?? null,
                 'password' => Hash::make($validated['password']) ?? null,
                 'role' => $validated['role'] ?? null,
+                'status' => 'aktif',
             ]);
 
             // Response sukses
@@ -80,12 +83,12 @@ class KepegawaianController extends Controller
                 'data' => [
                     'id' => $kepegawaian->id,
                     'nama' => $kepegawaian->nama,
-                    'email' => $kepegawaian->email,
-                    'status' => $kepegawaian->status,
-                    'nip' => $kepegawaian->nip,
-                    'nuptk' => $kepegawaian->nuptk,
-                    'keterangan' => $kepegawaian->keterangan,
+                    'email' => $kepegawaian->email ?? null,
+                    'nip' => $kepegawaian->nip ?? null,
+                    'nuptk' => $kepegawaian->nuptk ?? null,
+                    'keterangan' => $kepegawaian->keterangan ?? null,
                     'role' => $kepegawaian->role,
+                    'status' => $kepegawaian->status,
                 ]
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -107,12 +110,14 @@ class KepegawaianController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validasi input
             $validated = $request->validate([
+                // samakan dengan ini
+                // -----------------------------------------------------------------------
                 'nama' => 'required|string',
                 'email' => ['required', 'unique:kepegawaians,email', 'email'],
                 'nip' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nip', 'numeric'],
                 'nuptk' => ['nullable', 'digits_between:5,50', 'unique:kepegawaians,nuptk', 'numeric'],
+                'keterangan' => 'nullable',
                 'password' => [
                     'required',
                     'string',
@@ -125,6 +130,7 @@ class KepegawaianController extends Controller
                     'required',
                     'in:super_admin,kepsek,guru,tu,staff',
                 ]
+                // -----------------------------------------------------------------------
             ], [
                 'email.required' => 'Email wajib diisi.',
                 'email.unique' => 'Email sudah terdaftar.',
@@ -154,12 +160,12 @@ class KepegawaianController extends Controller
             $kepegawaian = Kepegawaian::create([
                 'nama' => $validated['nama'] ?? null,
                 'email' => $validated['email'] ?? null,
-                'status' => $request['status'] ?? null,
                 'nip' => $validated['nip'] ?? null,
                 'nuptk' => $validated['nuptk'] ?? null,
-                'keterangan' => $request['keterangan'] ?? null,
+                'keterangan' => $validated['keterangan'] ?? null,
                 'password' => Hash::make($validated['password']) ?? null,
                 'role' => $validated['role'] ?? null,
+                'status' => 'aktif',
             ]);
 
             // Response sukses
@@ -170,11 +176,11 @@ class KepegawaianController extends Controller
                     'id' => $kepegawaian->id,
                     'nama' => $kepegawaian->nama,
                     'email' => $kepegawaian->email,
-                    'status' => $kepegawaian->status,
                     'nip' => $kepegawaian->nip,
                     'nuptk' => $kepegawaian->nuptk,
                     'keterangan' => $kepegawaian->keterangan,
                     'role' => $kepegawaian->role,
+                    'status' => $kepegawaian->status,
                 ]
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -205,7 +211,7 @@ class KepegawaianController extends Controller
                 'password.required' => 'Password wajib diisi.',
             ]);
 
-            // Cari Pegawai berdasarkan NIP
+            // Cari Pegawai berdasarkan email
             $kepegawaian = Kepegawaian::where('email', $validated['email'])->first();
 
             // Cek apakah Pegawai ada & password cocok
@@ -236,11 +242,11 @@ class KepegawaianController extends Controller
                 'id' => $kepegawaian->id ?? null,
                 'nama' => $kepegawaian->nama ?? null,
                 'email' => $kepegawaian->email ?? null,
-                'status' => $kepegawaian->status ?? null,
                 'nip' => $kepegawaian->nip ?? null,
                 'nuptk' => $kepegawaian->nuptk ?? null,
                 'keterangan' => $kepegawaian->keterangan ?? null,
                 'role' => $kepegawaian->role ?? null,
+                'status' => $kepegawaian->status ?? null,
                 'token' => $token ?? null,
             ], 'Login berhasil.');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -290,36 +296,45 @@ class KepegawaianController extends Controller
     }
 
     // CRUD
-    // ✅ get all pegawai
+    // ✅ untuk spa
     public function index()
     {
-        $pegawai = Kepegawaian::with('kelas')->get();
+        $pegawai = Kepegawaian::get();
 
         $formatted = $pegawai->map(function ($item) {
             return [
                 'id' => $item->id ?? null,
                 'nama' => $item->nama ?? null,
                 'email' => $item->email ?? null,
-                'status' => $item->status ?? null,
                 'nip' => $item->nip ?? null,
                 'nuptk' => $item->nuptk ?? null,
                 'keterangan' => $item->keterangan ?? null,
-                'role' => $item->role ?? null,
-                'kelas' => [
-                    'id' => $item->kelas->id ?? null,
-                    'nama_kelas' => $item->kelas->nama_kelas ?? null,
-                    'jam_masuk' => $item->kelas->jam_masuk ?? null,
-                ],
+                'role' => $item->role ?? null,                
+                'status' => $item->status ?? null,                
             ];
         });
 
         return ApiResponse::success($formatted, 'Daftar pegawai berhasil diambil');
     }
 
-    // ✅ show pegawai untuk super admin
+    // ✅ untuk spa
     public function show($id)
     {
-        $pegawai = Kepegawaian::with('kelas', 'ekstrakurikuler', 'jadwalPelajarans.mataPelajaran')->find($id);
+        $pegawai = Kepegawaian::with([
+            'rombels.kelas',
+            'rombels.tahunAkademik',
+            'pelatihEkskul.ekstrakurikuler',
+            'pelatihEkskul.tahunAkademik',
+            'pembinaEkskul.ekstrakurikuler',
+            'pembinaEkskul.tahunAkademik',
+            'jadwalPelajarans.mataPelajaran',
+            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
+            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
+            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
+            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
+            'jadwalPelajarans.semester.tahunAkademik',
+        ])->find($id);
+
         if (!$pegawai) {
             return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
@@ -328,90 +343,217 @@ class KepegawaianController extends Controller
             'id' => $pegawai->id ?? null,
             'nama' => $pegawai->nama ?? null,
             'email' => $pegawai->email ?? null,
-            'status' => $pegawai->status ?? null,
             'nip' => $pegawai->nip ?? null,
             'nuptk' => $pegawai->nuptk ?? null,
             'keterangan' => $pegawai->keterangan ?? null,
             'role' => $pegawai->role ?? null,
-            'kelas' => [
-                'id' => $pegawai->kelas->id ?? null,
-                'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
-                'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
-            ],
-            'ekstrakurikuler' => [
-                'id' => $pegawai->ekstrakurikuler->id ?? null,
-                'nama_ekstrakurikuler' => $pegawai->ekstrakurikuler->nama_ekstrakurikuler ?? null,
-                'anggaran' => $pegawai->ekstrakurikuler->anggaran ?? null,
-                'status' => $pegawai->ekstrakurikuler->status ?? null,
-            ],
-            'jadwal_pelajaran' => $pegawai->jadwalPelajarans->map(function ($item) {
+            'status' => $pegawai->status ?? null,
+            'histori_wali_rombel' => $pegawai->rombels->map(function ($walRom) {
                 return [
-                    'id' => $item->id,
-                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                    'status' => $item->mataPelajaran->status ?? null,
-                    'hari' => $item->hari ?? null,
-                    'guru' => $item->guru->nama ?? null,
-                    'kelas' => $item->kelas->nama_kelas ?? null,
-                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
-                    'ruangan' => $item->ruangan ?? null,
-                    'link_opsional' => $item->link_opsional ?? null,
-                ];
-            }),  
-        ];
+                    'rombel_id' => $walRom->id ?? null,
+                    'nama_rombel' => $walRom->nama_rombel ?? null, // X-1
 
+                    'kelas_id' => $walRom->kelas->id ?? null, // X
+                    'nama_kelas' => $walRom->kelas->nama_kelas ?? null,
+                    'tingkat_kelas' => $walRom->kelas->tingkat ?? null, // 10
+                    'jurusan_kelas' => $walRom->kelas->jurusan->nama_jurusan ?? null,                    
+
+                    'tahun_akademik_rombel' => $walRom->tahunAkademik->tahun_akademik ?? null,
+                    'status_tahun_akademik_rombel' => $walRom->tahunAkademik->status ?? null,
+                ];
+            }),
+            'histori_pelatih_ekskul' => $pegawai->pelatihEkskul->map(function ($pelatih) {
+                return [
+                    'pelatih_id' => $pelatih->id ?? null,
+                    'ekskul_id' => $pelatih->ekstrakurikuler_id ?? null,
+                    'nama_ekskul' => $pelatih->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                    'tahun_akademik_melatih' => $pelatih->tahunAkademik->tahun_akademik ?? null,
+                    'status_tahun_akademik_melatih' => $pelatih->tahunAkademik->status ?? null,
+                ];
+            }),
+            'histori_pembina_ekstrakurikuler' => $pegawai->pembinaEkskul->map(function ($pembina) {
+                return [
+                    'pembina_id' => $pembina->id ?? null,
+                    'ekstrakurikuler_id' => $pembina->ekstrakurikuler_id ?? null,
+                    'nama_ekstrakurikuler' => $pembina->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                    'tahun_akademik_membina' => $pembina->tahunAkademik->tahun_akademik ?? null,
+                    'status_tahun_akademik_membina' => $pembina->tahunAkademik->status ?? null,
+                ];
+            }),                    
+            'histori_jadwal_pelajaran' => $pegawai->jadwalPelajarans
+            ->groupBy(fn ($jadwal) => $jadwal->semester->tahunAkademik->id)
+            ->map(function ($jadwalPerTahun) {
+
+                $tahunAkademik = $jadwalPerTahun->first()->semester->tahunAkademik;
+
+                return [
+                    'tahun_akademik_id' => $tahunAkademik->id,
+                    'tahun_akademik' => $tahunAkademik->tahun_akademik,
+                    'status_tahun_akademik' => $tahunAkademik->status,
+
+                    'semester' => $jadwalPerTahun
+                        ->groupBy(fn ($jadwal) => $jadwal->semester->id)
+                        ->map(function ($jadwalPerSemester) {
+
+                            $semester = $jadwalPerSemester->first()->semester;
+
+                            return [
+                                'semester_id' => $semester->id,
+                                'semester' => $semester->semester, // Ganjil / Genap
+                                'status_semester' => $semester->status,
+
+                                'jadwal' => $jadwalPerSemester->map(function ($jadwal) {
+                                    $kurmap = $jadwal->kurikulumMataPelajaran;
+
+                                    return [
+                                        'jadwal_pelajaran_id' => $jadwal->id,
+                                        'hari' => $jadwal->hari,
+                                        'jam_mulai' => $jadwal->jam_mulai,
+                                        'jam_selesai' => $jadwal->jam_selesai,
+                                        'rombel' => $jadwal->rombel->nama_rombel ?? null,
+                                        'ruangan' => $jadwal->ruangan,
+                                        'link_opsional' => $jadwal->link_opsional,
+
+                                        'mata_pelajaran' => [
+                                            'nama_pelajaran' => $kurmap->mataPelajaran->nama_pelajaran ?? null,
+                                            'jurusan_pelajaran' => $kurmap->jurusan->nama_jurusan ?? null,
+                                            'tingkat_pelajaran' => $kurmap->tingkat,
+                                            'status_pelajaran' => $kurmap->status_mata_pelajaran,
+                                            'kkm' => $kurmap->nilai_kkm,
+                                            'tahun_akdemik_pelajaran' => $kurmap->tahunAkademik->tahun_akademik ?? null, 
+                                            'status_tahun_akdemik_pelajaran' => $kurmap->tahunAkademik->status ?? null, 
+                                        ],
+                                    ];
+                                })->values(),
+                            ];
+                        })->values(),
+                ];
+            })->values(),
+        ];
         return ApiResponse::success($formatted, 'Detail pegawai berhasil diambil');
     }
 
     // ✅ show diri sendiri (pegawai)
     public function showDiriSendiri()
     {
-        $pegawai = Auth::guard('kepegawaian')->user()->load('kelas', 'ekstrakurikuler', 'jadwalPelajarans.mataPelajaran');
+        $user = Auth::guard('kepegawaian')->user();
+
+        $pegawai = Kepegawaian::with([
+            'rombels.kelas',
+            'rombels.tahunAkademik',
+            'pelatihEkskul.ekstrakurikuler',
+            'pelatihEkskul.tahunAkademik',
+            'pembinaEkskul.ekstrakurikuler',
+            'pembinaEkskul.tahunAkademik',
+            'jadwalPelajarans.mataPelajaran',
+            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
+            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
+            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
+            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
+            'jadwalPelajarans.semester.tahunAkademik',
+        ])->find($user->id);
 
         if (!$pegawai) {
-            return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
         }
 
         $formatted = [
             'id' => $pegawai->id ?? null,
             'nama' => $pegawai->nama ?? null,
             'email' => $pegawai->email ?? null,
-            'status' => $pegawai->status ?? null,
             'nip' => $pegawai->nip ?? null,
             'nuptk' => $pegawai->nuptk ?? null,
             'keterangan' => $pegawai->keterangan ?? null,
             'role' => $pegawai->role ?? null,
-            'kelas' => [
-                'id' => $pegawai->kelas->id ?? null,
-                'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
-                'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
-            ],
-            'ekstrakurikuler' => [
-                'id' => $pegawai->ekstrakurikuler->id ?? null,
-                'nama_ekstrakurikuler' => $pegawai->ekstrakurikuler->nama_ekstrakurikuler ?? null,
-                'anggaran' => $pegawai->ekstrakurikuler->anggaran ?? null,
-                'status' => $pegawai->ekstrakurikuler->status ?? null,
-            ],
-            'jadwal_pelajaran' => $pegawai->jadwalPelajarans->map(function ($item) {
+            'status' => $pegawai->status ?? null,
+            'histori_wali_rombel' => $pegawai->rombels->map(function ($walRom) {
                 return [
-                    'id' => $item->id,
-                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                    'status' => $item->mataPelajaran->status ?? null,
-                    'hari' => $item->hari ?? null,
-                    'guru' => $item->guru->nama ?? null,
-                    'kelas' => $item->kelas->nama_kelas ?? null,
-                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
-                    'ruangan' => $item->ruangan ?? null,
-                    'link_opsional' => $item->link_opsional ?? null,
-                ];
-            }),  
-        ];
+                    'rombel_id' => $walRom->id ?? null,
+                    'nama_rombel' => $walRom->nama_rombel ?? null, // X-1
 
-        return ApiResponse::success($formatted, 'Detail pegawai berhasil diambil');
+                    'kelas_id' => $walRom->kelas->id ?? null, // X
+                    'nama_kelas' => $walRom->kelas->nama_kelas ?? null,
+                    'tingkat_kelas' => $walRom->kelas->tingkat ?? null, // 10
+                    'jurusan_kelas' => $walRom->kelas->jurusan->nama_jurusan ?? null,                    
+
+                    'tahun_akademik_rombel' => $walRom->tahunAkademik->tahun_akademik ?? null,
+                    'status_tahun_akademik_rombel' => $walRom->tahunAkademik->status ?? null,
+                ];
+            }),
+            'histori_pelatih_ekskul' => $pegawai->pelatihEkskul->map(function ($pelatih) {
+                return [
+                    'pelatih_id' => $pelatih->id ?? null,
+                    'ekskul_id' => $pelatih->ekstrakurikuler_id ?? null,
+                    'nama_ekskul' => $pelatih->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                    'tahun_akademik_melatih' => $pelatih->tahunAkademik->tahun_akademik ?? null,
+                    'status_tahun_akademik_melatih' => $pelatih->tahunAkademik->status ?? null,
+                ];
+            }),
+            'histori_pembina_ekstrakurikuler' => $pegawai->pembinaEkskul->map(function ($pembina) {
+                return [
+                    'pembina_id' => $pembina->id ?? null,
+                    'ekstrakurikuler_id' => $pembina->ekstrakurikuler_id ?? null,
+                    'nama_ekstrakurikuler' => $pembina->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                    'tahun_akademik_membina' => $pembina->tahunAkademik->tahun_akademik ?? null,
+                    'status_tahun_akademik_membina' => $pembina->tahunAkademik->status ?? null,
+                ];
+            }),                    
+            'histori_jadwal_pelajaran' => $pegawai->jadwalPelajarans
+            ->groupBy(fn ($jadwal) => $jadwal->semester->tahunAkademik->id)
+            ->map(function ($jadwalPerTahun) {
+
+                $tahunAkademik = $jadwalPerTahun->first()->semester->tahunAkademik;
+
+                return [
+                    'tahun_akademik_id' => $tahunAkademik->id,
+                    'tahun_akademik' => $tahunAkademik->tahun_akademik,
+                    'status_tahun_akademik' => $tahunAkademik->status,
+
+                    'semester' => $jadwalPerTahun
+                        ->groupBy(fn ($jadwal) => $jadwal->semester->id)
+                        ->map(function ($jadwalPerSemester) {
+
+                            $semester = $jadwalPerSemester->first()->semester;
+
+                            return [
+                                'semester_id' => $semester->id,
+                                'semester' => $semester->semester, // Ganjil / Genap
+                                'status_semester' => $semester->status,
+
+                                'jadwal' => $jadwalPerSemester->map(function ($jadwal) {
+                                    $kurmap = $jadwal->kurikulumMataPelajaran;
+
+                                    return [
+                                        'jadwal_pelajaran_id' => $jadwal->id,
+                                        'hari' => $jadwal->hari,
+                                        'jam_mulai' => $jadwal->jam_mulai,
+                                        'jam_selesai' => $jadwal->jam_selesai,
+                                        'rombel' => $jadwal->rombel->nama_rombel ?? null,
+                                        'ruangan' => $jadwal->ruangan,
+                                        'link_opsional' => $jadwal->link_opsional,
+
+                                        'mata_pelajaran' => [
+                                            'nama_pelajaran' => $kurmap->mataPelajaran->nama_pelajaran ?? null,
+                                            'jurusan_pelajaran' => $kurmap->jurusan->nama_jurusan ?? null,
+                                            'tingkat_pelajaran' => $kurmap->tingkat,
+                                            'status_pelajaran' => $kurmap->status_mata_pelajaran,
+                                            'kkm' => $kurmap->nilai_kkm,
+                                            'tahun_akdemik_pelajaran' => $kurmap->tahunAkademik->tahun_akademik ?? null, 
+                                            'status_tahun_akdemik_pelajaran' => $kurmap->tahunAkademik->status ?? null, 
+                                        ],
+                                    ];
+                                })->values(),
+                            ];
+                        })->values(),
+                ];
+            })->values(),
+        ];
+        return ApiResponse::success($formatted, 'Detail data berhasil diambil');
     }
 
     // ✅ Store = Register
 
-    // ✅ update pegawai oleh super admin
+    // ✅ untuk spa
     public function update(Request $request, $id)
     {
         $pegawai = Kepegawaian::find($id);
@@ -426,7 +568,6 @@ class KepegawaianController extends Controller
                 'required',
                 Rule::unique('kepegawaians')->ignore($id)
             ],
-            'status' => 'sometimes',
             'nip' => [
                 'sometimes',
                 'nullable',
@@ -437,8 +578,9 @@ class KepegawaianController extends Controller
                 'nullable',
                 Rule::unique('kepegawaians')->ignore($id)
             ],
-            'keterangan' => 'sometimes',
+            'keterangan' => 'sometimes|nullable',
             'role' => 'sometimes|required',
+            'status' => 'sometimes|required|in:aktif,tidak aktif'
         ], [
             'nama.required' => 'Nama wajib diisi',
             'email.required' => 'Email wajib diisi',
@@ -446,6 +588,8 @@ class KepegawaianController extends Controller
             'nip.unique' => 'Terdeteksi NIP ganda',
             'nuptk.unique' => 'Terdeteksi NUPTK ganda',
             'role.required' => 'Role wajib diisi',
+            'status.required' => 'Status wajib diisi',
+            'status.in' => 'Pilihan status hanya aktif dan tidak aktif',
         ]);
 
         // cek role super_admin dan kepsek agar tidak double
@@ -460,39 +604,45 @@ class KepegawaianController extends Controller
             }
         }
 
-        // Cek apakah sedang digunakan sebagai wali_kelas
-        if ($pegawai->kelas()->exists() && $validated['role'] !== $pegawai->role) {
-            return ApiResponse::error('Role tidak bisa diubah karena pegawai masih menjadi wali kelas', [
-                'role' => ['Tidak bisa, pegawai ini masih berstatus sebagai wali kelas']
-            ], 422);
+        // tidak boleh ubah role jika sedang menjadi wali_rombel di tahun akademik yang aktif
+        if (
+            $validated['role'] !== $pegawai->role &&
+            $pegawai->rombels()
+                ->whereHas('tahunAkademik', function ($q) {
+                    $q->where('status', 'aktif');
+                })
+                ->exists()
+        ) {
+            return ApiResponse::error(
+                'Role tidak bisa diubah karena pegawai masih menjadi wali rombel aktif',
+                [
+                    'role' => ['Tidak bisa, pegawai ini masih berstatus sebagai wali rombel di tahun akademik aktif']
+                ],
+                422
+            );
         }
-        
+            
         $pegawai->update([
             'nama' => $validated['nama'],
             'email' => $validated['email'],
-            'status' => $request['status'],
+            'status' => $validated['status'],
             'nip' => $validated['nip'],
             'nuptk' => $validated['nuptk'],
-            'keterangan' => $request['keterangan'],
+            'keterangan' => $validated['keterangan'],
             'role' => $validated['role'],
-        ]);
-        $pegawai->load('kelas');
+            'status' => $validated['status'],
+        ]);        
 
         return ApiResponse::success(
             [
                 'id' => $pegawai->id ?? null,
                 'nama' => $pegawai->nama ?? null,
                 'email' => $pegawai->email ?? null,
-                'status' => $pegawai->status ?? null,
                 'nip' => $pegawai->nip ?? null,
                 'nuptk' => $pegawai->nuptk ?? null,
                 'keterangan' => $pegawai->keterangan ?? null,
-                'role' => $pegawai->role ?? null,
-                'kelas' => [
-                    'id' => $pegawai->kelas->id ?? null,
-                    'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
-                    'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
-                ]
+                'role' => $pegawai->role ?? null,                
+                'status' => $pegawai->status ?? null,                
             ],
             'Pegawai berhasil diperbarui'
         );
@@ -501,11 +651,14 @@ class KepegawaianController extends Controller
      // ✅ Update super admin oleh dirinya sendiri
      public function updateDirinyaSendiri(Request $request)
      {
-         $pegawai = Auth::guard('kepegawaian')->user();
+         $user = Auth::guard('kepegawaian')->user();
+
+         $pegawai = Kepegawaian::find($user->id);
  
          if (!$pegawai) {
-             return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
          }
+
  
          $validated = $request->validate([
              'nama' => 'sometimes|required|string',
@@ -513,8 +666,7 @@ class KepegawaianController extends Controller
                  'sometimes',
                  'required',
                  Rule::unique('kepegawaians')->ignore($pegawai->id)
-             ],
-             'status' => 'sometimes',
+             ],             
              'nip' => [
                  'sometimes',
                  'nullable',
@@ -524,99 +676,40 @@ class KepegawaianController extends Controller
                  'sometimes',
                  'nullable',
                  Rule::unique('kepegawaians')->ignore($pegawai->id)
-             ],
-             'keterangan' => 'sometimes',
-             'role' => [
-                 'sometimes',
-                 'required',
-                //  Rule::unique('kepegawaians')->ignore($pegawai->id)
-             ],
+             ],                          
+             'keterangan' => 'sometimes|nullable',
         ], [
             'nama.required' => 'Nama wajib diisi',
             'email.required' => 'Email wajib diisi',
             'email.unique' => 'Terdeteksi email ganda',            
             'nip.unique' => 'Terdeteksi NIP ganda',
-            'nuptk.unique' => 'Terdeteksi NUPTK ganda',
-            'role.required' => 'Role wajib diisi',
+            'nuptk.unique' => 'Terdeteksi NUPTK ganda',            
         ]);
 
-        // ROLE AWAL
-        $roleAwal = $pegawai->role;
-
-        // ROLE BARU
-        $roleBaru = $validated['role'] ?? $pegawai->role;
-
-        // 1. Jika role awal super_admin atau kepsek → tidak boleh diubah
-        if (in_array($roleAwal, ['super_admin', 'kepsek'])) {
-
-            if ($roleBaru !== $roleAwal) {
-                return ApiResponse::error('Role tidak dapat diubah', [
-                    'role' => ['Pegawai dengan role ini tidak boleh mengubah role']
-                ], 422);
-            }
-        }
-
-        // 2. Jika role awal bukan super_admin/kepsek → cek agar tidak double
-        if (!in_array($roleAwal, ['super_admin', 'kepsek'])) {
-            if (in_array($roleBaru, ['super_admin', 'kepsek'])) {
-                $existing = Kepegawaian::where('role', $roleBaru)
-                    ->where('id', '!=', $pegawai->id)
-                    ->exists();
-
-                if ($existing) {
-                    return ApiResponse::error("Role {$roleBaru} sudah digunakan", [
-                        'role' => ["Role {$roleBaru} tidak boleh lebih dari satu"]
-                    ], 403);
-                }
-            }
-        }
-
-        // Cek apakah sedang digunakan sebagai wali_kelas
-        if ($pegawai->kelas()->exists() && $validated['role'] !== $pegawai->role) {
-            return ApiResponse::error('Role tidak bisa diubah karena pegawai masih menjadi wali kelas', [
-                'role' => ['Tidak bisa, pegawai ini masih berstatus sebagai wali kelas']
-            ], 422);
-        }
-        
         $pegawai->update([
             'nama' => $validated['nama'] ?? null,
             'email' => $validated['email'] ?? null,
-            'status' => $validated['status'] ?? null,
             'nip' => $validated['nip'] ?? null,
             'nuptk' => $validated['nuptk'] ?? null,
             'keterangan' => $validated['keterangan'] ?? null,
-            'role' => $validated['role'] ?? null,
-        ]);
-
-        $pegawai->load('kelas','ekstrakurikuler');
+        ]);        
 
         return ApiResponse::success(
             [
                 'id' => $pegawai->id ?? null,
                 'nama' => $pegawai->nama ?? null,
                 'email' => $pegawai->email ?? null,
-                'status' => $pegawai->status ?? null,
                 'nip' => $pegawai->nip ?? null,
                 'nuptk' => $pegawai->nuptk ?? null,
                 'keterangan' => $pegawai->keterangan ?? null,
-                'role' => $pegawai->role ?? null,
-                'kelas' => [
-                    'id' => $pegawai->kelas->id ?? null,
-                    'nama_kelas' => $pegawai->kelas->nama_kelas ?? null,
-                    'jam_masuk' => $pegawai->kelas->jam_masuk ?? null,
-                ],
-                'ekstrakurikuler' => [
-                    'id' => $pegawai->ekstrakurikuler->id ?? null,
-                    'nama_ekstrakurikuler' => $pegawai->ekstrakurikuler->nama_ekstrakurikuler ?? null,
-                    'anggaran' => $pegawai->ekstrakurikuler->anggaran ?? null,
-                    'status' => $pegawai->ekstrakurikuler->status ?? null,
-                ]
+                'role' => $pegawai->role ?? null,                
+                'status' => $pegawai->status ?? null,                
             ],
-            'Pegawai berhasil diperbarui'
+            'Data berhasil diperbarui'
         );
      }
 
-    // ✅ destroy pegawai untuk super admin
+    // ✅ untuk spa
     public function destroy($id)
     {
         $pegawai = Kepegawaian::find($id);
@@ -624,11 +717,24 @@ class KepegawaianController extends Controller
             return ApiResponse::error('Pegawai tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
-        // Cek di model Kepegawaian apakah pegawai masih jadi wali kelas
-        if ($pegawai->kelas()->exists()) {
-            return ApiResponse::error('Pegawai tidak bisa dihapus karena masih menjadi wali kelas', [
-                'wali_kelas' => ['Tidak bisa, pegawai ini masih berstatus sebagai wali kelas']
-            ], 422);
+        $dipakaiRombel = $pegawai->rombels()->exists();
+        $dipakaiPembina = $pegawai->pembinaEkskul()->exists();
+        $dipakaiPelatih = $pegawai->pelatihEkskul()->exists();
+        $dipakaiJadwal = $pegawai->jadwalPelajarans()->exists();
+        $dipakaiAbsenPegawai = $pegawai->absensiKepegawaians()->exists();
+        $dipakaiAbsenPelajaran = $pegawai->absensiPelajarans()->exists();
+        $dipakaiAbsenNilai = $pegawai->dataNilaiSiswas()->exists();
+        
+        if ($dipakaiRombel || $dipakaiPembina || $dipakaiPelatih || $dipakaiJadwal || $dipakaiAbsenPegawai || $dipakaiAbsenPelajaran || $dipakaiAbsenNilai) {
+            return ApiResponse::error(
+                'Pegawai tidak dapat dihapus',
+                [
+                    'id' => [
+                        'Pegawai sudah menjadi bagian dari histori arsip, ubah status sebagai solusi'
+                    ]
+                ],
+                422
+            );
         }
 
         $pegawai->delete();

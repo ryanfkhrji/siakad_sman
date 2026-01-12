@@ -14,5 +14,10 @@ class Kurikulum extends Model
     public function kompetensiDasars()
     {
         return $this->hasMany(KompetensiDasar::class, 'kurikulum_id');
+    }    
+
+    public function kurikulumMataPelajaran()
+    {
+        return $this->hasMany(KurikulumMataPelajaran::class);
     }
 }

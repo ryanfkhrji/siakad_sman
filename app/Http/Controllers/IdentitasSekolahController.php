@@ -65,10 +65,23 @@ class IdentitasSekolahController extends Controller
 
 
     /**
-     * Store a newly created resource in storage.
+     * spa dan tu
      */
     public function store(Request $request)
     {
+        $kepegawaian = Auth::guard('kepegawaian')->user();
+
+        if (! in_array($kepegawaian->role, ['tu', 'super_admin'])) {
+            return ApiResponse::error('Not supported', ['role' => 'Anda tidak memiliki hak']);
+        }
+
+        $sudahAda = IdentitasSekolah::exists();
+        
+        if ($sudahAda) {
+            return ApiResponse::error('Not supported', ['data' => 'Identitas sekolah sudah ada']);
+        }
+        
+
        try {
             $validated = $request->validate([
                 'npsn' => 'nullable|string|unique:identitas_sekolah,npsn',
@@ -174,6 +187,12 @@ class IdentitasSekolahController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $kepegawaian = Auth::guard('kepegawaian')->user();
+
+        if (! in_array($kepegawaian->role, ['tu', 'super_admin'])) {
+            return ApiResponse::error('Not supported', ['role' => 'Anda tidak memiliki hak']);
+        }
+
         try {
             $identitas = IdentitasSekolah::find($id);
 
@@ -282,6 +301,12 @@ class IdentitasSekolahController extends Controller
      */
     public function destroy(string $id)
     {
+        $kepegawaian = Auth::guard('kepegawaian')->user();
+
+        if (! in_array($kepegawaian->role, ['tu', 'super_admin'])) {
+            return ApiResponse::error('Not supported', ['role' => 'Anda tidak memiliki hak']);
+        }
+
         $identitas = IdentitasSekolah::find($id);
 
         if (!$identitas) {

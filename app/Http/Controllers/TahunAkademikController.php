@@ -7,25 +7,30 @@ use App\Models\TahunAkademik;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class TahunAkademikController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * ✅ untuk spa
      */
     public function index()
     {
-        $ta = TahunAkademik::orderBy('tahun_akademik', 'desc')->get();
+        $ta = TahunAkademik::waith('semester')->orderBy('tahun_akademik', 'desc')->get();
 
         $formatted = $ta->map(function($item) {
             return [
-                'id' => $item->id ?? null,
+                'id_tahun_akademik' => $item->id ?? null,
                 'tahun_akademik' => $item->tahun_akademik ?? null,
-                'semester' => $item->semester ?? null,
-                'tanggal_mulai' => $item->tanggal_mulai ?? null,
-                'tanggal_selesai' => $item->tanggal_selesai ?? null,
-                'status' => $item->status ?? null,
+                'semester' => $item->semester->map(function ($semester) {
+                    return [
+                        'id_semester' => $semester->id ?? null,
+                        'semester' => $semester->semester ?? null,
+                        'status_semester' => $semester->status ?? null,
+                    ];
+                }),
                 'keterangan' => $item->keterangan ?? null,
+                'status_tahun_akademik' => $item->status ?? null,
             ];
         });
 
@@ -33,37 +38,38 @@ class TahunAkademikController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ✅ untuk spa
      */
     public function store(Request $request)
     {
         try {
             $validated = $request->validate([
-                'tahun_akademik' => 'required|unique:tahun_akademik,tahun_akademik',
-                'semester' => 'required|in:Ganjil,Genap',
-                'tanggal_mulai' => 'nullable',
-                'tanggal_selesai' => 'nullable',
-                'status' => 'required|in:aktif,nonaktif',            
+                // sesuaikan dengan ini @Ryan, 2 ini aja
+                'tahun_akademik' => 'required|unique:tahun_akademik,tahun_akademik',                
                 'keterangan' => 'nullable',            
             ],[
                 'tahun_akademik.required' => 'Wajib diisi',
-                'tahun_akademik.unique' => 'Tahun akademik sudah ada',
-                'semester.required' => 'Wajib diisi',
-                'semester.in' => 'Pilihan hanya Ganjil dan Genap',
-                'status.required' => 'Wajib diisi',
-                'status.in' => 'Pilihan hanya aktif dan nonaktif',
-            ]);            
+                'tahun_akademik.unique' => 'Tahun akademik sudah ada',                
+            ]);                        
 
-            $ta = TahunAkademik::create($validated);
+            // cegah create sebelum semua TA menjadi arsip
+            $tahunAkademikAktif = TahunAkademik::where('status', 'aktif')->exists();
+
+            if ($tahunAkademikAktif) {
+                return ApiResponse::error('Double aktif', ['pesan' => 'Masih ada tahun akademik lain yang aktif, arsipkan terlebih dahulu']);
+            }
+
+            $ta = TahunAkademik::create([
+                'tahun_akademik' => $validated['tahun_akademik'],
+                'keterangan' => $validated['keterangan'],
+                'status' => 'aktif',
+            ]);
 
             return ApiResponse::success([
                 'id' => $ta->id ?? null,
-                'tahun_akademik' => $ta->tahun_akademik ?? null,
-                'semester' => $ta->semester ?? null,
-                'tanggal_mulai' => $ta->tanggal_mulai ?? null,
-                'tanggal_selesai' => $ta->tanggal_selesai ?? null,
-                'status' => $ta->status ?? null,
+                'tahun_akademik' => $ta->tahun_akademik ?? null,                
                 'keterangan' => $ta->keterangan ?? null,
+                'status' => $ta->status ?? null,
             ], 'Data berhasil dibuat');
 
         } catch (ValidationException $e) {
@@ -72,74 +78,94 @@ class TahunAkademikController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * ✅ untuk spa
      */
     public function show(string $id)
     {
-        $ta = TahunAkademik::find($id);
+        $ta = TahunAkademik::with('semester')->find($id);
 
         if (!$ta) {
             return ApiResponse::error('Tahun akademik tidak ditemukan', ['id' => 'Data tidak ditemukan']);
         }
 
         $formatted = [
-                'id' => $ta->id ?? null,
+                'tahun_akademik_id' => $ta->id ?? null,
                 'tahun_akademik' => $ta->tahun_akademik ?? null,
-                'semester' => $ta->semester ?? null,
-                'tanggal_mulai' => $ta->tanggal_mulai ?? null,
-                'tanggal_selesai' => $ta->tanggal_selesai ?? null,
-                'status' => $ta->status ?? null,
+                'semester' => $ta->semester->map(function ($semester) {
+                    return [
+                        'semester_id' => $semester->id,   
+                        'semester' => $semester->semester,   
+                        'status_semester' => $semester->status,   
+                    ];
+                }) ?? null,                
                 'keterangan' => $ta->keterangan ?? null,
+                'status_tahun_akademik' => $ta->status ?? null,
             ];
 
         return ApiResponse::success($formatted, 'Detail tahun akademik berhasil diambil');
     }
 
     /**
-     * Update the specified resource in storage.
+     * ✅ untuk spa
      */
     public function update(Request $request, string $id)
     {
         $ta = TahunAkademik::find($id);
+
         if (!$ta) {
             return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
         }
 
         $validated = $request->validate([
+            // ini @Ryan, di dalam $validated, 3 inputan
             'tahun_akademik' => [
                 'sometimes',
                 'required',
                 Rule::unique('tahun_akademik')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
             ],
-            'semester' => 'sometimes|required|in:Ganjil,Genap',
-            'tanggal_mulai' => 'sometimes|nullable',        
-            'tanggal_selesai' => 'sometimes|nullable',        
-            'status' => 'sometimes|in:aktif,nonaktif',        
             'keterangan' => 'sometimes|nullable',        
+            'status' => 'sometimes|required|in:aktif,arsip',
         ],[
             'tahun_akademik.required' => 'Wajib diisi',
             'tahun_akademik.unique' => 'Tahun akademik sudah ada',
-            'semester.required' => 'Wajib diisi',
-            'semester.in' => 'Pilihan hanya Ganjil dan Genap',
-            'status.in' => 'Pilihan hanya aktif dan nonaktif',
+            'status.required' => 'Status wajib diisi',
+            'status.in' => 'Pilihan status hanya aktif dan arsip',
         ]);
 
+        if (
+            $ta->status === 'arsip'
+            && isset($validated['status'])
+            && $validated['status'] === 'aktif'
+        ) {
+            return ApiResponse::error(
+                'Kesalahan',
+                ['status' => 'Tahun akademik yang sudah diarsipkan tidak dapat diaktifkan kembali'],
+                422
+            );
+        }
+
         $ta->update($validated);
+
+        $ta->load('semester');
         
         return ApiResponse::success(
             [
-                'id' => $ta->id ?? null,
+                'tahun_akademik_id' => $ta->id ?? null,
                 'tahun_akademik' => $ta->tahun_akademik ?? null,
-                'semester' => $ta->semester ?? null,
-                'tanggal_mulai' => $ta->tanggal_mulai ?? null,
-                'tanggal_selesai' => $ta->tanggal_selesai ?? null,
-                'status' => $ta->status ?? null,
+                'semester' => $ta->semester->map(function ($semester) {
+                    return [
+                        'semester_id' => $semester->id,
+                        'semester' => $semester->semester,
+                        'status_semester' => $semester->status,
+                    ];
+                }) ?? null,                
                 'keterangan' => $ta->keterangan ?? null,
+                'status_tahun_akademik' => $ta->status ?? null,
             ], 'Tahun akademik berhasil diperbarui');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * ✅ untuk spa
      */
     public function destroy(string $id)
     {
@@ -147,6 +173,20 @@ class TahunAkademikController extends Controller
 
         if (!$ta) {
             return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        $dipakaiSemester = $ta->semester()->exists();
+
+        if ($dipakaiSemester) {
+            return ApiResponse::error(
+                'Tahun akademik tidak dapat dihapus',
+                [
+                    'pesan' => [
+                        'Tahun akademik sudah digunakan pada semester'
+                    ]
+                ],
+                422
+            );
         }
 
         $ta->delete();

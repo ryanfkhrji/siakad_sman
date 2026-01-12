@@ -45,15 +45,11 @@ class Siswa extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-    ];
-
-     /**
-     * 1 siswa = banyak ekskul
-     * Menggunakan pivot table
-     *  */ 
-    public function ekstrakurikulers()
+    ];     
+    
+    public function ekskulSiswa()
     {
-        return $this->belongsToMany(Ekstrakurikuler::class, 'ekskul_siswa_pivot')->withPivot('id', 'sikap');
+        return $this->hasMany(EkskulSiswaPivot::class);
     }
 
     // 1 siswa = 1 jurusan
@@ -68,8 +64,27 @@ class Siswa extends Authenticatable
      */
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsToMany(Kelas::class, 'siswa_rombel')
+        ->withPivot(['id', 'siswa_id', 'rombel_id', 'tahun_akademik_id', 'status']);
+        // status: aktif/arsip
+    }    
+
+    public function siswaRombels()
+    {
+        return $this->hasMany(SiswaRombel::class, 'siswa_id');
     }
+
+    // helper (opsional): rombel aktif
+    public function rombels()
+    {
+        return $this->belongsToMany(
+            Rombel::class,
+            'siswa_rombel',
+            'siswa_id',
+            'rombel_id'
+        )->withTimestamps();
+    }
+
 
     public function pengajar()
     {
@@ -78,7 +93,9 @@ class Siswa extends Authenticatable
 
     public function jadwalPelajarans()
     {
-        return $this->belongsToMany(JadwalPelajaran::class, 'siswa_jadwal_pelajaran');
+        return $this->belongsToMany(JadwalPelajaran::class, 'siswa_jadwal_pelajaran')
+        ->withPivot(['id', 'siswa_id', 'jadwal_pelajaran_id', 'tahun_akademik_id', 'status']);
+        // status: aktif/arsip
     }
 
     public function absensis()
@@ -86,9 +103,14 @@ class Siswa extends Authenticatable
         return $this->hasMany(AbsensiSiswa::class, 'siswa_id'); 
     }
 
-    public function nilaiSiswa()
+    public function kurikulumMataPelajarans()
     {
-        return $this->hasOne(DataNilaiSiswa::class, 'siswa_id');
+        return $this->hasMany(KurikulumMataPelajaran::class, 'siswa_id'); 
+    }
+
+    public function dataNilaiSiswas()
+    {
+        return $this->hasMany(DataNilaiSiswa::class, 'siswa_id');
     }
 
     public function prestasis()

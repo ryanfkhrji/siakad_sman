@@ -25,21 +25,23 @@ class AbsensiPegawaiExport implements FromCollection, WithHeadings
     public function collection()
     {
         $query = $this->ids
-            ? AbsensiPegawai::whereIn('id', $this->ids)->with('mataPelajaran', 'guru')->get()
-            : AbsensiPegawai::with('mataPelajaran', 'guru')->get();
+            ? AbsensiPegawai::whereIn('id', $this->ids)->with('mataPelajaran', 'guru', 'tahunAkademik')->get()
+            : AbsensiPegawai::with('mataPelajaran', 'guru', 'tahunAkademik')->get();
 
         return $query->map(function($item) {
             return [
-                $item->guru->nama,
-                $item->mataPelajaran->nama_pelajaran,
-                Carbon::parse($item->hari)->translatedFormat('l, d F Y'),
-                $item->status,
+                $item->guru->nama ?? null,
+                $item->mataPelajaran->nama_pelajaran ?? null,
+                Carbon::parse($item->hari)->translatedFormat('l, d F Y') ?? null,
+                $item->status ?? null,
+                $item->tahunAkademik->tahun_akademik ?? null,
+                $item->tahunAkademik->semester ?? null,
             ];
         });
     }
 
     public function headings(): array
     {
-        return ['Nama Guru', 'Mata Pelajaran', 'Hari', 'Status'];
+        return ['Nama Guru', 'Mata Pelajaran', 'Hari', 'Status', 'Tahun Akademik', 'Semester'];
     }
 }

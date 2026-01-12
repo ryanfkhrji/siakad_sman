@@ -45,4 +45,14 @@ class DataNilaiSiswa extends Model
      {
          return $this->belongsTo(Kepegawaian::class, 'guru_id');
      }     
+
+    public function kurikulumMataPelajaran()
+    {
+        return $this->belongsTo(KurikulumMataPelajaran::class);
+    }
+
+    // public function ekskulSiswaPivot()
+    // {
+    //     return $this->belongsTo(EkskulSiswaPivot::class);
+    // }
 }

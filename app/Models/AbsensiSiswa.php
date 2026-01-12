@@ -11,19 +11,30 @@ class AbsensiSiswa extends Model
     protected $table = 'absensi_siswa';
     protected $guarded = ['id'];
 
-    public function siswaJadwalPelajaran()
-    {
-        return $this->belongsTo(SiswaJadwalPelajaran::class, 'mata_pelajaran_id');
-    }
-
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');
     }
 
-    public function mataPelajaran()
+    public function jadwalPelajaran()
     {
-        return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
+        return $this->belongsToMany(JadwalPelajaran::class, 'siswa_jadwal_pelajaran')
+        ->withPivot(
+            [
+                'siswa_id',
+                'jadwal_pelajaran_id',
+                'tahun_akademik_id',
+                'status',        
+            ]);
     }
 
+    public function tahunAkademik()
+    {
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
 }

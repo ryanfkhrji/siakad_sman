@@ -46,32 +46,20 @@ class Kepegawaian extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-
-    /**
-     * Satu kelas = satu wali, yang datanya diambil dari tabel kepegawaians. 
-     * Kolom wali_kelas di tabel kelas menyimpan id dari kepegawaian yang menjadi wali.
-     * Relasi ini adalah one-to-one (inverse): kelas → kepegawaian.
-     */
-    // public function wali()
-    // {
-    //     return $this->hasOne(Kelas::class, 'wali_kelas');
-    // }
-
-    /**
-     * Seorang pegawai bisa menjadi wali dari satu kelas.
-     * Laravel akan mencari di tabel kelas di mana wali_kelas = id pegawai.
-     * Ini adalah relasi one-to-one: kepegawaian → kelas
-     */
-    public function kelas()
+    
+    public function rombels()
     {
-        return $this->hasOne(Kelas::class, 'wali_kelas');
+        return $this->hasMany(Rombel::class, 'wali_rombel_id');
+    }    
+
+    public function pembinaEkskul()
+    {
+        return $this->hasMany(PembinaEkskul::class, 'pembina_id');
     }
 
-    
-    public function ekstrakurikuler()
+    public function pelatihEkskul()
     {
-        return $this->hasOne(Ekstrakurikuler::class, 'pengajar_id');
+        return $this->hasMany(PelatihEkskul::class, 'pelatih_id');
     }
 
     public function jadwalPelajarans()

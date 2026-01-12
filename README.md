@@ -15,76 +15,476 @@ Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (Res
 -   php artisan serve
 -   lalu gunakan API yang tersedia
 
-## Cara Penggunaan Frontend
-
-<!-- done sampe tu -->
-
+========================================================================================================================================
 Perbaikan
 
-1. Kepegawaian
-    - Backend:
-          - ✅ (Seeder, Migrasi, Controller) nambah nuptk (nullable)
-          - ✅ (Seeder, Migrasi, Controller) nip menjadi nullable
+1. identitas_sekolah:
+   - ☑️ Backend
+   - Frontend:
+     - ikutin insomnia
+     - Ketika masih kosong, tombol tambah identitas muncul, ketika sudah ada data, tombol tambah identitas hilang
+2. gedung:
+   - ❌ Backend:
+3. ruangan:
+   - ❌ Backend:
+4. Kepegawaian: (independen)
+    - ☑️ Backend:
+          - ✅ samakan semua
     - Frontend: 
-          - tambahin kolom nuptk pada register (tapi nullable)
-          - NIP pada regsiter ubah jadi nullable
-2. Mata Pelajaran:
-    - Backend:
-          - ✅ (Seeder, Migrasi, Controller) Nambah kolom kode_mapel_diknas
-          - ✅ (Seeder, Migrasi, Controller) hapus kolom status
-          - ✅ (Seeder, Migrasi, Controller) hapus kolom nilai_kkm
-    - Frontend:
-          - Nambah inputan kode_mapel_diknas
-          - hilangkan inputan status
-          - hilangkan inputan nilai_kkm
-3. Kurikulum:
-    - Backend:
-          - ✅ (Seeder, Migrasi, Controller) nama_kurikulum tidak unique lagi
-          - ✅ (Seeder, Migrasi, Controller) Nambah kode_kurikulum (unik)
-          - ✅ (Seeder, Migrasi, controller) tahun_berlaku diubah jadi tahun_mulai
-          - ✅ (Seeder, Migrasi, controller) menambah kolom tahun_selesai
-    - Frontend:
-          - Nambah inputan kode_kurikulum
-          - ubah inputan tahun_berlaku menjadi tahun_mulai
-          - nambah inputan tahun_selesai
-4. Jurusan:
-    - Backend: 
-          - ✅ (Seeder, Migrasi, Controller) nama_jurusan tidak unique lagi
-          - ✅ (Seeder, Migrasi, Controller) Nambah kode_jurusan
+          - samakan dengan insomnia
+          - pada store atau register, tidak perlu inputan status (update perlu)
+5. penerimaan_siswa_baru:
+   - ❌ Backend:
+6. Siswa: (independen)
+    - ☑️ Backend:
+          - ✅ samakan semua        
+          - ❌ siswa tidak ada update dirinya sendiri (insomnia)
+   - Frontend:
+          - Samakan dengan insomnia
+          - pada store atau register, tidak perlu inputan status (update perlu)
+7. Jurusan: (independen)
+    - ☑️ Backend: 
+          - ✅ samakan semua
     - Frontend
-          - Nambah inputan kode_jurusan          
-5. Kelas
+          - ikutin insomnia
+          - kalo create/store, status otomatis aktif (gaperlu kasih inputan status, kecuali update)
+8. Kelas: (independen)
+    - ☑️ Backend:
+          - ✅ samakan semua
+    - Frontend:
+          - ikutin insomnia              
+9.  Kurikulum: (independen) 
+   aturan main, menentukan kompetensi KD/CP, 
+    - ☑️ Backend:
+        - ✅ samakan semua
+        - ❌ show belum yakin sampai semua yang terkait seleai
+    - Frontend:
+        - ikutin insomnia
+10. mata_pelajaran: (independen)
+    - ☑️ Backend:
+        - ✅ samakan semua
+        - ❌ (insomnia) semua milik spa
+    - Frontend:
+        - ikutin insomnia
+        - selain super admin tidak ada bagian disini
+11. tahun_akademik: (independen)
+    - ☑️ Backend:
+        - ✅ samakan semua
+        - ❌ (insomnia) semua milik spa
+    - Frontend:
+        - ikutin insomnia
+        - semua milik spa
+12. semester:
+    - ☑️ Backend:
+        - ✅ samakan semua
+    - Frontend:
+        - Ikutin insomnia
+13. kurikulum_mata_pelajaran:
+   - ☑️ Backend:
+          - ✅ samakan semua
+   - Frontend:
+          - ikutin insomnia
+          - Buat tampilannya (untuk spa saja)
+14. ☑️ kompetensi:
+    Target kemampuan siswa, lintas tahun
+    - Backend:        
+        - ✅ samakan semua
+    - Frontend:
+        - samakan dengan insomnia
+15. alur_tujuan_pembelajaran:
     - Backend:
-          - (Seeder, Migrasi, Controller) nama_kelas tidak unique lagi
-          - (Seeder, Migrasi, Controller) nambah kolom tingkat
-          - (Seeder, Migrasi, Controller) nambah kolom kurikulum_id
-          - (Seeder, Migrasi, Controller) kolom jam_masuk dihapus
-6. Membuat pivot kurikulum_mata_pelajaran
-7. data_nilai_siswa:
-    - ganti mata_pelajaran_id dan jurusan_pelajaran_id dengan kurikulum_mata_pelajaran_id
-    - buat cadangan grouping datanilaisiswa all milik pegawai agar di group berdasarkan jurusan_pelajaran_id (kaya si all punya spa)
-    - hitung total absensi siswa per mata pelajaran untuk menentukan point absensinya
-    - jabarin ekskul yang diikuti dan sikap pada ekskul
-    - Buat export data nilai siswa
-8. ekstrakurikuler:
-    - status pilihan hanya aktif dan tidak aktif
-9. ekskul_siswa_pivot:
-    - nambah kolom tahun_akademik_id
-10. tahun_akademik:
-    - kolom status, nonaktif jadi tidak aktif
-11. jadwal_pelajarans:
-    - jam_pelajaran diganti jadi jam_mulai dan jam_selesai
-12. kelas:
-    - penambahan kolom jam_mulai dan jam_selesai
-13. kompetensi_dasar:
-    - nambah kolom tingkat
-14. prestasi:
-    - nambah kolom tahun_akademik_id
-15. jadwal_pelajarans:
-    - ubah kolom mata_pelajaran_id menjadi kurikulum_mata_pelajaran_id
-16. absensi_siswa:
-    - ubah kolom mata_pelajaran_id menjadi jadwal_pelajaran_id
-    - nambah kolom tahun_akademik_id
-    - absensisiswacontroller sebaiknya di group berdasarkan mata pelajaran, karna satu siswa > 1 mapel untuk absen
+        - ❌ samakan semua
+        - ❌ route
+        - ❌ fitur approve
+        - ❌ fitur clone
+    - Frontend:
+        - ikutin insomnia
+        - referensi tampilan ada di pdf e-raport halaman 143
+        - kasih tombol clone pada tahun_akademik (fitur clone tahun lalu)
+        - kasih status (raft, diajukan, disetuji, ditolak) pada masing-masing baris atp
+        - kasih tombol "ajukan atp ke admin"
+        - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang
+16.  ❌ modul_ajar
+17.  ❌ asesmen
+18.  rombel: 
+    - ☑️ Backend:
+          - ✅ samakan semuanya
+          - ❌ API dan insomnia
+    - Frontend:
+          - ikutin insomnia      
+          - wali_rombel = wali_kelas
+          - hitung jumlah siswa di rombel yang tahun_akademik = aktif
+19. siswa_rombel:
+    - ☑️ Backend:
+          - ✅ samakan semuanya (M, S, C, R)
+          - ❌ API dan insomnia
+    - Frontend:
+          - Ikutin insomnia
+20. jadwal_pelajarans:
+    - Backend:
+        - ❌ (Seeder, Migrasi, Controller) jam_pelajaran diganti jadi jam_mulai dan jam_selesai
+        - ❌ (Seeder, Migrasi, Controller) ubah kolom mata_pelajaran_id menjadi kurikulum_mata_pelajaran_id
+        - ❌ (Seeder, Migrasi, Controller) Hapus kolom jurusan_pelajaran_id
+        - ❌ debug insomnia (seharusnya create dan update guru beda mapel gaboleh)
+    - Frontend:
+        - Untuk create dan update, samakan inputan dengan file JadwalPelajaranController.php (store dan update)
+        - Jika butuh data untuk select, silakan gunakan pada JadwalPelajaranController.php (index)
+        - create, update, delete jadwal pelajaran hanya bisa dilakukan oleh spa
+        - Alur pengisian jadwal adalah melalui button pada halaman index
+        - Filter menggunakan status_tahun_akademik dan status_semester, jika aktif maka tampil di ui, jika arsip maka tampil di halaman arsip
+        - ketika create dan update, guru mengambil mapel yang berbeda, maka tidak boleh (kabari jika gagal)
+21. siswa_jadwal_pelajaran
+   - Backend:
+        - ❌ samakan (seeder, controller, insomnia) dengan migrasi   
+        - ❌ jika ada siswa yang jurusan_pelajarannya beda dengan jurusan_siswanya, maka salah
+   - Frontend:
+        - Samakan inputan create dan update dengan file SiswaJadwalPelajaranController.php (store dan update)
+        - Jika butuh data untuk select, silakan gunakan pada JadwalPelajaranController.php (index)
+        - create, update, delete hanya bisa dilakukan oleh spa
+        - Alur pengisian jadwal siswa adalah melalui button halaman index
+        - Filter menggunakan status_tahun_akademik
+22. absensi_pegawai:
+    - Backend:
+        - ❌ samakan dengan migrasi
+        - ❌ show menggunakan id guru
+    - Frontend:
+        - filter menggunakan status_tahun_akademik, jika arsip maka jangan tampil di ui, tapi di halaman arsip
+        - create = pegawai, update = spa
+        - Alur untuk absen adalah lewat showAbsenSendiri, letakkan button absen di halaman itu
+        - Inputan create dan update, samakan dengan function store dan update
+23. absensi_pelajaran:
+    - Backend:
+        - ❌ samakan dengan migrasi
+        - ❌ show menggunakan id guru
+    - Frontend
+        - Samakan inputan dengan file AbsensiPelajaranController::store dan update
+        - Jika butuh data untuk select, gunakan dari function showAbsenPelajaranSendiri
+        - Alur absensi pegawai adalah melalui button pada showAbsenPelajaranSendiri
+        - filter menggunakan status_tahun_akademik
+24.  absensi_siswa:
+    - Backend:
+        - ❌ samakan (seeder, controller) dengan migrasi
+        - ❌ tambahkan fitur guru bisa absenkan siswa di controller        
+        - ❌ bisa ekstrak ke pdf         
+        - ❌ show menggunakan id siswa
+    - Frontend:        
+        - Alur absen siswa:
+            a. Klik semua jadwal yang siswa punya (SiswaJadwalPelajaranController::showAllJadwalSendiri)
+            b. klik jadwal, lalu absen (poin a sudah kirim kelas_id, jadwal_pelajaran_id dan tahun_akademik_id untuk di use, jadi siswa hanya isi status dan bukti saja untuk yang manual)
+        - Alur guru absenkan siswa:
+            a. klik semua jadwal yang guru punya (JadwalPelajaranController::showAllJadwalSendiri)
+            b. Klik detail (nanti bisa dapet data siswanya)
+            c. lalu absenkan siswa (jika bingung, baca AbsensiSiswaController, function guruAbsenkanSiswa)
+            d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan kelas_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
+        - Kalo update hanya milik spa, cuma bisa ganti status dan bukti, sisanya tidak bisa diganti
+        - Gunakan filter tahun dan semester agar absen tidak bercampur
+25. ekstrakurikuler:
+    - Backend:
+        - ❌ migrasi, seeder, controller
+    - Frontend:
+        - ikutin insomnia
+        - filter jika ada lebih dari 1 tahun_akademik
+26. pembina_ekskul:
+    - Backend:
+        - (migrasi, model, seeder)
+        - ❌ controller
+        - ❌ route
+27. pelatih_ekskul:
+    - Backend:
+        - (migrasi, model, seeder)
+        - ❌ controller
+        - ❌ route
+28. ekskul_siswa_pivot:
+    - Backend:
+        - ✅ (Migrasi, Seeder, Controller)
+    - Frontend:
+        - ikutin insomnia
+        - tidak ada tombol keluar ekskul jika status_tahun_akademik = arsip, jika status = aktif (kasih tombol keluar gapapa)
+29. prestasi:
+    - Backend:
+        - ✅ (Seeder, Migrasi, Controller) Hapus kolom kelas_id dan jurusan_id
+        - ✅ (Seeder, Migrasi, Controller) nambah kolom tahun_akademik_id
+    - Frontend:
+        - Hapus inputan kelas
+        - Hapus inputan jurusan
+        - Tambah inputan tahun akademik
+30. data_nilai_siswa:
+    kumpulan hasil asesmen (uts/uas, absensi, dll)
+    - Backend:
+          - ❌
+    - Frontend:
+          - Guru hanya update sikap, sisanya disi oleh sistem
+31. rapor_nilai_siswa
+    hasil akhir data_nilai_siswa
+    - Backend:
+          - ❌
+32. projek_p5:
+    - ❌ Backend:
+33. data_nilai_p5:
+    kumpulan hasil projek_p5
+    - ❌ Backend:
+34. data_nilai_ekskul
+    kumpulan hasil ekskul_siswa_pivot
+    - Backend:
+          - ❌
+35. rapor (wajib export excel)
+    hasil final rapor_nilai_siswa, ekskul, p5
+    - Backend:
+          - ❌
+36. membuat data_berkas:
+    - ❌ Backend:        
+37. keuangan:
+    - ❌ Backend:        
+38. ❌⚠️ membuat jurnal_kbm
+39. ❌⚠️ membuat forum diskusi
+40. ❌⚠️ membuat tugas (lms)
+41. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
+42. ====================================================================================================================================
+43. ❌⚠️ modul_ajar: ()
+    rencana pembelajaran untuk mencapai kompetensi, menciptakan asesmen (uts/uas), dibuat tiap tahun
+44. ❌⚠️ asesmen:
+    alat ukur modul ajar (uts/uas), menilai kompetensi
+45. ❌⚠️ asesmen_kompetensi:
+    menetapkan bobot kompetensi pada asesmen
+46. ❌⚠️ asesmen_siswa:
+    nilai mentah per asesmen
+47. ❌⚠️ nilai_kompetensi_siswa
+    hasil kalkulasi dari asesmen_kompetensi dan asesmen_siswa
+========================================================================================================================================
 
-Fin
+❌ (belum dikerjakan)
+✅ (sudah dikerjakan)
+⬅️ (lakukan)
+⚠️(coming soon)
+☑️ (done)
+🎯 (target) 
+
+==================================================
+- Digunakan ulang
+1. jurusan
+2. kurikulum
+3. mata_pelajaran
+4. Kompetensi
+5. Identitas sekolah
+6. Gedung
+7. Ruangan
+8. Keuangan
+9. pegawai
+10. siswa
+11. Ekstrakurikuler
+12. kelas
+
+
+- Dibuat tiap semester:
+1. semester
+4. Buka tutup penerimaan siswa baru
+5. jadwal_pelajaran
+6. siswa_jadwal_pelajaran
+7. absensi pegawai
+8. absensi pelajaran
+9. absensi siswa
+10. prestasi
+11. data_nilai_siswa
+
+
+- Dibuat tiap tahun (saat semester ganjil):
+1. tahun_kademik
+2. kurikulum_mata_pelajaran
+3. Alur Tujuan Pembelajaran (ATP)
+4. rombel
+5. siswa_rombel
+6. wali_rombel
+7. pelatih_ekskul
+8. pembina_ekskul
+9. ekskul_siswa_pivot
+
+==================================================
+
+
+
+
+
+==================================================================================================================
+# = tidak dibuat tiap tahun
+  = dibuat tiap tahun
+
+
+- Alur pertama kali program berjalan:
+1. # spa        : membuat jurusan
+2. spa          : membuat tahun_akademik
+3. # spa        : membuat kurikulum
+4. # spa        : membuat mata_pelajaran
+5. spa          : membuat kurikulum_mata_pelajaran
+6. # spa        : membuat kompetensi
+7. spa          : membuat alur_tujuan_pembelajaran
+8. # spa        : membuat data identitas sekolah
+9. # spa        : membuat data gedung
+10. # spa        : membuat data ruangan
+11. #           : spa membuat data keuangan
+12. # pegawai   : daftar
+13. # siswa     : daftar
+14. spa         : membuka/menutup penerimaan siswa baru
+15. spa         : membuat kelas
+16. spa         : membuat siswa_kelas
+17. spa         : membuat jadwal pelajaran
+18. spa         : membuat siswa_jadwal_pelajaran
+19. guru        : absensi pegawai
+20. guru        : absensi pelajaran
+21. siswa       : absensi pelajaran
+22. # spa       : membuat ekstrakurikuler
+23. guru/siswa  : masuk ekskul_siswa_pivot
+24. spa         : membuat data prestasi
+25. guru        : mengisi data_nilai_siswa
+
+
+- Alur per tahun/tiap naik kelas:
+1. spa          : membuat tahun akademik (yang lama set status = arsip, otomatis semua data berikut kosong)
+2. spa          : membuat kurikulum_mata_pelajaran (menggunakan kurikulum dan mapel lama)
+3. spa          : membuka/menutup penerimaan siswa baru
+4. spa          : membuat kelas (kelas lama set status = arsip)
+5. spa          : membuat siswa_kelas (siswa_kelas lama set status = arsip)
+6. spa          : membuat jadwal_pelajaran (jadwal lama set status = arsip) 
+7. spa          : membuat siswa_jadwal_pelajaran (yang lama set status = arsip)
+8. guru         : absen pegawai (yang lama set arsip)
+9.  guru        : absen pelajaran (yang lama set arsip)
+10. siswa       : absen pelajaran (yang lama set arsip)
+11. guru/siswa  : masuk ekskul (yang lama set arsip)
+12. spa         : membuat data prestasi (prestasi lama set = arsip)
+13. guru        : mengiri data_nilai_siswa (yang lama set status = arsip)
+==================================================================================================================
+
+
+
+
+
+==================================================================================================================
+Back do:
+1. Berikan pagination pada data yang banyak (back dan front, misal per 10)
+2. Kasih update pada halaman arsip
+
+
+Ryan:
+Front do:
+1. Kelas di kelompokkan per tingkat, jangan campur (untuk spa)
+2. Buat halaman arsip untuk melihat yang statusnya = arsip
+==================================================================================================================
+
+
+
+
+
+==================================================================================================================
+ATURAN PROJEK (Masih dipertimbangkan)
+Tahun akademik:
+1. Hanya ada satu tahun akademik yang aktif
+2. Jika ingin create TA baru, maka TA yang aktif wajib di arsip
+3. Tidak boleh update status arsip menjadi aktif kembali
+   
+
+Jadwal pelajaran:
+4. Satu guru hanya boleh satu mata pelajaran (lakukan update nama atau tukar mapel dengan guru lain jika mendesak)
+==================================================================================================================
+
+
+
+
+
+==================================================================================================================
+1. Tahap Perencanaan:
+- Awal Tahun: {
+                               Oleh       Frekuensi                                 Waktu                     Catatan
+    Kurikulum               => spa/tu ||  -+ 3-5 tahun (sampe ganti kurikulum)  ||  awal ganti kurikulum   ||  Guru tidak boleh ubah
+        ↓
+    Kompetensi              => spa/tu ||  reusable sampe ganti kurikulum        ||  awal kurikulum         ||  import dari pusat/tidak ketika manual
+        ↓
+    ATP                     => guru   ||  1x pertahun (clone daari tahun lalu)  ||  awal tahun ajaran      ||  guru tidak membuat dari nol
+}
+- Sebelum Mengajar: {
+        ↓
+    Modul Ajar              => guru   || 1x per-topik                           ||   sebelum mengajar      ||  bisa copy modul tahun lalu
+        ↓
+    Asesmen                 => guru   || ikut modul ajar                        ||   sebelum&saat mengajar ||  2-4 asesmen / modul
+        ↓
+    asesmen_kompetensi      => auto   || otomatis                               ||   saat asesmen diuuat   ||  guru cukup centang CP
+}
+
+1. Tahap Pelaksanaan
+- Saat belajar: {
+        ↓
+    asesmen_siswa           => guru   || setiap asesmen                         ||   setelah pelaksanaan   || bisa import/bulk input
+        ↓
+    nilai_kompetensi_siswa  => auto   || realtime                               ||   setelah nilai masuk   || guru tidak input manual
+}
+
+1. Tahap Rekap & Rapor
+- Akhir Periode: {
+        ↓
+    data_nilai_siswa        => auto   || realtime                               ||   setelah asesmen       || guruhanya review dan koreksi
+        ↓
+    Rapor                   => walas  || 1x per-semester                        ||    akhir semester       || guru tidak input ulang
+}
+
+
+CONTOH:
+1. Tahap Perencanaan:
+   - kurikulum
+     id     nama_kurikulum          tipe
+     1      Kurikulum Merdeka       MERDEKA
+
+   - kompetensi (CP)
+     id     kode        judul                               fase
+     101    CP-MAT-F    Menerapkan konsep aljabar           F
+     102    CP-MAT-P    Menyelesaikan masalah kontekstual   F
+
+   - ATP
+     id     kompetensi_id   tahun_akademik_id   tujuan_pembelajaran                     urutan
+     201    101             2024/2025           Siswa memahami persamaan linear         1
+     202    102             2024/2025           Siswa mampu menyelesaikan soal SPLDV    2
+
+   - modul_ajar (silabus)
+     id     atp_id      judul_modul                         alokasi_waktu       status
+     301    201         Persamaan linear dua variabel       6 JP                approved
+
+   - asesmen (alat ukur: UTS/UAS/Observasi)
+     id     modul_ajar_id       nama_asesmen        jenis       bobot
+     401    301                 UTS Matematika      sumatif     40
+     402    301                 Proyek SPLDV        sumatif     60
+
+   - asesmen_kompetensi
+     asesmen_id     kompetensi_id
+     401            101
+     401            102
+     402            102
+
+
+2. Tahap Pelaksanaan (saat belajar)
+   - asesmen_siswa (nilai/skor mentah)
+     asesmen_id     siswa_id       skor
+     401            1              80
+     401            2              75
+     401            3              90
+
+     402            1              85
+     402            2              70
+     402            3              88
+
+   - nilai_kompetensi_siswa (hasil olahan asesmen_siswa berbasis CP)
+     siswa_id       kompetensi_id   nilai
+     1              101             80
+     1              102             83
+     2              101             75
+     2              102             72
+     3              101             90
+     3              102             89
+
+
+3. Tahap rekap dan rapor
+   - data_nilai_siswa (rekap nilai mapel per-siswa)
+     siswa_id       kurikulum_mata_pelajaran_id     point_tugas     point_uts       point_uas       sikap
+     1              10                              85              80              0               Baik
+     2              10                              70              75              0               Cukup
+     3              10                              88              90              0               Sangat Baik
+
+   - rapor
+     siswa_id       mapel               nilai_akhir     predikat        deskripsi
+     1              "Matematika"        83              B               Mampu memahami dan menyelesaikan maasalah SPLDV dengan baik

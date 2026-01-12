@@ -14,15 +14,10 @@ class Kelas extends Model
     protected $table = 'kelas';
 
     protected $guarded = ['id'];
-
-    /**
-     * Satu kelas = satu wali, yang datanya diambil dari tabel kepegawaians. 
-     * Kolom wali_kelas di tabel kelas menyimpan id dari kepegawaian yang menjadi wali.
-     * Relasi ini adalah one-to-one (inverse): kelas → kepegawaian.
-     */
-    public function wali()
+    
+    public function rombels()
     {
-        return $this->belongsTo(Kepegawaian::class, 'wali_kelas');
+        return $this->hasMany(Rombel::class);
     }
 
     public function jurusan()
@@ -30,14 +25,11 @@ class Kelas extends Model
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
 
-    /**
-     * Satu kelas = banyak siswa
-     * id = kelas_id pada tabel kelas
-     * Relasi ini adalah one-to-many (inverse): kelas → siswa.
-     */
-    public function siswa()
+    public function siswas()
     {
-        return $this->hasMany(Siswa::class);
+        return $this->belongsToMany(Siswa::class, 'siswa_kelas')
+            ->withPivot(['id', 'siswa_id', 'kelas_id', 'tahun_akademik'])
+            ->withTimestamps();
     }
 
     public function jadwalPelajarans()
@@ -50,4 +42,13 @@ class Kelas extends Model
         return $this->hasMany(DataNilaiSiswa::class, 'kelas_id');
     }
 
+    public function tahunAkademik()
+    {
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
+
+    public function kurikulum()
+    {
+        return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
+    }
 }

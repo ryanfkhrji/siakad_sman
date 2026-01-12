@@ -23,10 +23,8 @@ class SiswaController extends Controller
             $validated = $request->validate([
                 'nisn' => ['required', 'digits_between:5,50', 'unique:siswas,nisn'],
                 'nama' => 'required|string',
+                'nis' => ['required', 'digits_between:5,50', 'unique:siswas,nis'],                
                 'email' => 'required|email|unique:siswas,email',
-                'nis' => ['required', 'digits_between:5,50', 'unique:siswas,nis'],
-                'jurusan_id' => ['required', 'exists:jurusans,id'],
-                'kelas_id' => ['required', 'exists:kelas,id'],
                 'password' => [
                     'required',
                     'string',
@@ -39,30 +37,22 @@ class SiswaController extends Controller
                 'email.required' => 'Email wajib diisi.',
                 'email.email' => 'Email tidak valid.',
                 'email.unique' => 'Email sudah terdaftar.',
-                'nis.unique' => 'NIS sudah terdaftar.',
-                'jurusan_id.exists' => 'Jurusan tidak ada.',
-                'kelas_id.exists' => 'Kelas tidak ada.',
+                'nis.unique' => 'NIS sudah terdaftar.',                
                 'password.min' => 'Password minimal 5 karakter.',
                 'password.confirmed' => 'Konfirmasi password tidak cocok.',
                 'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
             ]);
-
-            // Simpan baru
+            
             $siswa = Siswa::create([
                 'nisn' => $validated['nisn'],
                 'nama' => $validated['nama'],
+                'nis' => $validated['nis'],                
                 'email' => $validated['email'],
-                'nis' => $validated['nis'],
-                'jurusan_id' => $validated['jurusan_id'],
-                'kelas_id' => $validated['kelas_id'],
-                'status' => $request['status'],
                 'password' => Hash::make($validated['password']),
                 'role' => 'siswa',
+                'status' => 'aktif'
             ]);
 
-            $siswa->load(['kelas.wali', 'jurusan', 'ekstrakurikulers']);
-
-            // Response sukses
             return response()->json([
                 'status' => 'success',
                 'message' => 'Registrasi siswa berhasil, silakan login',
@@ -70,27 +60,10 @@ class SiswaController extends Controller
                     'id' => $siswa->id,
                     'nisn' => $siswa->nisn,
                     'nama' => $siswa->nama,
+                    'nis' => $siswa->nis,                                        
                     'email' => $siswa->email,
-                    'nis' => $siswa->nis,
-                    'jurusan_id' => $siswa->jurusan_id,
-                    'kelas_id' => $siswa->kelas_id,
-                    'status' => $siswa->status,
-                    'role' => $siswa->role,
-                    'kelas' => [
-                        'id' => $siswa->kelas->id,
-                        'nama_kelas' => $siswa->kelas->nama_kelas,
-                        'jam_masuk' => $siswa->kelas->jam_masuk,
-                        'wali_kelas' => $siswa->kelas->wali_kelas,
-                    ],
-                    'wali_kelas' => [
-                        'id' => $siswa->kelas->wali->id ?? null,
-                        'nama' => $siswa->kelas->wali->nama ?? null,
-                        'email' => $siswa->kelas->wali->email ?? null,
-                        'status' => $siswa->kelas->wali->status ?? null,
-                        'nip' => $siswa->kelas->wali->nip ?? null,
-                        'keterangan' => $siswa->kelas->wali->keterangan ?? null,
-                        'role' => $siswa->kelas->wali->role ?? null,
-                    ]
+                    'role' => $siswa->role,                    
+                    'status_siswa' => $siswa->status,                    
                 ]
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -108,6 +81,7 @@ class SiswaController extends Controller
         }
     }
 
+    // ✅ untuk spa
     public function store(Request $request)
     {
         try {
@@ -115,10 +89,8 @@ class SiswaController extends Controller
             $validated = $request->validate([
                 'nisn' => ['required', 'digits_between:5,50', 'unique:siswas,nisn'],
                 'nama' => 'required|string',
+                'nis' => ['required', 'digits_between:5,50', 'unique:siswas,nis'],                
                 'email' => 'required|email|unique:siswas,email',
-                'nis' => ['required', 'digits_between:5,50', 'unique:siswas,nis'],
-                'jurusan_id' => ['required', 'exists:jurusans,id'],
-                'kelas_id' => ['required', 'exists:kelas,id'],
                 'password' => [
                     'required',
                     'string',
@@ -127,34 +99,29 @@ class SiswaController extends Controller
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'
                 ],
             ], [
+                'nisn.required' => 'NISN wajib diisi.',
                 'nisn.unique' => 'NISN sudah terdaftar.',
+                'nama.required' => 'Nama wajib diisi',
+                'nis.required' => 'NIS wajib diisi.',
+                'nis.unique' => 'NIS sudah terdaftar.',                
                 'email.required' => 'Email wajib diisi.',
                 'email.email' => 'Email tidak valid.',
                 'email.unique' => 'Email sudah terdaftar.',
-                'nis.unique' => 'NIS sudah terdaftar.',
-                'jurusan_id.exists' => 'Jurusan tidak ada.',
-                'kelas_id.exists' => 'Kelas tidak ada.',
                 'password.min' => 'Password minimal 5 karakter.',
                 'password.confirmed' => 'Konfirmasi password tidak cocok.',
                 'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
             ]);
-
-            // Simpan baru
+            
             $siswa = Siswa::create([
                 'nisn' => $validated['nisn'],
                 'nama' => $validated['nama'],
+                'nis' => $validated['nis'],                
                 'email' => $validated['email'],
-                'nis' => $validated['nis'],
-                'jurusan_id' => $validated['jurusan_id'],
-                'kelas_id' => $validated['kelas_id'],
-                'status' => $request['status'],
                 'password' => Hash::make($validated['password']),
                 'role' => 'siswa',
+                'status' => 'aktif'
             ]);
-
-            $siswa->load(['kelas.wali', 'jurusan', 'ekstrakurikulers']);
-
-            // Response sukses
+        
             return response()->json([
                 'status' => 'success',
                 'message' => 'Registrasi siswa berhasil, silakan login',
@@ -162,27 +129,10 @@ class SiswaController extends Controller
                     'id' => $siswa->id,
                     'nisn' => $siswa->nisn,
                     'nama' => $siswa->nama,
+                    'nis' => $siswa->nis,               
                     'email' => $siswa->email,
-                    'nis' => $siswa->nis,
-                    'jurusan_id' => $siswa->jurusan_id,
-                    'kelas_id' => $siswa->kelas_id,
-                    'status' => $siswa->status,
-                    'role' => $siswa->role,
-                    'kelas' => [
-                        'id' => $siswa->kelas->id,
-                        'nama_kelas' => $siswa->kelas->nama_kelas,
-                        'jam_masuk' => $siswa->kelas->jam_masuk,
-                        'wali_kelas' => $siswa->kelas->wali_kelas,
-                    ],
-                    'wali_kelas' => [
-                        'id' => $siswa->kelas->wali->id ?? null,
-                        'nama' => $siswa->kelas->wali->nama ?? null,
-                        'email' => $siswa->kelas->wali->email ?? null,
-                        'status' => $siswa->kelas->wali->status ?? null,
-                        'nip' => $siswa->kelas->wali->nip ?? null,
-                        'keterangan' => $siswa->kelas->wali->keterangan ?? null,
-                        'role' => $siswa->kelas->wali->role ?? null,
-                    ]
+                    'role' => $siswa->role,                    
+                    'status_siswa' => $siswa->status,                    
                 ]
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -214,7 +164,7 @@ class SiswaController extends Controller
             ]);
 
             // Cari siswa berdasarkan email
-            $siswa = Siswa::with('kelas.wali', 'ekstrakurikulers', 'jurusan')->where('email', $validated['email'])->first();
+            $siswa = Siswa::with('kelas.jurusan')->where('email', $validated['email'])->first();
 
             // Cek apakah Siswa ada & password cocok
             if (!$siswa || !Hash::check($validated['password'], $siswa->password)) {
@@ -245,26 +195,11 @@ class SiswaController extends Controller
                 'id' => $siswa->id,
                 'nisn' => $siswa->nisn,
                 'nama' => $siswa->nama,
-                'email' => $siswa->email,
                 'nis' => $siswa->nis,
-                'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-                'nama_ekstrakurikuler' => $siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
-                'status' => $siswa->status,
-                'role' => $siswa->role,
-                'kelas' => [
-                    'id' => $siswa->kelas->id ?? null,
-                    'nama_kelas' => $siswa->kelas->nama_kelas ?? null,
-                    'jam_masuk' => $siswa->kelas->jam_masuk ?? null,
-                    'wali_kelas' => [
-                        'id' => $siswa->kelas->wali->id ?? null,
-                        'nama' => $siswa->kelas->wali->nama ?? null,
-                        'email' => $siswa->kelas->wali->email ?? null,
-                        'status' => $siswa->kelas->wali->status ?? null,
-                        'nip' => $siswa->kelas->wali->nip ?? null,
-                        'keterangan' => $siswa->kelas->wali->keterangan ?? null,
-                        'role' => $siswa->kelas->wali->role ?? null,
-                    ]
-                ],
+                'nama_jurusan' => $siswa->kelas->jurusan->nama_jurusan ?? null,
+                'email' => $siswa->email,
+                'role' => $siswa->role,                
+                'status_siswa' => $siswa->status,                
                 'token' => $token,
             ], 'Login berhasil.');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -314,163 +249,193 @@ class SiswaController extends Controller
     }
 
     // CRUD
-    // ✅ get all siswa untuk pegawai
+    // ✅ get all siswa untuk spa
     public function index()
     {
-        $siswa = Siswa::with('kelas.wali', 'ekstrakurikulers', 'jurusan', 'prestasis','jadwalPelajarans.mataPelajaran')->get();
+        $siswa = Siswa::with('kelas.jurusan')->get();
 
         $formatted = $siswa->map(function ($item) {
             return [
-                'id' => $item->id,
+                'siswa_id' => $item->id,
                 'nisn' => $item->nisn,
                 'nama' => $item->nama,
-                'email' => $item->email,
                 'nis' => $item->nis,
-                'nama_jurusan' => $item->jurusan->nama_jurusan,
-                'nama_ekstrakurikuler' => $item->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
-                'status' => $item->status,
-                'role' => $item->role,
-                'kelas' => [
-                    'id' => $item->kelas->id ?? null,
-                    'nama_kelas' => $item->kelas->nama_kelas ?? null,
-                    'jam_masuk' => $item->kelas->jam_masuk ?? null,
-                    'wali_kelas' => [
-                        'id' => $item->kelas->wali->id ?? null,
-                        'nama' => $item->kelas->wali->nama ?? null,
-                        'email' => $item->kelas->wali->email ?? null,
-                        'status' => $item->kelas->wali->status ?? null,
-                        'nip' => $item->kelas->wali->nip ?? null,
-                        'keterangan' => $item->kelas->wali->keterangan ?? null,
-                        'role' => $item->kelas->wali->role ?? null,
-                    ]
-                ],
-                'jadwal_pelajaran' => $item->jadwalPelajarans->map(function ($items) {
-                    return [
-                        'id' => $items->id,
-                        'mata_pelajaran' => $items->mataPelajaran->nama_pelajaran ?? null,
-                        'status' => $items->mataPelajaran->status ?? null,
-                        'hari' => $items->hari ?? null,
-                        'guru' => $items->guru->nama ?? null,
-                        'kelas' => $items->kelas->nama_kelas ?? null,
-                        'jam_pelajaran' => $items->jam_pelajaran ?? null,
-                        'ruangan' => $items->ruangan ?? null,
-                        'link_opsional' => $items->link_opsional ?? null,
-                    ];
-                }), 
-                'prestasi' => $item->prestasis->map(function ($items) {
-                    return [
-                        'id' => $items->id,
-                        'prestasi_diraih' => $items->prestasis->prestasi_diraih ?? null,
-                    ];
-                }), 
+                'nama_jurusan' => $item->kelas->jurusan->nama_jurusan ?? null,
+                'email' => $item->email,                
+                'role' => $item->role,                
+                'status_siswa' => $item->status,                
             ];
         });
 
         return ApiResponse::success($formatted, 'Daftar siswa berhasil diambil');
-    }
+    }    
 
-    // ✅ show siswa untuk pegawai
+    // ✅ guru dan spa
     public function show($id)
     {
-        $siswa = Siswa::with('kelas.wali', 'jurusan', 'prestasis','ekstrakurikulers', 'jadwalPelajarans.mataPelajaran')->find($id);
+        $siswa = Siswa::with([            
+            'siswaRombels.rombel.kelas.jurusan',
+            'siswaRombels.rombel.tahunAkademik',
+            'ekskulSiswa.tahunAkademik',
+            'ekskulSiswa.ekstrakurikuler',
+            'prestasis.tahunAkademik',
+        ])->find($id);
+
         if (!$siswa) {
-            return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error(
+                'Siswa tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
         $formatted = [
-            'id' => $siswa->id,
+            'siswa_id' => $siswa->id,
+            'nama_siswa' => $siswa->nama,
+            'jurusan_siswa' => $siswa->rombel->kelas->jurusan->nama_jurusan ?? null,
             'nisn' => $siswa->nisn,
-            'nama' => $siswa->nama,
-            'email' => $siswa->email,
             'nis' => $siswa->nis,
-            'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-            'nama_ekstrakurikuler' => $siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
-            'status' => $siswa->status,
-            'role' => $siswa->role,
-            'kelas' => [
-                'id' => $siswa->kelas->id ?? null,
-                'nama_kelas' => $siswa->kelas->nama_kelas ?? null,
-                'jam_masuk' => $siswa->kelas->jam_masuk ?? null,
-            ],
-            'wali_kelas' => [
-                'id' => $siswa->kelas->wali->id ?? null,
-                'nama' => $siswa->kelas->wali->nama ?? null,
-                'email' => $siswa->kelas->wali->email ?? null,
-                'status' => $siswa->kelas->wali->status ?? null,
-                'nip' => $siswa->kelas->wali->nip ?? null,
-                'keterangan' => $siswa->kelas->wali->keterangan ?? null,
-                'role' => $siswa->kelas->wali->role ?? null,
-            ],
-            'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
+            'email' => $siswa->email,
+            'status_siswa' => $siswa->status,  
+            'histori_rombel' => $siswa->siswaRombels->map(function ($items) {                  
                 return [
-                    'id' => $item->id,
-                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                    'status' => $item->mataPelajaran->status ?? null,
-                    'hari' => $item->hari ?? null,
-                    'guru' => $item->guru->nama ?? null,
-                    'kelas' => $item->kelas->nama_kelas ?? null,
-                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
-                    'ruangan' => $item->ruangan ?? null,
-                    'link_opsional' => $item->link_opsional ?? null,
+                    'rombel_id' => $item->id ?? null,
+                    'nama_rombel' => $item->nama_rombel ?? null,
+                            
+                    'kelas_id' => $row->rombel->kelas->id,
+                    'nama_kelas' => $row->rombel->kelas->nama_kelas,
+                    'tingkat_kelas' => $row->rombel->kelas->tingkat,
+                    'jurusan_kelas' => $row->rombel->kelas->jurusan->nama_jurusan ?? null,
+
+                    'tahun_akademik_rombel_id' => $row->rombel->tahunAkademik->id,
+                    'tahun_akademik_rombel' => $row->rombel->tahunAkademik->tahun_akademik,
+                    'status_tahun_akademik_rombel' => $row->rombel->tahunAkademik->status,
                 ];
-            }),  
-            'prestasi' => $item->prestasis->map(function ($items) {
-                return [
-                    'id' => $items->id,
-                    'prestasi_diraih' => $items->prestasis->prestasi_diraih ?? null,
+            })->values(),            
+            'histori_ekstrakurikuler' => $siswa->ekskulSiswa
+                ->groupBy('tahun_akademik_id')
+                ->map(function ($items) {
+                    $tahun = $items->first()->tahunAkademik;
+
+                    return [
+                        'tahun_akademik_ekskul_id' => $tahun->id,
+                        'tahun_akademik_ekskul' => $tahun->tahun_akademik,
+                        'status_tahun_akademik_ekskul' => $tahun->status,
+
+                        'ekstrakurikuler' => $items->map(function ($row) {
+                            return [
+                                'ekskul_id' => $row->ekstrakurikuler->id ?? null,
+                                'nama_ekskul' => $row->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+                                'anggaran_ekskul' => $row->ekstrakurikuler->anggaran ?? null,
+                                'status_ekskul' => $row->ekstrakurikuler->status ?? null,
+
+                                'sikap' => $row->sikap,
+                                'status_aktif' => $row->status,
+                            ];
+                    })->values(),
                 ];
-            }), 
+            })->values(),         
+            'histori_prestasi' => $siswa->prestasis
+                ->groupBy('tahun_akademik_id')
+                ->map(function ($items) {
+                    $tahun = $items->first()->tahunAkademik;
+
+                    return [
+                        'tahun_akademik_prestasi_id' => $tahun->id,
+                        'tahun_akademik_prestasi' => $tahun->tahun_akademik,
+                        'status_tahun_akademik_prestasi' => $tahun->status,
+
+                        'prestasi' => $items->map(function ($row) {
+                            return [
+                                'prestasi_id' => $row->id,
+                                'prestasi_diraih' => $row->prestasi_diraih,
+                                'tingkat' => $row->tingkat ?? null,
+                                'juara' => $row->juara ?? null,
+                            ];
+                        })->values(),
+                    ];
+                })
+                ->values(),
         ];
 
         return ApiResponse::success($formatted, 'Detail siswa berhasil diambil');
     }
 
+
+
     // ✅ show diri siswa sendiri
     public function showDiriSendiri()
     {
-        $siswa = Auth::guard('siswa')->user()->load('kelas.wali', 'jurusan', 'ekstrakurikulers', 'jadwalPelajarans.mataPelajaran');
+        $siswa = Auth::guard('siswa')->user();
+
+        $siswa = Siswa::with([            
+            'siswaRombels.rombel.kelas.jurusan',
+            // 'siswaRombels.rombel.tahunAkademik',
+            // 'ekskulSiswa.tahunAkademik',
+            // 'ekskulSiswa.ekstrakurikuler',
+            // 'prestasis.tahunAkademik',
+        ])->find($siswa->id);
 
         if (!$siswa) {
-            return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error(
+                'Siswa tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
         $formatted = [
-            'id' => $siswa->id,
+            'siswa_id' => $siswa->id,
+            'nama_siswa' => $siswa->nama,
+            'jurusan_siswa' => $siswa->siswaRombels->rombel->kelas->jurusan->nama_jurusan ?? null,
             'nisn' => $siswa->nisn,
-            'nama' => $siswa->nama,
-            'email' => $siswa->email,
             'nis' => $siswa->nis,
-            'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-            'nama_ekstrakurikuler' => $siswa->ekstrakurikulers->pluck('nama_ekstrakurikuler')->implode(', '),
-            'status' => $siswa->status,
-            'role' => $siswa->role,
-            'kelas' => [
-                'id' => $siswa->kelas->id ?? null,
-                'nama_kelas' => $siswa->kelas->nama_kelas ?? null,
-                'jam_masuk' => $siswa->kelas->jam_masuk ?? null,
-            ],
-            'wali_kelas' => [
-                'id' => $siswa->kelas->wali->id ?? null,
-                'nama' => $siswa->kelas->wali->nama ?? null,
-                'email' => $siswa->kelas->wali->email ?? null,
-                'status' => $siswa->kelas->wali->status ?? null,
-                'nip' => $siswa->kelas->wali->nip ?? null,
-                'keterangan' => $siswa->kelas->wali->keterangan ?? null,
-                'role' => $siswa->kelas->wali->role ?? null,
-            ],
-            'jadwal_pelajaran' => $siswa->jadwalPelajarans->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                    'status' => $item->mataPelajaran->status ?? null,
-                    'hari' => $item->hari ?? null,
-                    'guru' => $item->guru->nama ?? null,
-                    'kelas' => $item->kelas->nama_kelas ?? null,
-                    'jam_pelajaran' => $item->jam_pelajaran ?? null,
-                    'ruangan' => $item->ruangan ?? null,
-                    'link_opsional' => $item->link_opsional ?? null,
-                ];
-            }),  
+            'email' => $siswa->email,
+            'status_siswa' => $siswa->status,                      
+            // 'histori_ekstrakurikuler' => $siswa->ekskulSiswa
+            //     ->groupBy('tahun_akademik_id')
+            //     ->map(function ($items) {
+            //         $tahun = $items->first()->tahunAkademik;
+
+            //         return [
+            //             'tahun_akademik_ekskul_id' => $tahun->id,
+            //             'tahun_akademik_ekskul' => $tahun->tahun_akademik,
+            //             'status_tahun_akademik_ekskul' => $tahun->status,
+
+            //             'ekstrakurikuler' => $items->map(function ($row) {
+            //                 return [
+            //                     'ekskul_id' => $row->ekstrakurikuler->id ?? null,
+            //                     'nama_ekskul' => $row->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+            //                     'anggaran_ekskul' => $row->ekstrakurikuler->anggaran ?? null,
+            //                     'status_ekskul' => $row->ekstrakurikuler->status ?? null,
+
+            //                     'sikap' => $row->sikap,
+            //                     'status_aktif' => $row->status,
+            //                 ];
+            //         })->values(),
+            //     ];
+            // })->values(),         
+            // 'histori_prestasi' => $siswa->prestasis
+            //     ->groupBy('tahun_akademik_id')
+            //     ->map(function ($items) {
+            //         $tahun = $items->first()->tahunAkademik;
+
+            //         return [
+            //             'tahun_akademik_prestasi_id' => $tahun->id,
+            //             'tahun_akademik_prestasi' => $tahun->tahun_akademik,
+            //             'status_tahun_akademik_prestasi' => $tahun->status,
+
+            //             'prestasi' => $items->map(function ($row) {
+            //                 return [
+            //                     'prestasi_id' => $row->id,
+            //                     'prestasi_diraih' => $row->prestasi_diraih,
+            //                     'tingkat' => $row->tingkat ?? null,
+            //                     'juara' => $row->juara ?? null,
+            //                 ];
+            //             })->values(),
+            //         ];
+            //     })
+            //     ->values(),
         ];
 
         return ApiResponse::success($formatted, 'Detail siswa berhasil diambil');
@@ -478,7 +443,7 @@ class SiswaController extends Controller
 
     // ✅ Store = Register
 
-    // ✅ update siswa oleh pegawai
+    // ✅ spa
     public function update(Request $request, $id)
     {
         $siswa = Siswa::with('jurusan', 'kelas')->find($id);
@@ -493,45 +458,40 @@ class SiswaController extends Controller
                 Rule::unique('siswas')->ignore($id)
             ],
             'nama' => 'sometimes|required|string',
+            'nis' => [
+                'sometimes',
+                'required',
+                Rule::unique('siswas')->ignore($id)
+            ],            
             'email' => [
                 'sometimes',
                 'required',
                 Rule::unique('siswas')->ignore($id)
             ],
-            'nis' => [
-                'sometimes',
-                'required',
-                Rule::unique('siswas')->ignore($id)
-            ],
-            'jurusan_id' => [
-                'sometimes',
-                'required',
-                'exists:jurusans,id'
-            ],
-            'kelas_id' => 'sometimes|required|exists:kelas,id',
-            'status' => 'sometimes',
-            'role' => 'sometimes|required',
-        ]);
-
-        // cek kelas
-        if (isset($validated['kelas_id'])) {
-            $kelas = Kelas::find($validated['kelas_id']);
-            if (!$kelas) {
-                return ApiResponse::error('Kelas tidak ditemukan', [
-                    'kelas_id' => ['Kelas tidak ditemukan']
-                ], 422);
-            }
-        }
+            'status' => 'sometimes|required|in:aktif,tidak aktif',
+        ], [
+            'nisn.required' => 'NISN wajib diisi.',
+            'nisn.unique' => 'NISN sudah terdaftar.',
+            'nama.required' => 'Nama wajib diisi',
+            'nis.required' => 'NIS wajib diisi.',
+            'nis.unique' => 'NIS sudah terdaftar.',                
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.min' => 'Password minimal 5 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
+            'status.required' => 'Status wajib diisi.',
+            'status.in' => 'Piilihan status hanya aktif dan tidak aktif.',
+        ]);        
 
         $siswa->update([
             'nisn' => $validated['nisn'],
             'nama' => $validated['nama'],
+            'nis' => $validated['nis'],            
             'email' => $validated['email'],
-            'nis' => $validated['nis'],
-            'jurusan_id' => $validated['jurusan_id'],
-            'kelas_id' => $validated['kelas_id'],
-            'status' => $request['status'],
             'role' => 'siswa',
+            'status' => $validated['status'],
         ]);
 
         return ApiResponse::success(
@@ -539,104 +499,64 @@ class SiswaController extends Controller
                 'id' => $siswa->id,
                 'nisn' => $siswa->nisn,
                 'nama' => $siswa->nama,
+                'nis' => $siswa->nis,                
                 'email' => $siswa->email,
-                'nis' => $siswa->nis,
-                'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-                'nama_kelas' => $siswa->kelas->nama_kelas,
-                'status' => $siswa->status,
                 'role' => $siswa->role,
+                'status' => $siswa->status,
             ],
-            'Siswa berhasil diperbarui'
+            'Data siswa berhasil diperbarui'
         );
     }
 
-     // ✅ Update siswa oleh dirinya sendiri
-     public function updateDirinyaSendiri(Request $request)
-     {
-         $siswa = Auth::guard('siswa')->user()->load('jurusan', 'kelas');
- 
-         if (!$siswa) {
-             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
-         }
- 
-         $validated = $request->validate([
-             'nisn' => [
-                 'sometimes',
-                 'required',
-                 Rule::unique('siswas')->ignore($siswa->id)
-             ],
-             'nama' => 'sometimes|required|string',
-             'email' => [
-                 'sometimes',
-                 'required',
-                 Rule::unique('siswas')->ignore($siswa->id)
-             ],
-             'nis' => [
-                 'sometimes',
-                 'required',
-                 Rule::unique('siswas')->ignore($siswa->id)
-             ],
-             'jurusan_id' => [
-                 'sometimes',
-                 'required',
-                 'exists:jurusans,id'
-             ],
-             'kelas_id' => 'sometimes|required|exists:kelas,id',
-             'status' => 'sometimes',
-             'role' => 'sometimes|required',
-         ]);
- 
-         // cek kelas
-         if (isset($validated['kelas_id'])) {
-             $kelas = Kelas::find($validated['kelas_id']);
-             if (!$kelas) {
-                 return ApiResponse::error('Kelas tidak ditemukan', [
-                     'kelas_id' => ['Kelas tidak ditemukan']
-                 ], 422);
-             }
-         }
- 
-         $siswa->update([
-             'nisn' => $validated['nisn'],
-             'nama' => $validated['nama'],
-             'email' => $validated['email'],
-             'nis' => $validated['nis'],
-             'jurusan_id' => $validated['jurusan_id'] ?? $siswa->jurusan_id,
-             'kelas_id' => $validated['kelas_id'] ?? $siswa->kelas_id,
-             'status' => $validated['status'] ?? $siswa->status,
-             'role' => 'siswa',
-         ]);
- 
-         return ApiResponse::success(
-             [
-                 'id' => $siswa->id,
-                 'nisn' => $siswa->nisn,
-                 'nama' => $siswa->nama,
-                 'email' => $siswa->email,
-                 'nis' => $siswa->nis,
-                 'nama_jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-                 'nama_kelas' => $siswa->kelas->nama_kelas,
-                 'status' => $siswa->status,
-                 'role' => $siswa->role,
-             ],
-             'Siswa berhasil diperbarui'
-         );
-     }
-
-    // ✅ hapus siswa oleh pegawai
+    // ✅ spa
     public function destroy($id)
     {
         $siswa = Siswa::find($id);
-        if (!$siswa) {
-            return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+
+        if (! $siswa) {
+            return ApiResponse::error(
+                'Siswa tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
+        }
+
+        // Daftar relasi yang harus dicek
+        $relations = [
+            'ekskulSiswa',
+            'jurusan',
+            'kelas',
+            'siswaRombels',
+            'pengajar',
+            'jadwalPelajarans',
+            'absensis',
+            'kurikulumMataPelajarans',
+            'dataNilaiSiswas',
+            'prestasis'
+        ];
+
+        foreach ($relations as $relation) {
+            if ($siswa->$relation()->exists()) {
+                return ApiResponse::error(
+                    'Siswa tidak dapat dihapus',
+                    [
+                        'relasi' => [
+                            "Siswa sudah digunakan pada data lain, update status sebagai solusi"
+                        ]
+                    ],
+                    422
+                );
+            }
         }
 
         $siswa->delete();
+
         return ApiResponse::success(null, 'Siswa berhasil dihapus');
     }
+
     // CRUD
 
-    // ✅ ubah password oleh pegawai
+    // ✅ ubah password oleh super admin
     public function ubahPassword(Request $request)
     {
         // Validasi input

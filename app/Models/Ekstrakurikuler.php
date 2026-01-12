@@ -21,13 +21,18 @@ class Ekstrakurikuler extends Model
     public function siswas()
     {        
         return $this->belongsToMany(Siswa::class, 'ekskul_siswa_pivot')
-            ->withPivot('id')
+            ->withPivot('id', 'tahun_akademik_id', 'sikap', 'status')
             ->withTimestamps();
+    }    
+
+    public function pelatihEkskul()
+    {
+        return $this->hasMany(PelatihEkskul::class);
     }
 
-    public function pengajar()
+    public function pembinaEkskul()
     {
-        return $this->belongsTo(Kepegawaian::class, 'pengajar_id');
+        return $this->hasMany(PembinaEkskul::class);
     }
 
 

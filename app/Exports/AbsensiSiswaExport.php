@@ -21,8 +21,8 @@ class AbsensiSiswaExport implements FromCollection, WithHeadings
     public function collection()
     {
         $query = $this->ids
-            ? AbsensiSiswa::whereIn('id', $this->ids)->with('mataPelajaran', 'siswa.kelas')->get()
-            : AbsensiSiswa::with('mataPelajaran', 'siswa.kelas')->get();
+            ? AbsensiSiswa::whereIn('id', $this->ids)->with('siswa.kelas', 'jadwalPelajaran.mataPelajaran', 'tahunAkademik')->get()
+            : AbsensiSiswa::with('siswa.kelas', 'jadwalPelajaran.mataPelajaran', 'tahunAkademik')->get();
 
         return $query->map(function($item) {
             return [
@@ -32,12 +32,14 @@ class AbsensiSiswaExport implements FromCollection, WithHeadings
                 Carbon::parse($item->hari)->translatedFormat('l, d F Y'),
                 $item->status ?? null,
                 $item->bukti ?? null,
+                $item->tahunAkademik->tahun_akademik ?? null,
+                $item->tahunAkademik->semester ?? null,
             ];
         });
     }
 
     public function headings(): array
     {
-        return ['Nama Siswa', 'Kelas', 'Mata Pelajaran', 'Hari', 'Status', 'Bukti'];
+        return ['Nama Siswa', 'Kelas', 'Mata Pelajaran', 'Hari', 'Status', 'Bukti', 'Tahun Akademik', 'Semester'];
     }
 }

@@ -21,4 +21,9 @@ class AbsensiPegawai extends Model
     {
         return $this->belongsTo(Kepegawaian::class, 'guru_id');
     }
+
+    public function tahunAkademik()
+    {
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
 }

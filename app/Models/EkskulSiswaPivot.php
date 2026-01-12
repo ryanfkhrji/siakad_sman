@@ -24,10 +24,9 @@ class EkskulSiswaPivot extends Model
     {
         return $this->belongsTo(Siswa::class);
     }    
-
-    public function pengajar()
+    
+    public function tahunAkademik()
     {
-        return $this->belongsTo(Kepegawaian::class, 'pengajar_id', 'id');
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
     }
-
 }

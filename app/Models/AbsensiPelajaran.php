@@ -15,20 +15,15 @@ class AbsensiPelajaran extends Model
     public function jadwalPelajaran()
     {
         return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');
-    }
-
-    public function mataPelajaran()
-    {
-        return $this->belongsTo(MataPelajaran::class, 'jadwal_pelajaran_id');
-    }
+    }    
 
     public function guru()
     {
         return $this->belongsTo(Kepegawaian::class, 'guru_pengajar_id');
-    }
+    }    
 
-    public function kelas()
+    public function tahunAkademik()
     {
-        return $this->belongsTo(Kelas::class, 'kelas_id');
-    }
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }    
 }

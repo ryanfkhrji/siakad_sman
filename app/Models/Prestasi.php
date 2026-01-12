@@ -35,4 +35,9 @@ class Prestasi extends Model
         return $this->hasMany(DataNilaiSiswa::class, 'prestasi_id');
     }
 
+    public function tahunAkademik() 
+    {
+         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
+
 }
