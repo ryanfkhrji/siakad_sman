@@ -15,6 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kompetensi_id')->constrained('kompetensi')->cascadeOnDelete();
             $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik')->cascadeOnDelete();
+            $table->foreignId('guru_id')
+            ->nullable()
+            ->constrained('kepegawaians')
+            ->nullOnDelete();
+
             $table->enum('semester', ['Ganjil','Genap']); 
             $table->text('tujuan_pembelajaran'); // TP
             $table->unsignedInteger('urutan'); // ATP
@@ -32,6 +37,16 @@ return new class extends Migration
             $table->text('catatan_penolakan')->nullable();
         
             $table->boolean('is_locked')->default(false); // diterima = true, ditolak = false
+
+            // cegah guru bikin ganda
+            $table->unique([
+                'kompetensi_id',
+                'tahun_akademik_id',
+                'semester',
+                'urutan',
+                'guru_id'
+            ]);
+            
 
             $table->timestamps();
         });
@@ -52,5 +67,4 @@ return new class extends Migration
 *   1      1 (K13)                                      2           Siswa mengenal...       1         Ganjil      arsip
 *   2      3 (MERDEKA)                                  3           Siswa memahami...       1         Ganjil      arsip
 *   2      3 (MERDEKA)                                  3           Siswa mencoba...        2         Genap       aktif
-*/
-
+*/            

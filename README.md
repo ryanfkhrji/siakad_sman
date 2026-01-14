@@ -53,13 +53,15 @@ Perbaikan
           - ✅ samakan semua
     - Frontend:
           - ikutin insomnia              
-9.  Kurikulum: (independen) 
+9. Kurikulum: (independen) 
    aturan main, menentukan kompetensi KD/CP, 
     - ☑️ Backend:
         - ✅ samakan semua
         - ❌ show belum yakin sampai semua yang terkait seleai
     - Frontend:
         - ikutin insomnia
+        - jika tipe = MERDEKA, maka memiliki ATP (Alur Tujuan Pembelajaran)
+        - jika tipe = K13, tidak memiliki ATP
 10. mata_pelajaran: (independen)
     - ☑️ Backend:
         - ✅ samakan semua
@@ -91,19 +93,21 @@ Perbaikan
         - ✅ samakan semua
     - Frontend:
         - samakan dengan insomnia
+        - jika jenis = KD, tidak memiliki ATP (Alur Tujuan Pembelajaran)
+        - jika jenis = CP, maka memiliki ATP
 15. alur_tujuan_pembelajaran:
     - Backend:
         - ❌ samakan semua
         - ❌ route
-        - ❌ fitur approve
-        - ❌ fitur clone
+        - ❌ fitur approve (spa)
+        - ❌ fitur clone (guru)
     - Frontend:
         - ikutin insomnia
         - referensi tampilan ada di pdf e-raport halaman 143
-        - kasih tombol clone pada tahun_akademik (fitur clone tahun lalu)
-        - kasih status (raft, diajukan, disetuji, ditolak) pada masing-masing baris atp
-        - kasih tombol "ajukan atp ke admin"
-        - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang
+        - kasih tombol clone pada tahun_akademik (fitur clone tahun lalu) untuk guru
+        - kasih status (draft, diajukan, disetuji, ditolak) pada masing-masing baris atp
+        - kasih tombol "ajukan atp ke admin" (pada masing-masing baris atp)
+        - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang dari guru (spa gabisa crud, cuma bisa approve aja)
 16.  ❌ modul_ajar
 17.  ❌ asesmen
 18.  rombel: 

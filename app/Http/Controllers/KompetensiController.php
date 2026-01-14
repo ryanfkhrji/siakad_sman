@@ -15,47 +15,111 @@ class KompetensiController extends Controller
      */
     public function index()
     {
-        $data = Kompetensi::with('kurikulum', 'mataPelajaran')->get();
-        
+        $data = Kompetensi::with(['kurikulum', 'mataPelajaran'])->get();
+
         if ($data->isEmpty()) {
-            return ApiResponse::error('Not found', ['data' => 'Belum ada data']);
+            return ApiResponse::error(
+                'Not found',
+                ['data' => 'Belum ada data']
+            );
         }
 
-        if ($data->kurikulum->tipe == 'K13') {
-            $formatted = $data->map(function ($item) {
-               return [
-                    'id' => $item->id ?? null,
-                    'kurikulum' => $item->kurikulum->nama_kurikulum ?? null,
-                    'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                    'judul_kompetensi' => $item->judul_kompetensi ?? null,
-                    'jenis' => $item->jenis ?? null,
-                    'kode' => $item->kode ?? null,
-                    'tingkat' => $item->tingkat ?? null,
-                    'aspek' => $item->aspek ?? null,
-                    'deskripsi' => $item->deskripsi ?? null,
-                    'status' => $item->status ?? null,
-                ];
-            });
-    
-            return ApiResponse::success($formatted, 'Kompetensi K13 berhasil diambil');
-        } else {
-            $formatted = $data->map(function ($item) {
-                return [
-                     'id' => $item->id ?? null,
-                     'kurikulum' => $item->kurikulum->nama_kurikulum ?? null,
-                     'mata_pelajaran' => $item->mataPelajaran->nama_pelajaran ?? null,
-                     'judul_kompetensi' => $item->judul_kompetensi ?? null,
-                     'jenis' => $item->jenis ?? null,
-                     'kode' => $item->kode ?? null,
-                     'fase' => $item->fase ?? null,
-                     'deskripsi' => $item->deskripsi ?? null,
-                     'status' => $item->status ?? null,
-                 ];
-             });
-     
-             return ApiResponse::success($formatted, 'Kompetensi Kurikulum MERDEKA berhasil diambil');
+        // ambil tipe dari data pertama (diasumsikan 1 endpoint = 1 tipe)
+        $tipeKurikulum = $data->first()->kurikulum->tipe ?? null;
+
+        // =========================
+        // KURIKULUM K13
+        // =========================
+        if ($tipeKurikulum === 'K13') {
+
+            $formatted = $data
+                ->groupBy('tingkat')
+                ->map(function ($groupByTingkat) {
+
+                    return [
+                        'tingkat' => $groupByTingkat->first()->tingkat,
+
+                        'mata_pelajaran' => $groupByTingkat
+                            ->groupBy('mata_pelajaran_id')
+                            ->map(function ($groupByMapel) {
+
+                                $mapel = $groupByMapel->first()->mataPelajaran;
+
+                                return [
+                                    'mata_pelajaran_id' => $mapel->id,
+                                    'mata_pelajaran' => $mapel->nama_pelajaran,
+
+                                    'kompetensi' => $groupByMapel
+                                        ->map(function ($kompetensi) {
+                                            return [
+                                                'kompetensi_id' => $kompetensi->id,
+                                                'judul_kompetensi' => $kompetensi->judul_kompetensi,
+                                                'jenis' => $kompetensi->jenis,
+                                                'kode' => $kompetensi->kode,
+                                                'aspek' => $kompetensi->aspek,
+                                                'deskripsi' => $kompetensi->deskripsi,
+                                                'status' => $kompetensi->status,
+                                            ];
+                                        })
+                                        ->values(),
+                                ];
+                            })
+                            ->values(),
+                    ];
+                })
+                ->values();
+
+            return ApiResponse::success(
+                $formatted,
+                'Kompetensi K13 berhasil diambil'
+            );
         }
+
+        // =========================
+        // KURIKULUM MERDEKA
+        // =========================
+        $formatted = $data
+            ->groupBy('fase')
+            ->map(function ($groupByFase) {
+
+                return [
+                    'fase' => $groupByFase->first()->fase,
+
+                    'mata_pelajaran' => $groupByFase
+                        ->groupBy('mata_pelajaran_id')
+                        ->map(function ($groupByMapel) {
+
+                            $mapel = $groupByMapel->first()->mataPelajaran;
+
+                            return [
+                                'mata_pelajaran_id' => $mapel->id,
+                                'mata_pelajaran' => $mapel->nama_pelajaran,
+
+                                'kompetensi' => $groupByMapel
+                                    ->map(function ($kompetensi) {
+                                        return [
+                                            'kompetensi_id' => $kompetensi->id,
+                                            'judul_kompetensi' => $kompetensi->judul_kompetensi,
+                                            'jenis' => $kompetensi->jenis,
+                                            'kode' => $kompetensi->kode,
+                                            'deskripsi' => $kompetensi->deskripsi,
+                                            'status' => $kompetensi->status,
+                                        ];
+                                    })
+                                    ->values(),
+                            ];
+                        })
+                        ->values(),
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success(
+            $formatted,
+            'Kompetensi Kurikulum Merdeka berhasil diambil'
+        );
     }
+        
 
     /**
      * ✅ spa
@@ -166,11 +230,12 @@ class KompetensiController extends Controller
 
 
     /**
-     * ✅ spa
+     * ✅ spa 
+     * hanya yang approve saja, yg belum approve ada di menu atp
      */
     public function show(string $id)
     {
-        $kd = Kompetensi::where('id', $id)->with('kurikulum', 'mataPelajaran', 'atps.tahunAkademik', 'atps.kompetensi')->first();
+        $kd = Kompetensi::where('id', $id)->with('kurikulum', 'atps.guru', 'mataPelajaran', 'atps.tahunAkademik', 'atps.kompetensi')->first();
 
         if (!$kd) {
             return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
@@ -201,35 +266,76 @@ class KompetensiController extends Controller
                 'fase' => $kd->fase,
                 'deskripsi' => $kd->deskripsi,
                 'status_kompetensi' => $kd->status,
+        
                 'histori_atp' => $kd->atps
-                ->groupBy('tahun_akademik_id')
-                ->map(function ($group) {
-
-                    $tahun = $group->first()->tahunAkademik;
-
-                    return [
-                        'tahun_akademik_id' => $tahun->id,
-                        'tahun_akademik' => $tahun->tahun_akademik,
-
-                        'daftar_tp' => $group
-                            ->sortBy('urutan')
-                            ->map(function ($atp) {
-                                return [
-                                    'atp_id' => $atp->id,
-                                    'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
-                                    'urutan' => $atp->urutan,
-                                    'semester' => $atp->semester,
-                                    'status_atp' => $atp->status,
-                                ];
-                            })
-                            ->values(),
-                    ];
-                })
-                ->values(),
+                    // ✅ hanya yang disetujui
+                    ->where('approval_status', 'disetujui')
+        
+                    // ✅ urut global
+                    ->sortBy([
+                        ['tahun_akademik_id', 'asc'],
+                        ['semester', 'asc'],
+                        ['guru_id', 'asc'],
+                        ['urutan', 'asc'],
+                    ])
+        
+                    // ✅ group tahun akademik
+                    ->groupBy('tahun_akademik_id')
+                    ->map(function ($groupByTahun) {
+        
+                        $tahun = $groupByTahun->first()->tahunAkademik;
+        
+                        return [
+                            'tahun_akademik_id' => $tahun->id,
+                            'tahun_akademik' => $tahun->tahun_akademik,
+        
+                            // ✅ group semester
+                            'semester' => $groupByTahun
+                                ->groupBy('semester')
+                                ->map(function ($groupBySemester, $semester) {
+        
+                                    return [
+                                        'nama_semester' => $semester,
+        
+                                        // 🔥 GROUP BY GURU
+                                        'guru' => $groupBySemester
+                                            ->groupBy('guru_id')
+                                            ->map(function ($groupByGuru) {
+        
+                                                $guru = $groupByGuru->first()->guru;
+        
+                                                return [
+                                                    'guru_id' => $guru->id,
+                                                    'nama_guru' => $guru->nama,
+        
+                                                    // ✅ daftar ATP per guru
+                                                    'daftar_atp' => $groupByGuru
+                                                        ->sortBy('urutan')
+                                                        ->map(function ($atp) {
+                                                            return [
+                                                                'atp_id' => $atp->id,
+                                                                'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
+                                                                'urutan' => $atp->urutan,
+                                                                'approval_status' => $atp->approval_status,
+                                                                'approved_by' => $atp->approved_by,
+                                                                'approved_at' => $atp->approved_at,
+                                                                'terkunci' => $atp->is_locked,
+                                                            ];
+                                                        })
+                                                        ->values(),
+                                                ];
+                                            })
+                                            ->values(),
+                                    ];
+                                })
+                                ->values(),
+                        ];
+                    })
+                    ->values(),
             ];
-    
+        
             return ApiResponse::success($formatted, 'Detail kompetensi berhasil diambil');
-        }
+        }        
     }
 
     /**

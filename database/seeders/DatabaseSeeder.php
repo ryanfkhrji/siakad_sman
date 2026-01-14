@@ -442,39 +442,39 @@ class DatabaseSeeder extends Seeder
         KurikulumMataPelajaran::insert([
             [
                 'kurikulum_id' => 2, // Kurtilas
-                'mata_pelajaran_id' => 1, // Fisika
+                'mata_pelajaran_id' => 1, // MTK
                 'jurusan_pelajaran_id' => 1, // IPA
                 'tahun_akademik_id' => 1, // 2013/2023
-                'tingkat' => 11, // 2013/2023
-                'nilai_kkm' => 75.55, // 2013/2023
-                'status_mata_pelajaran' => 'jurusan', // 2013/2023                
+                'tingkat' => 11,
+                'nilai_kkm' => 75.55,
+                'status_mata_pelajaran' => 'jurusan',                
             ],
             [
                 'kurikulum_id' => 3, // Merdeka
-                'mata_pelajaran_id' => 2, // B. Indo
-                'jurusan_pelajaran_id' => 1, // IPA
+                'mata_pelajaran_id' => 1, // MTK
+                'jurusan_pelajaran_id' => null,
                 'tahun_akademik_id' => 2, // 2024/2025
-                'tingkat' => 10, // 2024/2025
-                'nilai_kkm' => 80, // 2024/2025
-                'status_mata_pelajaran' => 'wajib', // 2024/2025                
-            ],
+                'tingkat' => 10,
+                'nilai_kkm' => 80,
+                'status_mata_pelajaran' => 'wajib',                
+            ],            
             [
                 'kurikulum_id' => 3, // Merdeka
                 'mata_pelajaran_id' => 2, // B. Indo
-                'jurusan_pelajaran_id' => 2, // IPS
-                'tahun_akademik_id' => 2, // 2024/2025
-                'tingkat' => 10, // 2024/2025
-                'nilai_kkm' => 75.55, // 2024/2025
-                'status_mata_pelajaran' => 'wajib', // 2024/2025                
-            ],
+                'jurusan_pelajaran_id' => null,
+                'tahun_akademik_id' => 2,
+                'tingkat' => 10,
+                'nilai_kkm' => 80,
+                'status_mata_pelajaran' => 'wajib',                
+            ],            
             [
                 'kurikulum_id' => 3, // Merdeka
                 'mata_pelajaran_id' => 3, // B. Sunda
-                'jurusan_pelajaran_id' => 2, // IPS
-                'tahun_akademik_id' => 2, // 2024/2025
-                'tingkat' => 10, // 2024/2025
-                'nilai_kkm' => 70, // 2024/2025
-                'status_mata_pelajaran' => 'pilihan', // 2024/2025                
+                'jurusan_pelajaran_id' => null,
+                'tahun_akademik_id' => 2,
+                'tingkat' => 10,
+                'nilai_kkm' => 70,
+                'status_mata_pelajaran' => 'pilihan',                
             ]
         ]);
 
@@ -487,6 +487,7 @@ class DatabaseSeeder extends Seeder
          * */  
         Kompetensi::insert([
             [
+                // 1
                 'kurikulum_id' => 2, // K13
                 'mata_pelajaran_id' => 1, // Matematika
                 'judul_kompetensi' => 'Memahami konsep persamaan linear satu variabel',
@@ -499,6 +500,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'arsip'
             ],
             [
+                // 2
                 'kurikulum_id' => 2, // K13
                 'mata_pelajaran_id' => 1, // Matematika
                 'judul_kompetensi' => 'Menyelesaikan persamaan linear satu variabel',
@@ -511,6 +513,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'arsip'
             ],
             [
+                // 3
                 'kurikulum_id' => 2, // K13
                 'mata_pelajaran_id' => 1, // Matematika
                 'judul_kompetensi' => 'Menunjukkan sikap teliti dan jujur dalam menyelesaikan masalah matematika',
@@ -523,6 +526,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'arsip'
             ],            
             [
+                // 4
                 'kurikulum_id' => 3, // MERDEKA
                 'mata_pelajaran_id' => 1, // Matematika
                 'judul_kompetensi' => 'Bernalar menggunakan persamaan dan pertidaksamaan linear',
@@ -535,6 +539,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'aktif'
             ],
             [
+                // 5
                 'kurikulum_id' => 3, // MERDEKA
                 'mata_pelajaran_id' => 1, // Matematika
                 'judul_kompetensi' => 'Menganalisis hubungan antar variabel dalam bentuk aljabar',
@@ -547,27 +552,55 @@ class DatabaseSeeder extends Seeder
                 'status' => 'aktif'
             ],
             [
+                // 6
                 'kurikulum_id' => 3, // MERDEKA
-                'mata_pelajaran_id' => 1, // Matematika
-                'judul_kompetensi' => 'Mengomunikasikan solusi matematis secara logis',
+                'mata_pelajaran_id' => 2, // Indo
+                'judul_kompetensi' => 'Menulis sesuai KBBI',
                 'jenis' => 'CP',
-                'kode' => 'CP-MAT-E3',
+                'kode' => 'CP-IND-F1',
                 'tingkat' => null,
                 'aspek' => null,
-                'fase' => 'E',
-                'deskripsi' => 'Peserta didik mampu mengomunikasikan solusi matematika secara logis',                
+                'fase' => 'F',
+                'deskripsi' => 'Peserta didik mampu menulis sesuai KBBI dan menerapkannya dalam kehidupan sehari-hari',                
+                'status' => 'aktif'
+            ],            
+            [
+                // 7
+                'kurikulum_id' => 3, // MERDEKA
+                'mata_pelajaran_id' => 2, // Indo
+                'judul_kompetensi' => 'Memahami tanda baca pada kalimat',
+                'jenis' => 'CP',
+                'kode' => 'CP-IND-F2',
+                'tingkat' => null,
+                'aspek' => null,
+                'fase' => 'F',
+                'deskripsi' => 'Peserta didik mampu membedakan tanda baca beserta kegunaannya',                
+                'status' => 'aktif'
+            ],            
+            [
+                // 8
+                'kurikulum_id' => 3, // MERDEKA
+                'mata_pelajaran_id' => 2, // Indo
+                'judul_kompetensi' => 'Memahami awal paragraf',
+                'jenis' => 'CP',
+                'kode' => 'CP-IND-F3',
+                'tingkat' => null,
+                'aspek' => null,
+                'fase' => 'F',
+                'deskripsi' => 'Peserta didik mampu membedakan paragraf',                
                 'status' => 'aktif'
             ],            
         ]);
 
         // guru (tiap awal tahun akademik/ganjil)
         /**
-         * ! 🎯 spa: CRUD
+         * 🎯✅ spa: Index, Show, Diterima, Ditolak
          */
         AlurTujuanPembelajaran::insert([            
             [
-                'kompetensi_id' => 4, // MERDEKA || Matematika || CP
+                'kompetensi_id' => 4, // MERDEKA || Matematika
                 'tahun_akademik_id' => 2, // 2024/2025
+                'guru_id' => 5, // Guru IPA
                 'semester' => 'Ganjil',
                 'tujuan_pembelajaran' => 'Peserta didik mampu menjelaskan pengertian persamaan linear satu variabel melalui contoh kontekstual',
                 'urutan' => 1,
@@ -578,8 +611,9 @@ class DatabaseSeeder extends Seeder
                 'is_locked' => false,                
             ],
             [
-                'kompetensi_id' => 4, // MERDEKA || Matematika || CP
+                'kompetensi_id' => 4, // MERDEKA || Matematika
                 'tahun_akademik_id' => 2, // 2024/2025
+                'guru_id' => 5, // Guru IPA
                 'semester' => 'Ganjil',
                 'tujuan_pembelajaran' => 'Peserta didik mampu menyusun dan menyelesaikan persamaan linear satu variabel dari masalah kontekstual',
                 'urutan' => 2,
@@ -590,10 +624,50 @@ class DatabaseSeeder extends Seeder
                 'is_locked' => false,                
             ],
             [
-                'kompetensi_id' => 4, // MERDEKA || Matematika || CP
+                'kompetensi_id' => 4, // MERDEKA || Matematika
                 'tahun_akademik_id' => 2, // 2024/2025
-                'semester' => 'Genap',
+                'guru_id' => 5,
+                'semester' => 'Ganjil',
                 'tujuan_pembelajaran' => 'Peserta didik mampu mengevaluasi kebenarsan solusi persamaan linear dan mengomunikasikannya secara lisan maupun tertulis',
+                'urutan' => 3,
+                'approval_status' => 'draft',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],
+            [
+                'kompetensi_id' => 6, // MERDEKA || Indo || Menulis sesuai KBBI
+                'tahun_akademik_id' => 2, // 2024/2025
+                'guru_id' => 6, // Guru IPS
+                'semester' => 'Ganjil',
+                'tujuan_pembelajaran' => 'Peserta didik mampu menjelaskan konsep KBBI',
+                'urutan' => 1,
+                'approval_status' => 'draft',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],
+            [
+                'kompetensi_id' => 7, // MERDEKA || Indo || Memahami Tanda baca pada kalimat
+                'tahun_akademik_id' => 2, // 2024/2025
+                'guru_id' => 6, // Guru IPS
+                'semester' => 'Ganjil',
+                'tujuan_pembelajaran' => 'Peserta didik mampu menyusun dan menyelesaikan teks menggunakan tanda baca yang benar',
+                'urutan' => 2,
+                'approval_status' => 'draft',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],
+            [
+                'kompetensi_id' => 8, // MERDEKA || Indo || Memahami awal paragraf
+                'tahun_akademik_id' => 2, // 2024/2025
+                'guru_id' => 6, // Guru IPS
+                'semester' => 'Ganjil',
+                'tujuan_pembelajaran' => 'Peserta didik mampu memahami awal dan akhir sebuah paragraf',
                 'urutan' => 3,
                 'approval_status' => 'draft',
                 'approved_by' => null,
@@ -608,10 +682,7 @@ class DatabaseSeeder extends Seeder
         // asesmen
 
         /**
-         * spa: CREATE, DELETE
-         * tu: CREATE, DELETE
-         * kepsek:
-         * guru: READ, SHOW, UPDATE
+         * 🎯✅ spa: CRUD    
          */
         Rombel::insert([
             [
@@ -628,7 +699,7 @@ class DatabaseSeeder extends Seeder
             ],            
         ]);
 
-        // siswa mengambil kelas
+        // 🎯 spa
         SiswaRombel::insert([
             [
                 'siswa_id' => 1, // Bagas
@@ -652,8 +723,8 @@ class DatabaseSeeder extends Seeder
          * */ 
         JadwalPelajaran::insert([
             [
-                'kurikulum_mata_pelajaran_id' => 1, // Kurtilas, Fisika, J.IPA, 2013/2023                
-                'semester_id' => 1, // Kurtilas, Fisika, J.IPA, 2013/2023                
+                'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
+                'semester_id' => 1, // Ganjil
                 'hari' => 'Senin',
                 'guru_id' => 5, // Guru IPA
                 'rombel_id' => 1, // IX IPA
@@ -663,27 +734,16 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => 'www.youtube.com',                
             ],
             [
-                'kurikulum_mata_pelajaran_id' => 2, // Merdeka, B.Indo, J.IPS, 2024/2025                
-                'semester_id' => 1, // Merdeka, B.Indo, J.IPS, 2024/2025                
+                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
+                'semester_id' => 1, // Ganjil
                 'hari' => 'Selasa',
                 'guru_id' => 6, // Guru IPS
-                'rombel_id' => 1,
-                'jam_mulai' => '07:30',
-                'jam_selesai' => '09:30',
-                'ruangan' => '7.5.6',                
-                'link_opsional' => '',                
-            ],
-            [
-                'kurikulum_mata_pelajaran_id' => 2, // Merdeka, B.Indo, J.IPS, 2024/2025                
-                'semester_id' => 2, // Merdeka, B.Indo, J.IPS, 2024/2025                
-                'hari' => 'Rabu',
-                'guru_id' => 6,
                 'rombel_id' => 2,
                 'jam_mulai' => '07:30',
                 'jam_selesai' => '09:30',
                 'ruangan' => '7.5.6',                
                 'link_opsional' => '',                
-            ]
+            ],            
         ]);      
         
         // siswa mengambil jadwal

@@ -10,6 +10,9 @@ use App\Http\Controllers\JadwalPelajaranController;
 use App\Http\Controllers\SiswaJadwalPelajaranController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\KompetensiController;
+use App\Http\Controllers\AlurTujuanPembelajaranController;
+use App\Http\Controllers\RombelController;
+use App\Http\Controllers\SiswaRombelController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\TahunAkademikController;
@@ -114,8 +117,16 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅☑️ CRUD kompetensi
     Route::apiResource('/spa/kompetensi', KompetensiController::class);     
 
-    // ! ✅ CRUD ATP
-    Route::apiResource('/spa/atp', KompetensiController::class);     
+    // ✅☑️ CRUD ATP
+    Route::apiResource('/spa/atp', AlurTujuanPembelajaranController::class)->only(['index', 'show']);  
+    Route::put('/spa/atp-diterima/{id}', [AlurTujuanPembelajaranController::class, 'diterima']);   
+    Route::put('/spa/atp-ditolak/{id}', [AlurTujuanPembelajaranController::class, 'ditolak']);   
+
+    // ✅☑️ CRUD rombel
+    Route::apiResource('/spa/rombel', RombelController::class);    
+
+    // ! ✅ CRUD siswa rombel
+    Route::apiResource('/spa/siswa-rombel', SiswaRombelController::class);    
 
     // ✅ CRUD jadwal pelajaran
     Route::apiResource('/spa/jadwal-pelajaran', JadwalPelajaranController::class);
@@ -123,8 +134,6 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅ CRUD siswa mengambil jadwal pelajaran
     Route::apiResource('/spa/siswa/jadwal-pelajaran', SiswaJadwalPelajaranController::class);           
 
-    // ! ✅ CRUD Wali Kelas (insomnianya belum dibuat)
-    Route::apiResource('/spa/rombel', RombelController::class);    
     
     // ✅ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);

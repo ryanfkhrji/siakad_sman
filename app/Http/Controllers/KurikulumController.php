@@ -74,28 +74,118 @@ class KurikulumController extends Controller
 
     /**
      * ✅ untuk spa
+     * kurikulum
+     *  
      */
     public function show(string $id)
     {
-        $find = Kurikulum::where('id', $id)->first();
+        $kurikulum = Kurikulum::with([
+            'kompetensi.mataPelajaran'
+        ])->find($id);
 
-        if (!$find) {
-            return ApiResponse::error('Data tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        if (! $kurikulum) {
+            return ApiResponse::error(
+                'Data tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
-        $formatted = [
-            'id' => $find->id ?? null,
-            'nama_kurikulum' => $find->nama_kurikulum ?? null,
-            'kode_kurikulum' => $find->kode_kurikulum ?? null,
-            'tipe' => $find->tipe ?? null,
-            'tahun_mulai' => $find->tahun_mulai ?? null,
-            'tahun_selesai' => $find->tahun_selesai ?? null,
-            'deskripsi' => $find->deskripsi ?? null,
-            'status' => $find->status ?? null,
-        ];
+        // =========================
+        // KURIKULUM KD
+        // =========================
+        if ($kurikulum->jenis === 'KD') {
 
-        return ApiResponse::success($formatted, 'Detail kurikulum berhasil diambil');
+            $histori = $kurikulum->kompetensi
+                ->groupBy('tingkat')
+                ->map(function ($groupByTingkat) {
+
+                    return [
+                        'tingkat' => $groupByTingkat->first()->tingkat,
+
+                        // group by mapel
+                        'mata_pelajaran' => $groupByTingkat
+                            ->groupBy('mata_pelajaran_id')
+                            ->map(function ($groupByMapel) {
+
+                                $mapel = $groupByMapel->first()->mataPelajaran;
+
+                                return [
+                                    'mata_pelajaran_id' => $mapel->id,
+                                    'mata_pelajaran' => $mapel->nama_pelajaran,
+
+                                    // daftar kompetensi
+                                    'kompetensi' => $groupByMapel->map(function ($kompetensi) {
+                                        return [
+                                            'kompetensi_id' => $kompetensi->id,
+                                            'judul_kompetensi' => $kompetensi->judul_kompetensi,
+                                            'jenis' => $kompetensi->jenis,
+                                            'kode' => $kompetensi->kode,
+                                            'aspek' => $kompetensi->aspek,
+                                            'deskripsi' => $kompetensi->deskripsi,
+                                            'status_kompetensi' => $kompetensi->status,
+                                        ];
+                                    })->values(),
+                                ];
+                            })->values(),
+                    ];
+                })->values();
+
+        }
+        // =========================
+        // KURIKULUM CP (MERDEKA)
+        // =========================
+        else {
+
+            $histori = $kurikulum->kompetensi
+                ->groupBy('fase')
+                ->map(function ($groupByFase) {
+
+                    return [
+                        'fase' => $groupByFase->first()->fase,
+
+                        // group by mapel
+                        'mata_pelajaran' => $groupByFase
+                            ->groupBy('mata_pelajaran_id')
+                            ->map(function ($groupByMapel) {
+
+                                $mapel = $groupByMapel->first()->mataPelajaran;
+
+                                return [
+                                    'mata_pelajaran_id' => $mapel->id,
+                                    'mata_pelajaran' => $mapel->nama_pelajaran,
+
+                                    // daftar kompetensi
+                                    'kompetensi' => $groupByMapel->map(function ($kompetensi) {
+                                        return [
+                                            'kompetensi_id' => $kompetensi->id,
+                                            'judul_kompetensi' => $kompetensi->judul_kompetensi,
+                                            'jenis' => $kompetensi->jenis,
+                                            'kode' => $kompetensi->kode,
+                                            'deskripsi' => $kompetensi->deskripsi,
+                                            'status_kompetensi' => $kompetensi->status,
+                                        ];
+                                    })->values(),
+                                ];
+                            })->values(),
+                    ];
+                })->values();
+        }
+
+        return ApiResponse::success([
+            'id' => $kurikulum->id,
+            'nama_kurikulum' => $kurikulum->nama_kurikulum,
+            'kode_kurikulum' => $kurikulum->kode_kurikulum,
+            'tipe' => $kurikulum->tipe,
+            'tahun_mulai' => $kurikulum->tahun_mulai,
+            'tahun_selesai' => $kurikulum->tahun_selesai,
+            'deskripsi' => $kurikulum->deskripsi,
+            'status_kurikulum' => $kurikulum->status,
+            'histori_kompetensi' => $histori,
+        ], 'Detail kurikulum berhasil diambil');
     }
+
+
 
     /**
      * ✅ untuk spa

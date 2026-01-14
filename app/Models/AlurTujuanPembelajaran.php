@@ -20,4 +20,14 @@ class AlurTujuanPembelajaran extends Model
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
     }
+
+    public function approved()
+    {
+        return $this->belongsTo(Kepegawaian::class, 'approved_by');
+    }
+
+    public function guru()
+    {
+        return $this->belongsTo(Kepegawaian::class, 'guru_id');
+    }
 }

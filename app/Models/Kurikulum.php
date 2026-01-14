@@ -11,9 +11,9 @@ class Kurikulum extends Model
     protected $table = 'kurikulum';
     protected $guarded = ['id'];
 
-    public function kompetensiDasars()
+    public function kompetensi()
     {
-        return $this->hasMany(KompetensiDasar::class, 'kurikulum_id');
+        return $this->hasMany(Kompetensi::class, 'kurikulum_id');
     }    
 
     public function kurikulumMataPelajaran()
