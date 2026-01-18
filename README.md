@@ -103,7 +103,7 @@ Perbaikan
         - samakan dengan insomnia
         - jika jenis = KD, tidak memiliki ATP (Alur Tujuan Pembelajaran)
         - jika jenis = CP, maka memiliki ATP
-15. alur_tujuan_pembelajaran:
+15. ☑️ alur_tujuan_pembelajaran:
     - ✅ Backend:
         - ✅ samakan semua
         - ✅ route

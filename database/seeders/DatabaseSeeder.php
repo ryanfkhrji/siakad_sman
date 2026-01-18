@@ -307,7 +307,7 @@ class DatabaseSeeder extends Seeder
                 'jurusan_id' => null, // IPA                                                                            
             ],
             [
-                'nama_kelas' => 'XI IPS',
+                'nama_kelas' => 'XI',
                 'kode_kelas' => 'K22.IPS',                
                 'tingkat' => 11,                
                 'jurusan_id' => null, // IPS                                                                            
