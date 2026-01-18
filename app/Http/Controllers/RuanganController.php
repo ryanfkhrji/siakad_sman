@@ -42,6 +42,7 @@ class RuanganController extends Controller
         return ApiResponse::success($formatted, 'Daftar ruangan berhasil diambil');
     }
 
+
     /**
      * Store a newly created resource in storage.
      */
@@ -206,4 +207,24 @@ class RuanganController extends Controller
 
         return ApiResponse::success('null', 'Data ruangan berhasil dihapus');
     }
+
+     // data select
+     public function dataSelectRuangan()
+     {
+         $gedung = Gedung::select('id', 'nama_gedung', 'kode_gedung')->get();
+ 
+        if ($gedung->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+         $data = $gedung->map(function ($g) {
+             return [
+                 'gedung_id' => $g->id,
+                 'nama_gedung' => $g->nama_gedung,
+                 'kode_gedung' => $g->kode_gedung,
+             ];
+         });
+ 
+         return ApiResponse::success($data, 'Data select berhasil diambil');
+     }
 }

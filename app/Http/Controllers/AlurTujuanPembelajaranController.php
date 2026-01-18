@@ -9,6 +9,8 @@ use App\Helpers\ApiResponse;
 use App\Models\AlurTujuanPembelajaran;
 use App\Models\Kompetensi;
 use App\Models\TahunAkademik;
+use App\Models\Kepegawaian;
+use App\Models\Semester;
 use Illuminate\Support\Facades\DB;
 
 // di hal 143
@@ -769,4 +771,105 @@ class AlurTujuanPembelajaranController extends Controller
 
         return ApiResponse::success(null, 'ATP berhasil dihapus');
     }    
+
+    public function dataSelectAtp() {
+        // kompetensi
+        $data1 = Kompetensi::with('kurikulum', 'mataPelajaran')
+        ->where('status', 'aktif')
+        ->get();
+
+        if($data1->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+        $kompetensi = $data1->map(function ($komp) {
+            if ($komp->jenis == 'KD') {
+                return [
+                    'kompetensi_id' => $komp->id,
+                    'judul_kompetensi' => $komp->judul_kompetensi,
+                    'kurikulum' => $komp->kurikulum->nama_kurikulum,
+                    'mata_pelajaran' => $komp->mataPelajaran->nama_pelajaran,
+                    'tingkat' => $komp->tingkat,
+                    'aspek' => $komp->aspek,
+                ];
+            }
+
+            return [
+                'kompetensi_id' => $komp->id,
+                'judul_kompetensi' => $komp->judul_kompetensi,
+                'kurikulum' => $komp->kurikulum->nama_kurikulum,
+                'mata_pelajaran' => $komp->mataPelajaran->nama_pelajaran,
+                'fase' => $komp->fase,
+            ];
+            
+        });
+
+
+        // tahun akademik
+        $data2 = TahunAkademik::select('id', 'tahun_akademik', 'status')
+        ->where('status', 'aktif')
+        ->first();
+
+        if (!$data2) {
+            return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
+        }
+
+        $tahunAkademik = [
+            'tahun_akademik_id' => $data2->id,
+            'tahun_akademik' => $data2->tahun_akademik,
+            'status_tahun_akademik' => $data2->status,
+        ];
+
+
+        // guru
+        $data3 = Kepegawaian::select('id', 'nama', 'nip', 'nuptk')
+        ->where('role', 'guru')
+        ->where('status', 'aktif')
+        ->get();
+
+        if ($data3->isEmpty()) {
+            return ApiResponse::error(
+                'Data kosong',
+                ['data' => 'Tidak ada guru aktif']
+            );
+        }     
+
+        $guru = $data3->map(function ($g) {
+            return [
+                'guru_id' => $g->id,
+                'nama_guru' => $g->nama,
+                'nip' => $g->nip ?? null,
+                'nuptk' => $g->nuptk ?? null,
+            ];
+        });
+
+
+        // semester
+        $data4 = Semester::with('tahunAkademik')
+        ->whereHas('tahunAkademik', function ($q) {
+            $q->where('status', 'aktif');
+        })
+        ->where('status', 'aktif')
+        ->first();
+
+        if (!$data4) {
+            return ApiResponse::error( 'Data kosong', ['data' => 'Tidak ada semester aktif'] );
+        }   
+        
+        $semester = [
+            'semester_id' => $data4->id,
+            'semester' => $data4->semester,
+            'status_semester' => $data4->status,
+            'tahun_akademik' => $data4->tahunAkademik->tahun_akademik ?? null,
+            'status_tahun_akademik' => $data4->tahunAkademik->status ?? null,
+        ];
+
+        return ApiResponse::success([
+            'kompetensi' => $kompetensi ?? null,
+            'tahun_akademik' => $tahunAkademik ?? null,
+            'guru' => $guru ?? null,
+            'semester' => $semester ?? null
+        ], 'Data select berhasil diambil');
+
+    }
 }

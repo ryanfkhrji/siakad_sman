@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Semester;
+use App\Models\TahunAkademik;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Auth;
@@ -235,5 +236,23 @@ class SemesterController extends Controller
 
         $semester->delete();
         return ApiResponse::success(null, 'Semester berhasil dihapus');
+    }
+
+    public function dataSelectSemester() {
+        $tahunAkademik = TahunAkademik::select('id', 'tahun_akademik', 'status')
+        ->where('status', 'aktif')
+        ->first();
+
+        if (!$tahunAkademik) {
+            return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
+        }
+
+        $data = [
+            'tahun_akademik_id' => $tahunAkademik->id,
+            'tahun_akademik' => $tahunAkademik->tahun_akademik,
+            'status_tahun_akademik' => $tahunAkademik->status,
+        ];
+
+        return ApiResponse::success($data, 'Tahun akademik aktif berhasil diambil');
     }
 }

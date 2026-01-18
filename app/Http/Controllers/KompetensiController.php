@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kompetensi;
+use App\Models\Kurikulum;
+use App\Models\MataPelajaran;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
@@ -472,5 +474,39 @@ class KompetensiController extends Controller
 
         $kd->delete();
         return ApiResponse::success(null, 'Kompetensi berhasil dihapus');
+    }
+
+    // data select
+    public function dataSelectKompetensi() {
+        // kurikulum
+        $data1 = Kurikulum::select('id', 'nama_kurikulum', 'tipe')->where('status', 'aktif')->first();
+        if (!$data1) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+        $kurikulum = [
+            'kurikulum_id' => $data1->id,
+            'nama_kurikulum' => $data1->nama_kurikulum,
+            'tipe' => $data1->tipe,
+        ];
+        
+        // mata pelajaran
+        $data2 = MataPelajaran::select('id', 'nama_pelajaran', 'kode_mapel_diknas')
+        ->where('status', 'aktif')
+        ->get();
+        if ($data2->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }    
+        $mataPelajaran = $data2->map(function ($mapel) {
+            return [
+                'mata_pelajaran_id' => $mapel->id,
+                'nama_pelajaran' => $mapel->nama_pelajaran,
+                'kode_mapel_diknas' => $mapel->kode_mapel_diknas,
+            ];
+        });
+
+        return ApiResponse::success([
+            'kurikulum' => $kurikulum,
+            'mata_pelajaran' => $mataPelajaran
+        ], 'Data select berhasil diambil');
     }
 }

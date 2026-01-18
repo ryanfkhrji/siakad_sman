@@ -11,7 +11,6 @@ use App\Http\Controllers\SiswaJadwalPelajaranController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\AlurTujuanPembelajaranController;
-use App\Http\Controllers\RombelController;
 use App\Http\Controllers\SiswaRombelController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\RuanganController;
@@ -67,15 +66,16 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ✅☑️ Super admin Update diri sendiri ((insomnia))
     Route::put('/spa/update/diri', [KepegawaianController::class, 'updateDirinyaSendiri']);
-
+    
     // ✅☑️ CRUD identitas sekolah oleh tu dan super admin
     Route::apiResource('/spa/identitas-sekolah', IdentitasSekolahController::class);
-
+    
     // ✅☑️ CRUD gedung
     Route::apiResource('/spa/gedung', GedungController::class);
-
+    
     // ✅☑️ Ruangan
     Route::apiResource('/spa/ruangan', RuanganController::class);
+    Route::get('/spa/data-select/ruangan', [RuanganController::class, 'dataSelectRuangan']);
     
     // ✅☑️ CRUD Kepegawaian
     Route::apiResource('/spa/kepegawaian', KepegawaianController::class);
@@ -89,7 +89,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅☑️ Ubah password siswa oleh super admin
     Route::post('/spa/ubah-password/siswa', [SiswaController::class, 'ubahPassword']);
-
+    
     // ✅☑️ CRUD Siswa
     Route::apiResource('/spa/siswa', SiswaController::class);
 
@@ -107,34 +107,37 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅☑️ Tahun Akademik
     Route::apiResource('/spa/tahun-akademik', TahunAkademikController::class);
-
+    
     // ✅☑️ Semester
     Route::apiResource('/spa/semester', SemesterController::class);
-
+    Route::get('/spa/data-select/semester', [SemesterController::class, 'dataSelectSemester']);
+    
     // ✅☑️ Kurikulum Mata Pelajran
     Route::apiResource('/spa/kurikulum-mata-pelajaran', KurikulumMataPelajaranController::class);
-
+    Route::get('/spa/data-select/kurmap', [KurikulumMataPelajaranController::class, 'dataSelectKurmap']);
+    
     // ✅☑️ CRUD kompetensi
     Route::apiResource('/spa/kompetensi', KompetensiController::class);     
-
+    Route::get('/spa/data-select/kompetensi', [KompetensiController::class, 'dataSelectKompetensi']);
+    
     // ✅☑️ CRUD ATP
     Route::apiResource('/spa/atp', AlurTujuanPembelajaranController::class)->only(['index', 'show']);  
     Route::put('/spa/atp-diterima/{id}', [AlurTujuanPembelajaranController::class, 'diterima']);   
     Route::put('/spa/atp-ditolak/{id}', [AlurTujuanPembelajaranController::class, 'ditolak']);   
-
+    
     // ✅☑️ CRUD rombel
     Route::apiResource('/spa/rombel', RombelController::class);    
-
-    // ! ✅ CRUD siswa rombel
+    
+    // ✅☑️ Create dan Delete siswa rombel
     Route::apiResource('/spa/siswa-rombel', SiswaRombelController::class);    
-
-    // ✅ CRUD jadwal pelajaran
+    
+    // ✅☑️ CRUD jadwal pelajaran
     Route::apiResource('/spa/jadwal-pelajaran', JadwalPelajaranController::class);
+    Route::get('/spa/data-select/jadwal-pelajaran', [JadwalPelajaranController::class, 'dataUntukSelect']);       
     
-    // ✅ CRUD siswa mengambil jadwal pelajaran
-    Route::apiResource('/spa/siswa/jadwal-pelajaran', SiswaJadwalPelajaranController::class);           
+    // ✅☑️ get jadwal pelajaran siswa
+    Route::get('/spa/siswa/jadwal-pelajaran/{id}', [SiswaJadwalPelajaranController::class, 'getSiswaJadwal']);       
 
-    
     // ✅ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
 
@@ -208,62 +211,63 @@ Route::put('/tu/update/diri', [KepegawaianController::class, 'updateDirinyaSendi
 // ? ======================================================= GURU ============================================================ ?
     // ✅☑️ identitas sekolah menggunakan Global: /all/identitas-sekolah
 
-    // ✅☑️ Ubah password pegawai oleh dirinya sendiri
-    Route::put('/pegawai/ubah-password/diri', [KepegawaianController::class, 'ubahPassDiri']);
+    // ✅☑️ Ubah password guru oleh dirinya sendiri
+    Route::put('/guru/ubah-password/diri', [KepegawaianController::class, 'ubahPassDiri']);
         
-    // ✅☑️ Pegawai Show Diri Sendiri
-    Route::get('/pegawai/show/diri', [KepegawaianController::class, 'showDiriSendiri']);        
+    // ✅☑️ guru Show Diri Sendiri
+    Route::get('/guru/show/diri', [KepegawaianController::class, 'showDiriSendiri']);        
     
-    // ✅ Pegawai Update diri sendiri
-    Route::put('/pegawai/update/diri', [KepegawaianController::class, 'updateDirinyaSendiri']);
+    // ✅ guru Update diri sendiri
+    Route::put('/guru/update/diri', [KepegawaianController::class, 'updateDirinyaSendiri']);
 
     // ! ✅ Get all rombel sendiri
-    // Route::get('/pegawai/kelas/show/diri', [KelasController::class, 'showKelasPegawai']);
+    // Route::get('/guru/kelas/show/diri', [KelasController::class, 'showKelasPegawai']);
 
     // ✅ Update kelas sendiri
-    Route::put('/pegawai/kelas/update/diri', [KelasController::class, 'updateKelasPegawai']);
+    Route::put('/guru/kelas/update/diri', [KelasController::class, 'updateKelasPegawai']);
 
     // ! rombel (belum dibuat insomnianya)
-    Route::get('/pegawai/rombel/all/diri', [RombelController::class, 'getAllRombelSendiri']);
-
-    // ✅ Get all jadwal pelajaran sendiri
-    Route::get('/pegawai/jadwal-pelajaran/all/diri', [JadwalPelajaranController::class, 'showAllJadwalSendiri']);
+    Route::get('/guru/rombel/all/diri', [RombelController::class, 'getAllRombelSendiri']);    
     
+    // ! ✅ Alur Tujuan Pembelajaran
+    Route::apiResource('/guru/atp/self', AlurTujuanPembelajaranController::class)->only('show');
+    Route::get('/guru/data-select/atp', [AlurTujuanPembelajaranController::class, 'dataSelectAtp']);
+
     // ✅ Get detail jadwal pelajaran sendiri
-    Route::apiResource('/pegawai/jadwal-pelajaran/show/diri', JadwalPelajaranController::class)->only('show');
+    Route::get('/guru/jadwal-pelajaran/all/self', [JadwalPelajaranController::class, 'getAllJadwalSendiri']);        
     
     // ✅ Read siswa oleh pegawai
-    Route::apiResource('/pegawai/siswa', SiswaController::class)->only(['index', 'show']);
+    Route::apiResource('/guru/siswa', SiswaController::class)->only(['index', 'show']);
 
     // ✅ Get ekskul sendiri
-    Route::get('/pegawai/ekskul/show/diri', [EkstrakurikulerController::class, 'showEkskulSendiri']);
+    Route::get('/guru/ekskul/show/diri', [EkstrakurikulerController::class, 'showEkskulSendiri']);
 
     // ✅ CRUD peserta ekstrakurikuler oleh pegawai
-    Route::apiResource('/pegawai/siswa/ekskul', EkskulSiswaPivotController::class);
+    Route::apiResource('/guru/siswa/ekskul', EkskulSiswaPivotController::class);
 
     // ✅ CRUD kompetensi
-    Route::apiResource('/pegawai/kompetensi', KompetensiController::class)->only(['index', 'show']);
+    Route::apiResource('/guru/kompetensi', KompetensiController::class)->only(['index', 'show']);
 
      // ✅ Absensi Sekolah
-    Route::apiResource('/pegawai/absensi/sekolah', AbsensiPegawaiController::class)->only('store');
-    Route::get('/pegawai/absensi/sekolah/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
-    Route::get('/pegawai/absensi/sekolah/export', [AbsensiPegawaiController::class, 'export']);
+    Route::apiResource('/guru/absensi/sekolah', AbsensiPegawaiController::class)->only('store');
+    Route::get('/guru/absensi/sekolah/all/self', [AbsensiPegawaiController::class, 'showAbsenSendiri']);
+    Route::get('/guru/absensi/sekolah/export', [AbsensiPegawaiController::class, 'export']);
     
     // ✅ Absensi Pelajaran (baca readme)
-    Route::apiResource('/pegawai/absensi/pelajaran', AbsensiPelajaranController::class)->only('store');
-    Route::get('/pegawai/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
-    Route::get('/pegawai/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
+    Route::apiResource('/guru/absensi/pelajaran', AbsensiPelajaranController::class)->only('store');
+    Route::get('/guru/absensi/pelajaran/all/self', [AbsensiPelajaranController::class, 'showAbsenPelajaranSendiri']);
+    Route::get('/guru/absensi/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
     
     // ! ✅ Guru absenkan siswa (tinggal debug)
-    Route::post('/pegawai/absensi/siswa', [AbsensiSiswaController::class, 'guruAbsenkanSiswa']);
+    Route::post('/guru/absensi/siswa', [AbsensiSiswaController::class, 'guruAbsenkanSiswa']);
 
 
     // ! ✅ Data Nilai Siswa
     // ini belom masuk insomnia
-    Route::get('/pegawai/data-nilai-siswa/self/all', [DataNilaiSiswaController::class, 'getAllDataNilaiSendiri']);
+    Route::get('/guru/data-nilai-siswa/self/all', [DataNilaiSiswaController::class, 'getAllDataNilaiSendiri']);
     
-    Route::apiResource('/pegawai/data-nilai-siswa', DataNilaiSiswaController::class)->except('destroy');   
-    Route::delete('/pegawai/data-nilai-siswa/destroy/{id?}', [DataNilaiSiswaController::class, 'destroyData']);
+    Route::apiResource('/guru/data-nilai-siswa', DataNilaiSiswaController::class)->except('destroy');   
+    Route::delete('/guru/data-nilai-siswa/destroy/{id?}', [DataNilaiSiswaController::class, 'destroyData']);
     // -------------------------------------------------------------------------------------
      
 
@@ -350,10 +354,10 @@ Route::middleware('auth:siswa')->group(function () {
 
     // ✅ get kompetensi
     // Route::apiResource('/siswa/kompetensi', KompetensiController::class)->only(['index', 'show']);
-
+    
     // ✅ Get all jadwal pelajaran sendiri
-    Route::get('/siswa/jadwal-pelajaran/all/diri', [SiswaJadwalPelajaranController::class, 'showAllJadwalSendiri']);
-
+    Route::apiResource('/siswa/jadwal-pelajaran', SiswaJadwalPelajaranController::class)->only('index');
+    
      // ✅ Absensi Pelajaran
      Route::apiResource('/siswa/absensi/pelajaran', AbsensiSiswaController::class)->only('store');
      Route::get('/siswa/absensi/pelajaran/all/self', [AbsensiSiswaController::class, 'showAbsenPelajaranSendiri']);

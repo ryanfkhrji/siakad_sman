@@ -33,7 +33,7 @@ class SiswaJadwalPelajaran extends Pivot
 
     public function jadwalPelajaran()
     {
-        return $this->belongsTo(JadwalPelajaran::class);
+        return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');
     }   
 
     // public function jadwalPelajarans()

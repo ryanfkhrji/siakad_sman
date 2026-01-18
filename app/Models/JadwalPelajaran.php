@@ -61,10 +61,38 @@ class JadwalPelajaran extends Model
         return $this->belongsToMany(Siswa::class, 'siswa_jadwal_pelajaran')
             ->withPivot('id', 'jadwal_pelajaran_id')
             ->withTimestamps();
+    }    
+
+    // public function siswaJadwalPelajaran()
+    // {
+    //     return $this->belongsToMany(
+    //         Siswa::class,
+    //         'siswa_jadwal_pelajaran',
+    //         'jadwal_pelajaran_id',
+    //         'siswa_id'
+    //     );
+    // }
+
+    public function siswa()
+    {
+        return $this->belongsToMany(
+            Siswa::class,
+            'siswa_jadwal_pelajaran',
+            'jadwal_pelajaran_id',
+            'siswa_id'
+        );
     }
 
     public function absensiPelajaran()
     {
         return $this->hasMany(AbsensiPelajaran::class, 'jadwal_pelajaran_id');
+    }
+
+    public function ruangan()
+    {
+        return $this->belongsTo(
+            Ruangan::class,
+            'ruangan_id'
+        );
     }
 }

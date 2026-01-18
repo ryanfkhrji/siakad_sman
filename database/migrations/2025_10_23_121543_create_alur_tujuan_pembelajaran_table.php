@@ -45,7 +45,7 @@ return new class extends Migration
                 'semester',
                 'urutan',
                 'guru_id'
-            ]);
+            ], 'unik');
             
 
             $table->timestamps();

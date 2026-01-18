@@ -74,29 +74,27 @@ class Siswa extends Authenticatable
         return $this->hasMany(SiswaRombel::class, 'siswa_id');
     }
 
-    // helper (opsional): rombel aktif
-    public function rombels()
+    public function rombelAktif()
     {
-        return $this->belongsToMany(
-            Rombel::class,
-            'siswa_rombel',
-            'siswa_id',
-            'rombel_id'
-        )->withTimestamps();
+        return $this->hasOne(SiswaRombel::class)
+            ->whereHas('rombel.tahunAkademik', fn ($q) => $q->where('status', 'aktif'));
     }
-
 
     public function pengajar()
     {
         return $this->belongsTo(Kepegawaian::class, 'pengajar_id');
-    }
+    }    
 
     public function jadwalPelajarans()
     {
-        return $this->belongsToMany(JadwalPelajaran::class, 'siswa_jadwal_pelajaran')
-        ->withPivot(['id', 'siswa_id', 'jadwal_pelajaran_id', 'tahun_akademik_id', 'status']);
-        // status: aktif/arsip
+        return $this->belongsToMany(
+            JadwalPelajaran::class,
+            'siswa_jadwal_pelajaran',
+            'siswa_id',
+            'jadwal_pelajaran_id'
+        );
     }
+
 
     public function absensis()
     {

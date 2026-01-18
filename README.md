@@ -18,46 +18,51 @@ Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (Res
 ========================================================================================================================================
 Perbaikan
 
-1. identitas_sekolah:
+1. identitas_sekolah: (independen)
    - ☑️ Backend
    - Frontend:
-     - ikutin insomnia
-     - Ketika masih kosong, tombol tambah identitas muncul, ketika sudah ada data, tombol tambah identitas hilang
-2. gedung:
-   - ❌ Backend:
+         - ikutin insomnia
+         - Ketika masih kosong, tombol tambah identitas muncul, ketika sudah ada data, tombol tambah identitas hilang
+2. gedung: (independen)
+   - ☑️ Backend:
+   - Frontend:
+          - ikutin insomnia
 3. ruangan:
-   - ❌ Backend:
+   - ☑️ Backend:
+          - ✅ send data untuk select
+   - Frontend:
+          - ikutin insomnia
 4. Kepegawaian: (independen)
     - ☑️ Backend:
           - ✅ samakan semua
     - Frontend: 
-          - samakan dengan insomnia
-          - pada store atau register, tidak perlu inputan status (update perlu)
-5. penerimaan_siswa_baru:
-   - ❌ Backend:
+          - samakan dengan insomnia          
+5. penerimaan_siswa_baru: (independen)
+   - ☑️ Backend:
+   - Frontend:
+          - ikutin insomnia
 6. Siswa: (independen)
     - ☑️ Backend:
           - ✅ samakan semua        
-          - ❌ siswa tidak ada update dirinya sendiri (insomnia)
+          - ❌ siswa: siswa tidak ada update dirinya sendiri (insomnia)
    - Frontend:
           - Samakan dengan insomnia
-          - pada store atau register, tidak perlu inputan status (update perlu)
 7. Jurusan: (independen)
     - ☑️ Backend: 
           - ✅ samakan semua
     - Frontend
-          - ikutin insomnia
-          - kalo create/store, status otomatis aktif (gaperlu kasih inputan status, kecuali update)
+          - ikutin insomnia          
 8. Kelas: (independen)
     - ☑️ Backend:
           - ✅ samakan semua
+          - ❌ (insomnia) semua milik spa
     - Frontend:
           - ikutin insomnia              
 9. Kurikulum: (independen) 
    aturan main, menentukan kompetensi KD/CP, 
     - ☑️ Backend:
         - ✅ samakan semua
-        - ❌ show belum yakin sampai semua yang terkait seleai
+        - ❌ (insomnia) semua milik spa        
     - Frontend:
         - ikutin insomnia
         - jika tipe = MERDEKA, maka memiliki ATP (Alur Tujuan Pembelajaran)
@@ -79,11 +84,13 @@ Perbaikan
 12. semester:
     - ☑️ Backend:
         - ✅ samakan semua
+        - ✅ send data untuk select (hanya tahun_akademik_id aktif saja)
     - Frontend:
         - Ikutin insomnia
 13. kurikulum_mata_pelajaran:
    - ☑️ Backend:
           - ✅ samakan semua
+          - ✅ send data untuk select
    - Frontend:
           - ikutin insomnia
           - Buat tampilannya (untuk spa saja)
@@ -91,16 +98,18 @@ Perbaikan
     Target kemampuan siswa, lintas tahun
     - Backend:        
         - ✅ samakan semua
+        - ✅ send data untuk select
     - Frontend:
         - samakan dengan insomnia
         - jika jenis = KD, tidak memiliki ATP (Alur Tujuan Pembelajaran)
         - jika jenis = CP, maka memiliki ATP
 15. alur_tujuan_pembelajaran:
-    - Backend:
-        - ❌ samakan semua
-        - ❌ route
-        - ❌ fitur approve (spa)
-        - ❌ fitur clone (guru)
+    - ✅ Backend:
+        - ✅ samakan semua
+        - ✅ route
+        - ✅ guru: data select
+        - ❌ fitur approve (spa) (tinggal uji)
+        - ❌ fitur clone (guru) (tinggal uji)
     - Frontend:
         - ikutin insomnia
         - referensi tampilan ada di pdf e-raport halaman 143
@@ -114,33 +123,27 @@ Perbaikan
     - ☑️ Backend:
           - ✅ samakan semuanya
           - ❌ API dan insomnia
+          - ❌ data select
     - Frontend:
           - ikutin insomnia      
           - wali_rombel = wali_kelas
           - hitung jumlah siswa di rombel yang tahun_akademik = aktif
 19. siswa_rombel:
     - ☑️ Backend:
-          - ✅ samakan semuanya (M, S, C, R)
-          - ❌ API dan insomnia
+          - ✅ samakan semuanya (M, S, C, R)          
+          - data select
     - Frontend:
           - Ikutin insomnia
 20. jadwal_pelajarans:
-    - Backend:
-        - ❌ (Seeder, Migrasi, Controller) jam_pelajaran diganti jadi jam_mulai dan jam_selesai
-        - ❌ (Seeder, Migrasi, Controller) ubah kolom mata_pelajaran_id menjadi kurikulum_mata_pelajaran_id
-        - ❌ (Seeder, Migrasi, Controller) Hapus kolom jurusan_pelajaran_id
-        - ❌ debug insomnia (seharusnya create dan update guru beda mapel gaboleh)
+    - ☑️ Backend:
+        - ✅ Guru: Tampilkan tahun_akademik dan semester aktif saja 
+        - ✅ spa: tidak bisa hapus jika sudah digunakan pada siswa_jadwal_pelajaran dan absensi_pelajaran
+        - ✅ send data untuk select
     - Frontend:
-        - Untuk create dan update, samakan inputan dengan file JadwalPelajaranController.php (store dan update)
-        - Jika butuh data untuk select, silakan gunakan pada JadwalPelajaranController.php (index)
-        - create, update, delete jadwal pelajaran hanya bisa dilakukan oleh spa
-        - Alur pengisian jadwal adalah melalui button pada halaman index
-        - Filter menggunakan status_tahun_akademik dan status_semester, jika aktif maka tampil di ui, jika arsip maka tampil di halaman arsip
-        - ketika create dan update, guru mengambil mapel yang berbeda, maka tidak boleh (kabari jika gagal)
+        - samakan dengan insomnia
 21. siswa_jadwal_pelajaran
    - Backend:
-        - ❌ samakan (seeder, controller, insomnia) dengan migrasi   
-        - ❌ jika ada siswa yang jurusan_pelajarannya beda dengan jurusan_siswanya, maka salah
+        - ❌ tampilkan yang tahun akademik dan semesternya aktif saja
    - Frontend:
         - Samakan inputan create dan update dengan file SiswaJadwalPelajaranController.php (store dan update)
         - Jika butuh data untuk select, silakan gunakan pada JadwalPelajaranController.php (index)

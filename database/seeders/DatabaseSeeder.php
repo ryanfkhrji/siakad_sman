@@ -31,7 +31,6 @@ use App\Models\PembinaEkskul;
 use App\Models\PelatihEkskul;
 use App\Models\Siswa;
 use App\Models\SiswaRombel;
-use App\Models\SiswaJadwalPelajaran;
 use App\Models\EkskulSiswaPivot;
 use App\Models\DataNilaiSiswa;
 use App\Models\DataBerkas;
@@ -198,22 +197,33 @@ class DatabaseSeeder extends Seeder
                 'status' => 'aktif',
             ],
             [
-                'nama' => 'Guru IPA Pengajar Paskibra',
-                'email' => 'guruipa@gmail.com',
+                'nama' => 'Guru MTK',
+                'email' => 'gurumtk@gmail.com',
                 'nip' => '123454',
                 'nuptk' => '0123454',
-                'keterangan' => 'Guru IPA',
+                'keterangan' => 'Guru MTK',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'guru',
                 'remember_token' => Str::random(10),
                 'status' => 'aktif',
             ],
             [
-                'nama' => 'Guru IPS Pengajar Tari',
-                'email' => 'guruips@gmail.com',
+                'nama' => 'Guru Indo',
+                'email' => 'guruindo@gmail.com',
                 'nip' => '123455',
                 'nuptk' => '0123455',
-                'keterangan' => 'Guru IPS',
+                'keterangan' => 'Guru Indo',
+                'password' => Hash::make('K3ps3k.'),
+                'role' => 'guru',
+                'remember_token' => Str::random(10),
+                'status' => 'aktif',
+            ],
+            [
+                'nama' => 'Guru Sunda',
+                'email' => 'gurusunda@gmail.com',
+                'nip' => '123456',
+                'nuptk' => '0123456',
+                'keterangan' => 'Guru Sunda',
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'guru',
                 'remember_token' => Str::random(10),
@@ -291,29 +301,23 @@ class DatabaseSeeder extends Seeder
          * **/
         Kelas::insert([
             [
-                'nama_kelas' => 'IX IPA',
+                'nama_kelas' => 'X',
                 'kode_kelas' => 'K12-IPA',                
                 'tingkat' => 11,                
                 'jurusan_id' => null, // IPA                                                                            
             ],
             [
-                'nama_kelas' => 'IX IPS',
+                'nama_kelas' => 'XI IPS',
                 'kode_kelas' => 'K22.IPS',                
                 'tingkat' => 11,                
                 'jurusan_id' => null, // IPS                                                                            
             ],
             [
-                'nama_kelas' => 'X IPA',
+                'nama_kelas' => 'XII',
                 'kode_kelas' => 'K11-IPA',                
                 'tingkat' => 10,                
                 'jurusan_id' => 1, // IPA                                                                            
-            ],
-            [
-                'nama_kelas' => 'X IPS',
-                'kode_kelas' => 'K21.IPS',                
-                'tingkat' => 10,                
-                'jurusan_id' => 2, // IPS                                                                            
-            ],
+            ],            
         ]);
 
         /**
@@ -686,20 +690,32 @@ class DatabaseSeeder extends Seeder
          */
         Rombel::insert([
             [
-                'kelas_id' => 3, // X IPA
+                'kelas_id' => 1, // X
                 'tahun_akademik_id' => 2, // 2024/2025
-                'nama_rombel' => 'X-1A', // X IPA
-                'wali_rombel_id' => 5, // Guru IPA
+                'nama_rombel' => 'X-A',
+                'wali_rombel_id' => 5, // Guru mtk
             ],
             [
-                'kelas_id' => 4, // X IPS
+                'kelas_id' => 1, // X
                 'tahun_akademik_id' => 2, // 2024/2025
-                'nama_rombel' => 'X-1B', // X IPS
-                'wali_rombel_id' => 6, // Guru IPS
+                'nama_rombel' => 'X-B',
+                'wali_rombel_id' => 6, // Guru Indo
             ],            
+            [
+                'kelas_id' => 1, // X
+                'tahun_akademik_id' => 2, // 2024/2025
+                'nama_rombel' => 'X-C',
+                'wali_rombel_id' => 7, // Guru Sunda
+            ],                        
+            [
+                'kelas_id' => 2, // XI
+                'tahun_akademik_id' => 1, // 2013/2023
+                'nama_rombel' => 'XI-A',
+                'wali_rombel_id' => 7, // Guru Sunda
+            ],                        
         ]);
 
-        // 🎯 spa
+        // 🎯✅ spa: Create dan Delete
         SiswaRombel::insert([
             [
                 'siswa_id' => 1, // Bagas
@@ -710,53 +726,132 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 2, // X-1B - J.IPS                
             ],
             [
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 4, // X1-A
+            ],
+            [
                 'siswa_id' => 3, // Sanita
                 'rombel_id' => 2, // X-1B - J.IPS                
             ],
         ]);
 
         /** 
-         * 🎯 spa: CRUD
+         * 🎯✅ spa: CRUD
          * tu: GET, SHOW
          * guru: GET/SHOW
          * Kepsek: GET, SHOW
          * */ 
-        JadwalPelajaran::insert([
+        JadwalPelajaran::insert([            
             [
+                // 1
                 'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
-                'semester_id' => 1, // Ganjil
+                'semester_id' => 3, // 2024/2025 = Ganjil
                 'hari' => 'Senin',
-                'guru_id' => 5, // Guru IPA
-                'rombel_id' => 1, // IX IPA
+                'guru_id' => 5, // Guru MTK
+                'rombel_id' => 1, // X-A
                 'jam_mulai' => '07:30',
                 'jam_selesai' => '09:30',
-                'ruangan' => 'Lab Komputer',                
+                'ruangan_id' => 1,                
                 'link_opsional' => 'www.youtube.com',                
             ],
             [
-                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
-                'semester_id' => 1, // Ganjil
+                // 2
+                'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
+                'semester_id' => 3, // 2024/2025 = Ganjil
                 'hari' => 'Selasa',
-                'guru_id' => 6, // Guru IPS
-                'rombel_id' => 2,
+                'guru_id' => 5, // Guru MTK
+                'rombel_id' => 2, // X-B
                 'jam_mulai' => '07:30',
                 'jam_selesai' => '09:30',
-                'ruangan' => '7.5.6',                
+                'ruangan_id' => 2,
+                'link_opsional' => 'www.youtube.com',                
+            ],
+            [
+                // 3
+                'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Selasa',
+                'guru_id' => 5, // Guru MTK
+                'rombel_id' => 3, // X-C
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 2,
+                'link_opsional' => 'www.youtube.com', 
+            ],      
+            [
+                // 4                   
+                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
+                'semester_id' => 4, // 2024/2025 = Ganjil
+                'hari' => 'Selasa',
+                'guru_id' => 6, // Guru Indo
+                'rombel_id' => 1, //X-A
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 3,
+                'link_opsional' => '',                            
+            ],          
+            [
+                // 5
+                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Rabu',
+                'guru_id' => 6, // Guru Indo
+                'rombel_id' => 2, // X-B
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 1,
                 'link_opsional' => '',                
             ],            
-        ]);      
-        
-        // siswa mengambil jadwal
-        SiswaJadwalPelajaran::insert([
             [
-                'siswa_id' => 1, // Andi
-                'jadwal_pelajaran_id' => 2, // B.Indonesia                
-            ],
+                // 6
+                'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
+                'semester_id' => 3, // 2024/2025 = Ganjil
+                'hari' => 'Rabu',
+                'guru_id' => 7, // Guru Sunda
+                'rombel_id' => 1, // X-A
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],            
             [
-                'siswa_id' => 2, // Rina
-                'jadwal_pelajaran_id' => 1, // IPA                
-            ],
-        ]);
+                // 7
+                'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
+                'semester_id' => 4, // 2013/2023 = Genap
+                'hari' => 'Rabu',
+                'guru_id' => 7, // Guru Sunda
+                'rombel_id' => 2, // X-B
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],   
+            [
+                // 8
+                'kurikulum_mata_pelajaran_id' => 1, // K13 - MTK
+                'semester_id' => 1, // 2013/2023 = Genap
+                'hari' => 'Kamis',
+                'guru_id' => 7, // Guru MTK
+                'rombel_id' => 3, // X-C
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],   
+            [
+                // 9
+                'kurikulum_mata_pelajaran_id' => 1, // K13 - Sunda
+                'semester_id' => 2, // 2013/2023 = Genap
+                'hari' => 'Rabu',
+                'guru_id' => 5, // Guru MTK
+                'rombel_id' => 4, // XI-A
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],   
+                 
+        ]);              
 
         /**
          * 🎯 spa: CRUD

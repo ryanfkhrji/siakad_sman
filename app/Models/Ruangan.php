@@ -16,4 +16,12 @@ class Ruangan extends Model
     {
         return $this->belongsTo(Gedung::class, 'gedung_id');
     }    
+
+    public function jadwalPelajarans()
+    {
+        return $this->hasMany(
+            JadwalPelajaran::class,
+            'ruangan_id'
+        );
+    }
 }

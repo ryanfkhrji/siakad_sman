@@ -164,7 +164,7 @@ class SiswaController extends Controller
             ]);
 
             // Cari siswa berdasarkan email
-            $siswa = Siswa::with('kelas.jurusan')->where('email', $validated['email'])->first();
+            $siswa = Siswa::with('rombelAktif.rombel.kelas.jurusan')->where('email', $validated['email'])->first();
 
             // Cek apakah Siswa ada & password cocok
             if (!$siswa || !Hash::check($validated['password'], $siswa->password)) {
@@ -190,13 +190,14 @@ class SiswaController extends Controller
              */
             $token = $siswa->createToken('API Token', ['*'], now()->addMinutes(660))->plainTextToken;
 
+            $jurusan = $siswa->rombelAktif->rombel->kelas->jurusan;
             // Response sukses
             return ApiResponse::success([
                 'id' => $siswa->id,
                 'nisn' => $siswa->nisn,
                 'nama' => $siswa->nama,
                 'nis' => $siswa->nis,
-                'nama_jurusan' => $siswa->kelas->jurusan->nama_jurusan ?? null,
+                'nama_jurusan' => $jurusan->nama_jurusan ?? null,
                 'email' => $siswa->email,
                 'role' => $siswa->role,                
                 'status_siswa' => $siswa->status,                

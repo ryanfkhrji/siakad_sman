@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Models\KurikulumMataPelajaran;
-use App\Http\Models\Kurikulum;
-use App\Http\Models\TahunAkademik;
+use App\Models\KurikulumMataPelajaran;
+use App\Models\Kurikulum;
+use App\Models\MataPelajaran;
+use App\Models\Jurusan;
+use App\Models\TahunAkademik;
 use Illuminate\Validation\Rule;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Validator;
@@ -315,5 +317,79 @@ class KurikulumMataPelajaranController extends Controller
         $kurmap->delete();
 
         return ApiResponse::success(null, 'Data berhasil dihapus');
+    }
+
+
+    public function dataSelectKurmap() {
+        // kurikulum
+        $data = Kurikulum::select('id', 'nama_kurikulum', 'tipe')->where('status', 'aktif')->first();
+
+        if (!$data) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+        $kurikulum = [
+            'kurikulum_id' => $data->id,
+            'nama_kurikulum' => $data->nama_kurikulum,
+            'tipe_kurikulum' => $data->tipe,
+        ];
+
+
+        // mata pelajaran
+        $data2 = MataPelajaran::select('id', 'nama_pelajaran', 'kode_mapel_diknas')
+        ->where('status', 'aktif')
+        ->get();
+
+        if ($data2->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+        $mataPelajaran = $data2->map(function ($mapel) {
+            return [
+                'mata_pelajaran_id' => $mapel->id,
+                'nama_pelajaran' => $mapel->nama_pelajaran,
+                'kode_mapel_diknas' => $mapel->kode_mapel_diknas
+            ];
+        });
+
+
+        // jurusan
+        $data3 = Jurusan::select('id', 'nama_jurusan', 'kode_jurusan')
+        ->where('status', 'aktif')
+        ->get();
+
+        if ($data3->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+        $jurusanPelajaran = $data3->map(function ($j) {
+            return [
+                'jurusan_pelajaran_id' => $j->id,
+                'nama_jurusan' => $j->nama_jurusan,
+                'kode_jurusan' => $j->kode_jurusan
+            ];
+        });
+
+
+        // tahun akademik
+        $data4 = TahunAkademik::select('id', 'tahun_akademik', 'status')->where('status', 'aktif')->first();
+
+        if (!$data4) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+        $tahunAkademik = [
+            'tahun_akademik_id' => $data4->id,
+            'tahun_akademik' => $data4->tahun_akademik,
+            'status_tahun_akademik' => $data4->status,
+        ];
+
+
+        return ApiResponse::success([
+            'kurikulum' => $kurikulum,
+            'mata_pelajaran' => $mataPelajaran,
+            'jurusan_pelajaran' => $jurusanPelajaran ?? null,
+            'tahun_akademik' => $tahunAkademik,
+        ], 'Data select berhasil diambil');
     }
 }

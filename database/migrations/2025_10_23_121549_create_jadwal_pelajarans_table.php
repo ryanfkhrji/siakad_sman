@@ -22,25 +22,26 @@ return new class extends Migration
                 ->constrained('semester')
                 ->restrictOnDelete(); // tidak boleh hapus
             
-            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
+            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);            
 
-            $table->foreignId('guru_id')
-                ->nullable()
-                ->constrained('kepegawaians')
-                ->nullOnDelete(); // set null jika induk dihapus
+            $table->foreignId('guru_id')->constrained('kepegawaians')->restrictOnDelete(); // tidak boleh hapus
 
-            $table->foreignId('rombel_id')->constrained('rombels')->restrictOnDelete(); // tidak boleh hapus
+            $table->foreignId('rombel_id')->constrained('rombels')->restrictOnDelete();
 
             $table->time('jam_mulai');
             $table->time('jam_selesai');
 
-            $table->string('ruangan')->nullable();
+            $table->foreignId('ruangan_id')
+            ->nullable()
+            ->constrained('ruangan')
+            ->nullOnDelete();
                         
             $table->string('link_opsional')->nullable();        
 
             $table->timestamps();
 
             $table->unique([
+                'kurikulum_mata_pelajaran_id',
                 'rombel_id',
                 'semester_id',
                 'hari',
