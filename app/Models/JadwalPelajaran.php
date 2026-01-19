@@ -88,6 +88,11 @@ class JadwalPelajaran extends Model
         return $this->hasMany(AbsensiPelajaran::class, 'jadwal_pelajaran_id');
     }
 
+    public function absensiPegawai()
+    {
+        return $this->hasMany(AbsensiPegawai::class, 'jadwal_pelajaran_id');
+    }
+
     public function ruangan()
     {
         return $this->belongsTo(

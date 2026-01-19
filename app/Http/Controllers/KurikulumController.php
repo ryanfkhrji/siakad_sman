@@ -55,6 +55,12 @@ class KurikulumController extends Controller
                 'tipe.in' => 'Pilihan hanya K13 atau MERDEKA'
             ]);
 
+            $kurikulumAktif = Kurikulum::where('status', 'aktif')->exists();
+
+            if ($kurikulumAktif) {
+                return ApiResponse::error('Tidak bisa', ['data' => 'Masih ada kurikulum lain yang aktif, arsipkan terlebih dahulu']);
+            }
+
             $kurikulum = Kurikulum::create($validated);
 
             return ApiResponse::success([
@@ -198,6 +204,10 @@ class KurikulumController extends Controller
             return ApiResponse::error('Kurikulum tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
+        if ($kurikulum->status == 'arsip') {
+            return ApiResponse::error('Tidak bisa', ['data' => ['Tidak bisa ubah data arsip']], 404);
+        }
+
         $validated = $request->validate([
             'nama_kurikulum' => [
                 'sometimes',
@@ -251,8 +261,12 @@ class KurikulumController extends Controller
             return ApiResponse::error('Kurikulum tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
 
+        if ($kurikulum->status == 'arsip') {
+            return ApiResponse::error('Tidak bisa', ['data' => ['Tidak bisa hapus data arsip']], 404);
+        }
+
         // Cek apakah kurikulum sedang digunakan oleh kompetensi dasar
-        if ($kurikulum->kompetensiDasars()->exists()) {
+        if ($kurikulum->kompetensi()->exists()) {
             return ApiResponse::error('Kurikulum tidak bisa dihapus karena masih digunakan pada kompetensi dasar', [
                 'nama_kurikulum' => ['Kurikulum ini masih digunakan pada kompetensi']
             ], 422);

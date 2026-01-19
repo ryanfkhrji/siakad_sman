@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TahunAkademik;
+use App\Models\Semester;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class TahunAkademikController extends Controller
      */
     public function index()
     {
-        $ta = TahunAkademik::waith('semester')->orderBy('tahun_akademik', 'desc')->get();
+        $ta = TahunAkademik::with('semester')->orderBy('tahun_akademik', 'desc')->get();
 
         $formatted = $ta->map(function($item) {
             return [
@@ -44,7 +45,6 @@ class TahunAkademikController extends Controller
     {
         try {
             $validated = $request->validate([
-                // sesuaikan dengan ini @Ryan, 2 ini aja
                 'tahun_akademik' => 'required|unique:tahun_akademik,tahun_akademik',                
                 'keterangan' => 'nullable',            
             ],[
@@ -110,14 +110,17 @@ class TahunAkademikController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $ta = TahunAkademik::find($id);
+        $ta = TahunAkademik::with('semester')->find($id);
 
         if (!$ta) {
             return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
         }
 
+        if ($ta->status == 'arsip') {
+            return ApiResponse::error('Not supported', ['data' => ['Sudah menjadi arsip, tidak boleh diubah']], 404);
+        }
+
         $validated = $request->validate([
-            // ini @Ryan, di dalam $validated, 3 inputan
             'tahun_akademik' => [
                 'sometimes',
                 'required',
@@ -140,6 +143,18 @@ class TahunAkademikController extends Controller
             return ApiResponse::error(
                 'Kesalahan',
                 ['status' => 'Tahun akademik yang sudah diarsipkan tidak dapat diaktifkan kembali'],
+                422
+            );
+        }
+
+        $masihAdaSemesterAktif = Semester::where('tahun_akademik_id', $id)
+        ->where('status', 'aktif')
+        ->exists();
+
+        if ($masihAdaSemesterAktif) {
+            return ApiResponse::error(
+                'Kesalahan',
+                ['status' => 'Masih ada semester aktif pada tahun ini'],
                 422
             );
         }
@@ -173,6 +188,10 @@ class TahunAkademikController extends Controller
 
         if (!$ta) {
             return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        if ($ta->status == 'arsip') {
+            return ApiResponse::error('Not supported', ['id' => ['Tahun akademik sudah berstatus arsip']], 404);
         }
 
         $dipakaiSemester = $ta->semester()->exists();

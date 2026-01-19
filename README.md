@@ -108,22 +108,21 @@ Perbaikan
         - ✅ samakan semua
         - ✅ route
         - ✅ guru: data select
-        - ❌ fitur approve (spa) (tinggal uji)
-        - ❌ fitur clone (guru) (tinggal uji)
+        - ✅ fitur approve (spa)
+        - ✅ fitur clone (guru)
     - Frontend:
         - ikutin insomnia
         - referensi tampilan ada di pdf e-raport halaman 143
-        - kasih tombol clone pada tahun_akademik (fitur clone tahun lalu) untuk guru
-        - kasih status (draft, diajukan, disetuji, ditolak) pada masing-masing baris atp
-        - kasih tombol "ajukan atp ke admin" (pada masing-masing baris atp)
+        - kasih tombol clone pada semester (fitur clone semester tahun lalu) untuk guru        
+        - Untuk UI guru silakan minta ke Winton
         - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang dari guru (spa gabisa crud, cuma bisa approve aja)
 16.  ❌ modul_ajar
 17.  ❌ asesmen
 18.  rombel: 
     - ☑️ Backend:
           - ✅ samakan semuanya
-          - ❌ API dan insomnia
-          - ❌ data select
+          - ✅ API dan insomnia
+          - ✅ data select
     - Frontend:
           - ikutin insomnia      
           - wali_rombel = wali_kelas
@@ -131,7 +130,7 @@ Perbaikan
 19. siswa_rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya (M, S, C, R)          
-          - data select
+          - ✅ data select
     - Frontend:
           - Ikutin insomnia
 20. jadwal_pelajarans:
@@ -142,23 +141,16 @@ Perbaikan
     - Frontend:
         - samakan dengan insomnia
 21. siswa_jadwal_pelajaran
-   - Backend:
-        - ❌ tampilkan yang tahun akademik dan semesternya aktif saja
+   - ☑️ Backend:
+        - ✅ siswa: tahun dan semester aktif saja
    - Frontend:
-        - Samakan inputan create dan update dengan file SiswaJadwalPelajaranController.php (store dan update)
-        - Jika butuh data untuk select, silakan gunakan pada JadwalPelajaranController.php (index)
-        - create, update, delete hanya bisa dilakukan oleh spa
-        - Alur pengisian jadwal siswa adalah melalui button halaman index
-        - Filter menggunakan status_tahun_akademik
+        - samakan dengan insomnia
 22. absensi_pegawai:
     - Backend:
         - ❌ samakan dengan migrasi
         - ❌ show menggunakan id guru
     - Frontend:
-        - filter menggunakan status_tahun_akademik, jika arsip maka jangan tampil di ui, tapi di halaman arsip
-        - create = pegawai, update = spa
-        - Alur untuk absen adalah lewat showAbsenSendiri, letakkan button absen di halaman itu
-        - Inputan create dan update, samakan dengan function store dan update
+        - ikutin insomnia
 23. absensi_pelajaran:
     - Backend:
         - ❌ samakan dengan migrasi

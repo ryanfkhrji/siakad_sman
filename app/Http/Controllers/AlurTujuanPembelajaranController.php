@@ -25,6 +25,7 @@ class AlurTujuanPembelajaranController extends Controller
         $atps = AlurTujuanPembelajaran::with([
             'kompetensi.mataPelajaran',
             'tahunAkademik',
+            'semesterRelasi',
             'approved',
             'guru'
         ])
@@ -61,13 +62,19 @@ class AlurTujuanPembelajaranController extends Controller
                                 'status_tahun_akademik' => $tahun->status,
 
                                 'semesters' => $groupByTahun
-                                    ->groupBy('semester')
-                                    ->map(function ($groupBySemester, $semester) {
+                                    ->groupBy('semester_id')
+                                    ->map(function ($groupBySemester) {
+
+                                        $semester = $groupBySemester->first()->semesterRelasi;
+
+                                        if (!$semester) {
+                                            return null;
+                                        }
 
                                         return [
-                                            'semester' => $semester,
+                                            'semester_id' => $semester->id,
+                                            'semester' => $semester->semester,
 
-                                            // 🔥 GROUP BY GURU
                                             'guru' => $groupBySemester
                                                 ->groupBy('guru_id')
                                                 ->map(function ($groupByGuru) {
@@ -80,6 +87,7 @@ class AlurTujuanPembelajaranController extends Controller
 
                                                         'histori_atp' => $groupByGuru
                                                             ->sortBy('urutan')
+                                                            ->values()
                                                             ->map(function ($atp) {
                                                                 return [
                                                                     'atp_id' => $atp->id,
@@ -91,13 +99,13 @@ class AlurTujuanPembelajaranController extends Controller
                                                                     'catatan_penolakan' => $atp->catatan_penolakan,
                                                                     'is_locked' => $atp->is_locked,
                                                                 ];
-                                                            })
-                                                            ->values(),
+                                                            }),
                                                     ];
                                                 })
                                                 ->values(),
                                         ];
                                     })
+                                    ->filter()
                                     ->values(),
                             ];
                         })
@@ -110,7 +118,6 @@ class AlurTujuanPembelajaranController extends Controller
     }
 
 
-    
     // ✅ get all atp sendiri (guru)    
     public function getAllAtpSendiri()
     {
@@ -119,9 +126,12 @@ class AlurTujuanPembelajaranController extends Controller
         $atps = AlurTujuanPembelajaran::with([
             'kompetensi.mataPelajaran',
             'tahunAkademik',
-            'guru'
+            'semesterRelasi'
         ])
         ->where('guru_id', $user->id)
+        ->whereHas('semester', function ($q) {
+            $q->where('status', 'aktif');
+        })
         ->get();
 
         if ($atps->isEmpty()) {
@@ -154,14 +164,18 @@ class AlurTujuanPembelajaranController extends Controller
                                 'status_tahun_akademik' => $tahun->status,
 
                                 'semesters' => $groupByTahun
-                                    ->groupBy('semester')
-                                    ->map(function ($groupBySemester, $semester) {
+                                    ->groupBy('semester_id')
+                                    ->map(function ($groupBySemester) {
+
+                                        $semester = $groupBySemester->first()->semester;
 
                                         return [
-                                            'semester' => $semester,
+                                            'semester_id' => $semester->id,
+                                            'semester' => $semester->semester,
 
                                             'histori_atp' => $groupBySemester
                                                 ->sortBy('urutan')
+                                                ->values()
                                                 ->map(function ($atp) {
                                                     return [
                                                         'atp_id' => $atp->id,
@@ -173,8 +187,7 @@ class AlurTujuanPembelajaranController extends Controller
                                                         'catatan_penolakan' => $atp->catatan_penolakan,
                                                         'is_locked' => $atp->is_locked,
                                                     ];
-                                                })
-                                                ->values(),
+                                                }),
                                         ];
                                     })
                                     ->values(),
@@ -187,9 +200,10 @@ class AlurTujuanPembelajaranController extends Controller
 
         return ApiResponse::success(
             $formatted,
-            'Data ATP milik guru berhasil diambil'
+            'Data ATP milik guru (semester aktif) berhasil diambil'
         );
     }
+
 
     /**
      * ✅ guru
@@ -211,19 +225,15 @@ class AlurTujuanPembelajaranController extends Controller
 
         // 1. Validasi dasar input
         $validated = $request->validate([
-            'kompetensi_id' => 'required|exists:kompetensi,id',
-            'tahun_akademik_id' => 'required|exists:tahun_akademik,id',            
-            'semester' => 'required|in:Ganjil,Genap',
+            'kompetensi_id' => 'required|exists:kompetensi,id',            
             'tujuan_pembelajaran' => 'required|string',
             'urutan' => 'required|integer|min:1',
         ], [
             'kompetensi_id.required' => 'Kompetensi wajib diisi',
-            'kompetensi_id.exists' => 'Kompetensi tidak ditemukan',
-            'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',
-            'semester.in' => 'Semester harus Ganjil atau Genap',
+            'kompetensi_id.exists' => 'Kompetensi tidak ditemukan',            
             'tujuan_pembelajaran.required' => 'Tujuan pembelajaran wajib diisi',
             'urutan.required' => 'Urutan ATP wajib diisi',
-        ]);
+        ]);        
 
         // 2. Ambil kompetensi & pastikan CP (MERDEKA)
         $kompetensi = Kompetensi::find($validated['kompetensi_id']);
@@ -244,36 +254,38 @@ class AlurTujuanPembelajaranController extends Controller
             );
         }
 
-        // 3. Pastikan tahun akademik AKTIF
-        $tahunAkademik = TahunAkademik::find($validated['tahun_akademik_id']);
+        // 3. Pastikan tahun akademik dan semester AKTIF        
+        $tahunAkademik = TahunAkademik::where('status', 'aktif')->first();
 
-        if ($tahunAkademik->status !== 'aktif') {
-            return ApiResponse::error(
-                'Tidak valid',
-                ['tahun_akademik' => 'ATP hanya boleh dibuat pada tahun akademik aktif'],
-                422
-            );
+        if (!$tahunAkademik) {
+            return ApiResponse::error('Not supported', ['data' => 'Belum ada tahun akademik yang aktif']);
+        }
+        
+        $semester = Semester::where('status', 'aktif')->first();
+
+        if (!$semester) {
+            return ApiResponse::error('Not supported', ['data' => 'Belum ada semester yang aktif']);
         }
 
         // 4. Cegah input jika ATP sudah disetujui & dikunci
-        $locked = AlurTujuanPembelajaran::where('kompetensi_id', $validated['kompetensi_id'])
-            ->where('tahun_akademik_id', $validated['tahun_akademik_id'])
-            ->where('semester', $validated['semester'])
-            ->where('is_locked', true)
-            ->exists();
+        // $locked = AlurTujuanPembelajaran::where('kompetensi_id', $validated['kompetensi_id'])
+        //     ->where('tahun_akademik_id', $tahunAkademik->id)
+        //     ->where('semester', $semester->id)
+        //     ->where('is_locked', true)
+        //     ->exists();
 
-        if ($locked) {
-            return ApiResponse::error(
-                'Dikunci',
-                ['atp' => 'ATP untuk semester ini sudah disetujui dan dikunci'],
-                403
-            );
-        }
+        // if ($locked) {
+        //     return ApiResponse::error(
+        //         'Dikunci',
+        //         ['atp' => 'ATP untuk semester ini sudah disetujui dan dikunci'],
+        //         403
+        //     );
+        // }
 
         // 5. Cegah duplikasi urutan
         $duplicateUrutan = AlurTujuanPembelajaran::where('kompetensi_id', $validated['kompetensi_id'])
-            ->where('tahun_akademik_id', $validated['tahun_akademik_id'])
-            ->where('semester', $validated['semester'])
+            ->where('tahun_akademik_id', $tahunAkademik->id)
+            ->where('semester', $semester->id)
             ->where('urutan', $validated['urutan'])
             ->exists();
 
@@ -287,8 +299,8 @@ class AlurTujuanPembelajaranController extends Controller
 
         // 6. Cegah duplikasi
         $duplicateUrutan = AlurTujuanPembelajaran::where('kompetensi_id', $validated['kompetensi_id'])
-            ->where('tahun_akademik_id', $validated['tahun_akademik_id'])
-            ->where('semester', $validated['semester'])
+            ->where('tahun_akademik_id', $tahunAkademik->id)
+            ->where('semester', $semester->id)
             ->where('urutan', $validated['urutan'])
             ->where('guru_id', $validated['guru_id'])
             ->exists();
@@ -304,20 +316,23 @@ class AlurTujuanPembelajaranController extends Controller
         // 7. Simpan ATP (SELALU DRAFT)
         $atp = AlurTujuanPembelajaran::create([
             'kompetensi_id' => $validated['kompetensi_id'],
-            'tahun_akademik_id' => $validated['tahun_akademik_id'],
+            'tahun_akademik_id' => $tahunAkademik->id,
             'guru_id' => $user->id,
-            'semester' => $validated['semester'],
+            'semester_id' => $semester->id,
             'tujuan_pembelajaran' => $validated['tujuan_pembelajaran'],
             'urutan' => $validated['urutan'],
             'approval_status' => 'draft',
             'is_locked' => false,
         ]);
 
+        $atp->load('tahunAkademik', 'semesterRelasi', 'guru');
+
         return ApiResponse::success([
             'atp_id' => $atp->id,
             'kompetensi_id' => $atp->kompetensi_id,
-            'tahun_akademik_id' => $atp->tahun_akademik_id,
-            'semester' => $atp->semester,
+            'tahun_akademik' => $atp->tahunAkademik->tahun_akademik,
+            'guru' => $atp->guru->nama,
+            'semester' => $atp->semester->semester,
             'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
             'urutan' => $atp->urutan,
             'approval_status' => $atp->approval_status,
@@ -326,29 +341,33 @@ class AlurTujuanPembelajaranController extends Controller
     }
 
     // ✅ guru    
-    /**
-     * ketika sebagian sudah dikunci maka tidak bisa clone
-     * jika tahun lalu belum disetujui, maka tidak bisa clone
-     */
     public function cloneFromPreviousYear(Request $request)
     {
+        // =========================
+        // 1. VALIDASI REQUEST
+        // =========================
         $request->validate([
             'kompetensi_id' => 'required|exists:kompetensi,id',
             'from_tahun_akademik_id' => 'required|exists:tahun_akademik,id',
+            'from_semester_id' => 'required|exists:semester,id',
         ]);
 
-        // 1. Ambil kompetensi & pastikan CP
+        // =========================
+        // 2. VALIDASI KOMPETENSI (HARUS CP)
+        // =========================
         $kompetensi = Kompetensi::find($request->kompetensi_id);
 
         if (! $kompetensi || $kompetensi->jenis !== 'CP') {
             return ApiResponse::error(
                 'Tidak valid',
-                ['kompetensi' => 'ATP hanya berlaku untuk Kurikulum Merdeka (CP)'],
+                ['kompetensi' => 'ATP hanya untuk Kurikulum Merdeka (CP)'],
                 422
             );
         }
 
-        // 2. Tahun tujuan = tahun aktif
+        // =========================
+        // 3. AMBIL TAHUN AKADEMIK AKTIF (TUJUAN)
+        // =========================
         $toTahun = TahunAkademik::where('status', 'aktif')->first();
 
         if (! $toTahun) {
@@ -367,65 +386,98 @@ class AlurTujuanPembelajaranController extends Controller
             );
         }
 
-        // 3. Pastikan ATP sumber sudah disetujui
+        // =========================
+        // 4. AMBIL SEMESTER AKTIF (TUJUAN)
+        // =========================
+        $toSemester = Semester::where('status', 'aktif')->first();
+
+        if (! $toSemester) {
+            return ApiResponse::error(
+                'Semester aktif tidak ditemukan',
+                ['semester' => 'Tidak ada semester aktif'],
+                404
+            );
+        }
+
+        // =========================
+        // 5. AMBIL ATP SUMBER (1 SEMESTER SAJA)
+        // =========================
         $oldAtps = AlurTujuanPembelajaran::where('kompetensi_id', $request->kompetensi_id)
             ->where('tahun_akademik_id', $request->from_tahun_akademik_id)
+            ->where('semester_id', $request->from_semester_id)
             ->where('approval_status', 'disetujui')
-            ->orderBy('semester')
             ->orderBy('urutan')
             ->get();
 
         if ($oldAtps->isEmpty()) {
             return ApiResponse::error(
-                'Tidak ada ATP',
-                ['data' => 'ATP tahun sebelumnya belum disetujui'],
+                'Tidak ada data',
+                ['atp' => 'ATP semester sumber belum disetujui'],
                 422
             );
         }
 
-        // 4. Cegah clone jika target semester sudah dikunci
-        $locked = AlurTujuanPembelajaran::where('kompetensi_id', $request->kompetensi_id)
-            ->where('tahun_akademik_id', $toTahun->id)
-            ->where('is_locked', true)
-            ->exists();
+        // =========================
+        // 6. CEGAH CLONE JIKA SUDAH DIKUNCI
+        // =========================
+        // $locked = AlurTujuanPembelajaran::where('kompetensi_id', $request->kompetensi_id)
+        //     ->where('tahun_akademik_id', $toTahun->id)
+        //     ->where('semester_id', $toSemester->id)
+        //     ->where('is_locked', true)
+        //     ->exists();
 
-        if ($locked) {
-            return ApiResponse::error(
-                'Dikunci',
-                ['atp' => 'ATP tahun aktif sudah disetujui dan dikunci'],
-                403
-            );
-        }
+        // if ($locked) {
+        //     return ApiResponse::error(
+        //         'Dikunci',
+        //         ['atp' => 'ATP semester aktif sudah dikunci'],
+        //         403
+        //     );
+        // }
 
+        // =========================
+        // 7. PROSES CLONE
+        // =========================
         DB::beginTransaction();
 
         try {
             foreach ($oldAtps as $atp) {
-                $exists = AlurTujuanPembelajaran::where([
+
+                $target = AlurTujuanPembelajaran::where([
                     'kompetensi_id' => $atp->kompetensi_id,
                     'tahun_akademik_id' => $toTahun->id,
-                    'guru_id' => $atp->guru_id,
-                    'semester' => $atp->semester,
+                    'semester_id' => $toSemester->id,
                     'urutan' => $atp->urutan,
-                ])->exists();
-
-                if (! $exists) {
-                    AlurTujuanPembelajaran::create([
-                        'kompetensi_id' => $atp->kompetensi_id,
-                        'tahun_akademik_id' => $toTahun->id,
-                        'guru_id' => $atp->guru_id,
-                        'semester' => $atp->semester,
-                        'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
-                        'urutan' => $atp->urutan,
-                        'approval_status' => 'draft',
-                        'is_locked' => false,
-                    ]);
+                    'guru_id' => $atp->guru_id,
+                ])->first();
+            
+                // ⛔ jika sudah ada & dikunci → lewati
+                if ($target && $target->is_locked) {
+                    continue;
                 }
+            
+                // ⛔ jika sudah ada tapi belum dikunci → lewati (atau bisa update kalau mau)
+                if ($target) {
+                    continue;
+                }
+            
+                // ✅ baru buat
+                AlurTujuanPembelajaran::create([
+                    'kompetensi_id' => $atp->kompetensi_id,
+                    'tahun_akademik_id' => $toTahun->id,
+                    'semester_id' => $toSemester->id,
+                    'guru_id' => $atp->guru_id,
+                    'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
+                    'urutan' => $atp->urutan,
+                    'approval_status' => 'draft',
+                    'is_locked' => false,
+                ]);
             }
+            
 
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
+
             return ApiResponse::error(
                 'Gagal clone',
                 ['error' => $e->getMessage()],
@@ -433,10 +485,15 @@ class AlurTujuanPembelajaranController extends Controller
             );
         }
 
+        // =========================
+        // 8. RESPONSE
+        // =========================
         return ApiResponse::success([
-            'tahun_akademik_tujuan' => $toTahun->tahun_akademik
-        ], 'ATP berhasil di-clone ke tahun aktif');
+            'tahun_akademik_tujuan' => $toTahun->tahun_akademik,
+            'semester_tujuan' => $toSemester->semester,
+        ], 'ATP berhasil di-clone ke semester aktif');
     }
+
 
     // ✅ guru
     public function diajukan($id)
@@ -534,12 +591,13 @@ class AlurTujuanPembelajaranController extends Controller
         $atp = AlurTujuanPembelajaran::with([
             'kompetensi.mataPelajaran',
             'tahunAkademik',
+            'semesterRelasi',
             'approved',
             'guru'
         ])
         ->find($id);
 
-        if($atp->isEmpty()) {
+        if(!$atp) {
             return ApiResponse::error('Not found', ['data' => null]);
         }
 
@@ -552,7 +610,7 @@ class AlurTujuanPembelajaranController extends Controller
             'deskripsi_kompetensi' => $atp->kompetensi->deskripsi,
             'status_kompetensi' => $atp->kompetensi->status,
             'tahun_akademik' => $atp->tahunAkademik->tahun_akademik,
-            'semester' => $atp->semester,
+            'semester' => $atp->semesterRelasi->semester,
             'nama_guru' => $atp->guru->id,
             'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
             'urutan' => $atp->urutan,
@@ -582,7 +640,7 @@ class AlurTujuanPembelajaranController extends Controller
         $user = Auth::guard('kepegawaian')->user();
 
         // 1. Ambil ATP
-        $atp = AlurTujuanPembelajaran::find($id);
+        $atp = AlurTujuanPembelajaran::with('tahunAkademik', 'semester')->find($id);
 
         if (! $atp) {
             return ApiResponse::error(
@@ -622,15 +680,15 @@ class AlurTujuanPembelajaranController extends Controller
         // 5. Validasi input
         $validated = $request->validate([
             'kompetensi_id' => 'required|exists:kompetensi,id',
-            'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
-            'semester' => 'required|in:Ganjil,Genap',
+            // 'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
+            // 'semester' => 'required|in:Ganjil,Genap',
             'tujuan_pembelajaran' => 'required|string',
             'urutan' => 'required|integer|min:1',
         ], [
             'kompetensi_id.required' => 'Kompetensi wajib diisi',
             'kompetensi_id.exists' => 'Kompetensi tidak ditemukan',
-            'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',
-            'semester.in' => 'Semester harus Ganjil atau Genap',
+            // 'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',
+            // 'semester.in' => 'Semester harus Ganjil atau Genap',
             'tujuan_pembelajaran.required' => 'Tujuan pembelajaran wajib diisi',
             'urutan.required' => 'Urutan ATP wajib diisi',
         ]);
@@ -646,10 +704,8 @@ class AlurTujuanPembelajaranController extends Controller
             );
         }
 
-        // 7. Pastikan tahun akademik aktif
-        $tahunAkademik = TahunAkademik::find($validated['tahun_akademik_id']);
-
-        if ($tahunAkademik->status !== 'aktif') {
+        // 7. Pastikan tahun akademik dan semester aktif        
+        if ($atp->tahunAkademik->status !== 'aktif') {
             return ApiResponse::error(
                 'Tidak valid',
                 ['tahun_akademik' => 'Perubahan ATP hanya boleh pada tahun akademik aktif'],
@@ -657,11 +713,19 @@ class AlurTujuanPembelajaranController extends Controller
             );
         }
 
+        if ($atp->semester->status !== 'aktif') {
+            return ApiResponse::error(
+                'Tidak valid',
+                ['semester' => 'Perubahan ATP hanya boleh pada semester aktif'],
+                422
+            );
+        }
+
         // 8. Cegah duplikasi urutan (kecuali dirinya sendiri)
         $duplicate = AlurTujuanPembelajaran::where('id', '!=', $atp->id)
             ->where('kompetensi_id', $validated['kompetensi_id'])
-            ->where('tahun_akademik_id', $validated['tahun_akademik_id'])
-            ->where('semester', $validated['semester'])
+            ->where('tahun_akademik_id', $atp->tahunAkademik->id)
+            ->where('semester', $atp->semester->id)
             ->where('urutan', $validated['urutan'])
             ->where('guru_id', $user->id)
             ->exists();
@@ -677,8 +741,8 @@ class AlurTujuanPembelajaranController extends Controller
         // 9. Update ATP (kembali ke draft jika revisi)
         $atp->update([
             'kompetensi_id' => $validated['kompetensi_id'],
-            'tahun_akademik_id' => $validated['tahun_akademik_id'],
-            'semester' => $validated['semester'],
+            'tahun_akademik_id' => $atp->tahunAkademik->id,
+            'semester_id' => $atp->semester->id,
             'tujuan_pembelajaran' => $validated['tujuan_pembelajaran'],
             'urutan' => $validated['urutan'],
             'approval_status' => 'draft',
@@ -691,8 +755,8 @@ class AlurTujuanPembelajaranController extends Controller
         return ApiResponse::success([
             'atp_id' => $atp->id,
             'kompetensi_id' => $atp->kompetensi_id,
-            'tahun_akademik_id' => $atp->tahun_akademik_id,
-            'semester' => $atp->semester,
+            'tahun_akademik' => $atp->tahunAkademik->tahun_akademik,
+            'semester' => $atp->semester->semester,
             'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
             'urutan' => $atp->urutan,
             'approval_status' => $atp->approval_status,
@@ -746,13 +810,23 @@ class AlurTujuanPembelajaranController extends Controller
             );
         }
 
-        // 5. Pastikan tahun akademik aktif
+        // 5. Pastikan tahun akademik dan semester aktif
         $tahunAkademik = TahunAkademik::find($atp->tahun_akademik_id);
 
         if (! $tahunAkademik || $tahunAkademik->status !== 'aktif') {
             return ApiResponse::error(
                 'Tidak valid',
                 ['tahun_akademik' => 'Penghapusan ATP hanya boleh pada tahun akademik aktif'],
+                422
+            );
+        }
+
+        $semester = Semester::find($atp->semester_id);
+
+        if (! $semester || $semester->status !== 'aktif') {
+            return ApiResponse::error(
+                'Tidak valid',
+                ['semester' => 'Penghapusan ATP hanya boleh pada semester aktif'],
                 422
             );
         }

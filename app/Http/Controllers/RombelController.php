@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Rombel;
+use App\Models\Kelas;
+use App\Models\TahunAkademik;
+use App\Models\Kepegawaian;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -389,5 +392,69 @@ class RombelController extends Controller
         $rombel->delete();
 
         return ApiResponse::success('null', 'Data rombel berhasil dihapus');
+    }
+
+    public function dataSelect() {
+        // kelas
+        $data = Kelas::select('id', 'nama_kelas', 'tingkat', 'jurusan_id')
+        ->with('jurusan')
+        ->get();
+
+        if ($data->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+        $kelas = $data->map(function ($k) {
+            return [
+                'kelas_id' => $k->id ?? null,
+                'nama_kelas' => $k->nama_kelas ?? null,
+                'tingkat_kelas' => $k->tingkat ?? null,
+                'jurusan_kelas' => $k->jurusan->nama_jurusan ?? null,
+            ];
+        })->values();
+
+
+        // tahun akademik
+        $data2 = TahunAkademik::select('id', 'tahun_akademik', 'status')->where('status', 'aktif')->first();
+
+        if (!$data2) {
+            return ApiResponse::error('Not found', ['data' => null]);
+        }
+
+        $tahunAkademik = [
+            'tahun_akademik_id' => $data2->id,
+            'tahun_akademik' => $data2->tahun_akademik,
+            'status_tahun_akademik' => $data2->status,
+        ];
+
+
+        // wali rombel
+        $data3 = Kepegawaian::select('id', 'nama', 'nip', 'nuptk')
+        ->where('role', 'guru')
+        ->where('status', 'aktif')
+        ->get();
+
+        if ($data3->isEmpty()) {
+            return ApiResponse::error(
+                'Data kosong',
+                ['data' => 'Tidak ada guru aktif']
+            );
+        }     
+
+        $wali = $data3->map(function ($w) {
+            return [
+                'wali_rombel_id' => $w->id,
+                'nama_guru' => $w->nama,
+                'nip' => $w->nip ?? null,
+                'nuptk' => $w->nuptk ?? null,
+            ];
+        });
+
+
+        return ApiResponse::success([
+            'kelas' => $kelas,
+            'tahun_akademik' => $tahunAkademik,
+            'wali_rombel' => $wali
+        ], 'Data select berhasil diambil');
     }
 }

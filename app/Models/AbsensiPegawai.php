@@ -12,9 +12,9 @@ class AbsensiPegawai extends Model
 
     protected $guarded = ['id'];
 
-    public function mataPelajaran()
+    public function jadwalPelajaran()
     {
-        return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
+        return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');
     }
 
     public function guru()
@@ -25,5 +25,10 @@ class AbsensiPegawai extends Model
     public function tahunAkademik()
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
     }
 }

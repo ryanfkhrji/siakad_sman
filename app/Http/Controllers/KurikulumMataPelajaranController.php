@@ -90,7 +90,7 @@ class KurikulumMataPelajaranController extends Controller
                 'kurikulum_id' => 'required|exists:kurikulum,id',
                 'mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',                 
                 'jurusan_pelajaran_id' => 'nullable|exists:jurusans,id',                 
-                'tahun_akademik_id' => 'nullable|exists:tahun_akademik,id',                 
+                // 'tahun_akademik_id' => 'nullable|exists:tahun_akademik,id',                 
                 'tingkat' => 'required|numeric',                 
                 'nilai_kkm' => 'required|numeric',                 
                 'status_mata_pelajaran' => 'required|in:wajib,pilihan,jurusan',                 
@@ -100,7 +100,7 @@ class KurikulumMataPelajaranController extends Controller
                 'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
                 'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',                
                 'jurusan_pelajaran_id.exists' => 'Jurusan tidak ditemukan',                
-                'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
+                // 'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
                 'tingkat.required' => 'Tingkat wajib diisi',
                 'tingkat.numeric' => 'Tingkat hanya boleh berisi angka',
                 'nilai_kkm.required' => 'Nilai kkm wajib diisi',
@@ -109,12 +109,18 @@ class KurikulumMataPelajaranController extends Controller
                 'status_mata_pelajaran.in' => 'Pilihan status mata pelajaran hanya wajib, pilihan, atau jurusan',
             ]);
             
+            $tahunAkademik = TahunAkademik::where('status', 'aktif')->first();
+
+            if (!$tahunAkademik) {
+                return ApiResponse::error('Not supported', ['data' => 'Belum ada tahun akademik yang aktif']);
+            }
+
             // ketika 4 hal ini sudah ada di db, maka tidak boleh
             $unik = KurikulumMataPelajaran::where('kurikulum_id', $validated['kurikulum_id'])
                 ->where('mata_pelajaran_id', $validated['mata_pelajaran_id'])
                 ->where('jurusan_pelajaran_id', $validated['jurusan_pelajaran_id'])
                 ->where('tingkat', $validated['tingkat'])
-                ->where('tahun_akademik_id', $validated['tahun_akademik_id'])
+                ->where('tahun_akademik_id', $tahunAkademik->id)
                 ->exists();
 
             if ($unik) {
@@ -140,7 +146,7 @@ class KurikulumMataPelajaranController extends Controller
                 'kurikulum_id' => $validated['kurikulum_id'],
                 'mata_pelajaran_id' => $validated['mata_pelajaran_id'],
                 'jurusan_pelajaran_id' => $validated['jurusan_pelajaran_id'],
-                'tahun_akademik_id' => $validated['tahun_akademik_id'],
+                'tahun_akademik_id' => $tahunAkademik->id,
                 'tingkat' => $validated['tingkat'],
                 'nilai_kkm' => $validated['nilai_kkm'],
                 'status_mata_pelajaran' => $validated['status_mata_pelajaran'],                
@@ -211,17 +217,21 @@ class KurikulumMataPelajaranController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $kurmap = KurikulumMataPelajaran::find($id);
+        $kurmap = KurikulumMataPelajaran::with('tahunAkademik')->find($id);
 
         if (!$kurmap) {
             return ApiResponse::error('Not found', ['id', 'Data tidak ditemukan']);
+        }
+        
+        if ($kurmap->tahunAkademik->status == 'arsip') {        
+            return ApiResponse::error('Not supported', ['data', 'Tahun akademik sudah menjadi arsip']);
         }
 
         $validated = $request->validate([
             'kurikulum_id' => 'sometimes|required|exists:kurikulum,id',            
             'mata_pelajaran_id' => 'sometimes|required|exists:mata_pelajarans,id',            
             'jurusan_pelajaran_id' => 'sometimes|nullable|exists:jurusans,id',            
-            'tahun_akademik_id' => 'sometimes|nullable|exists:tahun_akademik,id',            
+            // 'tahun_akademik_id' => 'sometimes|nullable|exists:tahun_akademik,id',            
             'tingkat' => 'sometimes|required|numeric',            
             'nilai_kkm' => 'sometimes|required|numeric',            
             'status_mata_pelajaran' => 'sometimes|required|in:wajib,pilihan,jurusan',                        
@@ -231,7 +241,7 @@ class KurikulumMataPelajaranController extends Controller
             'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
             'mata_pelajaran_id.exists' => 'Mata pelajaran tidak ditemukan',                
             'jurusan_pelajaran_id.exists' => 'Jurusan tidak ditemukan',                
-            'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
+            // 'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
             'tingkat.required' => 'Tingkat wajib diisi',
             'tingkat.numeric' => 'Tingkat hanya boleh berisi angka',
             'nilai_kkm.required' => 'Nilai kkm wajib diisi',
@@ -245,7 +255,7 @@ class KurikulumMataPelajaranController extends Controller
          ->where('mata_pelajaran_id', $validated['mata_pelajaran_id'])
          ->where('jurusan_pelajaran_id', $validated['jurusan_pelajaran_id'])
          ->where('tingkat', $validated['tingkat'])
-         ->where('tahun_akademik_id', $validated['tahun_akademik_id'])
+         ->where('tahun_akademik_id', $kurmap->tahun_akademik_id)
          ->exists();
 
         if ($unik) {
@@ -267,7 +277,15 @@ class KurikulumMataPelajaranController extends Controller
             ]);
         }       
 
-        $kurmap->update($validated);
+        $kurmap->update([
+            'kurikulum_id' => $validated['kurikulum_id'],
+            'mata_pelajaran_id' => $validated['mata_pelajaran_id'],
+            'jurusan_pelajaran_id' => $validated['jurusan_pelajaran_id'],
+            'tahun_akademik_id' => $kurmap->tahun_akademik_id, // ga berubah
+            'tingkat' => $validated['tingkat'],
+            'nilai_kkm' => $validated['nilai_kkm'],
+            'status_mata_pelajaran' => $validated['status_mata_pelajaran'],    
+        ]);
 
         $kurmap->load('kurikulum', 'mataPelajaran', 'jurusan', 'tahunAkademik');    
 

@@ -7,6 +7,7 @@ use App\Models\IdentitasSekolah;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 

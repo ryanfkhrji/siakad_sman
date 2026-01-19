@@ -114,7 +114,6 @@ class JadwalPelajaranController extends Controller
         try {
             $validated = $request->validate([
                 'kurikulum_mata_pelajaran_id' => 'required|exists:kurikulum_mata_pelajaran,id',
-                'semester_id' => 'required|exists:semester,id',
                 'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
                 'guru_id' => 'required|exists:kepegawaians,id',
                 'rombel_id' => 'required|exists:rombels,id',
@@ -124,9 +123,7 @@ class JadwalPelajaranController extends Controller
                 'link_opsional' => 'nullable'
             ], [
                 'kurikulum_mata_pelajaran_id.required' => 'Kurikulum mata pelajaran wajib diisi',
-                'kurikulum_mata_pelajaran_id.exists' => 'Kurikulum mata pelajaran tidak ditemukan',
-                'semester_id.required' => 'Semester wajib diisi',
-                'semester_id.exists' => 'Semester tidak ditemukan',
+                'kurikulum_mata_pelajaran_id.exists' => 'Kurikulum mata pelajaran tidak ditemukan',                                
                 'hari.required' => 'Hari wajib diisi',
                 'hari.in' => 'Pilihan hanya Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu',
                 'guru_id.required' => 'Guru wajib diisi',
@@ -144,11 +141,18 @@ class JadwalPelajaranController extends Controller
             // ===============================
             // 1. Validasi tahun akademik sama
             // ===============================
-            $kurmap = KurikulumMataPelajaran::find($validated['kurikulum_mata_pelajaran_id']);
-            $semester = Semester::find($validated['semester_id']);
+            // $kurmap = KurikulumMataPelajaran::find($validated['kurikulum_mata_pelajaran_id']);
+            // $semester = Semester::find($validated['semester_id']);
 
-            if ($kurmap->tahun_akademik_id !== $semester->tahun_akademik_id) {
-                return ApiResponse::error('Not valid', ['semester' => 'Semester tidak sesuai dengan tahun akademik mata pelajaran']);
+            // if ($kurmap->tahun_akademik_id !== $semester->tahun_akademik_id) {
+            //     return ApiResponse::error('Not valid', ['semester' => 'Semester tidak sesuai dengan tahun akademik mata pelajaran']);
+            // }
+
+            // ambil tahun akademik aktif
+            $semester = Semester::where('status', 'aktif')->first();
+
+            if (!$semester) {
+                return ApiResponse::error('Not found', ['data' => 'Belum ada semester aktif pada tahun ini']);
             }
 
             // ===============================
@@ -192,7 +196,7 @@ class JadwalPelajaranController extends Controller
             // 4. Bentrok jadwal ROMBEL
             // ===============================
             $bentrokRombel = JadwalPelajaran::where('rombel_id', $validated['rombel_id'])
-                ->where('semester_id', $validated['semester_id'])
+                ->where('semester_id', $semester->id)
                 ->where('hari', $validated['hari'])
                 ->where(function ($q) use ($validated) {
                     $q->where('jam_mulai', '<', $validated['jam_selesai'])
@@ -209,7 +213,17 @@ class JadwalPelajaranController extends Controller
             // ===============================
             // 5. Simpan
             // ===============================
-            $jadwal = JadwalPelajaran::create($validated);
+            $jadwal = JadwalPelajaran::create([
+                'kurikulum_mata_pelajaran_id' => $validated['kurikulum_mata_pelajaran_id'],
+                'semester_id' => $semester->id,
+                'hari' => $validated['hari'],
+                'guru_id' => $validated['guru_id'],
+                'rombel_id' => $validated['rombel_id'],
+                'jam_mulai' => $validated['jam_mulai'],
+                'jam_selesai' => $validated['jam_selesai'],
+                'ruangan_id' => $validated['ruangan_id'] ?? null,
+                'link_opsional' => $validated['link_opsional'] ?? null,
+            ]);
 
             $jadwal->load([
                 'kurikulumMataPelajaran.mataPelajaran',
@@ -396,7 +410,7 @@ class JadwalPelajaranController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $jadwal = JadwalPelajaran::find($id);
+        $jadwal = JadwalPelajaran::with()->find($id);
 
         if (! $jadwal) {
             return ApiResponse::error(
@@ -406,9 +420,17 @@ class JadwalPelajaranController extends Controller
             );
         }
 
+        if ($jadwal->semester->status == 'arsip') {
+            return ApiResponse::error(
+                'Not supported',
+                ['data' => ['Jadwal pelajaran sudah berstatus arsip']],
+                404
+            );
+        }
+
         $validated = $request->validate([
             'kurikulum_mata_pelajaran_id' => 'sometimes|required|exists:kurikulum_mata_pelajaran,id',
-            'semester_id' => 'sometimes|required|exists:semester,id',
+            // 'semester_id' => 'sometimes|required|exists:semester,id',
             'hari' => 'sometimes|required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'guru_id' => 'sometimes|required|exists:kepegawaians,id',
             'rombel_id' => 'sometimes|required|exists:rombels,id',
@@ -421,7 +443,7 @@ class JadwalPelajaranController extends Controller
         // 🔑 DATA FINAL (gabungan lama + input baru)
         $data = [
             'kurikulum_mata_pelajaran_id' => $validated['kurikulum_mata_pelajaran_id'] ?? $jadwal->kurikulum_mata_pelajaran_id,
-            'semester_id' => $validated['semester_id'] ?? $jadwal->semester_id,
+            'semester_id' => $jadwal->semester_id,
             'hari' => $validated['hari'] ?? $jadwal->hari,
             'guru_id' => $validated['guru_id'] ?? $jadwal->guru_id,
             'rombel_id' => $validated['rombel_id'] ?? $jadwal->rombel_id,
@@ -520,7 +542,8 @@ class JadwalPelajaranController extends Controller
     public function destroy($id)
     {
         $jadwal = JadwalPelajaran::with([
-            'absensiPelajaran'
+            'absensiPelajaran',
+            'semester'
         ])->find($id);
 
         if (! $jadwal) {
@@ -536,6 +559,14 @@ class JadwalPelajaranController extends Controller
             return ApiResponse::error(
                 'Tidak diizinkan',
                 ['jadwal' => 'Jadwal sudah memiliki data absensi dan tidak dapat dihapus'],
+                403
+            );
+        }
+
+        if ($jadwal->semester->status == 'arsip') {
+            return ApiResponse::error(
+                'Tidak diizinkan',
+                ['arsip' => 'Hanya dapat dihapus saat semester masih aktif'],
                 403
             );
         }
@@ -658,7 +689,7 @@ class JadwalPelajaranController extends Controller
 
 
         // rombel
-        $data4 = Rombel::with('tahunAkademik')
+        $data4 = Rombel::with('tahunAkademik', 'waliRombel')
         ->whereHas('tahunAkademik', function ($q) {
             $q->where('status', 'aktif');
         })
@@ -673,10 +704,11 @@ class JadwalPelajaranController extends Controller
 
         $rombel = $data4->map(function ($r) {
             return [
-                'rombel_id' => $r->id,
-                'nama_rombel' => $r->nama_rombel,
-                'tahun_akademik' => $r->tahunAkademik->tahun_akademik,
-                'status_tahun_akademik' => $r->tahunAkademik->status,
+                'rombel_id' => $r->id ?? null,
+                'nama_rombel' => $r->nama_rombel ?? null,
+                'wali_rombel' => $r->waliRombel->nama ?? null,
+                'tahun_akademik' => $r->tahunAkademik->tahun_akademik ?? null,
+                'status_tahun_akademik' => $r->tahunAkademik->status ?? null,
             ];
         });
 

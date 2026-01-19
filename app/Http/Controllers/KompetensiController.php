@@ -8,6 +8,7 @@ use App\Models\Kurikulum;
 use App\Models\MataPelajaran;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class KompetensiController extends Controller
@@ -431,6 +432,21 @@ class KompetensiController extends Controller
             );
         }
 
+        // /**
+        //  * 🚫 Larangan: arsip → aktif
+        //  */
+        // if (
+        //     $kd->status === 'arsip'
+        //     && isset($validated['status'])
+        //     && $validated['status'] === 'aktif'
+        // ) {
+        //     return ApiResponse::error(
+        //         'Kesalahan',
+        //         ['status' => 'Kompetensi yang sudah diarsipkan tidak dapat diaktifkan kembali'],
+        //         422
+        //     );
+        // }
+
         // Update data
         $kd->update($validated);
 
@@ -463,6 +479,10 @@ class KompetensiController extends Controller
 
         if (!$kd) {
             return ApiResponse::error('Kompetensi tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        if ($kd->status == 'arsip') {
+            return ApiResponse::error('Tidak bisa', ['data' => ['Tidak bisa hapus data arsip']], 404);
         }
 
         // Cek apakah sudah dipakai atp

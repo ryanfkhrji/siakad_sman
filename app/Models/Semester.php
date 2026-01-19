@@ -27,4 +27,8 @@ class Semester extends Model
         return $this->hasMany(JadwalPelajaran::class);
     }
 
+    public function prestasi()
+     { 
+        return $this->hasMany(AbsensiPegawai::class, 'semester_id');
+     }
 }

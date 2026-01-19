@@ -59,31 +59,44 @@ class SemesterController extends Controller
     {
         try {
             $validated = $request->validate([                
-                'tahun_akademik_id' => 'required|exists:tahun_akademik,id',                
+                // 'tahun_akademik_id' => 'required|exists:tahun_akademik,id',                
                 'semester' => 'required|in:Ganjil,Genap',            
             ],[
-                'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',
-                'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
+                // 'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',
+                // 'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',                
                 'semester.required' => 'Semester wajib diisi',
                 'semester.in' => 'Pilihan semester hanya Ganjil dan Genap',
             ]);                        
 
             // cegah create sebelum semua semester menjadi arsip
-            $semesterAktif = Semester::where('status', 'aktif')->exists();
+            $semesterAktif = Semester::where('status', 'aktif')->first();
 
             if ($semesterAktif) {
                 return ApiResponse::error('Double aktif', ['pesan' => 'Masih ada semester lain yang aktif, arsipkan terlebih dahulu']);
             }
 
+            $tahunAkademik = TahunAkademik::where('status', 'aktif')->first();
+
+            if (!$tahunAkademik) {
+                return ApiResponse::error('Not supported', ['data' => 'Belum ada tahun akademik yang aktif']);
+            }
+
             // cek duplikasi
-            if (
-                isset($validated['tahun_akademik_id'], $validated['semester'])
-            ) {
-                $unik = Semester::where('tahun_akademik_id', $validated['tahun_akademik_id'])
-                    ->where('semester', $validated['semester'])
-                    ->where('id', '!=', $semester->id)
-                    ->exists();
-    
+            if (isset($validated['semester'])) {
+
+                if ($semesterAktif) {
+                    // jika sudah ada semester aktif
+                    $unik = Semester::where('tahun_akademik_id', $tahunAkademik->id)
+                        ->where('semester', $validated['semester'])
+                        ->where('id', '!=', $semesterAktif->id)
+                        ->exists();
+                } else {
+                    // jika belum ada semester aktif
+                    $unik = Semester::where('tahun_akademik_id', $tahunAkademik->id)
+                        ->where('semester', $validated['semester'])
+                        ->exists();
+                }
+            
                 if ($unik) {
                     return ApiResponse::error(
                         'Duplicated',
@@ -94,7 +107,7 @@ class SemesterController extends Controller
             }
 
             $semester = Semester::create([
-                'tahun_akademik_id' => $validated['tahun_akademik_id'],
+                'tahun_akademik_id' => $tahunAkademik->id,
                 'semester' => $validated['semester'],
                 'status' => 'aktif',
             ]);
@@ -125,7 +138,7 @@ class SemesterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $semester = Semester::find($id);
+        $semester = Semester::with('tahunAkademik')->find($id);
 
         if (! $semester) {
             return ApiResponse::error(
@@ -133,19 +146,12 @@ class SemesterController extends Controller
                 ['id' => ['Data tidak ditemukan']],
                 404
             );
-        }
+        }        
 
-        $validated = $request->validate([
-            'tahun_akademik_id' => [
-                'sometimes',
-                'required',
-                'exists:tahun_akademik,id',
-            ],
+        $validated = $request->validate([           
             'semester' => 'sometimes|required|in:Ganjil,Genap',
             'status' => 'sometimes|required|in:aktif,arsip',
-        ], [
-            'tahun_akademik_id.required' => 'Wajib diisi',
-            'tahun_akademik_id.exists' => 'Tahun akademik tidak valid',
+        ], [            
             'status.required' => 'Status wajib diisi',
             'status.in' => 'Pilihan status hanya aktif dan arsip',
         ]);
@@ -165,13 +171,29 @@ class SemesterController extends Controller
             );
         }
 
+        if ($semester->status == 'arsip') {            
+            return ApiResponse::error(
+                'Not supported',
+                ['data' => ['Tidak bisa mengubah data arsip']],
+                404
+            );
+        }
+
+        if ($semester->tahunAkademik->status == 'arsip') {            
+            return ApiResponse::error(
+                'Not supported',
+                ['data' => ['Tahun akademik sudah menjadi arsip']],
+                404
+            );
+        }
+
         /**
          * 🔒 Cek duplikasi
-         */
+         */    
         if (
-            isset($validated['tahun_akademik_id'], $validated['semester'])
+            isset($validated['semester'])
         ) {
-            $unik = Semester::where('tahun_akademik_id', $validated['tahun_akademik_id'])
+            $unik = Semester::where('tahun_akademik_id', $semester->tahun_akademik_id)
                 ->where('semester', $validated['semester'])
                 ->where('id', '!=', $semester->id)
                 ->exists();
@@ -185,7 +207,11 @@ class SemesterController extends Controller
             }
         }
 
-        $semester->update($validated);
+        $semester->update([
+            'tahun_akademik_id' => $semester->tahun_akademik_id, // ga berubah
+            'semester' => $validated['semester'],
+            'status' => $validated['status'],
+        ]);
         $semester->load('tahunAkademik');
 
         return ApiResponse::success([
@@ -206,6 +232,10 @@ class SemesterController extends Controller
 
         if (!$semester) {
             return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        if ($semester->status == 'arsip') {
+            return ApiResponse::error('Not suported', ['data' => ['Semester sudah menjadi arsip']], 404);
         }
 
         $dipakaiJadwal = $semester->jadwalPelajarans()->exists();

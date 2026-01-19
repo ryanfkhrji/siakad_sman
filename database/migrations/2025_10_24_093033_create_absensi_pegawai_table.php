@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('absensi_pegawai', function (Blueprint $table) {
             $table->id();
             $table->foreignId('guru_id')->constrained('kepegawaians')->onDelete('cascade');
-            $table->foreignId('mata_pelajaran_id')->nullable()->constrained('mata_pelajarans')->nullOnDelete();
+            $table->foreignId('jadwal_pelajaran_id')->nullable()->constrained('jadwal_pelajarans')->nullOnDelete();
             $table->date('hari');
             $table->enum('status', ['hadir', 'tidak hadir']);
-            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik');
+            $table->foreignId('tahun_akademik_id')->nullable()->constrained('tahun_akademik')->nullOnDelete();
+            $table->foreignId('semester_id')->nullable()->constrained('semester')->nullOnDelete();
             $table->timestamps();
         });
     }

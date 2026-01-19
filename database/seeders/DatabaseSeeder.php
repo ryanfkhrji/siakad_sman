@@ -393,6 +393,11 @@ class DatabaseSeeder extends Seeder
                 'kode_mapel_diknas' => '224',                
                 'status' => 'aktif',                
             ],
+            [
+                'nama_pelajaran' => 'Bahasa Inggris',
+                'kode_mapel_diknas' => '225',                
+                'status' => 'aktif',                
+            ],
         ]);  
 
         /**
@@ -605,23 +610,23 @@ class DatabaseSeeder extends Seeder
                 'kompetensi_id' => 4, // MERDEKA || Matematika
                 'tahun_akademik_id' => 2, // 2024/2025
                 'guru_id' => 5, // Guru IPA
-                'semester' => 'Ganjil',
+                'semester_id' => 3, // Ganjil
                 'tujuan_pembelajaran' => 'Peserta didik mampu menjelaskan pengertian persamaan linear satu variabel melalui contoh kontekstual',
                 'urutan' => 1,
-                'approval_status' => 'draft',
+                'approval_status' => 'diajukan',
                 'approved_by' => null,
                 'approved_at' => null,
                 'catatan_penolakan' => null,
                 'is_locked' => false,                
-            ],
+            ],            
             [
                 'kompetensi_id' => 4, // MERDEKA || Matematika
                 'tahun_akademik_id' => 2, // 2024/2025
                 'guru_id' => 5, // Guru IPA
-                'semester' => 'Ganjil',
+                'semester_id' => 3, // Ganjil
                 'tujuan_pembelajaran' => 'Peserta didik mampu menyusun dan menyelesaikan persamaan linear satu variabel dari masalah kontekstual',
                 'urutan' => 2,
-                'approval_status' => 'draft',
+                'approval_status' => 'diajukan',
                 'approved_by' => null,
                 'approved_at' => null,
                 'catatan_penolakan' => null,
@@ -631,10 +636,10 @@ class DatabaseSeeder extends Seeder
                 'kompetensi_id' => 4, // MERDEKA || Matematika
                 'tahun_akademik_id' => 2, // 2024/2025
                 'guru_id' => 5,
-                'semester' => 'Ganjil',
+                'semester_id' => 4, // Genap
                 'tujuan_pembelajaran' => 'Peserta didik mampu mengevaluasi kebenarsan solusi persamaan linear dan mengomunikasikannya secara lisan maupun tertulis',
-                'urutan' => 3,
-                'approval_status' => 'draft',
+                'urutan' => 1,
+                'approval_status' => 'diajukan',
                 'approved_by' => null,
                 'approved_at' => null,
                 'catatan_penolakan' => null,
@@ -644,7 +649,7 @@ class DatabaseSeeder extends Seeder
                 'kompetensi_id' => 6, // MERDEKA || Indo || Menulis sesuai KBBI
                 'tahun_akademik_id' => 2, // 2024/2025
                 'guru_id' => 6, // Guru IPS
-                'semester' => 'Ganjil',
+                'semester_id' => 3, // Ganjil
                 'tujuan_pembelajaran' => 'Peserta didik mampu menjelaskan konsep KBBI',
                 'urutan' => 1,
                 'approval_status' => 'draft',
@@ -657,10 +662,10 @@ class DatabaseSeeder extends Seeder
                 'kompetensi_id' => 7, // MERDEKA || Indo || Memahami Tanda baca pada kalimat
                 'tahun_akademik_id' => 2, // 2024/2025
                 'guru_id' => 6, // Guru IPS
-                'semester' => 'Ganjil',
+                'semester_id' => 3, // Ganjil
                 'tujuan_pembelajaran' => 'Peserta didik mampu menyusun dan menyelesaikan teks menggunakan tanda baca yang benar',
                 'urutan' => 2,
-                'approval_status' => 'draft',
+                'approval_status' => 'diajukan',
                 'approved_by' => null,
                 'approved_at' => null,
                 'catatan_penolakan' => null,
@@ -670,10 +675,10 @@ class DatabaseSeeder extends Seeder
                 'kompetensi_id' => 8, // MERDEKA || Indo || Memahami awal paragraf
                 'tahun_akademik_id' => 2, // 2024/2025
                 'guru_id' => 6, // Guru IPS
-                'semester' => 'Ganjil',
+                'semester_id' => 3, // Ganjil
                 'tujuan_pembelajaran' => 'Peserta didik mampu memahami awal dan akhir sebuah paragraf',
                 'urutan' => 3,
-                'approval_status' => 'draft',
+                'approval_status' => 'diajukan',
                 'approved_by' => null,
                 'approved_at' => null,
                 'catatan_penolakan' => null,
@@ -860,18 +865,36 @@ class DatabaseSeeder extends Seeder
          */
         AbsensiPegawai::insert([
             [
-                'guru_id' => 5,
-                'mata_pelajaran_id' => 1,
+                'guru_id' => 5, // Guru MTK
+                'jadwal_pelajaran_id' => 1,
                 'hari' => '2025-05-24',
                 'status' => 'hadir',
-                'tahun_akademik_id' => 1,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
             ],
             [
                 'guru_id' => 6,
-                'mata_pelajaran_id' => null,
+                'jadwal_pelajaran_id' => 2, // Indon
                 'hari' => '2025-05-24',
                 'status' => 'tidak hadir',
                 'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                'guru_id' => 6,
+                'jadwal_pelajaran_id' => 2,
+                'hari' => '2025-05-25',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                'guru_id' => 7,
+                'jadwal_pelajaran_id' => 3, // Sunda
+                'hari' => '2025-05-24',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
             ],
         ]);
 

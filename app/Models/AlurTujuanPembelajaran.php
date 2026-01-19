@@ -21,6 +21,11 @@ class AlurTujuanPembelajaran extends Model
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
     }
 
+    public function semesterRelasi()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
     public function approved()
     {
         return $this->belongsTo(Kepegawaian::class, 'approved_by');

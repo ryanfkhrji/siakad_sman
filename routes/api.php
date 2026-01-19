@@ -127,6 +127,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ✅☑️ CRUD rombel
     Route::apiResource('/spa/rombel', RombelController::class);    
+    Route::get('/spa/data-select/rombel', [RombelController::class, 'dataSelect']);       
     
     // ✅☑️ Create dan Delete siswa rombel
     Route::apiResource('/spa/siswa-rombel', SiswaRombelController::class);    
@@ -137,6 +138,12 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ✅☑️ get jadwal pelajaran siswa
     Route::get('/spa/siswa/jadwal-pelajaran/{id}', [SiswaJadwalPelajaranController::class, 'getSiswaJadwal']);       
+
+    // ! ✅ Absensi Pegawai Ke Sekolah (sampe sini)
+    Route::get('/spa/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
+    Route::delete('/spa/absensi/pegawai/sekolah/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
+    Route::apiResource('/spa/absensi/pegawai/sekolah', AbsensiPegawaiController::class)->except('store', 'destroy');  
+
 
     // ✅ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
@@ -149,12 +156,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ! ✅ Data Nilai Siswa (belum masuk tahap ini)
     Route::get('/spa/data-nilai-siswa/all', [DataNilaiSiswaController::class, 'All']);   
-    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');   
-
-    // ✅ Absensi Pegawai Ke Sekolah
-    Route::get('/spa/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
-    Route::delete('/spa/absensi/pegawai/sekolah/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
-    Route::apiResource('/spa/absensi/pegawai/sekolah', AbsensiPegawaiController::class)->except('store', 'destroy');  
+    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');       
     
     // ✅ Absensi Pegawai ke Pelajaran
     Route::get('/spa/absensi/pegawai/pelajaran/export', [AbsensiPelajaranController::class, 'export']);

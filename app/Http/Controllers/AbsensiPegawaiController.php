@@ -20,84 +20,76 @@ class AbsensiPegawaiController extends Controller
     /**
      * ✅ Untuk super admin
      */
-    public function index()
-    {
-        $absen = AbsensiPegawai::with([
-            'mataPelajaran',
-            'guru.kelas',
-            'tahunAkademik'
-        ])
-        ->orderBy('hari', 'desc')
-        ->get();
+    // public function index()
+    // {
+    //     $absen = AbsensiPegawai::with([
+    //         'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
+    //         'guru',
+    //         'jadwalPelajaran.tahunAkademik',
+    //         'jadwalPelajaran.semester'
+    //     ])
+    //     ->orderBy('hari', 'desc')
+    //     ->get();
 
-        if ($absen->isEmpty()) {
-            return ApiResponse::error(
-                'Not found',
-                ['data' => 'Data absensi tidak ditemukan']
-            );
-        }
+    //     if ($absen->isEmpty()) {
+    //         return ApiResponse::error(
+    //             'Not found',
+    //             ['data' => 'Data absensi tidak ditemukan']
+    //         );
+    //     }
 
-        $result = $absen
-            ->groupBy('guru_id')
-            ->map(function ($items) {
+    //     $formatted = $absen->groupBy('guru_id')
+    //     ->map(function ($abs) {
 
-                $first = $items->first();
+    //         $guru = $abs->first()->guru;
 
-                // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK (2025/2026)
-                $perTahun = $items
-                    ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
-                    ->map(function ($tahunItems, $tahunAkademik) {
+    //         return [
+    //             'guru_id' => $guru->id ?? null,
+    //             'nama' => $guru->nama ?? null,
+    //             'nip' => $guru->nip ?? null,
+    //             'nuptk' => $guru->nuptk ?? null,
+    //             'role' => $guru->role ?? null,
+    //             'periode' => $abs->jadwalPelajaran->groupBy('tahun_akademik_id')
+    //             ->map(function ($ta) {
 
-                        // total per tahun (gabungan ganjil + genap)
-                        $totalHadir = $tahunItems->where('status', 'hadir')->count();
-                        $totalTidakHadir = $tahunItems->where('status', 'tidak hadir')->count();
+    //                 $tahunAkademik = $ta->first()->tahunAkademik;
 
-                        // 🔹 GROUP PER SEMESTER DARI DATABASE
-                        $perSemester = $tahunItems
-                            ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
-                            ->map(function ($semesterItems, $semester) {
+    //                 return [
+    //                     'tahun_akademik_id' => $tahunAkademik->id ?? null,
+    //                     'tahun_akademik' => $tahunAkademik->tahun_akademik ?? null,
+    //                     'status_tahun_akademik' => $tahunAkademik->status ?? null,
+    //                     'semester' => $ta->jadwalPelajaran->groupBy('semester_id')
+    //                     ->map(function ($smt) {
 
-                                return [
-                                    'semester' => $semester,
-                                    'rincian' => $semesterItems->map(function ($abs) {
-                                        return [
-                                            'absensi_id' => $abs->id,
-                                            'hari' => Carbon::parse($abs->hari)
-                                                ->translatedFormat('l, d F Y'),
-                                            'status' => $abs->status,
-                                        ];
-                                    })->values(),
-                                ];
-                            })
-                            ->values();
+    //                         $semester = $smt->first()->semester;
 
-                        return [
-                            'tahun_akademik' => $tahunAkademik,
-                            'status_tahun_akademik' => $tahunItems->first()->tahunAkademik->status ?? null,
-                            
-                            'total_hadir' => $totalHadir,
-                            'total_tidak_hadir' => $totalTidakHadir,
-                            'semester' => $perSemester,
-                            'status_semester' => $tahunItems->first()->tahunAkademik->status ?? null,
-                        ];
-                    })
-                    ->values();
+    //                         return [
+    //                             'semester_id' => $semester->id ?? null,
+    //                             'semester' => $semester->semester ?? null,
+    //                             'status_semester' => $semester->status ?? null,
 
-                return [
-                    'guru_id' => $first->guru_id,
-                    'nama_guru' => $first->guru->nama ?? null,
-                    'mengajar' => $first->mataPelajaran->nama_pelajaran ?? null,
-                    'wali_kelas' => $first->guru->kelas->nama_kelas ?? null,
-                    'absensi' => $perTahun,
-                ];
-            })
-            ->values();
+    //                             'absensis' => $smt->map(function ($abs) {
+    //                                 $mataPelajaran = $abs->jadwalPelajaran->kurikulumMataPelajaran->mataPelajaran;
+    //                                 return [
+    //                                     'absensi_id' => $abs->id ?? null,
+    //                                     'mengajar' => $mataPelajaran->nama_pelajaran ?? null,
+    //                                     'hari' => $abs->hari ?? null,
+    //                                     'status' => $abs->status ?? null,
+    //                                 ];
+    //                             })->values();
+    //                         ];
+    //                     })->values();
+    //                 ];
 
-        return ApiResponse::success(
-            $result,
-            'Absensi berhasil diambil'
-        );
-    }
+    //             })->values();
+    //         ];
+    //     })->values();
+
+    //     return ApiResponse::success(
+    //         $result,
+    //         'Absensi berhasil diambil'
+    //     );
+    // }
 
 
     /**

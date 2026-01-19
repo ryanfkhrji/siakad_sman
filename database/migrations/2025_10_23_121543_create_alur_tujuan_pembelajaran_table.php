@@ -19,9 +19,10 @@ return new class extends Migration
             ->nullable()
             ->constrained('kepegawaians')
             ->nullOnDelete();
-
-            $table->enum('semester', ['Ganjil','Genap']); 
+            
+            $table->foreignId('semester_id')->constrained('semester')->cascadeOnDelete();
             $table->text('tujuan_pembelajaran'); // TP
+            
             $table->unsignedInteger('urutan'); // ATP
             
             // untuk spa
@@ -42,9 +43,9 @@ return new class extends Migration
             $table->unique([
                 'kompetensi_id',
                 'tahun_akademik_id',
-                'semester',
+                'guru_id',
+                'semester_id',
                 'urutan',
-                'guru_id'
             ], 'unik');
             
 

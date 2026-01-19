@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SiswaRombel;
 use App\Models\Siswa;
+use App\Models\Rombel;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -169,6 +170,57 @@ class SiswaRombelController extends Controller
             null,
             'Data siswa rombel berhasil dihapus'
         );
+    }
+
+    public function dataSelect() {
+        // siswa
+        $data = Siswa::select('id', 'nama', 'nisn', 'nis')
+        ->where('status', 'aktif')
+        ->get();
+
+        if ($data->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => 'Belum ada data siswa aktif']);
+        }
+
+        $siswa = $data->map(function ($s) {
+            return [
+                'siswa_id' => $s->id ?? null,
+                'nama_siswa' => $s->nama ?? null,
+                'nisn' => $s->nisn ?? null,
+                'nis' => $s->nis ?? null,
+            ];
+        })->values();
+        
+
+        // rombel
+        $data2 = Rombel::with('tahunAkademik', 'waliRombel')
+        ->whereHas('tahunAkademik', function ($q) {
+            $q->where('status', 'aktif');
+        })
+        ->get();
+
+        if ($data2->isEmpty()) {
+            return ApiResponse::error(
+                'Data kosong',
+                ['data' => 'Belum ada rombel pada tahun akademik akktif']
+            );
+        }    
+
+        $rombel = $data2->map(function ($r) {
+            return [
+                'rombel_id' => $r->id ?? null,
+                'nama_rombel' => $r->nama_rombel ?? null,
+                'wali_rombel' => $r->waliRombel->nama ?? null,
+                'tahun_akademik' => $r->tahunAkademik->tahun_akademik ?? null,
+                'status_tahun_akademik' => $r->tahunAkademik->status ?? null,
+            ];
+        });
+
+
+        return ApiResponse::success([
+            'siswa' => $siswa,
+            'rombels' => $rombel
+        ], 'Data select berhasil diambil');
     }
 
 }
