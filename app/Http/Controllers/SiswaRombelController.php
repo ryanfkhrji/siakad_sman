@@ -44,7 +44,7 @@ class SiswaRombelController extends Controller
             ->where('rombel_id', $validated['rombel_id'])
             ->exists();
             if ($unikDua) {
-                return ApiResponse::error('Siswa sudah terdaftar di rombel ini pada tahun ini');
+                return ApiResponse::error('Siswa sudah terdaftar di rombel ini pada tahun ini', 'Duplicated');
             }            
 
             $siswaRombel = SiswaRombel::create([
@@ -59,6 +59,7 @@ class SiswaRombelController extends Controller
                 'nama_siswa' => $siswaRombel->siswa->nama ?? null,
                 'nama_rombel' => $siswaRombel->rombel->nama_rombel ?? null,
                 'kelas' => $siswaRombel->rombel->kelas->nama_kelas ?? null,
+                'tingkat' => $siswaRombel->rombel->kelas->tingkat ?? null,
                 'tahun_akademik' => $siswaRombel->rombel->tahunAkademik->tahun_akademik ?? null,
             ], 'Siswa berhasil didaftarkan ke rombel');
 
@@ -172,6 +173,7 @@ class SiswaRombelController extends Controller
         );
     }
 
+    // spa
     public function dataSelect() {
         // siswa
         $data = Siswa::select('id', 'nama', 'nisn', 'nis')

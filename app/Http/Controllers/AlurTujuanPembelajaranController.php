@@ -553,7 +553,7 @@ class AlurTujuanPembelajaranController extends Controller
     }
 
 
-    // ✅ ditolak
+    // ✅ spa
     public function ditolak(Request $request, $id)
     {
         $request->validate([
@@ -846,6 +846,7 @@ class AlurTujuanPembelajaranController extends Controller
         return ApiResponse::success(null, 'ATP berhasil dihapus');
     }    
 
+    // guru
     public function dataSelectAtp() {
         // kompetensi
         $data1 = Kompetensi::with('kurikulum', 'mataPelajaran')

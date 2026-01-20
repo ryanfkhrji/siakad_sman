@@ -11,7 +11,6 @@ use App\Http\Controllers\SiswaJadwalPelajaranController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\KompetensiController;
 use App\Http\Controllers\AlurTujuanPembelajaranController;
-use App\Http\Controllers\SiswaRombelController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\TahunAkademikController;
@@ -21,6 +20,7 @@ use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\IdentitasSekolahController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\RombelController;
+use App\Http\Controllers\SiswaRombelController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\DataNilaiSiswaController;
@@ -131,6 +131,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ✅☑️ Create dan Delete siswa rombel
     Route::apiResource('/spa/siswa-rombel', SiswaRombelController::class);    
+    Route::get('/spa/siswa/data-select/rombel', [SiswaRombelController::class, 'dataSelect']);       
     
     // ✅☑️ CRUD jadwal pelajaran
     Route::apiResource('/spa/jadwal-pelajaran', JadwalPelajaranController::class);

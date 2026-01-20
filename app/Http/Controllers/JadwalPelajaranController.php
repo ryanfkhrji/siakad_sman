@@ -141,23 +141,30 @@ class JadwalPelajaranController extends Controller
             // ===============================
             // 1. Validasi tahun akademik sama
             // ===============================
-            // $kurmap = KurikulumMataPelajaran::find($validated['kurikulum_mata_pelajaran_id']);
             // $semester = Semester::find($validated['semester_id']);
-
+            
             // if ($kurmap->tahun_akademik_id !== $semester->tahun_akademik_id) {
-            //     return ApiResponse::error('Not valid', ['semester' => 'Semester tidak sesuai dengan tahun akademik mata pelajaran']);
-            // }
+                //     return ApiResponse::error('Not valid', ['semester' => 'Semester tidak sesuai dengan tahun akademik mata pelajaran']);
+                // }
+                
+            // ambil semester aktif
+            $semesterAktif = Semester::with('tahunAkademik')
+            ->whereHas('tahunAkademik', function ($q) {
+                $q->where('status', 'aktif');
+            })
+            ->where('status', 'aktif')
+            ->first();
 
-            // ambil tahun akademik aktif
-            $semester = Semester::where('status', 'aktif')->first();
+            if (!$semesterAktif) {
+                return ApiResponse::error( 'Data kosong', ['data' => 'Belum ada semester aktif pada tahun ini'] );
+            }               
 
-            if (!$semester) {
-                return ApiResponse::error('Not found', ['data' => 'Belum ada semester aktif pada tahun ini']);
-            }
 
             // ===============================
             // 2. Guru hanya boleh 1 mapel per TA
             // ===============================
+            $kurmap = KurikulumMataPelajaran::find($validated['kurikulum_mata_pelajaran_id']);
+
             $existingMapelGuru = JadwalPelajaran::where('guru_id', $validated['guru_id'])
                 ->whereHas('kurikulumMataPelajaran', function ($q) use ($kurmap) {
                     $q->where('tahun_akademik_id', $kurmap->tahun_akademik_id);
@@ -196,7 +203,7 @@ class JadwalPelajaranController extends Controller
             // 4. Bentrok jadwal ROMBEL
             // ===============================
             $bentrokRombel = JadwalPelajaran::where('rombel_id', $validated['rombel_id'])
-                ->where('semester_id', $semester->id)
+                ->where('semester_id', $semesterAktif->id)
                 ->where('hari', $validated['hari'])
                 ->where(function ($q) use ($validated) {
                     $q->where('jam_mulai', '<', $validated['jam_selesai'])
@@ -215,7 +222,7 @@ class JadwalPelajaranController extends Controller
             // ===============================
             $jadwal = JadwalPelajaran::create([
                 'kurikulum_mata_pelajaran_id' => $validated['kurikulum_mata_pelajaran_id'],
-                'semester_id' => $semester->id,
+                'semester_id' => $semesterAktif->id,
                 'hari' => $validated['hari'],
                 'guru_id' => $validated['guru_id'],
                 'rombel_id' => $validated['rombel_id'],
@@ -410,27 +417,33 @@ class JadwalPelajaranController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $jadwal = JadwalPelajaran::with()->find($id);
-
-        if (! $jadwal) {
+        $jadwal = JadwalPelajaran::with([
+            'semester',
+            'kurikulumMataPelajaran.mataPelajaran',
+            'kurikulumMataPelajaran.tahunAkademik',
+            'guru',
+            'rombel',
+            'ruangan',
+        ])->find($id);
+        
+        if (!$jadwal) {
             return ApiResponse::error(
                 'Jadwal pelajaran tidak ditemukan',
                 ['id' => ['Data tidak ditemukan']],
                 404
             );
         }
-
-        if ($jadwal->semester->status == 'arsip') {
+        
+        if (!$jadwal->semester || $jadwal->semester->status === 'arsip') {
             return ApiResponse::error(
                 'Not supported',
                 ['data' => ['Jadwal pelajaran sudah berstatus arsip']],
                 404
             );
-        }
+        }        
 
         $validated = $request->validate([
             'kurikulum_mata_pelajaran_id' => 'sometimes|required|exists:kurikulum_mata_pelajaran,id',
-            // 'semester_id' => 'sometimes|required|exists:semester,id',
             'hari' => 'sometimes|required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'guru_id' => 'sometimes|required|exists:kepegawaians,id',
             'rombel_id' => 'sometimes|required|exists:rombels,id',
@@ -454,7 +467,7 @@ class JadwalPelajaranController extends Controller
         ];
 
         // ===============================
-        // 2. Guru hanya boleh 1 mapel per TA
+        // 1. Guru hanya boleh 1 mapel per TA
         // ===============================
         $kurmap = KurikulumMataPelajaran::find($validated['kurikulum_mata_pelajaran_id']);
 
@@ -646,24 +659,24 @@ class JadwalPelajaranController extends Controller
 
         
         // semester
-        $data2 = Semester::with('tahunAkademik')
-        ->whereHas('tahunAkademik', function ($q) {
-            $q->where('status', 'aktif');
-        })
-        ->where('status', 'aktif')
-        ->first();
+        // $data2 = Semester::with('tahunAkademik')
+        // ->whereHas('tahunAkademik', function ($q) {
+        //     $q->where('status', 'aktif');
+        // })
+        // ->where('status', 'aktif')
+        // ->first();
 
-        if (!$data2) {
-            return ApiResponse::error( 'Data kosong', ['data' => 'Tidak ada semester aktif'] );
-        }   
+        // if (!$data2) {
+        //     return ApiResponse::error( 'Data kosong', ['data' => 'Tidak ada semester aktif'] );
+        // }   
         
-        $semester = [
-            'semester_id' => $data2->id,
-            'semester' => $data2->semester,
-            'status_semester' => $data2->status,
-            'tahun_akademik' => $data2->tahunAkademik->tahun_akademik,
-            'status_tahun_akademik' => $data2->tahunAkademik->status
-        ];
+        // $semester = [
+        //     'semester_id' => $data2->id,
+        //     'semester' => $data2->semester,
+        //     'status_semester' => $data2->status,
+        //     'tahun_akademik' => $data2->tahunAkademik->tahun_akademik,
+        //     'status_tahun_akademik' => $data2->tahunAkademik->status
+        // ];
 
         
         // guru

@@ -50,7 +50,7 @@ return new class extends Migration
             ], 'uq_rmb_smt_har_jam');
             
         });
-    }
+    }    
 
 
     /**
