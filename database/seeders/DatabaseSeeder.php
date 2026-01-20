@@ -836,7 +836,7 @@ class DatabaseSeeder extends Seeder
         ]);              
 
         /**
-         * 🎯 spa: CRUD
+         * 🎯✅ spa: CRUD
          * kepsek: GET, SHOW
          * guru: CREATE
          */

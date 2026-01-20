@@ -67,11 +67,105 @@ class SiswaJadwalPelajaranController extends Controller
         return ApiResponse::success($formatted, 'Jadwal berhasil diambil');        
     }
 
-    // spa (get siswa->ta->rombel->jadwal)
-    public function getSiswaJadwal($id)
+
+    // spa (get all siswa yang punya rombel di tahun akademik aktif)
+    public function getAllSiswaAktif()
     {
-        $allRombel = SiswaRombel::where('siswa_id', $id)
-            ->with([
+        $siswa = Siswa::with([
+                'siswaRombels.rombel.kelas.jurusan',
+                'siswaRombels.rombel.tahunAkademik',
+            ])
+            ->whereHas('siswaRombels.rombel.tahunAkademik', function ($q) {
+                $q->where('status', 'aktif');
+            })
+            ->get();
+
+        if ($siswa->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => 'Tidak ada siswa aktif']);
+        }
+
+        /**
+         * Ambil data siswa + rombel aktif
+         */
+        $mapped = $siswa->map(function ($item) {
+
+            $rombelAktif = $item->siswaRombels
+                ->filter(fn ($sr) =>
+                    $sr->rombel !== null &&
+                    $sr->rombel->tahunAkademik !== null &&
+                    $sr->rombel->tahunAkademik->status === 'aktif'
+                )
+                ->first()
+                ?->rombel;
+
+            if (! $rombelAktif) {
+                return null;
+            }
+
+            return [
+                'kelas_id' => $rombelAktif->kelas->id,
+                'nama_kelas' => $rombelAktif->kelas->nama_kelas,
+                'jurusan' => $rombelAktif->kelas->jurusan->nama_jurusan ?? null,
+
+                'rombel_id' => $rombelAktif->id,
+                'nama_rombel' => $rombelAktif->nama_rombel,
+
+                'siswa' => [
+                    'siswa_id' => $item->id,
+                    'nisn' => $item->nisn,
+                    'nama' => $item->nama,
+                    'nis' => $item->nis,
+                    'email' => $item->email,
+                    'role' => $item->role,
+                    'status_siswa' => $item->status,
+                ]
+            ];
+        })->filter();
+
+        /**
+         * GROUPING:
+         * kelas -> rombel -> siswa
+         */
+        $grouped = $mapped
+            ->groupBy('kelas_id')
+            ->map(function ($kelasItems) {
+
+                return [
+                    'kelas_id' => $kelasItems->first()['kelas_id'],
+                    'nama_kelas' => $kelasItems->first()['nama_kelas'],
+                    'jurusan' => $kelasItems->first()['jurusan'],
+
+                    'rombels' => $kelasItems
+                        ->groupBy('rombel_id')
+                        ->map(function ($rombelItems) {
+
+                            return [
+                                'rombel_id' => $rombelItems->first()['rombel_id'],
+                                'nama_rombel' => $rombelItems->first()['nama_rombel'],
+                                'total_siswa' => $rombelItems->count(),
+
+                                'siswa' => $rombelItems
+                                    ->pluck('siswa')
+                                    ->values(),
+                            ];
+                        })
+                        ->values(),
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success($grouped, 'Daftar siswa aktif berhasil diambil');
+    }
+
+
+
+
+
+    // spa (get siswa->ta->rombel->jadwal)
+    public function showSiswaJadwal($id)
+    {
+        $allRombel = SiswaRombel::with([
+                'siswa',
                 'rombel.kelas',
                 'rombel.waliRombel',
                 'rombel.tahunAkademik',
@@ -81,6 +175,7 @@ class SiswaJadwalPelajaranController extends Controller
                 'rombel.jadwalPelajarans.guru',
                 'rombel.jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
             ])
+            ->where('siswa_id', $id)
             ->get();
 
         if ($allRombel->isEmpty()) {
@@ -88,65 +183,79 @@ class SiswaJadwalPelajaranController extends Controller
         }
 
         $formatted = $allRombel
-            ->map(fn ($sr) => $sr->rombel)     // ambil entitas rombel
-            ->filter()
-            ->groupBy('tahun_akademik_id')
-            ->map(function ($rombels) {
+            ->groupBy('siswa_id')
+            ->map(function ($siswaRombels) {
 
-                $tahunAkademik = $rombels->first()->tahunAkademik;
+                $siswa = $siswaRombels->first()->siswa;
 
                 return [
-                    'tahun_akademik_id' => $tahunAkademik->id ?? null,
-                    'tahun_akademik' => $tahunAkademik->tahun_akademik ?? null,
-                    'status_tahun_akademik' => $tahunAkademik->status ?? null,
+                    'siswa_id' => $siswa->id ?? null,
+                    'nama_siswa' => $siswa->nama ?? null,
 
-                    'histori_rombel' => $rombels->map(function ($rombel) {
-                        return [
-                            'rombel_id' => $rombel->id ?? null,
-                            'nama_rombel' => $rombel->nama_rombel ?? null,
-                            'kelas' => $rombel->kelas->nama_kelas ?? null,
-                            'wali_rombel' => $rombel->waliRombel->nama ?? null,
+                    'periode' => $siswaRombels
+                        ->map(fn ($sr) => $sr->rombel)
+                        ->filter()
+                        ->groupBy('tahun_akademik_id')
+                        ->map(function ($rombels) {
 
-                            'histori_jadwal_pelajaran' =>
-                                $rombel->jadwalPelajarans
-                                    ->groupBy('semester_id')
-                                    ->map(function ($jadwalPelajaran) {
+                            $tahunAkademik = $rombels->first()->tahunAkademik;
 
-                                        $smt = $jadwalPelajaran->first()->semester;
+                            return [
+                                'tahun_akademik_id' => $tahunAkademik->id ?? null,
+                                'tahun_akademik' => $tahunAkademik->tahun_akademik ?? null,
+                                'status_tahun_akademik' => $tahunAkademik->status ?? null,
 
-                                        return [
-                                            'semester_id' => $smt->id ?? null,
-                                            'semester' => $smt->semester ?? null,
-                                            'status_semester' => $smt->status ?? null,
+                                'histori_rombel' => $rombels->map(function ($rombel) {
+                                    return [
+                                        'rombel_id' => $rombel->id ?? null,
+                                        'nama_rombel' => $rombel->nama_rombel ?? null,
+                                        'kelas' => $rombel->kelas->nama_kelas ?? null,
+                                        'wali_rombel' => $rombel->waliRombel->nama ?? null,
 
-                                            'jadwal_pelajarans' =>
-                                                $jadwalPelajaran->map(function ($jadwal) {
+                                        'histori_jadwal_pelajaran' =>
+                                            $rombel->jadwalPelajarans
+                                                ->groupBy('semester_id')
+                                                ->map(function ($jadwalPelajaran) {
 
-                                                    $mataPelajaran =
-                                                        $jadwal->kurikulumMataPelajaran
-                                                            ->mataPelajaran ?? null;
+                                                    $smt = $jadwalPelajaran->first()->semester;
 
                                                     return [
-                                                        'jadwal_pelajaran_id' => $jadwal->id ?? null,
-                                                        'mata_pelajaran' => $mataPelajaran->nama_pelajaran ?? null,
-                                                        'hari' => $jadwal->hari ?? null,
-                                                        'guru' => $jadwal->guru->nama ?? null,
-                                                        'rombel' => $jadwal->rombel->nama_rombel ?? null,
-                                                        'jam_mulai' => $jadwal->jam_mulai ?? null,
-                                                        'jam_selesai' => $jadwal->jam_selesai ?? null,
-                                                        'ruangan' => $jadwal->ruangan->nama_ruangan ?? null,
-                                                        'link_opsional' => $jadwal->link_opsional ?? null,
+                                                        'semester_id' => $smt->id ?? null,
+                                                        'semester' => $smt->semester ?? null,
+                                                        'status_semester' => $smt->status ?? null,
+
+                                                        'jadwal_pelajarans' =>
+                                                            $jadwalPelajaran->map(function ($jadwal) {
+
+                                                                $mataPelajaran =
+                                                                    $jadwal->kurikulumMataPelajaran
+                                                                        ->mataPelajaran ?? null;
+
+                                                                return [
+                                                                    'jadwal_pelajaran_id' => $jadwal->id ?? null,
+                                                                    'mata_pelajaran' => $mataPelajaran->nama_pelajaran ?? null,
+                                                                    'hari' => $jadwal->hari ?? null,
+                                                                    'guru' => $jadwal->guru->nama ?? null,
+                                                                    'rombel' => $jadwal->rombel->nama_rombel ?? null,
+                                                                    'jam_mulai' => $jadwal->jam_mulai ?? null,
+                                                                    'jam_selesai' => $jadwal->jam_selesai ?? null,
+                                                                    'ruangan' => $jadwal->ruangan->nama_ruangan ?? null,
+                                                                    'link_opsional' => $jadwal->link_opsional ?? null,
+                                                                ];
+                                                            })->values(),
                                                     ];
                                                 })->values(),
-                                        ];
-                                    })->values(),
-                        ];
-                    })->values(),
+                                    ];
+                                })->values(),
+                            ];
+                        })->values(),
                 ];
             })
             ->values();
 
         return ApiResponse::success($formatted, 'Jadwal berhasil diambil');
     }
+
+
 
 }

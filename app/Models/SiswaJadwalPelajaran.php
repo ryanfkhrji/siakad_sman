@@ -45,4 +45,6 @@ class SiswaJadwalPelajaran extends Pivot
     {
         return $this->hasMany(AbsensiSiswa::class, 'siswa_id'); 
     }
+
+    
 }

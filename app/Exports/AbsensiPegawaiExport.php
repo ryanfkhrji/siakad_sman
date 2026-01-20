@@ -3,58 +3,65 @@
 namespace App\Exports;
 
 use App\Models\AbsensiPegawai;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Carbon\Carbon;
 
-class AbsensiPegawaiExport implements FromCollection, WithHeadings
+class AbsensiPegawaiExport implements FromQuery, WithMapping, WithHeadings
 {
     use Exportable;
 
     protected $ids;
 
-    public function __construct($ids = null) {
+    public function __construct($ids = null)
+    {
         $this->ids = $ids;
     }
 
-    /**
-     * bawaan
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function query()
     {
-        $query = $this->ids
-            ? AbsensiPegawai::whereIn('id', $this->ids)->with([
-                'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
-                'guru',
-                'jadwalPelajaran.tahunAkademik',
-                'jadwalPelajaran.semester',
-                'semester'
-            ])->get()
-            : AbsensiPegawai::with([
-                'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
-                'guru',
-                'jadwalPelajaran.tahunAkademik',
-                'jadwalPelajaran.semester',
-                'semester'
-            ])->get();
+        $query = AbsensiPegawai::with([
+            'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
+            'guru',
+            'tahunAkademik',
+            'semester'
+        ]);
 
-        return $query->map(function($item) {
-            $mataPelajaran = $item->jadwalPelajaran->kurikulumMataPelajaran->mataPelajaran;
-            return [
-                $item->guru->nama ?? null,
-                $mataPelajaran->nama_pelajaran ?? null,
-                Carbon::parse($item->hari)->translatedFormat('l, d F Y') ?? null,
-                $item->status ?? null,
-                $item->jadwalPelajaran->tahunAkademik->tahun_akademik ?? null,
-                $item->jadwalPelajaran->semester->semester ?? null,
-            ];
-        });
+        if ($this->ids) {
+            $query->whereIn('id', $this->ids);
+        }
+
+        return $query;
+    }
+
+    public function map($item): array
+    {
+        return [
+            $item->guru->nama ?? '-',
+            $item->jadwalPelajaran
+                ?->kurikulumMataPelajaran
+                ?->mataPelajaran
+                ?->nama_pelajaran ?? '-',
+            $item->hari
+                ? Carbon::parse($item->hari)->translatedFormat('l, d F Y')
+                : '-',
+            $item->status ?? '-',
+            $item->tahunAkademik->tahun_akademik ?? '-',
+            $item->semester->semester ?? '-',
+        ];
     }
 
     public function headings(): array
     {
-        return ['Nama Guru', 'Mata Pelajaran', 'Hari', 'Status', 'Tahun Akademik', 'Semester'];
+        return [
+            'Nama Pegawai',
+            'Mata Pelajaran',
+            'Hari',
+            'Status',
+            'Tahun Akademik',
+            'Semester'
+        ];
     }
 }

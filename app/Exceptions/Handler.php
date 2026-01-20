@@ -6,9 +6,22 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
+
+    // protected function unauthenticated($request, AuthenticationException $exception)
+    // {
+    //     if ($request->expectsJson()) {
+    //         return response()->json([
+    //             'message' => 'Unauthenticated'
+    //         ], 401);
+    //     }
+
+    //     abort(401, 'Silakan login terlebih dahulu');
+    // }
+
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof ValidationException) {

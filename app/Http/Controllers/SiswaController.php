@@ -253,30 +253,61 @@ class SiswaController extends Controller
     // ✅ get all siswa untuk spa
     public function index()
     {
-        $siswa = Siswa::with('kelas.jurusan')->get();
+        $siswa = Siswa::select(
+                'id',
+                'nisn',
+                'nama',
+                'nis',
+                'email',
+                'role',
+                'status'
+            )
+            ->orderBy('status')
+            ->orderBy('nama')
+            ->get();
 
-        $formatted = $siswa->map(function ($item) {
-            return [
-                'siswa_id' => $item->id,
-                'nisn' => $item->nisn,
-                'nama' => $item->nama,
-                'nis' => $item->nis,
-                'nama_jurusan' => $item->kelas->jurusan->nama_jurusan ?? null,
-                'email' => $item->email,                
-                'role' => $item->role,                
-                'status_siswa' => $item->status,                
-            ];
-        });
+        if ($siswa->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => 'Data siswa kosong']);
+        }
 
-        return ApiResponse::success($formatted, 'Daftar siswa berhasil diambil');
-    }    
+        $grouped = $siswa
+            ->groupBy('status')
+            ->map(function ($items, $status) {
+                return [
+                    'status' => $status,
+                    'total' => $items->count(),
+                    'siswa' => $items->map(function ($item) {
+                        return [
+                            'siswa_id' => $item->id,
+                            'nisn' => $item->nisn,
+                            'nama' => $item->nama,
+                            'nis' => $item->nis,
+                            'email' => $item->email,
+                            'role' => $item->role,
+                            'status' => $item->status,
+                        ];
+                    })->values(),
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success($grouped, 'Daftar siswa berhasil diambil');
+    }
+ 
 
     // ✅ guru dan spa
     public function show($id)
     {
-        $siswa = Siswa::with([            
+        $siswa = Siswa::with([
             'siswaRombels.rombel.kelas.jurusan',
             'siswaRombels.rombel.tahunAkademik',
+            'siswaRombels.rombel.jadwalPelajarans.semester.tahunAkademik',
+            'siswaRombels.rombel.jadwalPelajarans.guru',
+            'siswaRombels.rombel.jadwalPelajarans.ruangan',
+            'siswaRombels.rombel.jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
+            'siswaRombels.rombel.jadwalPelajarans.kurikulumMataPelajaran.jurusan',
+            'siswaRombels.rombel.jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
+            'siswaRombels.rombel.waliRombel',
             'ekskulSiswa.tahunAkademik',
             'ekskulSiswa.ekstrakurikuler',
             'prestasis.tahunAkademik',
@@ -293,26 +324,69 @@ class SiswaController extends Controller
         $formatted = [
             'siswa_id' => $siswa->id,
             'nama_siswa' => $siswa->nama,
-            'jurusan_siswa' => $siswa->rombel->kelas->jurusan->nama_jurusan ?? null,
             'nisn' => $siswa->nisn,
             'nis' => $siswa->nis,
             'email' => $siswa->email,
-            'status_siswa' => $siswa->status,  
-            'histori_rombel' => $siswa->siswaRombels->map(function ($items) {                  
-                return [
-                    'rombel_id' => $item->id ?? null,
-                    'nama_rombel' => $item->nama_rombel ?? null,
-                            
-                    'kelas_id' => $row->rombel->kelas->id,
-                    'nama_kelas' => $row->rombel->kelas->nama_kelas,
-                    'tingkat_kelas' => $row->rombel->kelas->tingkat,
-                    'jurusan_kelas' => $row->rombel->kelas->jurusan->nama_jurusan ?? null,
+            'status_siswa' => $siswa->status,
 
-                    'tahun_akademik_rombel_id' => $row->rombel->tahunAkademik->id,
-                    'tahun_akademik_rombel' => $row->rombel->tahunAkademik->tahun_akademik,
-                    'status_tahun_akademik_rombel' => $row->rombel->tahunAkademik->status,
+            // ❗ FIX: siswaRombels adalah collection
+            'jurusan_siswa' => optional(
+                $siswa->siswaRombels->first()?->rombel?->kelas?->jurusan
+            )->nama_jurusan,
+
+            // =========================
+            // HISTORI ROMBEL
+            // =========================
+            'histori_rombel' => $siswa->siswaRombels->map(function ($row) {
+                return [
+                    'rombel_id' => $row->rombel?->id,
+                    'nama_rombel' => $row->rombel?->nama_rombel,
+
+                    'kelas_id' => $row->rombel?->kelas?->id,
+                    'kelas' => $row->rombel?->kelas?->nama_kelas,
+                    'tingkat' => $row->rombel?->kelas?->tingkat,
+                    'jurusan_kelas' => $row->rombel?->kelas?->jurusan?->nama_jurusan,
+
+                    'wali_rombel' => $row->rombel?->waliRombel->nama,
+
+                    'tahun_akademik_rombel_id' => $row->rombel?->tahunAkademik?->id,
+                    'tahun_akademik_rombel' => $row->rombel?->tahunAkademik?->tahun_akademik,
+                    'status_tahun_akademik_rombel' => $row->rombel?->tahunAkademik?->status,
+
+                    'histori_jadwal_pelajaran' => $row->rombel->jadwalPelajarans
+                    ->groupBy('semester_id')
+                    ->map(function ($jadwal) {
+                        $semester = $jadwal->first()->semester;
+                        return [
+                            'semester_id' => $semester->id ?? null,
+                            'semester' => $semester->semester ?? null,
+                            'tahun_akademik_semester' => $semester->tahunAkademik->tahun_akademik ?? null,
+                            'jadwal_pelajaran'  => $jadwal->map(function ($j) {
+                                $mataPelajaran = $j->kurikulumMataPelajaran->mataPelajaran;
+                                $jurusan = $j->kurikulumMataPelajaran->jurusan;
+                                $ta = $j->kurikulumMataPelajaran->tahunAkademik;
+                                return [
+                                    'jadwal_pelajaran_id' => $j->id ?? null,
+                                    'mata_pelajaran' => $mataPelajaran->nama_pelajaran ?? null,
+                                    'jurusan_pelajaran' => $jurusan->nama_jurusan ?? null,
+                                    'tahun_akademik_jadwal' => $ta->tahun_akademik ?? null,
+                                    'tingkat' => $j->kurikulumMataPelajaran->tingkat ?? null,
+                                    'hari' => $j->hari ?? null,
+                                    'guru_pengajar' => $j->guru->nama ?? null,
+                                    'jam_mulai' => $j->jam_mulai ?? null,
+                                    'jam_selesai' => $j->jam_selesai ?? null,
+                                    'ruangan' => $j->ruangan->nama_ruangan ?? null,
+                                    'link_opsional' => $j->link_opsional ?? null,
+                                ];
+                            })->values(),
+                        ];
+                    })->values(),
                 ];
-            })->values(),            
+            })->values(),
+
+            // =========================
+            // HISTORI EKSTRAKURIKULER
+            // =========================
             'histori_ekstrakurikuler' => $siswa->ekskulSiswa
                 ->groupBy('tahun_akademik_id')
                 ->map(function ($items) {
@@ -325,17 +399,21 @@ class SiswaController extends Controller
 
                         'ekstrakurikuler' => $items->map(function ($row) {
                             return [
-                                'ekskul_id' => $row->ekstrakurikuler->id ?? null,
-                                'nama_ekskul' => $row->ekstrakurikuler->nama_ekstrakurikuler ?? null,
-                                'anggaran_ekskul' => $row->ekstrakurikuler->anggaran ?? null,
-                                'status_ekskul' => $row->ekstrakurikuler->status ?? null,
+                                'ekskul_id' => $row->ekstrakurikuler?->id,
+                                'nama_ekskul' => $row->ekstrakurikuler?->nama_ekstrakurikuler,
+                                'anggaran_ekskul' => $row->ekstrakurikuler?->anggaran,
+                                'status_ekskul' => $row->ekstrakurikuler?->status,
 
                                 'sikap' => $row->sikap,
                                 'status_aktif' => $row->status,
                             ];
-                    })->values(),
-                ];
-            })->values(),         
+                        })->values(),
+                    ];
+                })->values(),
+
+            // =========================
+            // HISTORI PRESTASI
+            // =========================
             'histori_prestasi' => $siswa->prestasis
                 ->groupBy('tahun_akademik_id')
                 ->map(function ($items) {
@@ -349,22 +427,18 @@ class SiswaController extends Controller
                         'prestasi' => $items->map(function ($row) {
                             return [
                                 'prestasi_id' => $row->id,
-                                'prestasi_diraih' => $row->prestasi_diraih,
-                                'tingkat' => $row->tingkat ?? null,
-                                'juara' => $row->juara ?? null,
+                                'prestasi_diraih' => $row->prestasi_diraih,                                
                             ];
                         })->values(),
                     ];
-                })
-                ->values(),
+                })->values(),
         ];
 
         return ApiResponse::success($formatted, 'Detail siswa berhasil diambil');
     }
 
 
-
-    // ✅ show diri siswa sendiri
+    // ! ✅ show diri siswa  (samakan dengan show)
     public function showDiriSendiri()
     {
         $siswa = Auth::guard('siswa')->user();
