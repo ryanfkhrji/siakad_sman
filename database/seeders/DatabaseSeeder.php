@@ -303,7 +303,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_kelas' => 'X',
                 'kode_kelas' => 'K12-IPA',                
-                'tingkat' => 11,                
+                'tingkat' => 10,                
                 'jurusan_id' => null, // IPA                                                                            
             ],
             [
@@ -315,7 +315,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_kelas' => 'XII',
                 'kode_kelas' => 'K11-IPA',                
-                'tingkat' => 10,                
+                'tingkat' => 12,                
                 'jurusan_id' => 1, // IPA                                                                            
             ],            
         ]);
@@ -705,13 +705,7 @@ class DatabaseSeeder extends Seeder
                 'tahun_akademik_id' => 2, // 2024/2025
                 'nama_rombel' => 'X-B',
                 'wali_rombel_id' => 6, // Guru Indo
-            ],            
-            [
-                'kelas_id' => 1, // X
-                'tahun_akademik_id' => 2, // 2024/2025
-                'nama_rombel' => 'X-C',
-                'wali_rombel_id' => 7, // Guru Sunda
-            ],                        
+            ],                    
             [
                 'kelas_id' => 2, // XI
                 'tahun_akademik_id' => 1, // 2013/2023
@@ -724,19 +718,15 @@ class DatabaseSeeder extends Seeder
         SiswaRombel::insert([
             [
                 'siswa_id' => 1, // Bagas
-                'rombel_id' => 1, // X-1A - J.IPA                
+                'rombel_id' => 1, // X-A - J.IPA                
             ],
             [
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 2, // X-1B - J.IPS                
-            ],
-            [
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 4, // X1-A
-            ],
+                'rombel_id' => 2, // X-B - J.IPS                
+            ],            
             [
                 'siswa_id' => 3, // Sanita
-                'rombel_id' => 2, // X-1B - J.IPS                
+                'rombel_id' => 2, // X-B - J.IPS                
             ],
         ]);
 
@@ -842,20 +832,7 @@ class DatabaseSeeder extends Seeder
                 'jam_selesai' => '09:30',
                 'ruangan_id' => 2,
                 'link_opsional' => '',                
-            ],   
-            [
-                // 9
-                'kurikulum_mata_pelajaran_id' => 1, // K13 - Sunda
-                'semester_id' => 2, // 2013/2023 = Genap
-                'hari' => 'Rabu',
-                'guru_id' => 5, // Guru MTK
-                'rombel_id' => 4, // XI-A
-                'jam_mulai' => '07:30',
-                'jam_selesai' => '09:30',
-                'ruangan_id' => 2,
-                'link_opsional' => '',                
-            ],   
-                 
+            ],                                 
         ]);              
 
         /**
@@ -929,7 +906,7 @@ class DatabaseSeeder extends Seeder
         AbsensiSiswa::insert([
             [
                 'siswa_id' => 1, // Andi
-                'kelas_id' => 2, 
+                'rombel_id' => 2,  // X-B
                 'jadwal_pelajaran_id' => 2, // B.Indonesia
                 'hari' => '2025-10-17', // B.Indonesia
                 'status' => 'hadir',
@@ -937,7 +914,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'siswa_id' => 1, // Andi
-                'kelas_id' => 2, 
+                'rombel_id' => 2, // X-B
                 'jadwal_pelajaran_id' => 1, // IPA
                 'hari' => '2025-10-24', // IPA
                 'status' => 'sakit',
@@ -945,7 +922,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'siswa_id' => 2, // Rina
-                'kelas_id' => 1, 
+                'rombel_id' => 1, // X-A
                 'jadwal_pelajaran_id' => 1, // IPA
                 'hari' => '2025-10-10', // IPA
                 'status' => 'alfa',
@@ -953,7 +930,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'siswa_id' => 2, // Rina
-                'kelas_id' => 1, 
+                'rombel_id' => 1, // X-A
                 'jadwal_pelajaran_id' => 2, // B.Indonesia
                 'hari' => '2025-10-25', // B.Indonesia
                 'status' => 'izin',

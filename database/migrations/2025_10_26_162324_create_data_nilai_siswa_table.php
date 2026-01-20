@@ -31,8 +31,7 @@ return new class extends Migration
             $table->foreignId('guru_id')->constrained('kepegawaians');
 
 
-            // Point nilai
-            // butuh jabarin total absen
+            // Point nilai (gunakan rumus)            
             $table->decimal('point_absensi', 5, 2)->default(0);
 
             $table->decimal('point_tugas', 5, 2)->default(0);

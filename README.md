@@ -109,24 +109,25 @@ Perbaikan
         - ✅ route
         - ✅ guru: data select
         - ✅ fitur approve (spa)
-        - ✅ fitur clone (guru)
+        - ✅ fitur clone (guru)    
     - Frontend:
         - ikutin insomnia
         - referensi tampilan ada di pdf e-raport halaman 143
         - kasih tombol clone pada semester (fitur clone semester tahun lalu) untuk guru        
         - Untuk UI guru silakan minta ke Winton
-        - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang dari guru (spa gabisa crud, cuma bisa approve aja)
+        - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
 16.  ❌ modul_ajar
 17.  ❌ asesmen
-18.  rombel: 
+18.  rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya
           - ✅ API dan insomnia
           - ✅ data select
+          - ✅ sudah benar update dan storenya
     - Frontend:
           - ikutin insomnia      
           - wali_rombel = wali_kelas
-          - hitung jumlah siswa di rombel yang tahun_akademik = aktif
+          - hitung jumlah siswa di rombel
 19. siswa_rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya (M, S, C, R)          
@@ -156,10 +157,8 @@ Perbaikan
         - ❌ samakan dengan migrasi
         - ❌ show menggunakan id guru
     - Frontend
-        - Samakan inputan dengan file AbsensiPelajaranController::store dan update
-        - Jika butuh data untuk select, gunakan dari function showAbsenPelajaranSendiri
-        - Alur absensi pegawai adalah melalui button pada showAbsenPelajaranSendiri
-        - filter menggunakan status_tahun_akademik
+        - samakan dengan insomnia
+        - Alur absensi pegawai adalah melalui get all jadwal_pelajaran_sendiri -> klik jadwal -> absen        
 24.  absensi_siswa:
     - Backend:
         - ❌ samakan (seeder, controller) dengan migrasi
@@ -168,15 +167,14 @@ Perbaikan
         - ❌ show menggunakan id siswa
     - Frontend:        
         - Alur absen siswa:
-            a. Klik semua jadwal yang siswa punya (SiswaJadwalPelajaranController::showAllJadwalSendiri)
-            b. klik jadwal, lalu absen (poin a sudah kirim kelas_id, jadwal_pelajaran_id dan tahun_akademik_id untuk di use, jadi siswa hanya isi status dan bukti saja untuk yang manual)
+            a. Klik semua jadwal yang siswa punya
+            b. pilih jadwal, lalu absen (poin a sudah kirim rombel_id, jadwal_pelajaran_id dan tahun_akademik_id untuk di use, jadi siswa hanya isi status dan bukti saja untuk yang manual)
         - Alur guru absenkan siswa:
-            a. klik semua jadwal yang guru punya (JadwalPelajaranController::showAllJadwalSendiri)
+            a. klik semua jadwal yang guru punya 
             b. Klik detail (nanti bisa dapet data siswanya)
             c. lalu absenkan siswa (jika bingung, baca AbsensiSiswaController, function guruAbsenkanSiswa)
-            d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan kelas_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
-        - Kalo update hanya milik spa, cuma bisa ganti status dan bukti, sisanya tidak bisa diganti
-        - Gunakan filter tahun dan semester agar absen tidak bercampur
+            d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan rombel_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
+        - Kalo update hanya milik spa, cuma bisa ganti status dan bukti, sisanya tidak bisa diganti        
 25. ekstrakurikuler:
     - Backend:
         - ❌ migrasi, seeder, controller
@@ -188,25 +186,27 @@ Perbaikan
         - (migrasi, model, seeder)
         - ❌ controller
         - ❌ route
+    - Frontend:
+        - menambah pembina melalui menu ekstrakurikuler, sehingga spa hanya menginput pembina_id saja
 27. pelatih_ekskul:
     - Backend:
         - (migrasi, model, seeder)
         - ❌ controller
         - ❌ route
+    - Frontend:
+        - sama seperti pembina_ekskul
 28. ekskul_siswa_pivot:
     - Backend:
         - ✅ (Migrasi, Seeder, Controller)
     - Frontend:
         - ikutin insomnia
-        - tidak ada tombol keluar ekskul jika status_tahun_akademik = arsip, jika status = aktif (kasih tombol keluar gapapa)
+        - alur siswa daftar ekskul: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)
 29. prestasi:
     - Backend:
         - ✅ (Seeder, Migrasi, Controller) Hapus kolom kelas_id dan jurusan_id
-        - ✅ (Seeder, Migrasi, Controller) nambah kolom tahun_akademik_id
+        - ❌ jangan otomatis, gunakan data select manual aja (takutnya mau ngedata prestasi yang lampau)
     - Frontend:
-        - Hapus inputan kelas
-        - Hapus inputan jurusan
-        - Tambah inputan tahun akademik
+        - ikutin insomnia
 30. data_nilai_siswa:
     kumpulan hasil asesmen (uts/uas, absensi, dll)
     - Backend:

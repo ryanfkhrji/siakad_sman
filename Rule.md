@@ -50,7 +50,19 @@ Delete:
 ✅ Ditolak
 
 
-1. Jadwal Pelajaran
+5. Rombel
+Create:
+   - ✅ tahun_akademik otomatis
+   - ✅ tidak bisa jika tahun_akademik tidak ada yang aktif
+Update
+   - ✅ tahun_akademik tidak berubah
+   - ✅ tidak bisa jika tahun akademik sudah arsip
+Delete
+   - ✅ tidak bisa hapus jika tahun_akademik.status = arsip
+   - ✅ tidak bisa hapus jika sudah digunakan oleh siswa/jadwal
+
+
+6. Jadwal Pelajaran
 Create:
    - Tahun akademik dan semester otomatis
    - 1 guru hanya boleh 1 mapel
@@ -61,4 +73,18 @@ Delete:
    - Gabisa dihapus jika semester dan tahun akademik sudah arsip
 
 
-<!-- KERJAKAN INSOMNIANYA DULU, CEK DI ATAS -->
+7. absensi_pelajaran
+Create:
+   - tahun_akademik otomatis dari jadwal_pelajaran
+   - Alur absensi pegawai adalah melalui get all jadwal_pelajaran_sendiri -> klik jadwal -> absen
+update
+    - tahun_akademik_tidak berubah
+delete
+    - tidak bisa dihapus jika tahun_akademik sudah arsip
+
+
+8. absensi_siswa:
+- Baca readme
+
+
+9. pembina, pelatih, dan ekskul_siswa, baca readme
