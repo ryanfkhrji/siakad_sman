@@ -143,15 +143,19 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅☑️ Absensi Pegawai Ke Sekolah    
     Route::get('/spa/pegawai/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
-    Route::delete('/spa/absensi/pegawai/sekolah/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
+    Route::delete('/spa/absensi/guru/pelajaran/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/pegawai/sekolah', AbsensiPegawaiController::class)->except('store', 'destroy');  
 
-    // ! ✅ Absensi Pegawai ke Pelajaran (MASUK SINI)
-    Route::get('/spa/absensi/pegawai/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
-    Route::delete('/spa/absensi/pegawai/pelajaran/destroy/{id?}', [AbsensiPelajaranController::class, 'destroyData']);
-    Route::apiResource('/spa/absensi/pegawai/pelajaran', AbsensiPelajaranController::class)->except('store', 'destroy');  
+    // ✅☑️ Absensi guru ke Pelajaran
+    Route::get('/spa/absensi/guru/pelajaran/export', [AbsensiPelajaranController::class, 'export']);
+    Route::delete('/spa/absensi/guru/pelajaran/destroy/{id?}', [AbsensiPelajaranController::class, 'destroyData']);
+    Route::apiResource('/spa/guru/absensi/pelajaran', AbsensiPelajaranController::class)->except('store', 'destroy');  
 
-    
+    // ! ✅ Absensi Siswa ke Pelajaran (MASUK SINI)
+    Route::get('/spa/absensi/siswa/pelajaran/export', [AbsensiSiswaController::class, 'export']);
+    Route::get('/spa/absensi/siswa/pelajaran/zip', [AbsensiSiswaController::class, 'exportBerkasZip']);
+    Route::delete('/spa/absensi/siswa/pelajaran/destroy/{id?}', [AbsensiSiswaController::class, 'destroyData']);
+    Route::apiResource('/spa/absensi/siswa/pelajaran', AbsensiSiswaController::class)->except('store', 'destroy');  
 
     // ✅ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
@@ -164,14 +168,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ! ✅ Data Nilai Siswa (belum masuk tahap ini)
     Route::get('/spa/data-nilai-siswa/all', [DataNilaiSiswaController::class, 'All']);   
-    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');       
-        
-
-    // ✅ Absensi Siswa ke Pelajaran
-    Route::get('/spa/absensi/siswa/pelajaran/export', [AbsensiSiswaController::class, 'export']);
-    Route::get('/spa/absensi/siswa/pelajaran/zip', [AbsensiSiswaController::class, 'exportBerkasZip']);
-    Route::delete('/spa/absensi/siswa/pelajaran/destroy/{id?}', [AbsensiSiswaController::class, 'destroyData']);
-    Route::apiResource('/spa/absensi/siswa/pelajaran', AbsensiSiswaController::class)->except('store', 'destroy');  
+    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');           
     
     // ✅ Keuangan
     Route::delete('/spa/keuangan/destroy/{id?}', [KeuanganController::class, 'destroyData']);
@@ -216,6 +213,8 @@ Route::put('/tu/update/diri', [KepegawaianController::class, 'updateDirinyaSendi
     
 // ? ======================================================= GURU ============================================================ ?
     // ✅☑️ identitas sekolah menggunakan Global: /all/identitas-sekolah
+
+    Route::get('/spa/guru/absensi/pelajaran', [AbsensiPelajaranController::class, 'index']);
 
     // ✅☑️ Ubah password guru oleh dirinya sendiri
     Route::put('/guru/ubah-password/diri', [KepegawaianController::class, 'ubahPassDiri']);
@@ -304,8 +303,8 @@ Route::apiResource('/all/identitas-sekolah', IdentitasSekolahController::class)-
 // ✅☑️ PSB Public
 Route::apiResource('psb', PsbController::class)->only('store');
 
-// ! export absensi pegawai
-// Route::get('/spa/pegawai/absensi/harian/export', [AbsensiPegawaiController::class, 'export']);
+// ! absensi pelajaran
+// Route::get('/spa/guru/absensi/pelajaran', [AbsensiPelajaranController::class, 'show']);
 
 // ✅ untuk menampilkan berkas / foto yang private
 Route::get('/tampil-berkas/{jenis}/{filename}', [PsbController::class, 'tampilkanBerkas'])->name('berkas.view');

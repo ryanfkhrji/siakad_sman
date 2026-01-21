@@ -154,12 +154,11 @@ Perbaikan
         - ikutin insomnia (baca docs jika ada)
         - jika status pada tahun_akademik atau semester = 'arsip', maka button delete dan update hilang...update dan delete hanya berlaku saat TA dan semester aktif saja
 23. absensi_pelajaran:
-    - Backend:
-        - ❌ samakan dengan migrasi
-        - ❌ show menggunakan id guru
+    - ☑️ Backend:
+        - ✅ samakan semua
+        - ✅ show menggunakan id guru
     - Frontend
         - samakan dengan insomnia
-        - Alur absensi pegawai adalah melalui get all jadwal_pelajaran_sendiri -> klik jadwal -> absen        
 24.  absensi_siswa:
     - Backend:
         - ❌ samakan (seeder, controller) dengan migrasi
@@ -202,53 +201,53 @@ Perbaikan
     - Frontend:
         - ikutin insomnia
         - alur siswa daftar ekskul: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)
-7.  prestasi:
+29. prestasi:
     - Backend:
         - ✅ (Seeder, Migrasi, Controller) Hapus kolom kelas_id dan jurusan_id
         - ❌ jangan otomatis, gunakan data select manual aja (takutnya mau ngedata prestasi yang lampau)
     - Frontend:
         - ikutin insomnia
-8.  data_nilai_siswa:
+30. data_nilai_siswa:
     kumpulan hasil asesmen (uts/uas, absensi, dll)
     - Backend:
           - ❌
     - Frontend:
           - Guru hanya update sikap, sisanya disi oleh sistem
-9.  rapor_nilai_siswa
+31. rapor_nilai_siswa
     hasil akhir data_nilai_siswa
     - Backend:
           - ❌
-10. projek_p5:
+32. projek_p5:
     - ❌ Backend:
-11. data_nilai_p5:
+33. data_nilai_p5:
     kumpulan hasil projek_p5
     - ❌ Backend:
-12. data_nilai_ekskul
+11. data_nilai_ekskul
     kumpulan hasil ekskul_siswa_pivot
     - Backend:
           - ❌
-13. rapor (wajib export excel)
+12. rapor (wajib export excel)
     hasil final rapor_nilai_siswa, ekskul, p5
     - Backend:
           - ❌
-14. membuat data_berkas:
+13. membuat data_berkas:
     - ❌ Backend:        
-15. keuangan:
+14. keuangan:
     - ❌ Backend:        
-16. ❌⚠️ membuat jurnal_kbm
-17. ❌⚠️ membuat forum diskusi
-18. ❌⚠️ membuat tugas (lms)
-19. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
-20. ====================================================================================================================================
-21. ❌⚠️ modul_ajar: ()
+15. ❌⚠️ membuat jurnal_kbm
+16. ❌⚠️ membuat forum diskusi
+17. ❌⚠️ membuat tugas (lms)
+18. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
+19. ====================================================================================================================================
+20. ❌⚠️ modul_ajar: ()
     rencana pembelajaran untuk mencapai kompetensi, menciptakan asesmen (uts/uas), dibuat tiap tahun
-22. ❌⚠️ asesmen:
+21. ❌⚠️ asesmen:
     alat ukur modul ajar (uts/uas), menilai kompetensi
-23. ❌⚠️ asesmen_kompetensi:
+22. ❌⚠️ asesmen_kompetensi:
     menetapkan bobot kompetensi pada asesmen
-24. ❌⚠️ asesmen_siswa:
+23. ❌⚠️ asesmen_siswa:
     nilai mentah per asesmen
-25. ❌⚠️ nilai_kompetensi_siswa
+24. ❌⚠️ nilai_kompetensi_siswa
     hasil kalkulasi dari asesmen_kompetensi dan asesmen_siswa
 ========================================================================================================================================
 

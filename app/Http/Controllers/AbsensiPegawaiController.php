@@ -482,7 +482,7 @@ class AbsensiPegawaiController extends Controller
     {
         $ids = $request->input('ids');
 
-        // ❗ WAJIB array & tidak kosong
+        // WAJIB array & tidak kosong
         if (!$ids || !is_array($ids)) {
             return response()->json([
                 'status' => 'error',

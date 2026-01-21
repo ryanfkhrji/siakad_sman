@@ -26,4 +26,8 @@ class AbsensiPelajaran extends Model
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
     }    
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }    
 }
