@@ -31,4 +31,9 @@ class Semester extends Model
      { 
         return $this->hasMany(AbsensiPegawai::class, 'semester_id');
      }
+
+     public function absensis()
+    {
+        return $this->hasMany(AbsensiSiswa::class, 'semester_id');
+    }
 }

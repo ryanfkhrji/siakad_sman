@@ -18,14 +18,7 @@ class AbsensiSiswa extends Model
 
     public function jadwalPelajaran()
     {
-        return $this->belongsToMany(JadwalPelajaran::class, 'siswa_jadwal_pelajaran')
-        ->withPivot(
-            [
-                'siswa_id',
-                'jadwal_pelajaran_id',
-                'tahun_akademik_id',
-                'status',        
-            ]);
+        return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');
     }
 
     public function tahunAkademik()
@@ -42,4 +35,5 @@ class AbsensiSiswa extends Model
     {
         return $this->belongsTo(Rombel::class, 'rombel_id');
     }
+    
 }

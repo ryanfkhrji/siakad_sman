@@ -50,4 +50,9 @@ class TahunAkademik extends Model
     {
         return $this->hasMany(SiswaRombel::class);
     }
+
+    public function absensis()
+    {
+        return $this->hasMany(AbsensiSiswa::class, 'jadwal_pelajaran_id');
+    }
 }

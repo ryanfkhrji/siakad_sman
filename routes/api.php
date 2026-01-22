@@ -151,13 +151,13 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::delete('/spa/absensi/guru/pelajaran/destroy/{id?}', [AbsensiPelajaranController::class, 'destroyData']);
     Route::apiResource('/spa/guru/absensi/pelajaran', AbsensiPelajaranController::class)->except('store', 'destroy');  
 
-    // ! ✅ Absensi Siswa ke Pelajaran (MASUK SINI)
+    // ✅☑️ Absensi Siswa ke Pelajaran
     Route::get('/spa/absensi/siswa/pelajaran/export', [AbsensiSiswaController::class, 'export']);
     Route::get('/spa/absensi/siswa/pelajaran/zip', [AbsensiSiswaController::class, 'exportBerkasZip']);
     Route::delete('/spa/absensi/siswa/pelajaran/destroy/{id?}', [AbsensiSiswaController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/siswa/pelajaran', AbsensiSiswaController::class)->except('store', 'destroy');  
 
-    // ✅ CRUD Ekstrakurikuler
+    // ! ✅ CRUD Ekstrakurikuler (MASUK SINI)
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
 
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin

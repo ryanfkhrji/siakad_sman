@@ -23,11 +23,15 @@ return new class extends Migration
             $table->foreignId('rombel_id')
                 ->constrained('rombels')
                 ->restrictOnDelete();                          
+
+            $table->foreignId('tahun_akademik_id')
+                ->constrained('tahun_akademik')
+                ->restrictOnDelete();                          
             
             $table->timestamps();            
 
             // siswa tidak boleh masuk 2x pada rombel yang sama pada tahun yang sama
-            $table->unique(['siswa_id', 'rombel_id']);
+            $table->unique(['siswa_id', 'rombel_id', 'tahun_akademik_id']);
         });
     }
 

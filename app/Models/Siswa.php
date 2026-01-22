@@ -56,18 +56,7 @@ class Siswa extends Authenticatable
     public function jurusan()
     {
         return $this->belongsTo(Jurusan::class);
-    }
-
-    /**
-     * 1 siswa = 1 kelas
-     * kelas_id = id pada tabel kelas
-     */
-    // public function kelas()
-    // {
-    //     return $this->belongsToMany(Kelas::class, 'siswa_rombel')
-    //     ->withPivot(['id', 'siswa_id', 'rombel_id', 'tahun_akademik_id', 'status']);
-    //     // status: aktif/arsip
-    // }    
+    }    
 
     public function siswaRombels()
     {

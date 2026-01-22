@@ -25,12 +25,18 @@ return new class extends Migration
             
             $table->string('bukti')->nullable();                        
 
+            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik')->cascadeOnDelete();
+            
+            $table->foreignId('semester_id')->constrained('semester')->cascadeOnDelete();
+
             $table->timestamps();
 
             $table->unique([
                 'siswa_id',
                 'jadwal_pelajaran_id',
                 'hari',
+                'tahun_akademik_id',
+                'semester_id',
             ], 'unik');
         });
     }

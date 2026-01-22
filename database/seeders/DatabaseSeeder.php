@@ -407,7 +407,7 @@ class DatabaseSeeder extends Seeder
          */
         TahunAkademik::insert([
             [
-                'tahun_akademik' => '2013/2023',                
+                'tahun_akademik' => '2013/2024',                
                 'keterangan' => 'Kurikulum 2013',
                 'status' => 'arsip',
             ],
@@ -707,6 +707,12 @@ class DatabaseSeeder extends Seeder
                 'wali_rombel_id' => 6, // Guru Indo
             ],                    
             [
+                'kelas_id' => 1, // X
+                'tahun_akademik_id' => 2, // 2024/2025
+                'nama_rombel' => 'X-C',
+                'wali_rombel_id' => 7, // Guru Sunda
+            ],                    
+            [
                 'kelas_id' => 2, // XI
                 'tahun_akademik_id' => 1, // 2013/2023
                 'nama_rombel' => 'XI-A',
@@ -718,15 +724,28 @@ class DatabaseSeeder extends Seeder
         SiswaRombel::insert([
             [
                 'siswa_id' => 1, // Bagas
+                'rombel_id' => 4, // XI-A - J.IPA                
+                'tahun_akademik_id' => 1, // 2013/2024
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 4, // XI-A
+                'tahun_akademik_id' => 1, // 2013/2024
+            ],            
+            [
+                'siswa_id' => 1, // Bagas
                 'rombel_id' => 1, // X-A - J.IPA                
+                'tahun_akademik_id' => 2, // 2024/2025
             ],
             [
                 'siswa_id' => 2, // Winton
                 'rombel_id' => 2, // X-B - J.IPS                
+                'tahun_akademik_id' => 2, // 2024/2025
             ],            
             [
                 'siswa_id' => 3, // Sanita
-                'rombel_id' => 2, // X-B - J.IPS                
+                'rombel_id' => 3, // X-B - J.IPS                
+                'tahun_akademik_id' => 2, // 2024/2025
             ],
         ]);
 
@@ -744,7 +763,7 @@ class DatabaseSeeder extends Seeder
                 'semester_id' => 1, // 2013/2023 = Ganjil
                 'hari' => 'Kamis',
                 'guru_id' => 5, // Guru MTK
-                'rombel_id' => 3, // X-C
+                'rombel_id' => 4, // XI-A
                 'jam_mulai' => '07:30',
                 'jam_selesai' => '09:30',
                 'ruangan_id' => 2,
@@ -778,6 +797,42 @@ class DatabaseSeeder extends Seeder
             [
                 // 4
                 'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
+                'semester_id' => 3, // 2024/2025 = Ganjil
+                'hari' => 'Selasa',
+                'guru_id' => 5, // Guru MTK
+                'rombel_id' => 3, // X-C
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 2,
+                'link_opsional' => 'www.youtube.com', 
+            ],    
+            [
+                // 5
+                'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Senin',
+                'guru_id' => 5, // Guru MTK
+                'rombel_id' => 1, // X-A
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 1,                
+                'link_opsional' => 'www.youtube.com',                
+            ],
+            [
+                // 6
+                'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Senin',
+                'guru_id' => 5, // Guru MTK
+                'rombel_id' => 2, // X-B
+                'jam_mulai' => '09:31',
+                'jam_selesai' => '12:30',
+                'ruangan_id' => 2,
+                'link_opsional' => 'www.youtube.com',                
+            ],
+            [
+                // 7
+                'kurikulum_mata_pelajaran_id' => 2, // merdeka - MTK
                 'semester_id' => 4, // 2024/2025 = Genap
                 'hari' => 'Selasa',
                 'guru_id' => 5, // Guru MTK
@@ -791,7 +846,7 @@ class DatabaseSeeder extends Seeder
             // ---------------------            
             // Indo
             [
-                // 5                   
+                // 8
                 'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
                 'semester_id' => 3, // 2024/2025 = Ganjil
                 'hari' => 'Selasa',
@@ -803,7 +858,43 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => '',                            
             ],          
             [
-                // 6
+                // 9
+                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
+                'semester_id' => 3, // 2024/2025 = Ganjil
+                'hari' => 'Rabu',
+                'guru_id' => 6, // Guru Indo
+                'rombel_id' => 2, // X-B
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 1,
+                'link_opsional' => '',                
+            ],            
+            [
+                // 10
+                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
+                'semester_id' => 3, // 2024/2025 = Ganjil
+                'hari' => 'Rabu',
+                'guru_id' => 6, // Guru Indo
+                'rombel_id' => 3, // X-C
+                'jam_mulai' => '10:00',
+                'jam_selesai' => '12:30',
+                'ruangan_id' => 1,
+                'link_opsional' => '',                
+            ],            
+            [
+                // 11
+                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Selasa',
+                'guru_id' => 6, // Guru Indo
+                'rombel_id' => 1, // X-A
+                'jam_mulai' => '07:30',
+                'jam_selesai' => '09:30',
+                'ruangan_id' => 3,
+                'link_opsional' => '',                            
+            ],          
+            [
+                // 12
                 'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
                 'semester_id' => 4, // 2024/2025 = Genap
                 'hari' => 'Rabu',
@@ -814,11 +905,23 @@ class DatabaseSeeder extends Seeder
                 'ruangan_id' => 1,
                 'link_opsional' => '',                
             ],            
+            [
+                // 13
+                'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Rabu',
+                'guru_id' => 6, // Guru Indo
+                'rombel_id' => 3, // X-C
+                'jam_mulai' => '10:00',
+                'jam_selesai' => '12:30',
+                'ruangan_id' => 1,
+                'link_opsional' => '',                
+            ],            
             // Indo
             // ---------------------            
             // Sunda
             [
-                // 7
+                // 14
                 'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
                 'semester_id' => 3, // 2024/2025 = Ganjil
                 'hari' => 'Rabu',
@@ -830,14 +933,62 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => '',                
             ],            
             [
-                // 8
+                // 15
                 'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
-                'semester_id' => 4, // 2024/2025 = Genap
-                'hari' => 'Rabu',
+                'semester_id' => 3, // 2024/2025 = Ganjil
+                'hari' => 'Kamis',
                 'guru_id' => 7, // Guru Sunda
                 'rombel_id' => 2, // X-B
                 'jam_mulai' => '10:00',
                 'jam_selesai' => '12:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],                                                   
+            [
+                // 16
+                'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
+                'semester_id' => 3, // 2024/2025 = Ganjil
+                'hari' => 'Kamis',
+                'guru_id' => 7, // Guru Sunda
+                'rombel_id' => 3, // X-C
+                'jam_mulai' => '13:00',
+                'jam_selesai' => '15:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],                                                   
+            [
+                // 17
+                'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Rabu',
+                'guru_id' => 7, // Guru Sunda
+                'rombel_id' => 1, // X-A
+                'jam_mulai' => '10:00',
+                'jam_selesai' => '12:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],            
+            [
+                // 18
+                'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Kamis',
+                'guru_id' => 7, // Guru Sunda
+                'rombel_id' => 2, // X-B
+                'jam_mulai' => '10:00',
+                'jam_selesai' => '12:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',                
+            ],                                                   
+            [
+                // 19
+                'kurikulum_mata_pelajaran_id' => 4, // MERDEKA - Sunda
+                'semester_id' => 4, // 2024/2025 = Genap
+                'hari' => 'Kamis',
+                'guru_id' => 7, // Guru Sunda
+                'rombel_id' => 3, // X-C
+                'jam_mulai' => '13:00',
+                'jam_selesai' => '15:30',
                 'ruangan_id' => 2,
                 'link_opsional' => '',                
             ],                                                   
@@ -851,19 +1002,68 @@ class DatabaseSeeder extends Seeder
         AbsensiPegawai::insert([
             [
                 'guru_id' => 5, // Guru MTK
-                'jadwal_pelajaran_id' => 1,
+                'jadwal_pelajaran_id' => null,
+                'hari' => '2014-02-27',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 1,  // 13/24
+                'semester_id' => 2, // Genap
+            ],
+            [
+                'guru_id' => 5, // Guru MTK
+                'jadwal_pelajaran_id' => null,
                 'hari' => '2025-05-24',
                 'status' => 'hadir',
                 'tahun_akademik_id' => 2, 
-                'semester_id' => 4,
+                'semester_id' => 3, // Ganjil
             ],
+            [
+                'guru_id' => 5, // Guru MTK
+                'jadwal_pelajaran_id' => null,
+                'hari' => '2025-05-25',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 3, // Ganjil
+            ],
+            [
+                'guru_id' => 5, // Guru MTK
+                'jadwal_pelajaran_id' => 1,
+                'hari' => '2025-05-26',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 3, // Ganjil
+            ],
+            [
+                'guru_id' => 5, // Guru MTK
+                'jadwal_pelajaran_id' => 1,
+                'hari' => '2026-01-23',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 4, // Genap
+            ],
+            [
+                'guru_id' => 5, // Guru MTK
+                'jadwal_pelajaran_id' => null,
+                'hari' => '2026-01-24',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 4, // Genap
+            ],
+            [
+                'guru_id' => 5, // Guru MTK
+                'jadwal_pelajaran_id' => 1,
+                'hari' => '2026-01-25',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 4, // Genap
+            ],
+            // ---------------------------------------------------
             [
                 'guru_id' => 6,
                 'jadwal_pelajaran_id' => 2, // Indon
                 'hari' => '2025-05-24',
                 'status' => 'tidak hadir',
                 'tahun_akademik_id' => 2,
-                'semester_id' => 4,
+                'semester_id' => 3,
             ],
             [
                 'guru_id' => 6,
@@ -871,12 +1071,85 @@ class DatabaseSeeder extends Seeder
                 'hari' => '2025-05-25',
                 'status' => 'hadir',
                 'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                'guru_id' => 6,
+                'jadwal_pelajaran_id' => 2,
+                'hari' => '2025-05-26',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                'guru_id' => 6,
+                'jadwal_pelajaran_id' => 2, // Indon
+                'hari' => '2026-01-01',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                'guru_id' => 6,
+                'jadwal_pelajaran_id' => 2,
+                'hari' => '2026-01-02',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                'guru_id' => 6,
+                'jadwal_pelajaran_id' => 2,
+                'hari' => '2026-01-03',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            // ----------------------------------------------
+            [
+                'guru_id' => 7,
+                'jadwal_pelajaran_id' => 3, // Sunda
+                'hari' => '2025-05-24',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                'guru_id' => 7,
+                'jadwal_pelajaran_id' => 3, // Sunda
+                'hari' => '2025-05-25',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                'guru_id' => 7,
+                'jadwal_pelajaran_id' => 3, // Sunda
+                'hari' => '2025-05-26',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                'guru_id' => 7,
+                'jadwal_pelajaran_id' => 3, // Sunda
+                'hari' => '2026-01-04',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2,
                 'semester_id' => 4,
             ],
             [
                 'guru_id' => 7,
                 'jadwal_pelajaran_id' => 3, // Sunda
-                'hari' => '2025-05-24',
+                'hari' => '2026-01-05',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                'guru_id' => 7,
+                'jadwal_pelajaran_id' => 3, // Sunda
+                'hari' => '2026-01-06',
                 'status' => 'hadir',
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4,
@@ -902,8 +1175,8 @@ class DatabaseSeeder extends Seeder
             [
                 // 2
                 'guru_pengajar_id' => 5, /// Guru MTK
-                'jadwal_pelajaran_id' => 2, // MTK | 25/25 | Ganjil | X-A      
-                'hari' => '2025-05-26',
+                'jadwal_pelajaran_id' => 2, // MTK | 24/25 | Ganjil | X-A      
+                'hari' => '2024-05-05', // Senin
                 'status' => 'hadir',                
                 'tahun_akademik_id' => 2, // 24/25
                 'semester_id' => 3 // Ganjil
@@ -911,144 +1184,767 @@ class DatabaseSeeder extends Seeder
             [
                 // 3
                 'guru_pengajar_id' => 5, /// Guru MTK
-                'jadwal_pelajaran_id' => 3, // MTK | 25/25 | Ganjil | X-B     
-                'hari' => '2025-05-27',
-                'status' => 'tidak hadir',                
+                'jadwal_pelajaran_id' => 2, // MTK | 24/25 | Ganjil | X-A     
+                'hari' => '2024-05-12', // Senin
+                'status' => 'hadir',                
                 'tahun_akademik_id' => 2, // 24/25
                 'semester_id' => 3 // Ganjil
             ],
             [
                 // 4
                 'guru_pengajar_id' => 5, /// Guru MTK
-                'jadwal_pelajaran_id' => 4, // MTK | 25/25 | Genap | X-C      
-                'hari' => '2025-05-27',
+                'jadwal_pelajaran_id' => 2, // MTK | 24/25 | Ganjil | X-A     
+                'hari' => '2024-05-19', // Senin
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 3 // Ganjil
+            ],
+            [
+                // 5 (id 3)
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 3, // MTK | 24/25 | Ganjil | X-B      
+                'hari' => '2024-05-05',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 3  // Ganjil
+            ],
+            [
+                // 6
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 3, // MTK | 24/25 | Ganjil | X-B      
+                'hari' => '2024-05-12',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 3  // Ganjil
+            ],
+            [
+                // 7
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 3, // MTK | 24/25 | Ganjil | X-B      
+                'hari' => '2024-05-19',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 3  // Ganjil
+            ],
+            [
+                // 8 (id 4)
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 4, // MTK | 24/25 | Ganjil | X-C      
+                'hari' => '2024-05-06', // Selasa
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 3  // Ganjil
+            ],
+            [
+                // 9
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 4, // MTK | 24/25 | Ganjil | X-C      
+                'hari' => '2024-05-13',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 3  // Ganjil
+            ],
+            [
+                // 10
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 4, // MTK | 24/25 | Ganjil | X-C      
+                'hari' => '2024-05-20',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 3  // Ganjil
+            ],
+            [
+                // 11 (id 5)
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 5, // MTK | 24/25 | Genap | X-A      
+                'hari' => '2025-05-05', // Senin
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4 // Genap
+            ],
+            [
+                // 12
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 5, // MTK | 24/25 | Genap | X-A     
+                'hari' => '2025-05-12', // Senin
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4 // Genap
+            ],
+            [
+                // 13
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 5, // MTK | 24/25 | Genap | X-A     
+                'hari' => '2025-05-19', // Senin
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4 // Genap
+            ],            
+            [
+                // 14 (id 6)
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 6, // MTK | 24/25 | Genap | X-B      
+                'hari' => '2025-05-05',
                 'status' => 'tidak hadir',                
                 'tahun_akademik_id' => 2, // 24/25
                 'semester_id' => 4  // Genap
             ],
             [
-                // 5
+                // 15
                 'guru_pengajar_id' => 5, /// Guru MTK
-                'jadwal_pelajaran_id' => 4, // MTK | 25/25 | Genap | X-C      
-                'hari' => '2025-06-03',
-                'status' => 'hadir',                
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4  
+                'jadwal_pelajaran_id' => 6, // MTK | 24/25 | Genap | X-B      
+                'hari' => '2025-05-12',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4  // Genap
             ],
+            [
+                // 16
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 6, // MTK | 24/25 | Genap | X-B      
+                'hari' => '2025-05-19',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4  // Genap
+            ],
+            [
+                // 17 (id 7)
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 7, // MTK | 24/25 | Genap | X-C      
+                'hari' => '2025-05-06',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4  // Genap
+            ],
+            [
+                // 18
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 7, // MTK | 24/25 | Genap | X-C      
+                'hari' => '2025-05-13',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4  // Genap
+            ],
+            [
+                // 19
+                'guru_pengajar_id' => 5, /// Guru MTK
+                'jadwal_pelajaran_id' => 7, // MTK | 24/25 | Genap | X-C      
+                'hari' => '2025-05-20',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2, // 24/25
+                'semester_id' => 4  // Genap
+            ],        
             // ---------------------  
             [
-                // 6
+                // 20
                 'guru_pengajar_id' => 6, // Guru Indo
-                'jadwal_pelajaran_id' => 5, // Indo | 24/25 | Ganjil | X-A
-                'hari' => '2025-05-13',
+                'jadwal_pelajaran_id' => 8, // Indo | 24/25 | Ganjil | X-A
+                'hari' => '2024-05-06',
                 'status' => 'tidak hadir',                
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3
             ],                   
             [
-                // 7
+                // 21
                 'guru_pengajar_id' => 6, // Guru Indo
-                'jadwal_pelajaran_id' => 5, // Indo | 24/25 | Ganjil | X-A
-                'hari' => '2025-05-20',
+                'jadwal_pelajaran_id' => 8, // Indo | 24/25 | Ganjil | X-A
+                'hari' => '2024-05-13',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3
+            ],                   
+            [
+                // 22
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 8, // Indo | 24/25 | Ganjil | X-A
+                'hari' => '2024-05-20',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3
+            ],                   
+            [
+                // 23
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 9, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-05-07',
                 'status' => 'hadir',                
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3
             ],
             [
-                // 8
+                // 24
                 'guru_pengajar_id' => 6, // Guru Indo
-                'jadwal_pelajaran_id' => 6, // Indo | 24/25 | Genap | X-B
-                'hari' => '2025-05-21',
+                'jadwal_pelajaran_id' => 9, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-05-14',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 25
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 9, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-05-21',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 26
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 10, // Indo | 24/25 | Ganjil | X-C
+                'hari' => '2024-05-07',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3
+            ],
+            [
+                // 27
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 10, // Indo | 24/25 | Ganjil | X-C
+                'hari' => '2024-05-14',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 28
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 10, // Indo | 24/25 | Ganjil | X-C
+                'hari' => '2024-05-21',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 29
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 11, // Indo | 24/25 | Genap | X-A
+                'hari' => '2025-01-07',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],                   
+            [
+                // 30
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 11, // Indo | 24/25 | Genap | X-A
+                'hari' => '2025-01-14',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],                   
+            [
+                // 31
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 11, // Indo | 24/25 | Genap | X-A
+                'hari' => '2025-01-21',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],                   
+            [
+                // 32
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 12, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-01-08',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],
+            [
+                // 33
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 12, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-01-15',
                 'status' => 'hadir',                
                 'tahun_akademik_id' => 2,                
                 'semester_id' => 4
             ],
             [
-                // 9
+                // 34
                 'guru_pengajar_id' => 6, // Guru Indo
-                'jadwal_pelajaran_id' => 6, // Indo | 24/25 | Genap | X-B
-                'hari' => '2025-05-28',
+                'jadwal_pelajaran_id' => 12, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-01-22',
                 'status' => 'tidak hadir',                
                 'tahun_akademik_id' => 2,                
                 'semester_id' => 4
             ],
+            [
+                // 35
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 13, // Indo | 24/25 | Genap | X-C
+                'hari' => '2025-01-29',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],
+            [
+                // 36
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 13, // Indo | 24/25 | Genap | X-C
+                'hari' => '2025-02-08',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 4
+            ],
+            [
+                // 37
+                'guru_pengajar_id' => 6, // Guru Indo
+                'jadwal_pelajaran_id' => 13, // Indo | 24/25 | Genap | X-C
+                'hari' => '2025-02-15',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 4
+            ],            
             // ---------------------  
             [
-                // 10
+                // 38
                 'guru_pengajar_id' => 7, // Guru Sunda
-                'jadwal_pelajaran_id' => 7, // Sunda | 24/25 | Ganjil | X-A
-                'hari' => '2025-05-07',
+                'jadwal_pelajaran_id' => 14, // Indo | 24/25 | Ganjil | X-A
+                'hari' => '2024-04-02',
                 'status' => 'tidak hadir',                
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3
-            ],     
+            ],                   
             [
-                // 11
+                // 39
                 'guru_pengajar_id' => 7, // Guru Sunda
-                'jadwal_pelajaran_id' => 7, // Sunda | 24/25 | Ganjil | X-A
-                'hari' => '2025-05-14',
+                'jadwal_pelajaran_id' => 14, // Indo | 24/25 | Ganjil | X-A
+                'hari' => '2024-04-09',
                 'status' => 'hadir',                
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3
-            ],                        
+            ],                   
             [
-                // 12
+                // 40
                 'guru_pengajar_id' => 7, // Guru Sunda
-                'jadwal_pelajaran_id' => 8, // Sunda | 24/25 | Genap | X-B
-                'hari' => '2025-05-21',
+                'jadwal_pelajaran_id' => 14, // Indo | 24/25 | Ganjil | X-A
+                'hari' => '2024-04-16',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3
+            ],                   
+            [
+                // 41
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 15, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-04-03',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3
+            ],
+            [
+                // 42
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 15, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-04-10',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 43
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 15, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-04-17',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 44
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 16, // Indo | 24/25 | Ganjil | X-C
+                'hari' => '2024-08-07',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3
+            ],
+            [
+                // 45
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 16, // Indo | 24/25 | Ganjil | X-C
+                'hari' => '2024-08-14',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 46
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 16, // Indo | 24/25 | Ganjil | X-C
+                'hari' => '2024-08-21',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 3
+            ],
+            [
+                // 47
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 17, // Indo | 24/25 | Genap | X-A
+                'hari' => '2025-01-08',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],                   
+            [
+                // 48
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 17, // Indo | 24/25 | Genap | X-A
+                'hari' => '2025-01-15',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],                   
+            [
+                // 49
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 17, // Indo | 24/25 | Genap | X-A
+                'hari' => '2025-01-22',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],                   
+            [
+                // 50
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 18, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-01-09',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],
+            [
+                // 51
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 18, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-01-16',
                 'status' => 'hadir',                
                 'tahun_akademik_id' => 2,                
                 'semester_id' => 4
             ],
             [
-                // 13
+                // 52
                 'guru_pengajar_id' => 7, // Guru Sunda
-                'jadwal_pelajaran_id' => 8, // Sunda | 24/25 | Genap | X-B
-                'hari' => '2025-05-28',
+                'jadwal_pelajaran_id' => 18, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-01-23',
                 'status' => 'tidak hadir',                
                 'tahun_akademik_id' => 2,                
                 'semester_id' => 4
-            ]                                        
+            ],
+            [
+                // 53
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 19, // Indo | 24/25 | Genap | X-C
+                'hari' => '2025-01-09',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4
+            ],
+            [
+                // 54
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 19, // Indo | 24/25 | Genap | X-C
+                'hari' => '2025-01-16',
+                'status' => 'hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 4
+            ],
+            [
+                // 55
+                'guru_pengajar_id' => 7, // Guru Sunda
+                'jadwal_pelajaran_id' => 19, // Indo | 24/25 | Genap | X-C
+                'hari' => '2025-02-23',
+                'status' => 'tidak hadir',                
+                'tahun_akademik_id' => 2,                
+                'semester_id' => 4
+            ],           
         ]);
 
         /**
-         * 🎯 spa: CRUD
+         * 🎯✅ spa: CRUD
          * kepsek: GET, SHOW
          * guru: CRUD
          */
         AbsensiSiswa::insert([
             [
-                'siswa_id' => 1, // Andi
-                'rombel_id' => 2,  // X-B
-                'jadwal_pelajaran_id' => 2, // B.Indonesia
-                'hari' => '2025-10-17', // B.Indonesia
+                // 1
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 4,  // XI-A
+                'jadwal_pelajaran_id' => 1, // MTK | 13/24 | Ganjil | XI-A
+                'hari' => '2024-12-05',
                 'status' => 'hadir',
-                'bukti' => null,                                
-            ],
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],            
             [
-                'siswa_id' => 1, // Andi
-                'rombel_id' => 2, // X-B
-                'jadwal_pelajaran_id' => 1, // IPA
-                'hari' => '2025-10-24', // IPA
-                'status' => 'sakit',
-                'bukti' => 'sakit.jpg',                                
-            ],
-            [
-                'siswa_id' => 2, // Rina
-                'rombel_id' => 1, // X-A
-                'jadwal_pelajaran_id' => 1, // IPA
-                'hari' => '2025-10-10', // IPA
+                // 2
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 4,  // XI-A
+                'jadwal_pelajaran_id' => 1, // MTK | 13/24 | Ganjil | XI-A
+                'hari' => '2024-12-12',
                 'status' => 'alfa',
-                'bukti' => 'alfa.jpg',                                
-            ],
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],            
             [
-                'siswa_id' => 2, // Rina
-                'rombel_id' => 1, // X-A
-                'jadwal_pelajaran_id' => 2, // B.Indonesia
-                'hari' => '2025-10-25', // B.Indonesia
+                // 3
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1,  // X-A
+                'jadwal_pelajaran_id' => 2, // MTK | 24/25 | Ganjil | X-A
+                'hari' => '2024-12-09',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],            
+            [
+                // 4
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1,  // X-A
+                'jadwal_pelajaran_id' => 2, // MTK | 24/25 | Ganjil | X-A
+                'hari' => '2024-12-16',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],            
+            [
+                // 5
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1,  // X-A
+                'jadwal_pelajaran_id' => 5, // MTK | 24/25 | Genap | X-A
+                'hari' => '2025-05-06',
                 'status' => 'izin',
                 'bukti' => 'izin.jpg',                                
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],            
+            [
+                // 6
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1,  // X-A
+                'jadwal_pelajaran_id' => 8, // Indo | 24/25 | Ganjil | X-A
+                'hari' => '2024-12-10',
+                'status' => 'hadir',
+                'bukti' => null,  
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],            
+            [
+                // 7
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1,  // X-A
+                'jadwal_pelajaran_id' => 11, // Indo | 24/25 | Genap | X-A
+                'hari' => '2025-05-06',
+                'status' => 'hadir',
+                'bukti' => null,  
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],            
+            [
+                // 8
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1,  // X-A
+                'jadwal_pelajaran_id' => 14, // Sunda | 24/25 | Ganjil | X-A
+                'hari' => '2024-05-07',
+                'status' => 'hadir',
+                'bukti' => null,  
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],            
+            [
+                // 9
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 1,  // X-A
+                'jadwal_pelajaran_id' => 17, // Sunda | 24/25 | Genap | X-A
+                'hari' => '2025-05-07',
+                'status' => 'hadir',
+                'bukti' => null,  
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],            
+            // -------------------------------------------------------------
+            [
+                // 10
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 4, // XI-A
+                'jadwal_pelajaran_id' => 1, // MTK | 13/24 | Ganjil | XI-A
+                'hari' => '2024-12-05', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
             ],
+            [
+                // 11
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 4, // XI-A
+                'jadwal_pelajaran_id' => 1, // MTK | 13/24 | Ganjil | XI-A
+                'hari' => '2024-12-12', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+            ],
+            [
+                // 12
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 3, // MTK | 24/25 | Ganjil | X-B
+                'hari' => '2024-12-02', 
+                'status' => 'izin',
+                'bukti' => 'acara-keluarga-dummy.png',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                // 13
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 6, // MTK | 24/25 | Genap | X-B
+                'hari' => '2025-05-05', 
+                'status' => 'alfa',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                // 14
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 9, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-12-04', 
+                'status' => 'sakit',
+                'bukti' => 'surat-dokter-dummy.jpg',
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                // 15
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 9, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-12-11', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                // 16
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 12, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-05-07', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                // 17
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 15, // Sunda | 24/25 | Ganjil | X-B
+                'hari' => '2024-12-05', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                // 18
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 18, // Sunda | 24/25 | Genap | X-B
+                'hari' => '2025-05-08', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            // -------------------------------------------------------------   
+            [
+                // 19
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 3, // MTK | 24/25 | Ganjil | X-B
+                'hari' => '2024-12-02', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                // 20
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 6, // MTK | 24/25 | Genap | X-B
+                'hari' => '2025-05-06', 
+                'status' => 'alfa',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                // 21
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 9, // Indo | 24/25 | Ganjil | X-B
+                'hari' => '2024-12-04', 
+                'status' => 'alfa',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                // 22
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 12, // Indo | 24/25 | Genap | X-B
+                'hari' => '2025-05-07', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],
+            [
+                // 23
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 15, // Sunda | 24/25 | Ganjil | X-B
+                'hari' => '2024-12-05', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+            ],
+            [
+                // 24
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 18, // Sunda | 24/25 | Genap | X-B
+                'hari' => '2025-05-08', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],                  
+            [
+                // 25
+                'siswa_id' => 3, // Sanita
+                'rombel_id' => 2, // X-B
+                'jadwal_pelajaran_id' => 18, // Sunda | 24/25 | Genap | X-B
+                'hari' => '2025-05-15', 
+                'status' => 'hadir',
+                'bukti' => null,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+            ],                  
         ]);        
 
         /**

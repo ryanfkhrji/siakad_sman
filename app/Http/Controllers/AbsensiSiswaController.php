@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AbsensiSiswa;
 use App\Models\SiswaJadwalPelajaran;
+use App\Models\SiswaRombel;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -21,99 +22,69 @@ class AbsensiSiswaController extends Controller
 {
     /**
      * ✅ Untuk spa
+     * tahun->rombel->siswa
      */
     public function index()
     {
-        $absensi = AbsensiSiswa::with([
-            'siswa.kelas',
-            'jadwalPelajaran.mataPelajaran',
-            'tahunAkademik'
+        $siswaRombel = SiswaRombel::with([
+            'tahunAkademik',
+            'rombel.waliRombel',
+            'siswa',
         ])
-        ->orderBy('hari')
+        ->orderBy('tahun_akademik_id', 'desc')
         ->get();
 
-        if ($absensi->isEmpty()) {
+        if ($siswaRombel->isEmpty()) {
             return ApiResponse::error('Not found', [
-                'data' => 'Data absensi tidak ditemukan'
+                'data' => 'Tidak ada data'
             ]);
         }
 
-        $result = $absensi
-            ->groupBy('siswa_id')
-            ->map(function ($absenSiswa) {
+        $result = $siswaRombel
+            ->groupBy('tahun_akademik_id')
+            ->map(function ($tahun) {
 
-                $siswa = $absenSiswa->first()->siswa;
+                $ta = $tahun->first()->tahunAkademik;
 
                 return [
-                    'siswa_id'   => $siswa->id,
-                    'nama_siswa' => $siswa->nama,
-                    'kelas'      => $siswa->kelas->nama_kelas ?? null,
+                    'tahun_akademik_id' => $ta->id ?? null,
+                    'tahun_akademik' => $ta->tahun_akademik ?? null,
+                    'status_tahun_akademik' => $ta->status ?? null,
 
-                    // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK
-                    'absensi' => $absenSiswa
-                        ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
-                        ->map(function ($absenPerTahun, $tahunAkademik) {
+                    'rombels' => $tahun
+                        ->groupBy('rombel_id')
+                        ->map(function ($rombel) {
 
-                            // 🔹 GROUP PER SEMESTER
-                            $semester = $absenPerTahun
-                                ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
-                                ->map(function ($absenSemester, $semester) {
-
-                                    return [
-                                        'semester' => $semester,
-
-                                        // TOTAL PER SEMESTER
-                                        'total' => [
-                                            'hadir' => $absenSemester->where('status', 'hadir')->count(),
-                                            'izin'  => $absenSemester->where('status', 'izin')->count(),
-                                            'sakit' => $absenSemester->where('status', 'sakit')->count(),
-                                            'alfa'  => $absenSemester->where('status', 'alfa')->count(),
-                                        ],
-
-                                        // 🔹 RINCIAN PER MAPEL
-                                        'rincian' => $absenSemester
-                                            ->groupBy('jadwal_pelajaran_id')
-                                            ->map(function ($absenMapel) {
-
-                                                $mapel = $absenMapel->first()
-                                                    ->jadwalPelajaran
-                                                    ->mataPelajaran;
-
-                                                return [
-                                                    'mata_pelajaran' =>
-                                                        $mapel->nama_pelajaran ?? null,
-
-                                                    'detail' => $absenMapel->map(function ($abs) {
-                                                        return [
-                                                            'hari' => Carbon::parse($abs->hari)
-                                                                ->translatedFormat('l, d F Y'),
-                                                            'status' => $abs->status,
-                                                            'bukti' => $abs->bukti
-                                                                ? asset(str_replace(
-                                                                    'public/',
-                                                                    'storage/',
-                                                                    $abs->bukti
-                                                                ))
-                                                                : null,
-                                                        ];
-                                                    })->values(),
-                                                ];
-                                            })->values(),
-                                    ];
-                                })->values();
+                            $rmbl = $rombel->first()->rombel;
 
                             return [
-                                'tahun_akademik' => $tahunAkademik,
-                                'status_tahun_akademik' => $absenPerTahun->first()->tahunAkademik->status ?? null,
-                                'semester' => $semester,
-                                'status_semester' => $absenPerTahun->first()->tahunAkademik->status ?? null,
-                            ];
-                        })->values(),
-                ];
-            })->values();
+                                'rombel_id' => $rmbl->id ?? null,
+                                'nama_rombel' => $rmbl->nama_rombel ?? null,
+                                'wali_rombel' => $rmbl->waliRombel->nama ?? null,
 
-        return ApiResponse::success($result, 'Semua absensi berhasil diambil');
+                                'siswas' => $rombel
+                                    ->map(function ($item) {
+                                        $siswa = $item->siswa;
+
+                                        return [
+                                            'siswa_id' => $siswa->id,
+                                            'nama_siswa' => $siswa->nama,
+                                            'nisn' => $siswa->nisn,
+                                            'nis' => $siswa->nis,
+                                            'status' => $siswa->status,
+                                        ];
+                                    })
+                                    ->values(),
+                            ];
+                        })
+                        ->values(),
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success($result, 'Data berhasil diambil');
     }
+
 
 
     private function simpanFoto($file, $folder, $nama_siswa)
@@ -320,85 +291,103 @@ class AbsensiSiswaController extends Controller
 
     /**
      * ✅ untuk spa
-     * get siswa dan semua absennya
+     * siswa, tahun, semester, rombel, jadwal, absensi
      */   
     public function show($id)
-    {        
-        $absen = AbsensiSiswa::with([
-            'jadwalPelajaran.mataPelajaran',
-            'siswa.kelas',
-            'tahunAkademik'
+    {
+        $absensi = AbsensiSiswa::with([
+            'siswa',
+            'rombel',
+            'tahunAkademik',
+            'semester',
+            'jadwalPelajaran.ruangan',
+            'jadwalPelajaran.rombel',
+            'jadwalPelajaran.guru',
+            'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
         ])
         ->where('siswa_id', $id)
         ->orderBy('hari', 'desc')
         ->get();
-    
-        if ($absen->isEmpty()) {
+
+        if ($absensi->isEmpty()) {
             return ApiResponse::error('Not found', [
                 'data' => 'Data absensi tidak ditemukan'
             ]);
         }
-    
-        $siswa = $absen->first()->siswa;
-    
+
+        $siswa = $absensi->first()->siswa;
+
         $result = [
-            'siswa_id'   => $siswa->id,
+            'siswa_id' => $siswa->id,
             'nama_siswa' => $siswa->nama,
-            'kelas_id'   => $siswa->kelas->id ?? null,
-            'kelas'      => $siswa->kelas->nama_kelas ?? null,
-    
-            // 🔹 GROUP BERDASARKAN STRING TAHUN AKADEMIK
-            'tahun_akademik' => $absen
-                ->groupBy(fn ($abs) => $abs->tahunAkademik->tahun_akademik)
-                ->map(function ($absenPerTahun, $tahunAkademik) {
-    
-                    // 🔹 GROUP PER SEMESTER
-                    $semester = $absenPerTahun
-                        ->groupBy(fn ($abs) => $abs->tahunAkademik->semester)
-                        ->map(function ($itemsSemester, $semester) {
-    
-                            return [
-                                'semester' => $semester,
-    
-                                'total' => [
-                                    'hadir' => $itemsSemester->where('status', 'hadir')->count(),
-                                    'izin'  => $itemsSemester->where('status', 'izin')->count(),
-                                    'sakit' => $itemsSemester->where('status', 'sakit')->count(),
-                                    'alfa'  => $itemsSemester->where('status', 'alfa')->count(),
-                                ],
-    
-                                'absensi' => $itemsSemester->map(function ($abs) {
-                                    return [
-                                        'id' => $abs->id,
-                                        'mata_pelajaran' =>
-                                            $abs->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,
-                                        'hari' => Carbon::parse($abs->hari)
-                                            ->translatedFormat('l, d F Y'),
-                                        'status_kehadiran' => $abs->status,
-                                        'bukti' => $abs->bukti
-                                            ? asset(str_replace(
-                                                'public/',
-                                                'storage/',
-                                                $abs->bukti
-                                            ))
-                                            : null,
-                                    ];
-                                })->values(),
-                            ];
-                        })->values();
-    
+            'nisn' => $siswa->nisn,
+            'nis' => $siswa->nis,
+
+            'tahun_akademik' => $absensi
+                ->groupBy('tahun_akademik_id')
+                ->map(function ($taGroup) {
+
+                    $ta = $taGroup->first()->tahunAkademik;
+
                     return [
-                        'tahun_akademik' => $tahunAkademik,
-                        'status_tahun_akademik' => $absenPerTahun->first()->tahunAkademik->status ?? null,
-                        'semester' => $semester,
-                        'status_semester' => $absenPerTahun->first()->tahunAkademik->status ?? null,
+                        'tahun_akademik_id' => $ta->id,
+                        'tahun_akademik' => $ta->tahun_akademik,
+                        'status_tahun_akademik' => $ta->status,
+
+                        'semester' => $taGroup
+                            ->groupBy('semester_id')
+                            ->map(function ($semesterGroup) {
+
+                                $semester = $semesterGroup->first()->semester;
+
+                                return [
+                                    'semester_id' => $semester->id,
+                                    'semester' => $semester->semester,
+                                    'status_semester' => $semester->status,
+
+                                    'jadwal_pelajaran' => $semesterGroup
+                                        ->groupBy('jadwal_pelajaran_id')
+                                        ->map(function ($jadwalGroup) {
+
+                                            $jadwal = $jadwalGroup->first()->jadwalPelajaran;
+                                            $mapel = $jadwal->kurikulumMataPelajaran->mataPelajaran;
+
+                                            return [
+                                                'jadwal_pelajaran_id' => $jadwal->id,
+                                                'mata_pelajaran' => $mapel->nama_pelajaran ?? null,
+                                                'guru_pengajar' => $jadwal->guru->nama ?? null,
+                                                'hari' => $jadwal->hari ?? null,
+                                                'jam_mulai' => $jadwal->jam_mulai ?? null,
+                                                'jam_selesai' => $jadwal->jam_selesai ?? null,
+                                                'rombel_jadwal' => $jadwal->rombel->nama_rombel ?? null,
+                                                'ruangan' => $jadwal->ruangan->nama_ruangan ?? null,
+                                                'link_opsional' => $jadwal->link_opsional ?? null,
+
+                                                'absensi' => $jadwalGroup
+                                                    ->map(function ($absen) {
+                                                        return [
+                                                            'absensi_id' => $absen->id,
+                                                            'rombel_siswa' => $absen->rombel->nama_rombel ?? null,           
+                                                            'hari' => Carbon::parse($absen->hari)
+                                                            ->translatedFormat('l, d F Y'),
+                                                            'status' => $absen->status,
+                                                            'bukti' => $absen->bukti ? asset(str_replace('public/', 'storage/', $absen->bukti)) : null,
+                                                        ];
+                                                    })
+                                                    ->values(),
+                                            ];
+                                        })
+                                        ->values(),
+                                ];
+                            })
+                            ->values(),
                     ];
-                })->values(),
+                })
+                ->values(),
         ];
-    
-        return ApiResponse::success($result, 'Absensi berhasil diambil');
+
+        return ApiResponse::success($result, 'Detail absensi siswa berhasil diambil');
     }
-    
     
 
     // ✅ show all absen sendiri (untuk siswa)
@@ -488,12 +477,35 @@ class AbsensiSiswaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $absensi = AbsensiSiswa::with('mataPelajaran', 'siswa.kelas')->find($id);
+        $absensi = AbsensiSiswa::with([
+            'siswa',
+            'tahunAkademik',
+            'semester',
+            'rombel',
+            'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
+        ])->find($id);
 
         if (!$absensi) {
             return ApiResponse::error('Not found', ['id' => 'Data tidak ditemukan']);
         }
 
+        // jika tahun_akademik dan semester pada jadwal sudah arsip maka tidak boleh
+        if (!$absensi->semester || $absensi->semester->status === 'arsip') {
+            return ApiResponse::error(
+                'Not supported',
+                ['data' => ['Absensi sudah berstatus arsip']],
+                404
+            );
+        }     
+        
+         if (!$absensi->tahunAkademik || $absensi->tahunAkademik->status === 'arsip') {
+            return ApiResponse::error(
+                'Not supported',
+                ['data' => ['Absensi sudah berstatus arsip']],
+                404
+            );
+        }     
+        
         $validated = $request->validate([                
             'status' => 'sometimes|required|in:hadir,izin,sakit,alfa',
             'bukti' => 'sometimes|nullable|image|mimes:jpeg,png,jpg|max:2048'
@@ -533,22 +545,27 @@ class AbsensiSiswaController extends Controller
 
         $absensi->update($validated);
 
-        $absensi->load('jadwalPelajaran.mataPelajaran', 'siswa.kelas', 'tahunAkademik');        
+        $absensi->load([
+            'tahunAkademik',
+            'semester',
+            'rombel',
+            'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
+        ]);        
 
+        $mapel = $absensi->jadwalPelajaran->kurikulumMataPelajaran->mataPelajaran;
 
         return ApiResponse::success([
             'id' => $absensi->id ?? null,
             'siswa' => $absensi->siswa->nama ?? null,                
-            'kelas' => $absensi->siswa->kelas->nama_kelas ?? null,
-            'mata_pelajaran' => $absensi->jadwalPelajaran->mataPelajaran->nama_pelajaran ?? null,               
+            'rombel' => $absensi->rombel->nama_rombel ?? null,
+            'mata_pelajaran' => $mapel->nama_pelajaran ?? null,               
             'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,
             'status_kehadiran' => $absensi->status ?? null,       
             'bukti' => $absensi->bukti ? asset(str_replace('public/', 'storage/', $absensi->bukti)) : null,                
-            'tahun_akademik_id' => $absensi->tahunAkademik->id ?? null,               
             'tahun_akademik' => $absensi->tahunAkademik->tahun_akademik ?? null,               
             'status_tahun_akademik' => $absensi->tahunAkademik->status ?? null,          
-            'semester' => $absensi->tahunAkademik->semester ?? null,               
-            'status_semester' => $absensi->tahunAkademik->status ?? null,          
+            'semester' => $absensi->semester->semester ?? null,               
+            'status_semester' => $absensi->semester->status ?? null,          
         ], 'Data absensi pelajaran berhasil diperbarui');
     }
 
@@ -559,7 +576,6 @@ class AbsensiSiswaController extends Controller
      */    
     public function destroyData(Request $request, $id = null)
     {
-        // Kalau dikirim dari body berupa array: { "ids": [1,2,3] }
         $ids = $request->input('ids') ?? ($id ? [$id] : []);
 
         if (empty($ids)) {
@@ -568,10 +584,12 @@ class AbsensiSiswaController extends Controller
             ]);
         }
 
-        // Ambil data yang ada
-        $absensis = AbsensiSiswa::whereIn('id', $ids)->get();
+        // Ambil data + relasi status
+        $absensis = AbsensiSiswa::with(['tahunAkademik', 'semester'])
+            ->whereIn('id', $ids)
+            ->get();
 
-        // Cek jika ada ID yang tidak ditemukan
+        // Validasi ID tidak ditemukan
         $foundIds   = $absensis->pluck('id')->toArray();
         $missingIds = array_values(array_diff($ids, $foundIds));
 
@@ -581,11 +599,21 @@ class AbsensiSiswaController extends Controller
             ]);
         }
 
-        // Hapus file satu per satu
+        // ❌ CEK ARSIP (SATU SAJA = BATAL)
+        $hasArchived = $absensis->contains(function ($absensi) {
+            return $absensi->tahunAkademik->status === 'arsip'
+                || $absensi->semester->status === 'arsip';
+        });
+
+        if ($hasArchived) {
+            return ApiResponse::error('Forbidden', [
+                'message' => 'Gagal menghapus. Salah satu data sudah berstatus arsip.'
+            ]);
+        }
+
+        // ✅ AMAN → HAPUS FILE
         foreach ($absensis as $absensi) {
             if ($absensi->bukti) {
-
-                // "public/bukti/xxx.jpg" → "bukti/xxx.jpg"
                 $relativePath = ltrim(
                     Str::of($absensi->bukti)->replaceFirst('public/', ''),
                     '/'
@@ -597,11 +625,13 @@ class AbsensiSiswaController extends Controller
             }
         }
 
-        // Hapus record database
+        // ✅ HAPUS DATABASE
         AbsensiSiswa::whereIn('id', $ids)->delete();
 
         return ApiResponse::success(null, 'Data absensi berhasil dihapus');
     }
+
+
 
     // ✅ Export data
     public function export(Request $request)
@@ -670,7 +700,7 @@ class AbsensiSiswaController extends Controller
         $zip->close();
 
         if (!file_exists($tempZipPath)) {
-            return response()->json(['error' => 'Gagal membuat file ZIP'], 500);
+            return response()->json(['error' => 'Gagal membuat file ZIP, periksa kembali ketersediaan foto'], 500);
         }
 
         // Kirim file ZIP (hapus otomatis setelah dikirim)
