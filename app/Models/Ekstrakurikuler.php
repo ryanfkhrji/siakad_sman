@@ -12,22 +12,11 @@ class Ekstrakurikuler extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
     protected $table = 'ekstrakurikulers';
-    protected $guarded = ['id'];
-
-    /**
-     * 1 ekskul = banyak siswa
-     * Menggunakan pivot table
-     *  */
-    public function siswas()
-    {        
-        return $this->belongsToMany(Siswa::class, 'ekskul_siswa_pivot')
-            ->withPivot('id', 'tahun_akademik_id', 'sikap', 'status')
-            ->withTimestamps();
-    }    
-
-    public function pelatihEkskul()
+    protected $guarded = ['id'];    
+   
+    public function siswaEkskul()
     {
-        return $this->hasMany(PelatihEkskul::class);
+        return $this->hasMany(EkskulSiswaPivot::class, 'ekstrakurikuler_id');
     }
 
     public function pembinaEkskul()
@@ -35,10 +24,8 @@ class Ekstrakurikuler extends Model
         return $this->hasMany(PembinaEkskul::class);
     }
 
-
-    // untuk menampilkan anggota ekskul pada pivotcontroller
-    public function peserta()
+    public function pelatihEkskul()
     {
-        return $this->hasMany(EkskulSiswaPivot::class, 'ekstrakurikuler_id');
+        return $this->hasMany(PelatihEkskul::class);
     }
 }

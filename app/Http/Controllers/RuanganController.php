@@ -203,9 +203,24 @@ class RuanganController extends Controller
             return ApiResponse::error('Data tidak ditemukan', ['id' => 'Ruangan tidak ditemukan']);
         }
 
+        if ($ruangan->jadwalPelajarans()->exists()) {
+            return ApiResponse::error(
+                'Tidak diizinkan',
+                ['jadwal' => 'Ruangan sudah digunakan pada jadwal pelajaran'],
+                403
+            );
+        }
+        if ($ruangan->gedung()->exists()) {
+            return ApiResponse::error(
+                'Tidak diizinkan',
+                ['gedung' => 'Ruangan sudah digunakan pada gedung'],
+                403
+            );
+        }
+
         $ruangan->delete();
 
-        return ApiResponse::success('null', 'Data ruangan berhasil dihapus');
+        return ApiResponse::success(null, 'Data ruangan berhasil dihapus');
     }
 
      // data select

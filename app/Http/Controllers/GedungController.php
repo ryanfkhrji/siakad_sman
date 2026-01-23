@@ -245,6 +245,14 @@ class GedungController extends Controller
             return ApiResponse::error('Data gedung tidak ada', ['id' => 'Data gedung tidak ditemukan']);
         }
 
+        if ($gedung->ruangan()->exists()) {
+            return ApiResponse::error(
+                'Tidak diizinkan',
+                ['ruangan' => 'Gedung sudah digunakan pada ruangan'],
+                403
+            );
+        }
+
         // Nilai contoh: "public/foto_gedung/31e-lab-fisika.jpg"
         $storedPath = $gedung->foto_gedung;
 

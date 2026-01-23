@@ -1955,21 +1955,40 @@ class DatabaseSeeder extends Seeder
                 'nama_ekstrakurikuler' => 'Pramuka',                
                 'anggaran' => 1500000,
                 'status' => 'wajib',
+                'status_aktif' => 'aktif',
             ],
             [
                 'nama_ekstrakurikuler' => 'Paskibra',                
                 'anggaran' => 2000000,
                 'status' => 'pilihan',
+                'status_aktif' => 'aktif',
             ],
             [
                 'nama_ekstrakurikuler' => 'Tari',                
                 'anggaran' => 5000000,
                 'status' => 'jurusan',
+                'status_aktif' => 'aktif',
+            ],
+            [
+                'nama_ekstrakurikuler' => 'Futsal',                
+                'anggaran' => 2000000,
+                'status' => 'pilihan',
+                'status_aktif' => 'arsip',
             ],
         ]);
 
         // seed pembina ekskul
         PembinaEkskul::insert([
+            [
+                'pembina_id' => 5, // guru MTK
+                'ekstrakurikuler_id' => 1, // Pramuka
+                'tahun_akademik_id' => 1, // 2013/2024
+            ],
+            [
+                'pembina_id' => 5, // guru MTK
+                'ekstrakurikuler_id' => 1, // Pramuka
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
             [
                 'pembina_id' => 3, // staff tu
                 'ekstrakurikuler_id' => 2, // PASKIB
@@ -1980,18 +1999,38 @@ class DatabaseSeeder extends Seeder
                 'ekstrakurikuler_id' => 3, // Tari
                 'tahun_akademik_id' => 2, // 2024/2025
             ],
+            [
+                'pembina_id' => 7, // guru sunda
+                'ekstrakurikuler_id' => 4, // Futsal
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
         ]);
 
         // seed pelatih ekskul
         PelatihEkskul::insert([
             [
-                'pelatih_id' => 5, // Guru IPA pengajar PASKIB
-                'ekstrakurikuler_id' => 2, // PASKIB
+                'pelatih_id' => 5, // Guru MTK
+                'ekstrakurikuler_id' => 1, // pramuka
+                'tahun_akademik_id' => 1, // 2013/2024
+            ],
+            [
+                'pelatih_id' => 3, // Staf Tu
+                'ekstrakurikuler_id' => 1, // pramuka
                 'tahun_akademik_id' => 2, // 2024/2025
             ],
             [
-                'pelatih_id' => 6, // Guru IPS pengajar Tari
-                'ekstrakurikuler_id' => 3, // Tari
+                'pelatih_id' => 6, // Guru indon
+                'ekstrakurikuler_id' => 2, // paskibra
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
+            [
+                'pelatih_id' => 7, // Guru Sunda
+                'ekstrakurikuler_id' => 3, // tari
+                'tahun_akademik_id' => 2, // 2024/2025
+            ],
+            [
+                'pelatih_id' => 4, // staff kebersihan
+                'ekstrakurikuler_id' => 4, // futsal
                 'tahun_akademik_id' => 2, // 2024/2025
             ],
         ]);                    
@@ -2000,13 +2039,20 @@ class DatabaseSeeder extends Seeder
         EkskulSiswaPivot::insert([
             [
                 'siswa_id' => 1,
-                'ekstrakurikuler_id' => 3,
-                'tahun_akademik_id' => 2,
-                'sikap' => 'Sangat Baik',
+                'ekstrakurikuler_id' => 1,
+                'tahun_akademik_id' => 1,
+                'sikap' => 'Baik',
                 'status' => 'Aktif'
             ],
             [
                 'siswa_id' => 2,
+                'ekstrakurikuler_id' => 1,
+                'tahun_akademik_id' => 1,
+                'sikap' => 'Sangat Baik',
+                'status' => 'Aktif'
+            ],
+            [
+                'siswa_id' => 1,
                 'ekstrakurikuler_id' => 1,
                 'tahun_akademik_id' => 2,
                 'sikap' => 'Baik',
@@ -2014,16 +2060,37 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'siswa_id' => 2,
-                'ekstrakurikuler_id' => 2,
-                'tahun_akademik_id' => 1,
-                'sikap' => 'Cukup',
-                'status' => 'Kurang Aktif'
+                'ekstrakurikuler_id' => 1,
+                'tahun_akademik_id' => 2,
+                'sikap' => 'Baik',
+                'status' => 'Aktif'
             ],
             [
                 'siswa_id' => 2,
+                'ekstrakurikuler_id' => 2,
+                'tahun_akademik_id' => 2,
+                'sikap' => 'Baik',
+                'status' => 'Aktif'
+            ],
+            [
+                'siswa_id' => 3,
                 'ekstrakurikuler_id' => 3,
                 'tahun_akademik_id' => 2,
                 'sikap' => 'Kurang',
+                'status' => 'Tidak Aktif'
+            ],
+            [
+                'siswa_id' => 1,
+                'ekstrakurikuler_id' => 4,
+                'tahun_akademik_id' => 1,
+                'sikap' => 'Cukup',
+                'status' => 'Aktif'
+            ],
+            [
+                'siswa_id' => 1,
+                'ekstrakurikuler_id' => 4,
+                'tahun_akademik_id' => 2,
+                'sikap' => 'Sangat Baik',
                 'status' => 'Tidak Aktif'
             ],
         ]);

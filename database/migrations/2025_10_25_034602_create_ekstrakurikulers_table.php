@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('ekstrakurikulers', function (Blueprint $table) {
             $table->id();
             $table->string('nama_ekstrakurikuler')->unique();
-            $table->decimal('anggaran', 15, 2);
-            $table->enum('status', ['wajib', 'pilihan', 'jurusan', 'aktif', 'tidak aktif'])->default('aktif');
+            $table->decimal('anggaran', 15, 2)->nullable();
+            $table->enum('status', ['wajib', 'pilihan', 'jurusan'])->default('wajib');
+            $table->enum('status_aktif', ['aktif', 'arsip'])->default('aktif');
             $table->timestamps();
         });
     }
