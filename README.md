@@ -176,8 +176,8 @@ Perbaikan
             c. lalu absenkan siswa (jika bingung, baca AbsensiSiswaController, function guruAbsenkanSiswa)
             d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan rombel_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
 25. ekstrakurikuler:
-    - Backend:
-        - ❌ migrasi, seeder, controller
+    - ☑️ Backend:
+        - ✅ migrasi, seeder, controller
     - Frontend:
         - ikutin insomnia
         - filter jika ada lebih dari 1 tahun_akademik

@@ -19,6 +19,7 @@ use App\Http\Controllers\KurikulumMataPelajaranController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\IdentitasSekolahController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\PembinaEkskulController;
 use App\Http\Controllers\RombelController;
 use App\Http\Controllers\SiswaRombelController;
 use App\Http\Controllers\EkstrakurikulerController;
@@ -157,8 +158,12 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::delete('/spa/absensi/siswa/pelajaran/destroy/{id?}', [AbsensiSiswaController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/siswa/pelajaran', AbsensiSiswaController::class)->except('store', 'destroy');  
 
-    // ! ✅ CRUD Ekstrakurikuler (MASUK SINI)
+    // ✅☑️ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
+    
+    // ✅ CRUD Pembina Ekstrakurikuler
+    Route::apiResource('/spa/pembina/ekstrakurikuler', PembinaEkskulController::class);
+    Route::get('/spa/data-select/pembina/ekstrakurikuler', [PembinaEkskulController::class, 'dataSelect']);
 
     // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class);            

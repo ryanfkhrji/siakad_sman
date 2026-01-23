@@ -275,8 +275,6 @@ class EkstrakurikulerController extends Controller
             'status.in' => 'Pilihan hanya aktif dan arsip'
         ]);
 
-        // jika tadinya status_aktif adalah arsip lalu diubah menjadi aktif kembali
-
         $ekskul->update($validated);        
 
         return ApiResponse::success(

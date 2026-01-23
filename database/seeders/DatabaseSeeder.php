@@ -186,7 +186,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'aktif',
             ],
             [
-                'nama' => 'Staff Kebersihan Pengajar Pramuka',
+                'nama' => 'Staff Kebersihan',
                 'email' => 'staff@gmail.com',
                 'nip' => '123453',
                 'nuptk' => '0123453',
