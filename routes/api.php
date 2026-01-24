@@ -20,6 +20,7 @@ use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\IdentitasSekolahController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\PembinaEkskulController;
+use App\Http\Controllers\PelatihEkskulController;
 use App\Http\Controllers\RombelController;
 use App\Http\Controllers\SiswaRombelController;
 use App\Http\Controllers\EkstrakurikulerController;
@@ -161,17 +162,21 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅☑️ CRUD Ekstrakurikuler
     Route::apiResource('/spa/ekstrakurikuler', EkstrakurikulerController::class);
     
-    // ✅ CRUD Pembina Ekstrakurikuler
-    Route::apiResource('/spa/pembina/ekstrakurikuler', PembinaEkskulController::class);
+    // ✅☑️ CRUD Pembina Ekstrakurikuler
+    Route::apiResource('/spa/pembina/ekstrakurikuler', PembinaEkskulController::class)->except('index');
     Route::get('/spa/data-select/pembina/ekstrakurikuler', [PembinaEkskulController::class, 'dataSelect']);
 
-    // ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
+    // ✅☑️ CRUD Pelatih Ekstrakurikuler
+    Route::apiResource('/spa/pelatih/ekstrakurikuler', PelatihEkskulController::class)->except('index');
+    Route::get('/spa/data-select/pelatih/ekstrakurikuler', [PelatihEkskulController::class, 'dataSelect']);
+
+    // ! ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin (MASUK SINI, TAPI  perbaiki semua data select pegawai, agar ambil yang Staff dan Guru aja)
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class);            
 
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
     
-    // ! ✅ Data Nilai Siswa (belum masuk tahap ini)
+    // ✅ Data Nilai Siswa (belum masuk tahap ini)
     Route::get('/spa/data-nilai-siswa/all', [DataNilaiSiswaController::class, 'All']);   
     Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');           
     

@@ -1948,7 +1948,7 @@ class DatabaseSeeder extends Seeder
         ]);        
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯✅ SPA: CRUD
          *  */ 
         Ekstrakurikuler::insert([
             [
@@ -1977,7 +1977,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // seed pembina ekskul
+        // 🎯✅ seed pembina ekskul
         PembinaEkskul::insert([
             [
                 'pembina_id' => 5, // guru MTK
@@ -2006,7 +2006,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // seed pelatih ekskul
+        // 🎯✅ seed pelatih ekskul
         PelatihEkskul::insert([
             [
                 'pelatih_id' => 5, // Guru MTK
@@ -2035,7 +2035,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);                    
 
-        // Seed Siswa daftar ke ekstrakurikuler
+        // 🎯 Seed Siswa daftar ke ekstrakurikuler
         EkskulSiswaPivot::insert([
             [
                 'siswa_id' => 1,

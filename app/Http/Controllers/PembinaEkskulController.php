@@ -14,64 +14,64 @@ class PembinaEkskulController extends Controller
     /**
      * ✅ spa
      */
-    public function index()
-    {
-        $pembinaEkskul = PembinaEkskul::with([
-            'tahunAkademik',
-            'pembina',
-            'ekstrakurikuler'
-        ])->get();
+    // public function index()
+    // {
+    //     $pembinaEkskul = PembinaEkskul::with([
+    //         'tahunAkademik',
+    //         'pembina',
+    //         'ekstrakurikuler'
+    //     ])->get();
 
-        if ($pembinaEkskul->isEmpty()) {
-            return ApiResponse::error('No data', [
-                'data' => 'Belum ada data pembina'
-            ]);
-        }
+    //     if ($pembinaEkskul->isEmpty()) {
+    //         return ApiResponse::error('No data', [
+    //             'data' => 'Belum ada data pembina'
+    //         ]);
+    //     }
 
-        $formatted = $pembinaEkskul
-            ->groupBy('tahun_akademik_id')
-            ->map(function ($perTahun) {
+    //     $formatted = $pembinaEkskul
+    //         ->groupBy('tahun_akademik_id')
+    //         ->map(function ($perTahun) {
 
-                $tahun = $perTahun->first()->tahunAkademik;
+    //             $tahun = $perTahun->first()->tahunAkademik;
 
-                return [
-                    'tahun_akademik_id' => $tahun?->id,
-                    'tahun_akademik' => $tahun?->tahun_akademik,
-                    'status_tahun_akademik' => $tahun?->status,
+    //             return [
+    //                 'tahun_akademik_id' => $tahun?->id,
+    //                 'tahun_akademik' => $tahun?->tahun_akademik,
+    //                 'status_tahun_akademik' => $tahun?->status,
 
-                    'daftar_ekskul' => $perTahun
-                        ->groupBy('ekstrakurikuler_id')
-                        ->map(function ($perEkskul) {
+    //                 'daftar_ekskul' => $perTahun
+    //                     ->groupBy('ekstrakurikuler_id')
+    //                     ->map(function ($perEkskul) {
 
-                            $ekskul = $perEkskul->first()->ekstrakurikuler;
+    //                         $ekskul = $perEkskul->first()->ekstrakurikuler;
 
-                            return [
-                                'ekskul_id' => $ekskul?->id,
-                                'nama_ekskul' => $ekskul?->nama_ekstrakurikuler,
-                                'anggaran' => $ekskul?->anggaran,
-                                'status' => $ekskul?->status,
-                                'status_aktif' => $ekskul?->status_aktif,
+    //                         return [
+    //                             'ekskul_id' => $ekskul?->id,
+    //                             'nama_ekskul' => $ekskul?->nama_ekstrakurikuler,
+    //                             'anggaran' => $ekskul?->anggaran,
+    //                             'status' => $ekskul?->status,
+    //                             'status_aktif' => $ekskul?->status_aktif,
 
-                                'histori_pembina' => $perEkskul->map(function ($item) {
-                                    return [
-                                        'pembina_id' => $item->pembina?->id,
-                                        'nama_pembina' => $item->pembina?->nama,
-                                        'nip' => $item->pembina?->nip ?? null,
-                                        'nuptk' => $item->pembina?->nuptk ?? null,
-                                    ];
-                                })->values(),
-                            ];
-                        })
-                        ->values(),
-                ];
-            })
-            ->values();
+    //                             'histori_pembina' => $perEkskul->map(function ($item) {
+    //                                 return [
+    //                                     'pembina_id' => $item->pembina?->id,
+    //                                     'nama_pembina' => $item->pembina?->nama,
+    //                                     'nip' => $item->pembina?->nip ?? null,
+    //                                     'nuptk' => $item->pembina?->nuptk ?? null,
+    //                                 ];
+    //                             })->values(),
+    //                         ];
+    //                     })
+    //                     ->values(),
+    //             ];
+    //         })
+    //         ->values();
 
-        return ApiResponse::success(
-            $formatted,
-            'Data pembina berhasil diambil'
-        );
-    }
+    //     return ApiResponse::success(
+    //         $formatted,
+    //         'Data pembina berhasil diambil'
+    //     );
+    // }
 
 
     /**
@@ -131,6 +131,17 @@ class PembinaEkskulController extends Controller
             if ($cekPembina) {
                 return ApiResponse::error('Double', [
                     'data' => 'Pembina sudah membina ekskul lain pada tahun akademik ini'
+                ]);
+            }
+
+            // ekskul sudah memiliki pembina
+            $cekPembina = PembinaEkskul::where('ekstrakurikuler_id', $validated['ekstrakurikuler_id'])
+                ->where('tahun_akademik_id', $tahunAktif->id)
+                ->exists();
+
+            if ($cekPembina) {
+                return ApiResponse::error('Double', [
+                    'data' => 'Ekstrakurikuler sudah memiliki pembina pada tahun akademik ini'
                 ]);
             }
 
@@ -345,13 +356,7 @@ class PembinaEkskulController extends Controller
             return ApiResponse::error('Tidak bisa', ['arsip' => 'Hanya bisa dihapus pada saat tahun akademik aktif']);
         }        
 
-        $pembina->delete();
-
-        $pembina->load([
-            'tahunAkademik',
-            'pembina',
-            'ekstrakurikuler'
-        ]);
+        $pembina->delete();        
 
         return ApiResponse::success(null, 'Data pembina berhasil dihapus');
     }
@@ -376,7 +381,11 @@ class PembinaEkskulController extends Controller
         });
 
         // pembina
-        $data2 = Kepegawaian::where('status', 'aktif')->get();
+        $data2 = Kepegawaian::where('status', 'aktif')
+        ->where('role', '!=', 'super_admin')
+        ->where('role', '!=', 'kepsek')
+        ->where('role', '!=', 'tu')
+        ->get();
 
         if ($data2->isEmpty()) {
             return ApiResponse::error('No data', ['data' => 'Data tidak ditemukan']);

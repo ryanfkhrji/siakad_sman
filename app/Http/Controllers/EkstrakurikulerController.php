@@ -169,6 +169,7 @@ class EkstrakurikulerController extends Controller
                 ->map(function ($item) {
                     return [
                         'siswa_id'   => $item->siswa->id,
+                        'siswa_pivot_id' => $item->id,
                         'nama_siswa' => $item->siswa->nama,
                         'nisn' => $item->siswa->nisn,
                         'nis' => $item->siswa->nis,
@@ -186,11 +187,13 @@ class EkstrakurikulerController extends Controller
                 'anggota' => [
                     'pembina' => [
                         'pembina_id'   => $pembina?->pembina->id,
+                        'pembina_pivot_id' => $pembina?->id,
                         'nama_pembina' => $pembina?->pembina->nama,
                         'tahun_membina'=> $pembina?->tahunAkademik?->tahun_akademik,
                     ],
                     'pelatih' => [
                     'pelatih_id'   => $pelatih?->pelatih->id,
+                    'pelatih_pivot_id'   => $pelatih?->id,
                     'nama_pelatih' => $pelatih?->pelatih->nama,
                     'tahun_melatih'=> $pelatih?->tahunAkademik?->tahun_akademik,
                     ],

@@ -182,19 +182,19 @@ Perbaikan
         - ikutin insomnia
         - filter jika ada lebih dari 1 tahun_akademik
 26. pembina_ekskul:
-    - Backend:
+    - ☑️ Backend:
         - (migrasi, model, seeder)
-        - ❌ controller
-        - ❌ route
+        - ✅ controller
+        - ✅ route
     - Frontend:
-        - menambah pembina melalui menu ekstrakurikuler, sehingga spa hanya menginput pembina_id saja
+        - ikutin insomnia
 27. pelatih_ekskul:
-    - Backend:
-        - (migrasi, model, seeder)
-        - ❌ controller
-        - ❌ route
+    - ☑️ Backend:
+        - ✅ (migrasi, model, seeder)
+        - ✅ controller
+        - ✅ route
     - Frontend:
-        - sama seperti pembina_ekskul
+        - ikutin insomnia
 28. ekskul_siswa_pivot:
     - Backend:
         - ✅ (Migrasi, Seeder, Controller)
@@ -219,35 +219,35 @@ Perbaikan
           - ❌
 32. projek_p5:
     - ❌ Backend:
-9.  data_nilai_p5:
+33. data_nilai_p5:
     kumpulan hasil projek_p5
     - ❌ Backend:
-10. data_nilai_ekskul
+34. data_nilai_ekskul
     kumpulan hasil ekskul_siswa_pivot
     - Backend:
           - ❌
-11. rapor (wajib export excel)
+35. rapor (wajib export excel)
     hasil final rapor_nilai_siswa, ekskul, p5
     - Backend:
           - ❌
-12. membuat data_berkas:
+36. membuat data_berkas:
     - ❌ Backend:        
-13. keuangan:
+37. keuangan:
     - ❌ Backend:        
-14. ❌⚠️ membuat jurnal_kbm
-15. ❌⚠️ membuat forum diskusi
-16. ❌⚠️ membuat tugas (lms)
-17. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
-18. ====================================================================================================================================
-19. ❌⚠️ modul_ajar: ()
+38. ❌⚠️ membuat jurnal_kbm
+39. ❌⚠️ membuat forum diskusi
+40. ❌⚠️ membuat tugas (lms)
+41. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
+42. ====================================================================================================================================
+43. ❌⚠️ modul_ajar: ()
     rencana pembelajaran untuk mencapai kompetensi, menciptakan asesmen (uts/uas), dibuat tiap tahun
-20. ❌⚠️ asesmen:
+44. ❌⚠️ asesmen:
     alat ukur modul ajar (uts/uas), menilai kompetensi
-21. ❌⚠️ asesmen_kompetensi:
+45. ❌⚠️ asesmen_kompetensi:
     menetapkan bobot kompetensi pada asesmen
-22. ❌⚠️ asesmen_siswa:
+46. ❌⚠️ asesmen_siswa:
     nilai mentah per asesmen
-23. ❌⚠️ nilai_kompetensi_siswa
+47. ❌⚠️ nilai_kompetensi_siswa
     hasil kalkulasi dari asesmen_kompetensi dan asesmen_siswa
 ========================================================================================================================================
 
