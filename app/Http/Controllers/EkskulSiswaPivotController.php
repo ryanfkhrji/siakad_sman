@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\EkskulSiswaPivot;
 use App\Models\Siswa;
+use App\Models\TahunAkademik;
 use App\Models\Ekstrakurikuler;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\ApiResponse;
@@ -14,6 +15,72 @@ use Illuminate\Support\Facades\Validator;
 
 class EkskulSiswaPivotController extends Controller
 {
+    // ✅ spa: get histori
+    public function show(string $id)
+    {
+        $ekskulSiswa = EkskulSiswaPivot::with([
+            'ekstrakurikuler',
+            'siswa',
+            'tahunAkademik',
+        ])
+        ->where('siswa_id', $id)
+        ->get();
+
+        if ($ekskulSiswa->isEmpty()) {
+            return ApiResponse::error(
+                'No data',
+                ['data' => 'Data tidak ditemukan']
+            );
+        }
+
+        // ambil data siswa (cukup sekali)
+        $siswa = $ekskulSiswa->first()->siswa;
+
+        $formatted = [
+            'siswa_id'      => $siswa?->id,
+            'nama_siswa'    => $siswa?->nama,
+            'nisn'          => $siswa?->nisn,
+            'nis'           => $siswa?->nis,
+
+            'periode' => $ekskulSiswa
+                ->groupBy('tahun_akademik_id')
+                ->map(function ($perTahun) {
+
+                    $tahun = $perTahun->first()->tahunAkademik;
+
+                    return [
+                        'tahun_akademik_id' => $tahun?->id,
+                        'tahun_akademik' => $tahun?->tahun_akademik,
+                        'status_tahun_akademik' => $tahun?->status,
+
+                        'ekstrakurikulers' => $perTahun
+                            ->map(function ($item) {
+
+                                $ekskul = $item->ekstrakurikuler;
+
+                                return [
+                                    'ekskul_id' => $ekskul?->id,
+                                    'nama_ekskul' => $ekskul?->nama_ekstrakurikuler,
+                                    'anggaran' => $ekskul?->anggaran,
+                                    'status_ekskul' => $ekskul?->status,
+                                    'status_aktif_ekskul' => $ekskul?->status_aktif,
+                                    'sikap' => $item->sikap ?? null,
+                                    'status_kehadiran' => $item->status ?? null,
+                                ];
+                            })
+                            ->values(),
+                    ];
+                })
+                ->values(),
+        ];
+
+        return ApiResponse::success(
+            $formatted,
+            'Detail ekskul siswa berhasil diambil'
+        );
+    }
+
+
     // ✅ get all ekskul sendiri (siswa)
     public function getAllEkskulSendiri()
     {
@@ -83,55 +150,43 @@ class EkskulSiswaPivotController extends Controller
     
         return ApiResponse::success($hasil, 'Data ekstrakurikuler siswa');
     }
-    /**
-     * tahun_akademik
-     *      nama_ekskul, pelatih, pembina
-     *          peserta
-     */
     
 
-
-    // ✅ mendaftarkan siswa oleh pelatih/pembina
+    // ✅ mendaftarkan siswa oleh spa/pelatih/pembina
     public function store(Request $request)
     {
         try {
             $validated = $request->validate([
                 'siswa_id' => 'required|exists:siswas,id',
-                'ekstrakurikuler_id' => 'required|exists:ekstrakurikulers,id',
-                'tahun_akademik_id' => 'nullable|exists:tahun_akademik,id',
+                'ekstrakurikuler_id' => 'required|exists:ekstrakurikulers,id',                
             ], [
                 'siswa_id.required' => 'Siswa wajib diisi',
                 'siswa_id.exists' => 'Siswa tidak ditemukan',
                 'ekstrakurikuler_id.required' => 'Ekstrakurikuler wajib diisi',
-                'ekstrakurikuler_id.exists' => 'Ekstrakurikuler tidak ditemukan',
-                'tahun_akademik_id.exists' => 'Tahun akademik tidak ditemukan',
-            ]);
+                'ekstrakurikuler_id.exists' => 'Ekstrakurikuler tidak ditemukan',                
+            ]);            
 
-            // temukan id yang sesuai
-            $siswa = Siswa::find($validated['siswa_id']);
+            $tahunAktif = TahunAkademik::where('status', 'aktif')->first();
 
-            // kalo role nya bukan siswa, maka gabisa ikut ekskul
-            if (!$siswa || $siswa->role !== 'siswa') {
-                return ApiResponse::error('Siswa tidak ditemukan', [
-                    'siswa_id' => ['Siswa tidak ditemukan']
-                ], 422);
+            if (!$tahunAktif) {
+                return ApiResponse::error('Not supported', ['tahun' => 'Belum ada tahun aktif']);
             }
 
             $existing = EkskulSiswaPivot::where('siswa_id', $validated['siswa_id'])
                 ->where('ekstrakurikuler_id', $validated['ekstrakurikuler_id'])
-                ->where('tahun_akademik_id', $validated['tahun_akademik_id'])
+                ->where('tahun_akademik_id', $tahunAktif->id)
                 ->exists();
 
             if ($existing) {
-                return ApiResponse::error('Siswa sudah terdaftar di ekskul ini', [
-                    'siswa_id' => ['Siswa sudah terdaftar di ekskul ini']
+                return ApiResponse::error('Duplikasi', [
+                    'siswa_id' => ['Siswa sudah terdaftar di ekstrakurikuler ini']
                 ], 422);
-            }
+            }            
 
             $pivot = EkskulSiswaPivot::create([
                 'siswa_id' => $validated['siswa_id'],
                 'ekstrakurikuler_id' => $validated['ekstrakurikuler_id'],
-                'tahun_akademik_id' => $validated['tahun_akademik_id'],
+                'tahun_akademik_id' => $tahunAktif->id,
                 'status' => 'Aktif',
             ]);
             
@@ -179,6 +234,7 @@ class EkskulSiswaPivotController extends Controller
             'status' => $ekskul->status ?? null,
         ], 'Data berhasil diperbarui');
     }
+
 
     // ✅ destroy buat pelatih/pembina
     public function destroy($id)
@@ -268,5 +324,47 @@ class EkskulSiswaPivotController extends Controller
         $pivot->load('ekstrakurikuler');
 
         return ApiResponse::success(null, 'Peserta berhasil keluar dari ekskul '.$pivot->ekstrakurikuler->nama_ekstrakurikuler);
+    }
+
+
+    // ✅ spa
+    public function dataSelect() {
+        // data select
+        $data = Ekstrakurikuler::where('status_aktif', 'aktif')->get();
+
+        if ($data->isEmpty()) {
+            return ApiResponse::error('No data', ['data' => 'Belum ada ekstrakurikuler aktif']);
+        }
+
+        $ekskul = $data->map(function ($e) {
+        return [
+                'ekskul_id' => $e->id ?? null,
+                'nama_ekskul' => $e->nama_ekstrakurikuler ?? null,
+                'anggaran' => $e->anggaran ?? null,
+                'status' => $e->status ?? null,
+                'status_aktif' => $e->status_aktif ?? null,
+        ];
+        });
+
+        // siswa
+        $data2 = Siswa::where('status', 'aktif')->get();
+
+        if ($data2->isEmpty()) {
+            return ApiResponse::error('No data', ['data' => 'Data tidak ditemukan']);
+        }
+
+        $siswa = $data2->map(function ($s) {
+            return [
+                'siswa_id' => $s->id ?? null,
+                'nama_siswa' => $s->nama ?? null,
+                'nisn' => $s->nisn ?? null,
+                'nis' => $s->nis ?? null,
+            ];
+        })->values();    
+
+        return ApiResponse::success([
+            'siswa' => $siswa,
+            'ekskul' => $ekskul,
+        ], 'Data select berhasil diambil');
     }
 }

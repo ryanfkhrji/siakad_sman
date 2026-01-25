@@ -2002,7 +2002,7 @@ class DatabaseSeeder extends Seeder
             [
                 'pembina_id' => 7, // guru sunda
                 'ekstrakurikuler_id' => 4, // Futsal
-                'tahun_akademik_id' => 2, // 2024/2025
+                'tahun_akademik_id' => 1, // 2024/2025
             ],
         ]);
 
@@ -2031,7 +2031,7 @@ class DatabaseSeeder extends Seeder
             [
                 'pelatih_id' => 4, // staff kebersihan
                 'ekstrakurikuler_id' => 4, // futsal
-                'tahun_akademik_id' => 2, // 2024/2025
+                'tahun_akademik_id' => 1, // 2024/2025
             ],
         ]);                    
 
@@ -2080,7 +2080,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'Tidak Aktif'
             ],
             [
-                'siswa_id' => 1,
+                'siswa_id' => 2,
                 'ekstrakurikuler_id' => 4,
                 'tahun_akademik_id' => 1,
                 'sikap' => 'Cukup',
@@ -2089,7 +2089,7 @@ class DatabaseSeeder extends Seeder
             [
                 'siswa_id' => 1,
                 'ekstrakurikuler_id' => 4,
-                'tahun_akademik_id' => 2,
+                'tahun_akademik_id' => 1,
                 'sikap' => 'Sangat Baik',
                 'status' => 'Tidak Aktif'
             ],

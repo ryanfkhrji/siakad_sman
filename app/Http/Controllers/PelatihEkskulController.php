@@ -264,13 +264,10 @@ class PelatihEkskulController extends Controller
 
         // validasi input
         $validated = $request->validate([
-            'pelatih_id' => 'sometimes|required|exists:kepegawaians,id',
-            'ekstrakurikuler_id' => 'sometimes|required|exists:ekstrakurikulers,id',
+            'pelatih_id' => 'sometimes|required|exists:kepegawaians,id',            
         ], [
             'pelatih_id.required' => 'Pelatih wajib diisi',
-            'pelatih_id.exists' => 'Pelatih tidak ditemukan',
-            'ekstrakurikuler_id.required' => 'Ekstrakurikuler wajib diisi',
-            'ekstrakurikuler_id.exists' => 'Ekstrakurikuler tidak ditemukan',
+            'pelatih_id.exists' => 'Pelatih tidak ditemukan',                        
         ]);
 
         // gunakan tahun dari data lama (TIDAK BOLEH GANTI TAHUN)
@@ -306,8 +303,9 @@ class PelatihEkskulController extends Controller
         /* ======================
         * ATURAN 1 EKSKUL 1 PELATIH
         * ====================== */
-        if (isset($validated['ekstrakurikuler_id'])) {
-            $cekEkskul = PelatihEkskul::where('ekstrakurikuler_id', $validated['ekstrakurikuler_id'])
+        $ekskulLama = $pelatihEkskul->ekstrakurikuler_id;
+        
+            $cekEkskul = PelatihEkskul::where('ekstrakurikuler_id', $ekskulLama)
                 ->where('tahun_akademik_id', $tahunId)
                 ->where('id', '!=', $pelatihEkskul->id)
                 ->exists();
@@ -317,7 +315,6 @@ class PelatihEkskulController extends Controller
                     'data' => 'Ekstrakurikuler ini sudah memiliki pelatih pada tahun akademik ini'
                 ]);
             }
-        }
 
         // update data
         $pelatihEkskul->update($validated);

@@ -169,10 +169,11 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅☑️ CRUD Pelatih Ekstrakurikuler
     Route::apiResource('/spa/pelatih/ekstrakurikuler', PelatihEkskulController::class)->except('index');
     Route::get('/spa/data-select/pelatih/ekstrakurikuler', [PelatihEkskulController::class, 'dataSelect']);
-
-    // ! ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin (MASUK SINI, TAPI  perbaiki semua data select pegawai, agar ambil yang Staff dan Guru aja)
-    Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class);            
-
+    
+    // ! ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
+    Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->except('index');            
+    Route::get('/spa/data-select/siswa/ekskul', [EkskulSiswaPivotController::class, 'dataSelect']);
+    
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
     

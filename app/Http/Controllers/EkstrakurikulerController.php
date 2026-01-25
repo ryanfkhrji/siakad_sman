@@ -133,6 +133,7 @@ class EkstrakurikulerController extends Controller
 
 
     // ✅ SPA dan guru
+    // ! DEBUG GADA ANGGOTANYA SAMSEK
     public function show($id)
     {
         $ekskul = Ekstrakurikuler::with([
@@ -197,7 +198,7 @@ class EkstrakurikulerController extends Controller
                     'nama_pelatih' => $pelatih?->pelatih->nama,
                     'tahun_melatih'=> $pelatih?->tahunAkademik?->tahun_akademik,
                     ],
-                    'siswa'        => $siswa,
+                    'siswa'        => $siswa ?? null,
                 ],
             ];
         });

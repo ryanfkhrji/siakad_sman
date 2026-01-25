@@ -14,69 +14,6 @@ class PembinaEkskulController extends Controller
     /**
      * ✅ spa
      */
-    // public function index()
-    // {
-    //     $pembinaEkskul = PembinaEkskul::with([
-    //         'tahunAkademik',
-    //         'pembina',
-    //         'ekstrakurikuler'
-    //     ])->get();
-
-    //     if ($pembinaEkskul->isEmpty()) {
-    //         return ApiResponse::error('No data', [
-    //             'data' => 'Belum ada data pembina'
-    //         ]);
-    //     }
-
-    //     $formatted = $pembinaEkskul
-    //         ->groupBy('tahun_akademik_id')
-    //         ->map(function ($perTahun) {
-
-    //             $tahun = $perTahun->first()->tahunAkademik;
-
-    //             return [
-    //                 'tahun_akademik_id' => $tahun?->id,
-    //                 'tahun_akademik' => $tahun?->tahun_akademik,
-    //                 'status_tahun_akademik' => $tahun?->status,
-
-    //                 'daftar_ekskul' => $perTahun
-    //                     ->groupBy('ekstrakurikuler_id')
-    //                     ->map(function ($perEkskul) {
-
-    //                         $ekskul = $perEkskul->first()->ekstrakurikuler;
-
-    //                         return [
-    //                             'ekskul_id' => $ekskul?->id,
-    //                             'nama_ekskul' => $ekskul?->nama_ekstrakurikuler,
-    //                             'anggaran' => $ekskul?->anggaran,
-    //                             'status' => $ekskul?->status,
-    //                             'status_aktif' => $ekskul?->status_aktif,
-
-    //                             'histori_pembina' => $perEkskul->map(function ($item) {
-    //                                 return [
-    //                                     'pembina_id' => $item->pembina?->id,
-    //                                     'nama_pembina' => $item->pembina?->nama,
-    //                                     'nip' => $item->pembina?->nip ?? null,
-    //                                     'nuptk' => $item->pembina?->nuptk ?? null,
-    //                                 ];
-    //                             })->values(),
-    //                         ];
-    //                     })
-    //                     ->values(),
-    //             ];
-    //         })
-    //         ->values();
-
-    //     return ApiResponse::success(
-    //         $formatted,
-    //         'Data pembina berhasil diambil'
-    //     );
-    // }
-
-
-    /**
-     * ✅ spa
-     */
     public function store(Request $request)
     {
         try {
@@ -265,12 +202,12 @@ class PembinaEkskulController extends Controller
         // validasi input
         $validated = $request->validate([
             'pembina_id' => 'sometimes|required|exists:kepegawaians,id',
-            'ekstrakurikuler_id' => 'sometimes|required|exists:ekstrakurikulers,id',
+            // 'ekstrakurikuler_id' => 'sometimes|required|exists:ekstrakurikulers,id',
         ], [
             'pembina_id.required' => 'Pembina wajib diisi',
             'pembina_id.exists' => 'Pembina tidak ditemukan',
-            'ekstrakurikuler_id.required' => 'Ekstrakurikuler wajib diisi',
-            'ekstrakurikuler_id.exists' => 'Ekstrakurikuler tidak ditemukan',
+            // 'ekstrakurikuler_id.required' => 'Ekstrakurikuler wajib diisi',
+            // 'ekstrakurikuler_id.exists' => 'Ekstrakurikuler tidak ditemukan',
         ]);
 
         // gunakan tahun dari data lama (TIDAK BOLEH GANTI TAHUN)
@@ -306,8 +243,10 @@ class PembinaEkskulController extends Controller
         /* ======================
         * ATURAN 1 EKSKUL 1 PEMBINA
         * ====================== */
-        if (isset($validated['ekstrakurikuler_id'])) {
-            $cekEkskul = PembinaEkskul::where('ekstrakurikuler_id', $validated['ekstrakurikuler_id'])
+        // get id_ekskul lama
+        $ekskulLama = $pembinaEkskul->ekstrakurikuler_id;
+
+            $cekEkskul = PembinaEkskul::where('ekstrakurikuler_id', $ekskulLama)
                 ->where('tahun_akademik_id', $tahunId)
                 ->where('id', '!=', $pembinaEkskul->id)
                 ->exists();
@@ -316,8 +255,7 @@ class PembinaEkskulController extends Controller
                 return ApiResponse::error('Double', [
                     'data' => 'Ekstrakurikuler ini sudah memiliki pembina pada tahun akademik ini'
                 ]);
-            }
-        }
+            }        
 
         // update data
         $pembinaEkskul->update($validated);
