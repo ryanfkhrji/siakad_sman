@@ -2002,7 +2002,12 @@ class DatabaseSeeder extends Seeder
             [
                 'pembina_id' => 7, // guru sunda
                 'ekstrakurikuler_id' => 4, // Futsal
-                'tahun_akademik_id' => 1, // 2024/2025
+                'tahun_akademik_id' => 1, // 2013/2024
+            ],
+            [
+                'pembina_id' => 7, // guru sunda
+                'ekstrakurikuler_id' => 4, // Futsal
+                'tahun_akademik_id' => 2, // 2024/2025
             ],
         ]);
 
@@ -2031,7 +2036,7 @@ class DatabaseSeeder extends Seeder
             [
                 'pelatih_id' => 4, // staff kebersihan
                 'ekstrakurikuler_id' => 4, // futsal
-                'tahun_akademik_id' => 1, // 2024/2025
+                'tahun_akademik_id' => 1, // 2013/2024
             ],
         ]);                    
 

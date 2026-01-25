@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('ekskul_siswa_pivot', function (Blueprint $table) {
             $table->id();
 
-            // ketika siswa di tabel siswa dihapus, maka yang mengandung id siswa tsb di pivot ini juga dihapus
+            // siswa dihapus, maka ini juga dihapus
             $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-
-            // ketika ekskul di tabel ekskul dihapus, maka yang mengandung id ekskul tsb di pivot ini juga dihapus
+            
             $table->foreignId('ekstrakurikuler_id')->constrained('ekstrakurikulers')->onDelete('cascade');
         
             $table->foreignId('tahun_akademik_id')->nullable()->constrained('tahun_akademik');

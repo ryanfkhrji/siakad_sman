@@ -81,7 +81,7 @@ class EkskulSiswaPivotController extends Controller
     }
 
 
-    // ✅ get all ekskul sendiri (siswa)
+    // get all ekskul sendiri (siswa)
     public function getAllEkskulSendiri()
     {
         $siswa = Auth::guard('siswa')->user();
@@ -179,7 +179,7 @@ class EkskulSiswaPivotController extends Controller
 
             if ($existing) {
                 return ApiResponse::error('Duplikasi', [
-                    'siswa_id' => ['Siswa sudah terdaftar di ekstrakurikuler ini']
+                    'siswa_id' => ['Siswa sudah terdaftar di ekstrakurikuler ini pada tahun ini']
                 ], 422);
             }            
 
@@ -207,41 +207,78 @@ class EkskulSiswaPivotController extends Controller
     // ✅ untuk pelatih/pembina
     public function update(Request $request, string $id)
     {
-        $ekskul = EkskulSiswaPivot::with('ekstrakurikuler', 'siswa')->find($id);
+        $ekskul = EkskulSiswaPivot::with([
+            'ekstrakurikuler',
+            'siswa',
+            'tahunAkademik'
+        ])->find($id);
 
         if (!$ekskul) {
-            return ApiResponse::error('Not found', ['id', 'Data tidak ditemukan']);
+            return ApiResponse::error('Not Found', [
+                'id' => 'Data tidak ditemukan'
+            ], 404);
         }
 
-        $validated = $request->validate([            
-            'sikap' => 'sometimes|nullable|in:Sangat Baik,Baik,Cukup,Kurang', 
-            'status' => 'sometimes|nullable|in:Aktif,Cukup Aktif,Kurang Aktif,Tidak Aktif', 
-        ],[            
-            'sikap.in' => 'Pilihan sikap hanya Sangat Baik, Baik, Cukup, Kurang',
-            'status.in' => 'Pilihan status hanya Aktif, Cukup Aktif, Kurang Aktif, Tidak Aktif',
-        ]);       
+        // hanya boleh di tahun akademik aktif
+        if ($ekskul->tahunAkademik->status !== 'aktif') {
+            return ApiResponse::error('Tidak bisa', [
+                'tahun_akademik_id' => 'Tahun akademik sudah berstatus arsip'
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'siswa_id' => 'sometimes|required|exists:siswas,id',
+            'sikap'    => 'sometimes|nullable|in:Sangat Baik,Baik,Cukup,Kurang',
+            'status'   => 'sometimes|nullable|in:Aktif,Cukup Aktif,Kurang Aktif,Tidak Aktif',
+        ], [
+            'siswa_id.required' => 'Siswa harus diisi',
+            'siswa_id.exists'   => 'Siswa tidak ditemukan',
+            'sikap.in'          => 'Pilihan sikap hanya Sangat Baik, Baik, Cukup, Kurang',
+            'status.in'         => 'Pilihan status hanya Aktif, Cukup Aktif, Kurang Aktif, Tidak Aktif',
+        ]);
+
+        // cek duplikasi hanya jika siswa_id diubah
+        if (isset($validated['siswa_id'])) {
+            $existing = EkskulSiswaPivot::where('siswa_id', $validated['siswa_id'])
+                ->where('ekstrakurikuler_id', $ekskul->ekstrakurikuler_id)
+                ->where('tahun_akademik_id', $ekskul->tahun_akademik_id)
+                ->where('id', '!=', $ekskul->id) // Kecauali dirinya sendiri
+                ->exists();
+
+            if ($existing) {
+                return ApiResponse::error('Duplikasi', [
+                    'siswa_id' => 'Siswa sudah terdaftar di ekstrakurikuler ini pada tahun ini'
+                ], 422);
+            }
+        }
 
         $ekskul->update($validated);
 
         $ekskul->load('siswa', 'ekstrakurikuler', 'tahunAkademik');
 
         return ApiResponse::success([
-            'ekskul_siswa_pivot_id' => $ekskul->id ?? null,
-            'nama_siswa' => $ekskul->siswa->nama ?? null,
-            'nama_ekskul' => $ekskul->ekstrakurikuler->nama_ekstrakurikuler ?? null,
-            'tahun_akademik' => $ekskul->tahunAkademik->tahun_akademik ?? null,
-            'sikap' => $ekskul->sikap ?? null,
-            'status' => $ekskul->status ?? null,
+            'ekskul_siswa_pivot_id' => $ekskul->id,
+            'nama_siswa'           => $ekskul->siswa->nama ?? null,
+            'nama_ekskul'          => $ekskul->ekstrakurikuler->nama_ekstrakurikuler ?? null,
+            'tahun_akademik'       => $ekskul->tahunAkademik->tahun_akademik ?? null,
+            'sikap'                => $ekskul->sikap,
+            'status'               => $ekskul->status,
         ], 'Data berhasil diperbarui');
     }
 
 
-    // ✅ destroy buat pelatih/pembina
+
+    // ✅ destroy buat spa/pelatih/pembina
     public function destroy($id)
     {
-        $pivot = EkskulSiswaPivot::find($id);
+        $pivot = EkskulSiswaPivot::with('tahunAkademik')->find($id);
+
         if (!$pivot) {
             return ApiResponse::error('Peserta tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+        
+        if ($pivot->tahunAkademik->status != 'aktif') {            
+            return ApiResponse::error('Tidak bisa', ['tahun_akademik_id' => ['Status tahun sudah menjadi arsip']], 400);
         }
 
         $pivot->delete();

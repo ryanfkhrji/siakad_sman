@@ -113,27 +113,9 @@ class EkstrakurikulerController extends Controller
             'Detail ekstrakurikuler berhasil diambil'
         );
     }
-    /**
-     * 
-     * data: [
-     * {
-     *      pelatih,
-     *      tahun_akademik: [
-     *          {
-     *              tahun_akademik_id,
-     *              nama_ekskul,
-     *              anggota: []       
-     *          },
-     *          {...}
-     *      ]
-     * }
-     * ]
-     * 
-     * */
 
 
-    // ✅ SPA dan guru
-    // ! DEBUG GADA ANGGOTANYA SAMSEK
+    // ✅ SPA dan guru    
     public function show($id)
     {
         $ekskul = Ekstrakurikuler::with([
