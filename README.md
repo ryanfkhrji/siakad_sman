@@ -197,13 +197,13 @@ Perbaikan
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-28. ekskul_siswa_pivot:
+28. ☑️ ekskul_siswa_pivot:
     - Backend:
         - ✅ (Migrasi, Seeder, Controller)
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-        - alur siswa daftar ekskul: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)
+        - alur siswa daftar sendiri: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)
 29. prestasi:
     - Backend:
         - ✅ (Seeder, Migrasi, Controller) Hapus kolom kelas_id dan jurusan_id

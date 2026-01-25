@@ -2109,12 +2109,17 @@ class DatabaseSeeder extends Seeder
             [
                 'siswa_id' => 1, // Bagas                                
                 'tahun_akademik_id' => 2, // 2024/2025 (Merdeka)
-                'prestasi_diraih' => 'Juara 2 lomba renang tingkat kabupaten',
+                'prestasi_diraih' => 'Juara 2 lomba renang tingkat sekolah',
             ],
             [
                 'siswa_id' => 2, // Winton                                
                 'tahun_akademik_id' => 1, // 
                 'prestasi_diraih' => 'Rangking satu umum angkatan 2021',
+            ],
+            [
+                'siswa_id' => 2, // Winton                                
+                'tahun_akademik_id' => 2, // 
+                'prestasi_diraih' => 'Juara lomba paskibra tingkat sekolah',
             ],
             [
                 'siswa_id' => 3, // Sanita                                

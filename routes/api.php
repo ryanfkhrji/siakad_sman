@@ -170,12 +170,13 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/spa/pelatih/ekstrakurikuler', PelatihEkskulController::class)->except('index');
     Route::get('/spa/data-select/pelatih/ekstrakurikuler', [PelatihEkskulController::class, 'dataSelect']);
     
-    // ! ✅ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
+    // ✅☑️ CRUD Keikutsertaan Siswa ke Ekstrakurikuler oleh super admin
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->except('index');            
     Route::get('/spa/data-select/siswa/ekskul', [EkskulSiswaPivotController::class, 'dataSelect']);
     
     // ✅ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
+    Route::get('/spa/data-select/siswa/prestasi', [PrestasiController::class, 'dataSelect']);
     
     // ✅ Data Nilai Siswa (belum masuk tahap ini)
     Route::get('/spa/data-nilai-siswa/all', [DataNilaiSiswaController::class, 'All']);   
