@@ -332,7 +332,7 @@ class AlurTujuanPembelajaranController extends Controller
             'kompetensi_id' => $atp->kompetensi_id,
             'tahun_akademik' => $atp->tahunAkademik->tahun_akademik,
             'guru' => $atp->guru->nama,
-            'semester' => $atp->semester->semester,
+            'semester' => $atp->semesterRelasi->semester,
             'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
             'urutan' => $atp->urutan,
             'approval_status' => $atp->approval_status,
@@ -679,16 +679,12 @@ class AlurTujuanPembelajaranController extends Controller
 
         // 5. Validasi input
         $validated = $request->validate([
-            'kompetensi_id' => 'required|exists:kompetensi,id',
-            // 'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
-            // 'semester' => 'required|in:Ganjil,Genap',
+            'kompetensi_id' => 'required|exists:kompetensi,id',            
             'tujuan_pembelajaran' => 'required|string',
             'urutan' => 'required|integer|min:1',
         ], [
             'kompetensi_id.required' => 'Kompetensi wajib diisi',
-            'kompetensi_id.exists' => 'Kompetensi tidak ditemukan',
-            // 'tahun_akademik_id.required' => 'Tahun akademik wajib diisi',
-            // 'semester.in' => 'Semester harus Ganjil atau Genap',
+            'kompetensi_id.exists' => 'Kompetensi tidak ditemukan',            
             'tujuan_pembelajaran.required' => 'Tujuan pembelajaran wajib diisi',
             'urutan.required' => 'Urutan ATP wajib diisi',
         ]);
@@ -713,7 +709,7 @@ class AlurTujuanPembelajaranController extends Controller
             );
         }
 
-        if ($atp->semester->status !== 'aktif') {
+        if ($atp->semesterRelasi->status !== 'aktif') {
             return ApiResponse::error(
                 'Tidak valid',
                 ['semester' => 'Perubahan ATP hanya boleh pada semester aktif'],
@@ -725,7 +721,7 @@ class AlurTujuanPembelajaranController extends Controller
         $duplicate = AlurTujuanPembelajaran::where('id', '!=', $atp->id)
             ->where('kompetensi_id', $validated['kompetensi_id'])
             ->where('tahun_akademik_id', $atp->tahunAkademik->id)
-            ->where('semester', $atp->semester->id)
+            ->where('semester', $atp->semesterRelasi->id)
             ->where('urutan', $validated['urutan'])
             ->where('guru_id', $user->id)
             ->exists();
@@ -741,8 +737,8 @@ class AlurTujuanPembelajaranController extends Controller
         // 9. Update ATP (kembali ke draft jika revisi)
         $atp->update([
             'kompetensi_id' => $validated['kompetensi_id'],
-            'tahun_akademik_id' => $atp->tahunAkademik->id,
-            'semester_id' => $atp->semester->id,
+            // 'tahun_akademik_id' => $atp->tahunAkademik->id,
+            // 'semester_id' => $atp->semesterRelasi->id,
             'tujuan_pembelajaran' => $validated['tujuan_pembelajaran'],
             'urutan' => $validated['urutan'],
             'approval_status' => 'draft',
@@ -752,11 +748,19 @@ class AlurTujuanPembelajaranController extends Controller
             'is_locked' => false,
         ]);
 
+        $atp->load([
+            'kompetensi.mataPelajaran',
+            'tahunAkademik',
+            'semesterRelasi',
+            'guru'
+        ]);
+
         return ApiResponse::success([
             'atp_id' => $atp->id,
-            'kompetensi_id' => $atp->kompetensi_id,
+            'kompetensi' => $atp->kompetensi->mataPelajaran->nama_pelajaran,
             'tahun_akademik' => $atp->tahunAkademik->tahun_akademik,
-            'semester' => $atp->semester->semester,
+            'guru' => $atp->guru->nama,
+            'semester' => $atp->semesterRelasi->semester,
             'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
             'urutan' => $atp->urutan,
             'approval_status' => $atp->approval_status,
@@ -848,7 +852,7 @@ class AlurTujuanPembelajaranController extends Controller
 
     // guru
     public function dataSelectAtp() {
-        // kompetensi
+
         $data1 = Kompetensi::with('kurikulum', 'mataPelajaran')
         ->where('status', 'aktif')
         ->get();
@@ -879,71 +883,8 @@ class AlurTujuanPembelajaranController extends Controller
             
         });
 
-
-        // tahun akademik
-        // $data2 = TahunAkademik::select('id', 'tahun_akademik', 'status')
-        // ->where('status', 'aktif')
-        // ->first();
-
-        // if (!$data2) {
-        //     return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
-        // }
-
-        // $tahunAkademik = [
-        //     'tahun_akademik_id' => $data2->id,
-        //     'tahun_akademik' => $data2->tahun_akademik,
-        //     'status_tahun_akademik' => $data2->status,
-        // ];
-
-
-        // guru
-        $data3 = Kepegawaian::select('id', 'nama', 'nip', 'nuptk')
-        ->where('role', 'guru')
-        ->where('status', 'aktif')
-        ->get();
-
-        if ($data3->isEmpty()) {
-            return ApiResponse::error(
-                'Data kosong',
-                ['data' => 'Tidak ada guru aktif']
-            );
-        }     
-
-        $guru = $data3->map(function ($g) {
-            return [
-                'guru_id' => $g->id,
-                'nama_guru' => $g->nama,
-                'nip' => $g->nip ?? null,
-                'nuptk' => $g->nuptk ?? null,
-            ];
-        });
-
-
-        // semester
-        // $data4 = Semester::with('tahunAkademik')
-        // ->whereHas('tahunAkademik', function ($q) {
-        //     $q->where('status', 'aktif');
-        // })
-        // ->where('status', 'aktif')
-        // ->first();
-
-        // if (!$data4) {
-        //     return ApiResponse::error( 'Data kosong', ['data' => 'Tidak ada semester aktif'] );
-        // }   
-        
-        // $semester = [
-        //     'semester_id' => $data4->id,
-        //     'semester' => $data4->semester,
-        //     'status_semester' => $data4->status,
-        //     'tahun_akademik' => $data4->tahunAkademik->tahun_akademik ?? null,
-        //     'status_tahun_akademik' => $data4->tahunAkademik->status ?? null,
-        // ];
-
         return ApiResponse::success([
             'kompetensi' => $kompetensi ?? null,
-            'guru' => $guru ?? null,
-            // 'tahun_akademik' => $tahunAkademik ?? null,
-            // 'semester' => $semester ?? null
         ], 'Data select berhasil diambil');
 
     }

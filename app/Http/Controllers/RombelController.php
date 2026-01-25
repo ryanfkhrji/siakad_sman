@@ -482,21 +482,6 @@ class RombelController extends Controller
             ];
         })->values();
 
-
-        // tahun akademik
-        // $data2 = TahunAkademik::select('id', 'tahun_akademik', 'status')->where('status', 'aktif')->first();
-
-        // if (!$data2) {
-        //     return ApiResponse::error('Not found', ['data' => null]);
-        // }
-
-        // $tahunAkademik = [
-        //     'tahun_akademik_id' => $data2->id,
-        //     'tahun_akademik' => $data2->tahun_akademik,
-        //     'status_tahun_akademik' => $data2->status,
-        // ];
-
-
         // wali rombel
         $data3 = Kepegawaian::select('id', 'nama', 'nip', 'nuptk')
         ->where('role', 'guru')
@@ -522,7 +507,6 @@ class RombelController extends Controller
 
         return ApiResponse::success([
             'kelas' => $kelas,
-            // 'tahun_akademik' => $tahunAkademik,
             'wali_rombel' => $wali
         ], 'Data select berhasil diambil');
     }

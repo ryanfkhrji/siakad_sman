@@ -658,27 +658,6 @@ class JadwalPelajaranController extends Controller
         });
 
         
-        // semester
-        // $data2 = Semester::with('tahunAkademik')
-        // ->whereHas('tahunAkademik', function ($q) {
-        //     $q->where('status', 'aktif');
-        // })
-        // ->where('status', 'aktif')
-        // ->first();
-
-        // if (!$data2) {
-        //     return ApiResponse::error( 'Data kosong', ['data' => 'Tidak ada semester aktif'] );
-        // }   
-        
-        // $semester = [
-        //     'semester_id' => $data2->id,
-        //     'semester' => $data2->semester,
-        //     'status_semester' => $data2->status,
-        //     'tahun_akademik' => $data2->tahunAkademik->tahun_akademik,
-        //     'status_tahun_akademik' => $data2->tahunAkademik->status
-        // ];
-
-        
         // guru
         $data3 = Kepegawaian::where('role', 'guru')
         ->where('status', 'aktif')
@@ -748,7 +727,6 @@ class JadwalPelajaranController extends Controller
         return ApiResponse::success(
             [
                 'kurikulum_mata_pelajaran' => $kurmap,
-                // 'semester' => $semester,
                 'guru' => $guru,
                 'rombel' => $rombel,
                 'ruangan' => $ruangan,
