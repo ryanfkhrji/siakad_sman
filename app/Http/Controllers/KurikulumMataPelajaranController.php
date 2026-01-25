@@ -390,24 +390,24 @@ class KurikulumMataPelajaranController extends Controller
 
 
         // tahun akademik
-        $data4 = TahunAkademik::select('id', 'tahun_akademik', 'status')->where('status', 'aktif')->first();
+        // $data4 = TahunAkademik::select('id', 'tahun_akademik', 'status')->where('status', 'aktif')->first();
 
-        if (!$data4) {
-            return ApiResponse::error('Not found', ['data' => null]);
-        }
+        // if (!$data4) {
+        //     return ApiResponse::error('Not found', ['data' => null]);
+        // }
 
-        $tahunAkademik = [
-            'tahun_akademik_id' => $data4->id,
-            'tahun_akademik' => $data4->tahun_akademik,
-            'status_tahun_akademik' => $data4->status,
-        ];
+        // $tahunAkademik = [
+        //     'tahun_akademik_id' => $data4->id,
+        //     'tahun_akademik' => $data4->tahun_akademik,
+        //     'status_tahun_akademik' => $data4->status,
+        // ];
 
 
         return ApiResponse::success([
             'kurikulum' => $kurikulum,
             'mata_pelajaran' => $mataPelajaran,
             'jurusan_pelajaran' => $jurusanPelajaran ?? null,
-            'tahun_akademik' => $tahunAkademik,
+            // 'tahun_akademik' => $tahunAkademik,
         ], 'Data select berhasil diambil');
     }
 }

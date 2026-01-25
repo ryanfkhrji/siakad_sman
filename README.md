@@ -84,13 +84,13 @@ Perbaikan
 12. semester:
     - ☑️ Backend:
         - ✅ samakan semua
-        - ✅ send data untuk select (hanya tahun_akademik_id aktif saja)
+        <!-- - ✅ send data untuk select (hanya tahun_akademik_id aktif saja) -->
     - Frontend:
         - Ikutin insomnia
 13. kurikulum_mata_pelajaran:
    - ☑️ Backend:
           - ✅ samakan semua
-          - ✅ send data untuk select
+          <!-- - ✅ send data untuk select -->
    - Frontend:
           - ikutin insomnia
           - Buat tampilannya (untuk spa saja)
@@ -186,6 +186,7 @@ Perbaikan
         - (migrasi, model, seeder)
         - ✅ controller
         - ✅ route
+        - ✅ data select
     - Frontend:
         - ikutin insomnia
 27. pelatih_ekskul:
@@ -193,11 +194,13 @@ Perbaikan
         - ✅ (migrasi, model, seeder)
         - ✅ controller
         - ✅ route
+        - ✅ data select
     - Frontend:
         - ikutin insomnia
 28. ekskul_siswa_pivot:
     - Backend:
         - ✅ (Migrasi, Seeder, Controller)
+        - ✅ data select
     - Frontend:
         - ikutin insomnia
         - alur siswa daftar ekskul: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)

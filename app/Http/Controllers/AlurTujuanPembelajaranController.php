@@ -881,19 +881,19 @@ class AlurTujuanPembelajaranController extends Controller
 
 
         // tahun akademik
-        $data2 = TahunAkademik::select('id', 'tahun_akademik', 'status')
-        ->where('status', 'aktif')
-        ->first();
+        // $data2 = TahunAkademik::select('id', 'tahun_akademik', 'status')
+        // ->where('status', 'aktif')
+        // ->first();
 
-        if (!$data2) {
-            return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
-        }
+        // if (!$data2) {
+        //     return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
+        // }
 
-        $tahunAkademik = [
-            'tahun_akademik_id' => $data2->id,
-            'tahun_akademik' => $data2->tahun_akademik,
-            'status_tahun_akademik' => $data2->status,
-        ];
+        // $tahunAkademik = [
+        //     'tahun_akademik_id' => $data2->id,
+        //     'tahun_akademik' => $data2->tahun_akademik,
+        //     'status_tahun_akademik' => $data2->status,
+        // ];
 
 
         // guru
@@ -920,30 +920,30 @@ class AlurTujuanPembelajaranController extends Controller
 
 
         // semester
-        $data4 = Semester::with('tahunAkademik')
-        ->whereHas('tahunAkademik', function ($q) {
-            $q->where('status', 'aktif');
-        })
-        ->where('status', 'aktif')
-        ->first();
+        // $data4 = Semester::with('tahunAkademik')
+        // ->whereHas('tahunAkademik', function ($q) {
+        //     $q->where('status', 'aktif');
+        // })
+        // ->where('status', 'aktif')
+        // ->first();
 
-        if (!$data4) {
-            return ApiResponse::error( 'Data kosong', ['data' => 'Tidak ada semester aktif'] );
-        }   
+        // if (!$data4) {
+        //     return ApiResponse::error( 'Data kosong', ['data' => 'Tidak ada semester aktif'] );
+        // }   
         
-        $semester = [
-            'semester_id' => $data4->id,
-            'semester' => $data4->semester,
-            'status_semester' => $data4->status,
-            'tahun_akademik' => $data4->tahunAkademik->tahun_akademik ?? null,
-            'status_tahun_akademik' => $data4->tahunAkademik->status ?? null,
-        ];
+        // $semester = [
+        //     'semester_id' => $data4->id,
+        //     'semester' => $data4->semester,
+        //     'status_semester' => $data4->status,
+        //     'tahun_akademik' => $data4->tahunAkademik->tahun_akademik ?? null,
+        //     'status_tahun_akademik' => $data4->tahunAkademik->status ?? null,
+        // ];
 
         return ApiResponse::success([
             'kompetensi' => $kompetensi ?? null,
-            'tahun_akademik' => $tahunAkademik ?? null,
             'guru' => $guru ?? null,
-            'semester' => $semester ?? null
+            // 'tahun_akademik' => $tahunAkademik ?? null,
+            // 'semester' => $semester ?? null
         ], 'Data select berhasil diambil');
 
     }

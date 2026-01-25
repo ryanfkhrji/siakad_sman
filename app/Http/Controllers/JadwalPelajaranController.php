@@ -748,7 +748,7 @@ class JadwalPelajaranController extends Controller
         return ApiResponse::success(
             [
                 'kurikulum_mata_pelajaran' => $kurmap,
-                'semester' => $semester,
+                // 'semester' => $semester,
                 'guru' => $guru,
                 'rombel' => $rombel,
                 'ruangan' => $ruangan,

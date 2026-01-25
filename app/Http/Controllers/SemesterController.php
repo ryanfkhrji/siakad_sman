@@ -268,21 +268,21 @@ class SemesterController extends Controller
         return ApiResponse::success(null, 'Semester berhasil dihapus');
     }
 
-    public function dataSelectSemester() {
-        $tahunAkademik = TahunAkademik::select('id', 'tahun_akademik', 'status')
-        ->where('status', 'aktif')
-        ->first();
+    // public function dataSelectSemester() {
+    //     $tahunAkademik = TahunAkademik::select('id', 'tahun_akademik', 'status')
+    //     ->where('status', 'aktif')
+    //     ->first();
 
-        if (!$tahunAkademik) {
-            return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
-        }
+    //     if (!$tahunAkademik) {
+    //         return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
+    //     }
 
-        $data = [
-            'tahun_akademik_id' => $tahunAkademik->id,
-            'tahun_akademik' => $tahunAkademik->tahun_akademik,
-            'status_tahun_akademik' => $tahunAkademik->status,
-        ];
+    //     $data = [
+    //         'tahun_akademik_id' => $tahunAkademik->id,
+    //         'tahun_akademik' => $tahunAkademik->tahun_akademik,
+    //         'status_tahun_akademik' => $tahunAkademik->status,
+    //     ];
 
-        return ApiResponse::success($data, 'Tahun akademik aktif berhasil diambil');
-    }
+    //     return ApiResponse::success($data, 'Tahun akademik aktif berhasil diambil');
+    // }
 }
