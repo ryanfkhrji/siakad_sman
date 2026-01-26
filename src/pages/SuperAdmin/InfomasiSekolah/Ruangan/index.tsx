@@ -12,6 +12,7 @@ import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { DialogDetailRuangan } from "./DialogDetailRuangan";
+import { Badge } from "@/components/ui/badge";
 
 const DataRuangan = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -129,8 +130,13 @@ const DataRuangan = () => {
     else if (kondisi === "Rusak Berat") color = "bg-red-100 text-red-700 border-red-300";
     else color = "bg-blue-100 text-blue-600 border-blue-300";
 
-    return <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>{kondisi}</span>;
+    return (
+      <Badge variant="outline" className={`${color}`}>
+        {kondisi}
+      </Badge>
+    );
   };
+
 
 
   return (

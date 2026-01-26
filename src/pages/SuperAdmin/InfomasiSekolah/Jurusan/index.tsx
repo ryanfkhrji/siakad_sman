@@ -147,8 +147,8 @@ const DataJurusan = () => {
                       paginatedJurusan.map((jurusan, index) => (
                         <TableRow key={jurusan.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{jurusan.nama_jurusan}</TableCell>
-                          <TableCell>{jurusan.jumlah_siswa}</TableCell>
+                          <TableCell>{jurusan.nama_jurusan ?? "-"}</TableCell>
+                          <TableCell>{jurusan.jumlah_siswa ?? "0"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
                             <DialogDetailJurusan jurusanId={jurusan.id} />

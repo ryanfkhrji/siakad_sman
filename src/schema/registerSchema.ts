@@ -18,8 +18,8 @@ export const registerSiswaSchema = z
       .min(5, "NIP minimal 5 karakter")
       .max(50, "NIP maksimal 50 karakter")
       .regex(/^[0-9]+$/, "NIP hanya boleh berisi angka"),
-    kelas: z.string().trim().min(1, "Kelas wajib diisi"),
-    jurusan: z.string().trim().min(1, "Jurusan wajib diisi"),
+    // kelas: z.string().trim().min(1, "Kelas wajib diisi"),
+    // jurusan: z.string().trim().min(1, "Jurusan wajib diisi"),
     password: z
       .string()
       .min(5, "Password minimal 5 karakter")
@@ -44,10 +44,14 @@ export const registerKepegawaianSchema = z
       .min(5, "NIP minimal 5 karakter")
       .max(50, "NIP maksimal 50 karakter")
       .regex(/^[0-9]+$/, "NIP hanya boleh berisi angka"),
-    email: z
+    nuptk: z
       .string()
       .trim()
-      .min(1, "Email wajib diisi"),
+      .min(1, "NUPTK wajib diisi")
+      .min(5, "NIP minimal 5 karakter")
+      .max(50, "NIP maksimal 50 karakter")
+      .regex(/^[0-9]+$/, "NUPTK hanya boleh berisi angka"),
+    email: z.string().trim().min(1, "Email wajib diisi"),
     password: z
       .string()
       .min(5, "Password minimal 5 karakter")

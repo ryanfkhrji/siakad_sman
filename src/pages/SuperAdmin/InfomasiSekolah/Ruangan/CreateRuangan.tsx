@@ -9,45 +9,26 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
-
-interface FormErrors {
-  gedung_id?: string[];
-  kode_ruangan?: string[];
-  nama_ruangan?: string[];
-  jenis_ruangan?: string[];
-  lantai?: string[];
-  kapasitas?: string[];
-  luas_ruangan?: string[];
-  kondisi?: string[];
-  fasilitas?: string[];
-  keterangan?: string[];
-}
-
-interface Gedung {
-  id: number;
-  nama_gedung: string;
-  jumlah_lantai: number;
-}
+import type { FormRuanganPayload, GedungSelectOption } from "@/types/ruangan";
 
 const CreateRuangan = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [gedungList, setGedungList] = useState<Gedung[]>([]);
-  const [selectedGedung, setSelectedGedung] = useState<Gedung | null>(null);
+  const [gedungList, setGedungList] = useState<GedungSelectOption[]>([]);
 
-  const [formData, setFormData] = useState({
-    gedung_id: "",
+  const [formData, setFormData] = useState<FormRuanganPayload>({
+    gedung_id: 0,
     kode_ruangan: "",
     nama_ruangan: "",
     jenis_ruangan: "",
-    lantai: "",
-    kapasitas: "",
+    lantai: 0,
+    kapasitas: 0,
     luas_ruangan: "",
     kondisi: "",
     fasilitas: "",
     keterangan: "",
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -58,7 +39,7 @@ const CreateRuangan = () => {
 
   const fetchGedungList = async () => {
     try {
-      const res = await api.get("/spa/gedung");
+      const res = await api.get("/spa/data-select/ruangan");
       if (res.data.status === "success") {
         setGedungList(res.data.data);
       }
@@ -73,11 +54,22 @@ const CreateRuangan = () => {
   };
 
   const handleGedungChange = (gedungId: string) => {
-    const gedung = gedungList.find((g) => g.id.toString() === gedungId);
-    setSelectedGedung(gedung || null);
-    setFormData({ ...formData, gedung_id: gedungId });
+    const gedungIdNum = parseInt(gedungId);
+    setFormData({ ...formData, gedung_id: gedungIdNum });
 
-    // Clear lantai error when gedung changes
+    // Clear gedung_id error when gedung changes
+    if (errors.gedung_id) {
+      const newErrors = { ...errors };
+      delete newErrors.gedung_id;
+      setErrors(newErrors);
+    }
+  };
+
+  const handleLantaiChange = (value: string) => {
+    const lantaiValue = value ? parseInt(value) : 0;
+    setFormData({ ...formData, lantai: lantaiValue });
+
+    // Clear lantai error when value changes
     if (errors.lantai) {
       const newErrors = { ...errors };
       delete newErrors.lantai;
@@ -85,55 +77,36 @@ const CreateRuangan = () => {
     }
   };
 
-  const handleLantaiChange = (value: string) => {
-    setFormData({ ...formData, lantai: value });
+  const handleKapasitasChange = (value: string) => {
+    const kapasitasValue = value ? parseInt(value) : 0;
+    setFormData({ ...formData, kapasitas: kapasitasValue });
 
-    // Validate lantai against jumlah_lantai
-    if (selectedGedung && value) {
-      const lantaiValue = parseInt(value);
-      if (lantaiValue > selectedGedung.jumlah_lantai) {
-        setErrors({
-          ...errors,
-          lantai: [`Lantai tidak boleh lebih dari ${selectedGedung.jumlah_lantai} (jumlah lantai gedung)`],
-        });
-      } else {
-        const newErrors = { ...errors };
-        delete newErrors.lantai;
-        setErrors(newErrors);
-      }
+    // Clear kapasitas error when value changes
+    if (errors.kapasitas) {
+      const newErrors = { ...errors };
+      delete newErrors.kapasitas;
+      setErrors(newErrors);
     }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Client-side validation for lantai
-    if (selectedGedung && formData.lantai) {
-      const lantaiValue = parseInt(formData.lantai);
-      if (lantaiValue > selectedGedung.jumlah_lantai) {
-        setErrors({
-          ...errors,
-          lantai: [`Lantai tidak boleh lebih dari ${selectedGedung.jumlah_lantai} (jumlah lantai gedung)`],
-        });
-        return;
-      }
-    }
-
     setErrors({});
     setLoading(true);
 
     try {
-      const submitData = {
-        gedung_id: parseInt(formData.gedung_id),
+      const submitData: FormRuanganPayload = {
+        gedung_id: formData.gedung_id,
         kode_ruangan: formData.kode_ruangan,
         nama_ruangan: formData.nama_ruangan,
-        jenis_ruangan: formData.jenis_ruangan || null,
-        lantai: formData.lantai ? parseInt(formData.lantai) : null,
-        kapasitas: formData.kapasitas ? parseInt(formData.kapasitas) : null,
-        luas_ruangan: formData.luas_ruangan ? parseFloat(formData.luas_ruangan) : null,
-        kondisi: formData.kondisi || null,
-        fasilitas: formData.fasilitas || null,
-        keterangan: formData.keterangan || null,
+        jenis_ruangan: formData.jenis_ruangan,
+        lantai: formData.lantai,
+        kapasitas: formData.kapasitas,
+        luas_ruangan: formData.luas_ruangan,
+        kondisi: formData.kondisi,
+        fasilitas: formData.fasilitas,
+        keterangan: formData.keterangan,
       };
 
       const res = await api.post("/spa/ruangan", submitData);
@@ -188,14 +161,14 @@ const CreateRuangan = () => {
           <h1 className="text-3xl font-bold mb-6">Tambah Ruangan</h1>
 
           <div className="bg-white rounded shadow p-5">
-            <div className="space-y-6 max-w-2xl w-full">
+            <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl w-full">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Gedung */}
                 <div>
                   <label className="block font-semibold mb-2">
                     Gedung <span className="text-red-500">*</span>
                   </label>
-                  <Select onValueChange={handleGedungChange} value={formData.gedung_id}>
+                  <Select onValueChange={handleGedungChange} value={formData.gedung_id > 0 ? formData.gedung_id.toString() : ""}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="-- Pilih Gedung --" />
                     </SelectTrigger>
@@ -203,8 +176,8 @@ const CreateRuangan = () => {
                       <SelectGroup>
                         <SelectLabel>Pilih Gedung</SelectLabel>
                         {gedungList.map((gedung) => (
-                          <SelectItem key={gedung.id} value={gedung.id.toString()}>
-                            {gedung.nama_gedung} (Lantai: {gedung.jumlah_lantai})
+                          <SelectItem key={gedung.gedung_id} value={gedung.gedung_id.toString()}>
+                            {gedung.kode_gedung} - {gedung.nama_gedung}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -233,36 +206,45 @@ const CreateRuangan = () => {
 
                 {/* Jenis Ruangan */}
                 <div>
-                  <label className="block font-semibold mb-2">Jenis Ruangan</label>
+                  <label className="block font-semibold mb-2">
+                    Jenis Ruangan <span className="text-red-500">*</span>
+                  </label>
                   <input type="text" placeholder="cth: Kelas, Kantor, Laboratorium" value={formData.jenis_ruangan} onChange={(e) => setFormData({ ...formData, jenis_ruangan: e.target.value })} className="border p-2 w-full rounded" />
                   {errors.jenis_ruangan && errors.jenis_ruangan.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.jenis_ruangan[0]}</p>}
                 </div>
 
                 {/* Lantai */}
                 <div>
-                  <label className="block font-semibold mb-2">Lantai</label>
-                  <input type="number" placeholder="cth: 2" value={formData.lantai} onChange={(e) => handleLantaiChange(e.target.value)} min="1" max={selectedGedung?.jumlah_lantai || undefined} className="border p-2 w-full rounded" />
-                  {selectedGedung && <p className="text-xs text-gray-500 mt-1">Maksimal lantai: {selectedGedung.jumlah_lantai}</p>}
+                  <label className="block font-semibold mb-2">
+                    Lantai <span className="text-red-500">*</span>
+                  </label>
+                  <input type="number" placeholder="cth: 2" value={formData.lantai || ""} onChange={(e) => handleLantaiChange(e.target.value)} min="1" className="border p-2 w-full rounded" />
                   {errors.lantai && errors.lantai.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.lantai[0]}</p>}
                 </div>
 
                 {/* Kapasitas */}
                 <div>
-                  <label className="block font-semibold mb-2">Kapasitas</label>
-                  <input type="number" placeholder="cth: 30" value={formData.kapasitas} onChange={(e) => setFormData({ ...formData, kapasitas: e.target.value })} className="border p-2 w-full rounded" />
+                  <label className="block font-semibold mb-2">
+                    Kapasitas <span className="text-red-500">*</span>
+                  </label>
+                  <input type="number" placeholder="cth: 30" value={formData.kapasitas || ""} onChange={(e) => handleKapasitasChange(e.target.value)} min="1" className="border p-2 w-full rounded" />
                   {errors.kapasitas && errors.kapasitas.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kapasitas[0]}</p>}
                 </div>
 
                 {/* Luas Ruangan */}
                 <div>
-                  <label className="block font-semibold mb-2">Luas Ruangan (m²)</label>
-                  <input type="number" step="0.01" placeholder="cth: 20" value={formData.luas_ruangan} onChange={(e) => setFormData({ ...formData, luas_ruangan: e.target.value })} className="border p-2 w-full rounded" />
+                  <label className="block font-semibold mb-2">
+                    Luas Ruangan (m²) <span className="text-red-500">*</span>
+                  </label>
+                  <input type="text" placeholder="cth: 20 m² atau 20x30 m²" value={formData.luas_ruangan} onChange={(e) => setFormData({ ...formData, luas_ruangan: e.target.value })} className="border p-2 w-full rounded" />
                   {errors.luas_ruangan && errors.luas_ruangan.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.luas_ruangan[0]}</p>}
                 </div>
 
                 {/* Kondisi */}
                 <div>
-                  <label className="block font-semibold mb-2">Kondisi</label>
+                  <label className="block font-semibold mb-2">
+                    Kondisi <span className="text-red-500">*</span>
+                  </label>
                   <Select onValueChange={(value) => setFormData({ ...formData, kondisi: value })} value={formData.kondisi}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="-- Pilih Kondisi --" />
@@ -283,14 +265,18 @@ const CreateRuangan = () => {
 
               {/* Fasilitas */}
               <div>
-                <label className="block font-semibold mb-2">Fasilitas</label>
+                <label className="block font-semibold mb-2">
+                  Fasilitas <span className="text-red-500">*</span>
+                </label>
                 <input type="text" placeholder="cth: Alat Lukis, Patung" value={formData.fasilitas} onChange={(e) => setFormData({ ...formData, fasilitas: e.target.value })} className="border p-2 w-full rounded" />
                 {errors.fasilitas && errors.fasilitas.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.fasilitas[0]}</p>}
               </div>
 
               {/* Keterangan */}
               <div>
-                <label className="block font-semibold mb-2">Keterangan</label>
+                <label className="block font-semibold mb-2">
+                  Keterangan <span className="text-red-500">*</span>
+                </label>
                 <textarea
                   placeholder="Keterangan tambahan tentang ruangan..."
                   value={formData.keterangan}
@@ -302,7 +288,7 @@ const CreateRuangan = () => {
 
               {/* Tombol */}
               <div className="flex gap-2">
-                <Button type="button" onClick={(e: any) => handleSubmit(e)} disabled={loading} className="bg-primary flex items-center gap-2">
+                <Button type="submit" disabled={loading} className="bg-primary flex items-center gap-2">
                   <FilePlus size={18} />
                   {loading ? "Menyimpan..." : "Simpan"}
                 </Button>
@@ -313,7 +299,7 @@ const CreateRuangan = () => {
                   </Button>
                 </Link>
               </div>
-            </div>
+            </form>
           </div>
         </div>
 

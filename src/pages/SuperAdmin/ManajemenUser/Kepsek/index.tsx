@@ -13,6 +13,7 @@ import api from "@/api/axios";
 import type { Pegawai } from "@/types";
 import Swal from "sweetalert2";
 import { DialogDetailKepsek } from "./DialogDetailKepsek";
+import { Badge } from "@/components/ui/badge";
 
 const UserKepsek = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -206,6 +207,7 @@ const UserKepsek = () => {
                     <TableRow>
                       <TableHead className="w-[60px] text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">NIP</TableHead>
+                      <TableHead className="font-semibold text-white">NUPTK</TableHead>
                       <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
                       <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
@@ -220,9 +222,12 @@ const UserKepsek = () => {
                         <TableRow key={pegawai.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{pegawai.nip}</TableCell>
+                          <TableCell>{pegawai.nuptk}</TableCell>
                           <TableCell>{pegawai.nama}</TableCell>
                           <TableCell>{pegawai.email}</TableCell>
-                          <TableCell>{pegawai.status}</TableCell>
+                          <TableCell>
+                            <Badge className={pegawai.status === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>{pegawai.status}</Badge>
+                          </TableCell>
                           <TableCell>{pegawai.role}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
@@ -242,7 +247,7 @@ const UserKepsek = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-gray-500 py-4">
+                        <TableCell colSpan={8} className="text-center text-gray-500 py-4">
                           Tidak ada data kepala sekolah yang ditemukan
                         </TableCell>
                       </TableRow>

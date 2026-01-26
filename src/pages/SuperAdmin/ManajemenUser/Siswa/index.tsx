@@ -13,6 +13,7 @@ import api from "@/api/axios";
 import type { Siswa } from "@/types";
 import { DialogDetailSiswa } from "./DialogDetailSiswa";
 import Swal from "sweetalert2";
+import { Badge } from "@/components/ui/badge";
 
 const UserSiswa = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -224,7 +225,9 @@ const UserSiswa = () => {
                           <TableCell>{siswa.nis}</TableCell>
                           <TableCell>{siswa.nama}</TableCell>
                           <TableCell>{siswa.email}</TableCell>
-                          <TableCell>{siswa.status}</TableCell>
+                          <TableCell>
+                            <Badge className={siswa.status === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>{siswa.status}</Badge>
+                          </TableCell>
                           <TableCell>{siswa.role}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
@@ -244,8 +247,8 @@ const UserSiswa = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-gray-500 py-4">
-                          Tidak ada data guru yang ditemukan
+                        <TableCell colSpan={8} className="text-center text-gray-500 py-4">
+                          Tidak ada data siswa yang ditemukan
                         </TableCell>
                       </TableRow>
                     )}

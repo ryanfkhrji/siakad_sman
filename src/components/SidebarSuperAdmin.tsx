@@ -41,7 +41,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
           "fixed top-0 left-0 h-screen border-r bg-white backdrop-blur-sm transition-all duration-300 z-50 flex flex-col",
           isCollapsed ? "w-16" : "w-[300px]",
           "md:translate-x-0",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         )}
       >
         {/* === HEADER === */}
@@ -84,7 +84,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                 <SidebarMenu>
                   {/* Manajemen User */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={() => toggleDropdown("manajemen-user")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                    <SidebarMenuButton
+                      onClick={() => toggleDropdown("manajemen-user")}
+                      className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/manajemen-user") && "bg-primary/10 text-primary")}
+                    >
                       <span className="flex items-center gap-2">
                         <Users className="h-4 w-4" />
                         {!isCollapsed && "Manajemen User"}
@@ -115,7 +118,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                   {/* Informasi Sekolah */}
                   <SidebarMenuItem>
                     {/* Tombol utama dropdown */}
-                    <SidebarMenuButton onClick={() => toggleDropdown("informasi-sekolah")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                    <SidebarMenuButton
+                      onClick={() => toggleDropdown("informasi-sekolah")}
+                      className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/informasi-sekolah") && "bg-primary/10 text-primary")}
+                    >
                       <span className="flex items-center gap-2">
                         <School className="h-4 w-4" />
                         {!isCollapsed && "Informasi Sekolah"}
@@ -157,14 +163,23 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 
-                        {/* Item nested: Data Kepegawaian */}
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton onClick={() => toggleSubDropdown("kepegawaian")} className="hover:bg-primary rounded-md px-3 py-1.5 text-sm justify-between w-full">
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/kepegawaian") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-sekolah/kepegawaian">Data Kepegawaian</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+
+                        {/* Item nested: Data Kepegawaian */}
+                        {/* <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            onClick={() => toggleSubDropdown("kepegawaian")}
+                            className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/informasi-sekolah/kepegawaian") && "bg-primary/10 text-primary")}
+                          >
                             <span>Data Kepegawaian</span>
                             <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "kepegawaian" && "rotate-180")} />
                           </SidebarMenuSubButton>
 
-                          {/* Submenu dalam Data Kepegawaian */}
+
                           {!isCollapsed && openSubDropdown === "kepegawaian" && (
                             <SidebarMenuSub className="ml-4 mt-1 space-y-1">
                               <SidebarMenuSubItem>
@@ -195,7 +210,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                               </SidebarMenuSubItem>
                             </SidebarMenuSub>
                           )}
-                        </SidebarMenuSubItem>
+                        </SidebarMenuSubItem> */}
 
                         {/* <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/staff") && "bg-primary text-white font-medium")}>
@@ -223,7 +238,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
 
                   <SidebarMenuItem>
                     {/* Tombol dropdown utama */}
-                    <SidebarMenuButton onClick={() => toggleDropdown("data-akademik")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                    <SidebarMenuButton
+                      onClick={() => toggleDropdown("data-akademik")}
+                      className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/informasi-akademik") && "bg-primary/10 text-primary")}
+                    >
                       <span className="flex items-center gap-2">
                         <GraduationCap className="h-4 w-4" />
                         {!isCollapsed && "Informasi Akademik"}
@@ -237,7 +255,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                       <SidebarMenuSub className="ml-4 mt-1 space-y-1">
                         {/* SUBMENU NESTED — Data Akademik */}
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton onClick={() => toggleSubDropdown("akademik")} className="hover:bg-primary rounded-md px-3 py-1.5 text-sm justify-between w-full">
+                          <SidebarMenuSubButton
+                            onClick={() => toggleSubDropdown("akademik")}
+                            className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/informasi-akademik") && "bg-primary/10 text-primary")}
+                          >
                             <span>Manajemen Akademik</span>
                             <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "akademik" && "rotate-180")} />
                           </SidebarMenuSubButton>
@@ -346,7 +367,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                   {/* Data Laporan Umum */}
                   {!isCollapsed && <SidebarGroupLabel className="text-xs uppercase text-muted-foreground mt-1">Data Laporan Umum</SidebarGroupLabel>}
                   {/* Tombol dropdown utama */}
-                  <SidebarMenuButton onClick={() => toggleDropdown("laporan-umum")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                  <SidebarMenuButton
+                    onClick={() => toggleDropdown("laporan-umum")}
+                    className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/informasi-laporan-umum") && "bg-primary/10 text-primary")}
+                  >
                     <span className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       {!isCollapsed && "Informasi Laporan Umum"}
@@ -362,7 +386,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                       <SidebarMenuSub className="ml-4 mt-1 space-y-1">
                         {/* SUBMENU NESTED */}
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton onClick={() => toggleSubDropdown("absensi")} className="hover:bg-primary rounded-md px-3 py-1.5 text-sm justify-between w-full">
+                          <SidebarMenuSubButton
+                            onClick={() => toggleSubDropdown("absensi")}
+                            className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/informasi-laporan-umum") && "bg-primary/10 text-primary")}
+                          >
                             <span>Data Absensi</span>
                             <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "absensi" && "rotate-180")} />
                           </SidebarMenuSubButton>
@@ -435,7 +462,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                         </SidebarMenuSubItem>
 
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-laporan-umum/data-keuangan") && "bg-primary text-white font-medium")}>
+                          <SidebarMenuSubButton
+                            asChild
+                            className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-laporan-umum/data-keuangan") && "bg-primary text-white font-medium")}
+                          >
                             <Link to="/superadmin/informasi-laporan-umum/data-keuangan">Data keuangan</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
@@ -447,7 +477,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                   {!isCollapsed && <SidebarGroupLabel className="text-xs uppercase text-muted-foreground mt-1">Data PSB Online</SidebarGroupLabel>}
                   {/* Data PSB Online */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={() => toggleDropdown("psb-online")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                    <SidebarMenuButton
+                      onClick={() => toggleDropdown("psb-online")}
+                      className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/psb") && "bg-primary/10 text-primary")}
+                    >
                       <span className="flex items-center gap-2">
                         <ClipboardList className="h-4 w-4" />
                         {!isCollapsed && "Informasi PSB Online"}
@@ -476,7 +509,10 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                   {!isCollapsed && <SidebarGroupLabel className="text-xs uppercase text-muted-foreground mt-1">Data Pengaturan</SidebarGroupLabel>}
                   {/* Data Pengaturan */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={() => toggleDropdown("pengaturan")} className="hover:bg-primary rounded-md justify-between py-2 px-3">
+                    <SidebarMenuButton
+                      onClick={() => toggleDropdown("pengaturan")}
+                      className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/settings-profile") && "bg-primary/10 text-primary")}
+                    >
                       <span className="flex items-center gap-2">
                         <Settings className="h-4 w-4" />
                         {!isCollapsed && "Pengaturan"}

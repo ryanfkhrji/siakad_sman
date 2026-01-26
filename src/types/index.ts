@@ -1,40 +1,9 @@
-export interface Kelas {
-  id: number;
-  nama_kelas: string | null;
-  jam_masuk: string | null;
-  jumlah_siswa?: number;
-  wali_kelas: Pegawai | null;
-}
 
-export interface Pegawai {
-  id: number;
-  nama: string;
-  status?: string;
-  nip: string;
-  email: string;
-  keterangan?: string;
-  role: string;
-  kelas?: Kelas | null;
-}
-
-export interface Siswa {
-  id: number;
-  nisn: string;
-  nama: string;
-  email: string;
-  nis: string;
-  kelas: Kelas | string | null;
-  status: string;
-  nama_jurusan?: string | null;
-  nama_ekstrakurikuler?: string | null;
-  role: string;
-}
 
 export interface Jurusan {
   id: number;
   nama_jurusan: string;
   jumlah_siswa: number;
-  siswa: Siswa[];
 }
 
 export interface MataPelajaran {
@@ -42,39 +11,6 @@ export interface MataPelajaran {
   nama_pelajaran: string;
   status: string;
   nilai_kkm: number;
-}
-
-export interface JadwalPelajaran {
-  id: number;
-  mata_pelajaran: string;
-  hari: string;
-  guru: Pegawai[] | string;
-  kelas: Kelas[] | string;
-  jam_pelajaran: string;
-  ruangan: string;
-  link_opsional: string | null;
-  peserta: [
-    {
-      id: number;
-      nama_siswa: string;
-      jurusan: string;
-      kelas: string | Kelas | null;
-    }
-  ];
-}
-
-export interface JadwalPelajaranSiswa {
-  id: number;
-  nisn: string;
-  nama: string;
-  email: string;
-  nis: string;
-  nama_jurusan?: string | null;
-  nama_ekstrakurikuler?: string | null;
-  status: string;
-  role: string;
-  kelas: Kelas | null;
-  jadwal_pelajaran: JadwalPelajaran | null;
 }
 
 export interface Ekskul {
@@ -85,7 +21,6 @@ export interface Ekskul {
   status: string;
   jumlah_peserta: number;
   sikap: string | null;
-  peserta: Siswa[];
 }
 
 export interface Kurikulum {
@@ -102,18 +37,6 @@ export interface KompetensiDasar {
   judul_kompetensi_dasar: string;
   deskripsi: string;
   kurikulum_id: string;
-}
-
-export interface Gedung {
-  id: number;
-  foto_gedung: string | null;
-  kode_gedung: string;
-  nama_gedung: string;
-  jumlah_lantai: number;
-  luas_bangunan: string;
-  tahun_dibangun: string;
-  kondisi: string;
-  keterangan: string;
 }
 
 export interface DetailKelasSiswa {
@@ -148,20 +71,6 @@ export interface IdentitasSekolah {
   visi: string;
   misi: string;
   logo: string;
-}
-
-export interface Ruangan {
-  id: number;
-  nama_gedung: string;
-  kode_ruangan: string;
-  nama_ruangan: string;
-  jenis_ruangan: string;
-  lantai: number;
-  kapasitas: number;
-  luas_ruangan: string;
-  kondisi: string;
-  fasilitas: string;
-  keterangan: string;
 }
 
 export interface TahunAkademik {

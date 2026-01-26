@@ -21,15 +21,11 @@ import { DashboardSiswa } from "@/pages/Siswa/DashboardSiswa";
 import DataKelas from "../pages/SuperAdmin/InfomasiSekolah/Kelas";
 import CreateKelas from "@/pages/SuperAdmin/InfomasiSekolah/Kelas/CreateKelas";
 import EditKelas from "@/pages/SuperAdmin/InfomasiSekolah/Kelas/EditKelas";
-import DataGuru from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/Guru";
-import EditGuru from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/Guru/EditGuru";
 import DataJurusan from "@/pages/SuperAdmin/InfomasiSekolah/Jurusan";
 import CreateJurusan from "@/pages/SuperAdmin/InfomasiSekolah/Jurusan/CreateJurusan";
 import EditJurusan from "@/pages/SuperAdmin/InfomasiSekolah/Jurusan/EditJurusan";
 import DataSiswa from "@/pages/SuperAdmin/informasiAkademik/Siswa";
 import EditSiswa from "@/pages/SuperAdmin/informasiAkademik/Siswa/EditSiswa";
-import DataStaff from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/Staff";
-import EditStaff from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/Staff/EditStaff";
 import UserSiswa from "@/pages/SuperAdmin/ManajemenUser/Siswa";
 import EditUserSiswa from "@/pages/SuperAdmin/ManajemenUser/Siswa/EditUserSiswa";
 import UserGuru from "@/pages/SuperAdmin/ManajemenUser/Guru";
@@ -124,6 +120,8 @@ import DetailKeuangan from "@/pages/SuperAdmin/InformasiLaporanUmum/Keuangan/Det
 import EditEkskulSiswaSikap from "@/pages/SuperAdmin/informasiAkademik/Ekstrakurikuler/EditEkskulSiswaSikap";
 import KompetensiDasar from "@/pages/Guru/KompetensiDasar";
 import EditEkskulSikapSiswaPegawai from "@/pages/Guru/Ekstrakurikuler/EditEkskulSikapSiswaPegawai";
+import DataKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian";
+import EditKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/EditKepegawaian";
 
 export default function AppRoutes() {
   return (
@@ -331,12 +329,12 @@ export default function AppRoutes() {
         {/* Data User Ortu */}
 
         {/* INFORMASI SEKOLAH */}
-        {/* Data Guru */}
+        {/* Data Kepegawaian */}
         <Route
-          path="/superadmin/informasi-sekolah/kepegawaian/guru"
+          path="/superadmin/informasi-sekolah/kepegawaian"
           element={
             <ProtectedRoute roles={["super_admin"]}>
-              <DataGuru />
+              <DataKepegawaian />
             </ProtectedRoute>
           }
         />
@@ -349,30 +347,14 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-sekolah/kepegawaian/guru/edit/:id"
+          path="/superadmin/informasi-sekolah/kepegawaian/edit/:id"
           element={
             <ProtectedRoute roles={["super_admin"]}>
-              <EditGuru />
+              <EditKepegawaian />
             </ProtectedRoute>
           }
         />
-        {/* Data Staff */}
-        <Route
-          path="/superadmin/informasi-sekolah/kepegawaian/staff"
-          element={
-            <ProtectedRoute roles={["super_admin"]}>
-              <DataStaff />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/superadmin/informasi-sekolah/kepegawaian/staff/edit/:id"
-          element={
-            <ProtectedRoute roles={["super_admin"]}>
-              <EditStaff />
-            </ProtectedRoute>
-          }
-        />
+
         {/* Data Kelas */}
         <Route
           path="/superadmin/informasi-sekolah/kelas"

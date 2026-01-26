@@ -12,6 +12,7 @@ import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { DialogDetailGedung } from "./DialogDetailGedung";
+import { Badge } from "@/components/ui/badge";
 
 const DataGedung = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -121,16 +122,21 @@ const DataGedung = () => {
     }
   };
 
-  const getKondisiBadge = (kondisi: string) => {
-    let color = "";
+const getKondisiBadge = (kondisi: string) => {
+  let color = "";
 
-    if (kondisi === "Baik") color = "bg-green-100 text-green-700 border-green-300";
-    else if (kondisi === "Rusak Ringan") color = "bg-yellow-100 text-yellow-700 border-yellow-300";
-    else if (kondisi === "Rusak Berat") color = "bg-red-100 text-red-700 border-red-300";
-    else color = "bg-blue-100 text-blue-600 border-blue-300";
+  if (kondisi === "Baik") color = "bg-green-100 text-green-700 border-green-300";
+  else if (kondisi === "Rusak Ringan") color = "bg-yellow-100 text-yellow-700 border-yellow-300";
+  else if (kondisi === "Rusak Berat") color = "bg-red-100 text-red-700 border-red-300";
+  else color = "bg-blue-100 text-blue-600 border-blue-300";
 
-    return <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${color}`}>{kondisi}</span>;
-  };
+  return (
+    <Badge variant="outline" className={`${color}`}>
+      {kondisi}
+    </Badge>
+  );
+};
+
 
   return (
     <SidebarProvider>

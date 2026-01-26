@@ -6,19 +6,20 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { PenBoxIcon, Trash2Icon, SearchIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, /*SelectGroup*/SelectItem, /*SelectLabel*/ SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import api from "@/api/axios";
-import type { Siswa } from "@/types";
+import type { Siswa, SiswaListResponse } from "@/types/siswa";
 import Swal from "sweetalert2";
 import { DialogDetailSiswa } from "./DialogDetailSiswa";
+import { Badge } from "@/components/ui/badge";
 
 const DataSiswa = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [dataSiswa, setDataSiswa] = useState<Siswa[]>([]);
   const [filteredSiswa, setFilteredSiswa] = useState<Siswa[]>([]);
-  const [selectedJenjang, setSelectedJenjang] = useState<string | null>(null);
+  const [selectedJenjang, /*setSelectedJenjang*/] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,11 +30,14 @@ const DataSiswa = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/spa/siswa");
+        const res = await api.get<SiswaListResponse>("/spa/siswa");
+
         if (res.data.status === "success") {
-          const siswaOnly = res.data.data.filter((p: Siswa) => p.role === "siswa");
-          setDataSiswa(siswaOnly);
-          setFilteredSiswa(siswaOnly);
+          // Backend mengembalikan data dalam format grouped by status
+          // Flatten array untuk mendapatkan semua siswa
+          const allSiswa = res.data.data.flatMap((group) => group.siswa);
+          setDataSiswa(allSiswa);
+          setFilteredSiswa(allSiswa);
         }
       } catch (error) {
         console.error("Gagal mengambil data siswa:", error);
@@ -56,16 +60,16 @@ const DataSiswa = () => {
 
     if (selectedJenjang) {
       filtered = filtered.filter((siswa) => {
-        if (typeof siswa.kelas === "string") {
-          return siswa.kelas.includes(selectedJenjang);
-        }
-        return siswa.kelas?.nama_kelas?.includes(selectedJenjang);
+        // Cek dari nama_jurusan atau dari relasi siswaRombels
+        const jurusanName = siswa.nama_jurusan || siswa.siswaRombels?.[0]?.rombel?.kelas?.jurusan?.nama_jurusan;
+
+        return jurusanName?.includes(selectedJenjang);
       });
     }
 
     if (searchTerm.trim() !== "") {
       const lowerSearch = searchTerm.toLowerCase();
-      filtered = filtered.filter((siswa) => siswa.nama.toLowerCase().includes(lowerSearch) || siswa.nisn?.toLowerCase().includes(lowerSearch));
+      filtered = filtered.filter((siswa) => siswa.nama.toLowerCase().includes(lowerSearch) || siswa.nisn?.toLowerCase().includes(lowerSearch) || siswa.nis?.toLowerCase().includes(lowerSearch));
     }
 
     setFilteredSiswa(filtered);
@@ -84,7 +88,6 @@ const DataSiswa = () => {
   };
 
   const handleDelete = async (id: number) => {
-    // Konfirmasi hapus
     const result = await Swal.fire({
       title: "Yakin ingin menghapus?",
       text: "Data siswa yang dihapus tidak dapat dikembalikan.",
@@ -102,7 +105,6 @@ const DataSiswa = () => {
       const res = await api.delete(`/spa/siswa/${id}`);
 
       if (res.data.status === "success") {
-        // Hapus dari state agar tabel langsung update tanpa reload
         setDataSiswa((prev) => prev.filter((siswa) => siswa.id !== id));
         setFilteredSiswa((prev) => prev.filter((siswa) => siswa.id !== id));
 
@@ -121,7 +123,6 @@ const DataSiswa = () => {
         });
       }
     } catch (err: any) {
-      // Tangani respons error dari backend
       if (err.response?.data?.status === "error") {
         Swal.fire({
           icon: "error",
@@ -141,21 +142,36 @@ const DataSiswa = () => {
     }
   };
 
+  // Helper function untuk mendapatkan nama rombel/kelas
+  // const getKelasName = (siswa: Siswa): string => {
+  //   if (typeof siswa.kelas === "string") return siswa.kelas;
+  //   if (siswa.kelas?.nama_kelas) return siswa.kelas.nama_kelas;
+  //   if (siswa.siswaRombels?.[0]?.rombel?.kelas?.nama_kelas) {
+  //     return siswa.siswaRombels[0].rombel.kelas.nama_kelas;
+  //   }
+  //   return "-";
+  // };
+
+  // Helper function untuk mendapatkan wali kelas
+  // const getWaliKelas = (siswa: Siswa): string => {
+  //   if (typeof siswa.kelas === "object" && siswa.kelas?.wali_kelas?.nama) {
+  //     return siswa.kelas.wali_kelas.nama;
+  //   }
+  //   if (siswa.siswaRombels?.[0]?.rombel?.waliRombel?.nama) {
+  //     return siswa.siswaRombels[0].rombel.waliRombel.nama;
+  //   }
+  //   return "-";
+  // };
+
   return (
     <SidebarProvider>
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      <main
-        className={`
-    w-full min-h-screen bg-background transition-all duration-300
-    ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}
-  `}
-      >
+      <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
         <PageTitle title="Data Siswa" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Data Siswa</h1>
 
-          {/* ✅ Loading State */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-600">
               <Loader2Icon className="animate-spin mb-2" size={28} />
@@ -163,7 +179,7 @@ const DataSiswa = () => {
             </div>
           ) : (
             <>
-              {/* Toolbar: Tambah + Filter + Search */}
+              {/* Toolbar */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                 <Link to="/superadmin/informasi-akademik/siswa/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full md:w-auto">
@@ -173,7 +189,7 @@ const DataSiswa = () => {
                 </Link>
 
                 {/* Filter Jenjang */}
-                <Select value={selectedJenjang ?? ""} onValueChange={(value) => setSelectedJenjang(value)}>
+                {/* <Select value={selectedJenjang ?? ""} onValueChange={(value) => setSelectedJenjang(value)}>
                   <SelectTrigger className="w-full md:w-1/3 cursor-pointer">
                     <SelectValue placeholder="Filter Berdasarkan Kelas" />
                   </SelectTrigger>
@@ -198,12 +214,12 @@ const DataSiswa = () => {
                       </Button>
                     </div>
                   </SelectContent>
-                </Select>
+                </Select> */}
 
                 {/* Search */}
                 <div className="relative w-full md:w-1/3">
                   <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari berdasarkan nama atau NISN..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  <Input type="text" placeholder="Cari berdasarkan nama, NISN, atau NIS..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
                 </div>
               </div>
 
@@ -216,13 +232,8 @@ const DataSiswa = () => {
                       <TableHead className="font-semibold text-white">NISN</TableHead>
                       <TableHead className="font-semibold text-white">NIS</TableHead>
                       <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
-                      {/* <TableHead className="font-semibold text-white">Email</TableHead> */}
-                      <TableHead className="font-semibold text-white">Jurusan</TableHead>
-                      <TableHead className="font-semibold text-white">Kelas</TableHead>
-                      <TableHead className="font-semibold text-white">Wali Kelas</TableHead>
-                      {/* <TableHead className="font-semibold text-white">Ekstrakurikuler</TableHead> */}
+                      <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
-                      {/* <TableHead className="font-semibold text-white">Role</TableHead> */}
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -230,25 +241,19 @@ const DataSiswa = () => {
                   <TableBody>
                     {paginatedSiswa.length > 0 ? (
                       paginatedSiswa.map((siswa, index) => (
-                        <TableRow key={siswa.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                        <TableRow key={`siswa-${siswa.id ?? siswa.siswa_id}`} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{siswa.nisn ?? "-"}</TableCell>
                           <TableCell>{siswa.nis ?? "-"}</TableCell>
                           <TableCell>{siswa.nama ?? "-"}</TableCell>
-                          {/* <TableCell>{siswa.email ?? "-"}</TableCell> */}
-                          <TableCell>{siswa.nama_jurusan ?? "-"}</TableCell>
-                          <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.nama_kelas ?? "-"}</TableCell>
-                          <TableCell>{typeof siswa.kelas === "string" ? siswa.kelas : siswa.kelas?.wali_kelas?.nama ?? "-"}</TableCell>
-                          {/* <TableCell>{siswa.nama_ekstrakurikuler ?? "-"}</TableCell> */}
+                          <TableCell>{siswa.email ?? "-"}</TableCell>
                           <TableCell>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${siswa.status === "aktif" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{siswa.status ?? "-"}</span>
+                            <Badge className={siswa.status === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>{siswa.status}</Badge>
                           </TableCell>
-                          {/* <TableCell>{siswa.role ?? "-"}</TableCell> */}
                           <TableCell className="flex gap-1 justify-center">
-                            {/* Tombol Detail */}
                             <DialogDetailSiswa siswa={siswa} />
 
-                            <Link to={`/superadmin/informasi-akademik/siswa/edit/${siswa.id}`}>
+                            <Link to={`/superadmin/informasi-akademik/siswa/edit/${siswa.siswa_id || siswa.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
