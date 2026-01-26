@@ -521,7 +521,7 @@ class SiswaController extends Controller
     // ✅ spa
     public function update(Request $request, $id)
     {
-        $siswa = Siswa::with('jurusan', 'kelas')->find($id);
+        $siswa = Siswa::find($id);
         if (!$siswa) {
             return ApiResponse::error('Siswa tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
         }
