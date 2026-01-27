@@ -36,43 +36,41 @@ class KelasController extends Controller
     {
         $kelas = Kelas::with([
             'jurusan',
-            'rombels.kelas',            
-            'rombels.waliRombel',            
-            'rombels.tahunAkademik',            
-            'rombels.siswaRombels.siswa.jurusan',            
-            'rombels.siswaRombels.tahunAkademik',            
+            'rombels.waliRombels.tahunAkademik',
+            'rombels.waliRombels.wali'
         ])->find($id);
 
-        $formatted = [
-                'kelas_id' => $kelas->id ?? null,
-                'nama_kelas' => $kelas->nama_kelas ?? null,
-                'tingkat' => $kelas->tingkat ?? null,
-                'jurusan_kelas' => $kelas->jurusan->nama_jurusan ?? null,
-                'histori_rombel' => $kelas->rombels->groupBy('kelas_id')->map(function ($rombel) {
-                    return [
-                        'rombel_id' => $rombel->id ?? null,
-                        'nama_rombel' => $rombel->nama_rombel ?? null,
-                        'wali_rombel' => $rombel->waliRombel->nama ?? null,
+        if (!$kelas) {
+            return ApiResponse::error('Not Found', [
+                'kelas' => 'Data kelas tidak ditemukan'
+            ]);
+        }
 
-                        'tahun_akademik_rombel' => $rombel->tahunAkademik->tahun_akademik ?? null,
-                        'status_tahun_akademik_rombel' => $rombel->tahunAkademik->status ?? null,
-                        'anggota_rombel' => $rombel->siswaRombels->map(function ($siswaRombel) {
-                            return [
-                                'siswa_rombel_id' => $siswaRombel->id ?? null,
-                                'siswa_id' => $siswaRombel->siswa->id ?? null,
-                                'nama_siswa' => $siswaRombel->siswa->nama ?? null,
-                                'nisn' => $siswaRombel->siswa->nisn ?? null,
-                                'nis' => $siswaRombel->siswa->nis ?? null,
-                                'jurusan_siswa' => $siswaRombel->siswa->jurusan->nama_jurusan ?? null,
-                                'tahun_akademik_siswa_rombel' => $siswaRombel->rombel->tahunAkademik->tahun_akademik ?? null,
-                                'status_tahun_akademik_siswa_rombel' => $siswaRombel->rombel->tahunAkademik->status ?? null,
-                            ];
-                        }),
-                    ];
-                }),                                                                                                         
-            ];
+        $formatted = [
+            'kelas_id'       => $kelas->id,
+            'nama_kelas'     => $kelas->nama_kelas,
+            'tingkat'        => $kelas->tingkat,
+            'jurusan_kelas'  => $kelas->jurusan?->nama_jurusan,
+
+            'daftar_rombel' => $kelas->rombels->map(function ($rombel) {
+                return [
+                    'rombel_id'   => $rombel->id,
+                    'nama_rombel' => $rombel->nama_rombel,
+
+                    'histori_wali_rombel' => $rombel->waliRombels->map(function ($wali) {
+                        return [
+                            'wali_rombel_id' => $wali->id,
+                            'wali_rombel'    => $wali->wali?->nama,
+                            'tahun_akademik' => $wali->tahunAkademik?->tahun_akademik,
+                        ];
+                    })->values(),
+                ];
+            })->values(),
+        ];
+
         return ApiResponse::success($formatted, 'Detail kelas berhasil diambil');
-    }       
+    }
+ 
 
     // ✅ create kelas oleh super admin
     public function store(Request $request)

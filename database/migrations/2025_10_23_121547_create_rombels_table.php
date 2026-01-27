@@ -20,7 +20,11 @@ return new class extends Migration
             ->restrictOnDelete();
 
             // Identitas rombel
-            $table->string('nama_rombel')->unique(); // contoh: X-A, XI-A, XII-A 
+            $table->string('nama_rombel'); // contoh: X-A, XI-A, XII-A-IPA
+
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
+
+            $table->unique(['kelas_id', 'nama_rombel']);
 
             $table->timestamps();        
         });

@@ -35,7 +35,7 @@ return new class extends Migration
                 'pindah',
                 'berhenti',
                 'diberhentikan'
-            ])->nullable()->after('tahun_akademik_id');
+            ])->nullable();
         
             $table->text('catatan')->nullable();
             

@@ -14,68 +14,6 @@ class PelatihEkskulController extends Controller
     /**
      * ✅ spa
      */
-    // public function index()
-    // {
-    //     $pelatihEkskul = PelatihEkskul::with([
-    //         'tahunAkademik',
-    //         'pelatih',
-    //         'ekstrakurikuler'
-    //     ])->get();
-
-    //     if ($pelatihEkskul->isEmpty()) {
-    //         return ApiResponse::error('No data', [
-    //             'data' => 'Belum ada data pelatih'
-    //         ]);
-    //     }
-
-    //     $formatted = $pelatihEkskul
-    //         ->groupBy('tahun_akademik_id')
-    //         ->map(function ($perTahun) {
-
-    //             $tahun = $perTahun->first()->tahunAkademik;
-
-    //             return [
-    //                 'tahun_akademik_id' => $tahun?->id,
-    //                 'tahun_akademik' => $tahun?->tahun_akademik,
-    //                 'status_tahun_akademik' => $tahun?->status,
-
-    //                 'daftar_ekskul' => $perTahun
-    //                     ->groupBy('ekstrakurikuler_id')
-    //                     ->map(function ($perEkskul) {
-
-    //                         $ekskul = $perEkskul->first()->ekstrakurikuler;
-
-    //                         return [
-    //                             'ekskul_id' => $ekskul?->id,
-    //                             'nama_ekskul' => $ekskul?->nama_ekstrakurikuler,
-    //                             'anggaran' => $ekskul?->anggaran,
-    //                             'status' => $ekskul?->status,
-    //                             'status_aktif' => $ekskul?->status_aktif,
-
-    //                             'histori_pelatih' => $perEkskul->map(function ($item) {
-    //                                 return [
-    //                                     'pelatih_id' => $item->pelatih?->id,
-    //                                     'nama_pelatih' => $item->pelatih?->nama,
-    //                                     'nip' => $item->pelatih?->nip ?? null,
-    //                                     'nuptk' => $item->pelatih?->nuptk ?? null,
-    //                                 ];
-    //                             })->values(),
-    //                         ];
-    //                     })
-    //                     ->values(),
-    //             ];
-    //         })
-    //         ->values();
-
-    //     return ApiResponse::success(
-    //         $formatted,
-    //         'Data pelatih berhasil diambil'
-    //     );
-    // }
-
-    /**
-     * ✅ spa
-     */
     public function store(Request $request)
     {
         try {
@@ -168,7 +106,6 @@ class PelatihEkskulController extends Controller
             return ApiResponse::error('Validasi gagal', $e->errors(), 422);
         }
     }
-
 
 
    /**

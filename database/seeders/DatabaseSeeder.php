@@ -368,6 +368,15 @@ class DatabaseSeeder extends Seeder
                 'role' => 'siswa',
                 'remember_token' => Str::random(10),
             ],
+            [
+                'nisn' => '123456',
+                'nama' => 'Anak Baru',
+                'nis' => '123456',                
+                'email' => 'anakbaru@gmail.com',
+                'password' => Hash::make('K3ps3k.'),
+                'role' => 'siswa',
+                'remember_token' => Str::random(10),
+            ],
         ]);
 
         /**
@@ -797,16 +806,19 @@ class DatabaseSeeder extends Seeder
                 // 1
                 'kelas_id' => 1, // X                
                 'nama_rombel' => 'X-A',
+                'status' => 'aktif',
             ],
             [
                 // 2
                 'kelas_id' => 1, // X                
                 'nama_rombel' => 'X-B',
+                'status' => 'aktif',
             ],                    
             [
                 // 3
                 'kelas_id' => 1, // X                
                 'nama_rombel' => 'X-C',
+                'status' => 'aktif',
             ],           
             
             // XI
@@ -814,16 +826,19 @@ class DatabaseSeeder extends Seeder
                 // 4
                 'kelas_id' => 2, // XI                
                 'nama_rombel' => 'XI-A',
+                'status' => 'aktif',
             ],                        
             [
                 // 5
                 'kelas_id' => 2, // XI                
                 'nama_rombel' => 'XI-B',
+                'status' => 'aktif',
             ],                                     
             [
                 // 6
                 'kelas_id' => 2, // XI                
                 'nama_rombel' => 'XI-C',
+                'status' => 'aktif',
             ],                                     
 
             // XII
@@ -831,20 +846,31 @@ class DatabaseSeeder extends Seeder
                 // 7
                 'kelas_id' => 3, // XII                
                 'nama_rombel' => 'XII-A',
+                'status' => 'aktif',
             ],                        
             [
                 // 8
                 'kelas_id' => 3, // XII                
                 'nama_rombel' => 'XII-B',
+                'status' => 'aktif',
             ],                        
             [
                 // 9
                 'kelas_id' => 3, // XII                
                 'nama_rombel' => 'XII-C',
+                'status' => 'aktif',
+            ],                        
+
+            // X ARSIP
+            [
+                // 10
+                'kelas_id' => 1, // XI
+                'nama_rombel' => 'X-A-IPS',
+                'status' => 'arsip',
             ],                        
         ]);
 
-        // 🎯 spa
+        // 🎯✅ spa
         WaliRombel::insert([
             [
                 'wali_rombel_id' => 5, // Guru MTK
@@ -913,21 +939,21 @@ class DatabaseSeeder extends Seeder
             // XI (24/25)
             [
                 'siswa_id' => 1, // Bagas
-                'rombel_id' => 5, // XI-A
+                'rombel_id' => 4, // XI-A
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => 'berhenti',
                 'catatan' => 'Siswa berhenti sekolah pada pertengahan tahun 2024'
             ],
             [
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 6, // XI-B
+                'rombel_id' => 5, // XI-B
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => null,
                 'catatan' => null,
             ],   
             [
                 'siswa_id' => 5, // Yuli
-                'rombel_id' => 6, // XI-B
+                'rombel_id' => 5, // XI-B
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => null,
                 'catatan' => null
@@ -936,7 +962,14 @@ class DatabaseSeeder extends Seeder
             // X (24/25)
             [
                 'siswa_id' => 3, // Sanita
-                'rombel_id' => 4, // X-B
+                'rombel_id' => 1, // X-A
+                'tahun_akademik_id' => 2, // 2024/2025
+                'status_akhir' => null,
+                'catatan' => null
+            ],           
+            [
+                'siswa_id' => 6, // Anak Baru
+                'rombel_id' => 1, // X-A
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => null,
                 'catatan' => null
@@ -1144,7 +1177,7 @@ class DatabaseSeeder extends Seeder
             [
                 // 14
                 'kurikulum_mata_pelajaran_id' => 3, // MERDEKA - Indo
-                'semester_id' => 5, // 2024/2025 = Ganjil
+                'semester_id' => 3, // 2024/2025 = Ganjil
                 'hari' => 'Rabu',
                 'guru_id' => 6, // Guru Indo
                 'rombel_id' => 2, // X-B

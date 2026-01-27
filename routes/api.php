@@ -132,7 +132,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/spa/rombel', RombelController::class);    
     Route::get('/spa/data-select/rombel', [RombelController::class, 'dataSelect']);       
 
-    // ! crud wali rombel
+    // ✅☑️ crud wali rombel
     Route::apiResource('/spa/wali-rombel', WaliRombelController::class)->except('index');    
     Route::get('/spa/data-select/wali-rombel', [WaliRombelController::class, 'dataSelect']);       
     

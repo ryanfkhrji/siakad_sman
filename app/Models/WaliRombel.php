@@ -11,11 +11,13 @@ class WaliRombel extends Model
 
     protected $table = 'wali_rombel';
 
-    protected $fillable = [
-        'wali_rombel_id',
-        'rombel_id',
-        'tahun_akademik_id',
-    ];
+    // protected $fillable = [
+    //     'wali_rombel_id',
+    //     'rombel_id',
+    //     'tahun_akademik_id',
+    // ];
+
+    protected $guarded = ['id'];
 
     public function wali()
     {

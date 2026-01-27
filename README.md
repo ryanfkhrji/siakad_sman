@@ -129,7 +129,7 @@ Perbaikan
           - wali_rombel = wali_kelas
           - hitung jumlah siswa di rombel
 19. wali_rombel:
-    - Backend:
+    - ☑️ Backend:
           - Samakan semua
     - Frontend:
           - Ikutin insomnia

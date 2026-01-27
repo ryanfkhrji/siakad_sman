@@ -29,10 +29,10 @@ class Rombel extends Model
         return $this->belongsTo(TahunAkademik::class);
     }
 
-    public function waliRombel()
-    {
-        return $this->belongsTo(Kepegawaian::class, 'wali_rombel_id');
-    }
+    // public function waliRombel()
+    // {
+    //     return $this->belongsTo(Kepegawaian::class, 'wali_rombel_id');
+    // }
 
     /**
      * ========================
