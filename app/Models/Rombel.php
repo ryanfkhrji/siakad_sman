@@ -18,6 +18,11 @@ class Rombel extends Model
         return $this->belongsTo(Kelas::class);
     }
 
+    public function waliRombels()
+    {
+        return $this->hasMany(WaliRombel::class);
+    }
+
     // Rombel → Tahun Akademik
     public function tahunAkademik()
     {

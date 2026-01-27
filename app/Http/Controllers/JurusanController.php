@@ -30,7 +30,7 @@ class JurusanController extends Controller
 
     public function show($id)
     {
-        $jurusan = Jurusan::with('kelas.tahunAkademik', 'kelas.siswas')->find($id);
+        $jurusan = Jurusan::with('kelas')->find($id);
 
         if (!$jurusan) {
             return ApiResponse::error('Jurusan tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
@@ -142,6 +142,13 @@ class JurusanController extends Controller
         $jurusan = Jurusan::find($id);
         if (!$jurusan) {
             return ApiResponse::error('Jurusan tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+        }
+
+        // Cek apakah jurusan masih dipakai kelas
+        if ($jurusan->kelas()->exists()) {
+            return ApiResponse::error('Tidak bisa', [
+                'nama_jurusan' => ['Ada kelas yang telah menggunakan jurusan ini']
+            ], 422);
         }
 
         // Cek apakah jurusan masih punya siswa

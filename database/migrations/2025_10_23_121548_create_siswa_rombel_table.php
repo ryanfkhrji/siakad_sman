@@ -26,7 +26,18 @@ return new class extends Migration
 
             $table->foreignId('tahun_akademik_id')
                 ->constrained('tahun_akademik')
-                ->restrictOnDelete();                          
+                ->restrictOnDelete();
+                
+            $table->enum('status_akhir', [
+                'naik_kelas',
+                'tinggal_kelas',
+                'lulus',
+                'pindah',
+                'berhenti',
+                'diberhentikan'
+            ])->nullable()->after('tahun_akademik_id');
+        
+            $table->text('catatan')->nullable();
             
             $table->timestamps();            
 

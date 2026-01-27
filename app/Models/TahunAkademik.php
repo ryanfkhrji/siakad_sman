@@ -16,6 +16,11 @@ class TahunAkademik extends Model
         return $this->hasMany(EkskulSiswaPivot::class, 'tahun_akademik_id');
     }
 
+    public function waliRombels()
+    {
+        return $this->hasMany(WaliRombel::class);
+    }
+
     public function pembinaEkskul()
      { 
         return $this->hasMany(PembinaEkskul::class, 'tahun_akademik_id');

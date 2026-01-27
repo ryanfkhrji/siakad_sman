@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SiswaRombel;
 use App\Models\Siswa;
+use App\Models\TahunAkademik;
 use App\Models\Rombel;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
@@ -46,13 +47,20 @@ class SiswaRombelController extends Controller
             if ($unikDua) {
                 return ApiResponse::error('Siswa sudah terdaftar di rombel ini pada tahun ini', 'Duplicated');
             }            
+            
+            $tahunAktif = TahunAkademik::where('status', 'aktif')->first();
+            
+            if (!$tahunAktif) {
+                return ApiResponse::error('Belum ada tahun akademik aktif');
+            }
 
             $siswaRombel = SiswaRombel::create([
                 'siswa_id' => $validated['siswa_id'],
                 'rombel_id' => $validated['rombel_id'],
+                'tahun_akademik_id' => $tahunAktif->id,
             ]);
 
-            $siswaRombel->load(['siswa', 'rombel.kelas', 'rombel.tahunAkademik']);
+            $siswaRombel->load(['siswa', 'rombel.kelas', 'tahunAkademik']);
 
             return ApiResponse::success([
                 'id' => $siswaRombel->id ?? null,
@@ -60,7 +68,7 @@ class SiswaRombelController extends Controller
                 'nama_rombel' => $siswaRombel->rombel->nama_rombel ?? null,
                 'kelas' => $siswaRombel->rombel->kelas->nama_kelas ?? null,
                 'tingkat' => $siswaRombel->rombel->kelas->tingkat ?? null,
-                'tahun_akademik' => $siswaRombel->rombel->tahunAkademik->tahun_akademik ?? null,
+                'tahun_akademik' => $siswaRombel->tahunAkademik->tahun_akademik ?? null,
             ], 'Siswa berhasil didaftarkan ke rombel');
 
         } catch (ValidationException $e) {
@@ -136,7 +144,7 @@ class SiswaRombelController extends Controller
      */
     public function destroy(string $id)
     {
-        $siswaRombel = SiswaRombel::with('rombel.tahunAkademik')->find($id);
+        $siswaRombel = SiswaRombel::with('tahunAkademik')->find($id);
 
         if (! $siswaRombel) {
             return ApiResponse::error(
@@ -146,7 +154,7 @@ class SiswaRombelController extends Controller
             );
         }
 
-        $tahunAkademik = $siswaRombel->rombel?->tahunAkademik;
+        $tahunAkademik = $siswaRombel->tahunAkademik;
 
         if (! $tahunAkademik) {
             return ApiResponse::error(

@@ -29,6 +29,7 @@ class Jurusan extends Model
     {
         return $this->hasMany(Kelas::class, 'jurusan_id');
     }
+    
     public function jadwalPelajarans()
     {
         return $this->hasMany(JadwalPelajaran::class, 'jurusan_id');

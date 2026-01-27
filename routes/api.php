@@ -22,6 +22,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\PembinaEkskulController;
 use App\Http\Controllers\PelatihEkskulController;
 use App\Http\Controllers\RombelController;
+use App\Http\Controllers\WaliRombelController;
 use App\Http\Controllers\SiswaRombelController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\SiswaController;
@@ -130,6 +131,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅☑️ CRUD rombel
     Route::apiResource('/spa/rombel', RombelController::class);    
     Route::get('/spa/data-select/rombel', [RombelController::class, 'dataSelect']);       
+
+    // ! crud wali rombel
+    Route::apiResource('/spa/wali-rombel', WaliRombelController::class)->except('index');    
+    Route::get('/spa/data-select/wali-rombel', [WaliRombelController::class, 'dataSelect']);       
     
     // ✅☑️ Create dan Delete siswa rombel
     Route::apiResource('/spa/siswa-rombel', SiswaRombelController::class);    

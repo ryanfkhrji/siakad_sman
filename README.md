@@ -118,7 +118,7 @@ Perbaikan
         - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
 16.  ❌ modul_ajar
 17.  ❌ asesmen
-18.  rombel:
+18. rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya
           - ✅ API dan insomnia
@@ -128,38 +128,43 @@ Perbaikan
           - ikutin insomnia      
           - wali_rombel = wali_kelas
           - hitung jumlah siswa di rombel
-19. siswa_rombel:
+19. wali_rombel:
+    - Backend:
+          - Samakan semua
+    - Frontend:
+          - Ikutin insomnia
+20. siswa_rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya (M, S, C, R)          
           - ✅ data select
     - Frontend:
           - Ikutin insomnia
-20. jadwal_pelajarans:
+21. jadwal_pelajarans:
     - ☑️ Backend:
         - ✅ Guru: Tampilkan tahun_akademik dan semester aktif saja 
         - ✅ spa: tidak bisa hapus jika sudah digunakan pada siswa_jadwal_pelajaran dan absensi_pelajaran
         - ✅ send data untuk select
     - Frontend:
         - samakan dengan insomnia
-21. siswa_jadwal_pelajaran
+22. siswa_jadwal_pelajaran
    - ☑️ Backend:
         - ✅ spa
         - ✅ siswa: tahun dan semester aktif saja
    - Frontend:
         - samakan dengan insomnia
-22. absensi_pegawai:
+23. absensi_pegawai:
     - ☑️ Backend:
         - ✅ samakan dengan migrasi
     - Frontend:
         - ikutin insomnia (baca docs jika ada)
         - jika status pada tahun_akademik atau semester = 'arsip', maka button delete dan update hilang...update dan delete hanya berlaku saat TA dan semester aktif saja
-23. absensi_pelajaran:
+24. absensi_pelajaran:
     - ☑️ Backend:
         - ✅ samakan semua
         - ✅ show menggunakan id guru
     - Frontend
         - samakan dengan insomnia
-24.  absensi_siswa:
+25.  absensi_siswa:
     - ☑️ Backend:
         - ✅ samakan (seeder, controller) dengan migrasi
         - ❌ tambahkan fitur guru bisa absenkan siswa di controller        
@@ -175,13 +180,13 @@ Perbaikan
             b. Klik detail (nanti bisa dapet data siswanya)
             c. lalu absenkan siswa (jika bingung, baca AbsensiSiswaController, function guruAbsenkanSiswa)
             d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan rombel_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
-25. ekstrakurikuler:
+26. ekstrakurikuler:
     - ☑️ Backend:
         - ✅ migrasi, seeder, controller
     - Frontend:
         - ikutin insomnia
         - filter jika ada lebih dari 1 tahun_akademik
-26. pembina_ekskul:
+27. pembina_ekskul:
     - ☑️ Backend:
         - (migrasi, model, seeder)
         - ✅ controller
@@ -189,7 +194,7 @@ Perbaikan
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-27. pelatih_ekskul:
+28. pelatih_ekskul:
     - ☑️ Backend:
         - ✅ (migrasi, model, seeder)
         - ✅ controller
@@ -197,60 +202,60 @@ Perbaikan
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-28. ☑️ ekskul_siswa_pivot:
+29. ☑️ ekskul_siswa_pivot:
     - Backend:
         - ✅ (Migrasi, Seeder, Controller)
         - ✅ data select
     - Frontend:
         - ikutin insomnia
         - alur siswa daftar sendiri: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)
-29. prestasi:
-    - Backend:
+30. prestasi:
+    - ☑️ Backend:
         - ✅ (Seeder, Migrasi, Controller) Hapus kolom kelas_id dan jurusan_id
-        - ❌ jangan otomatis, gunakan data select manual aja (takutnya mau ngedata prestasi yang lampau)
+        - ✅ jangan otomatis, gunakan data select manual aja (takutnya mau ngedata prestasi yang lampau)
     - Frontend:
         - ikutin insomnia
-30. data_nilai_siswa:
+31. data_nilai_siswa:
     kumpulan hasil asesmen (uts/uas, absensi, dll)
     - Backend:
-          - ❌
+          - ❌samakan semua
     - Frontend:
-          - Guru hanya update sikap, sisanya disi oleh sistem
-31. rapor_nilai_siswa
+          - Gua gatau ini gimana, coba cari referensi dari oss urindo
+32. rapor_nilai_siswa
     hasil akhir data_nilai_siswa
     - Backend:
           - ❌
-32. projek_p5:
+33. projek_p5:
     - ❌ Backend:
-33. data_nilai_p5:
+34. data_nilai_p5:
     kumpulan hasil projek_p5
     - ❌ Backend:
-34. data_nilai_ekskul
+35. data_nilai_ekskul
     kumpulan hasil ekskul_siswa_pivot
     - Backend:
           - ❌
-35. rapor (wajib export excel)
+36. rapor (wajib export excel)
     hasil final rapor_nilai_siswa, ekskul, p5
     - Backend:
           - ❌
-36. membuat data_berkas:
+37. membuat data_berkas:
     - ❌ Backend:        
-37. keuangan:
+38. keuangan:
     - ❌ Backend:        
-38. ❌⚠️ membuat jurnal_kbm
-39. ❌⚠️ membuat forum diskusi
-40. ❌⚠️ membuat tugas (lms)
-41. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
-42. ====================================================================================================================================
-43. ❌⚠️ modul_ajar: ()
+39. ❌⚠️ membuat jurnal_kbm
+40. ❌⚠️ membuat forum diskusi
+41. ❌⚠️ membuat tugas (lms)
+42. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
+43. ====================================================================================================================================
+44. ❌⚠️ modul_ajar: ()
     rencana pembelajaran untuk mencapai kompetensi, menciptakan asesmen (uts/uas), dibuat tiap tahun
-44. ❌⚠️ asesmen:
+45. ❌⚠️ asesmen:
     alat ukur modul ajar (uts/uas), menilai kompetensi
-45. ❌⚠️ asesmen_kompetensi:
+46. ❌⚠️ asesmen_kompetensi:
     menetapkan bobot kompetensi pada asesmen
-46. ❌⚠️ asesmen_siswa:
+47. ❌⚠️ asesmen_siswa:
     nilai mentah per asesmen
-47. ❌⚠️ nilai_kompetensi_siswa
+48. ❌⚠️ nilai_kompetensi_siswa
     hasil kalkulasi dari asesmen_kompetensi dan asesmen_siswa
 ========================================================================================================================================
 

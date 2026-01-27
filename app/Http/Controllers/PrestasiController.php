@@ -14,40 +14,6 @@ use Illuminate\Support\Facades\Validator;
 class PrestasiController extends Controller
 {
     /**
-     * spa/tu
-     */
-    public function index()
-    {
-        $prestasi = Prestasi::with([
-            'siswa.kelas',
-            'siswa.jurusan',
-            'tahunAkademik'
-        ])->get();
-
-        $grouped = $prestasi->groupBy('siswa_id')->map(function ($items) {
-            $siswa = $items->first()->siswa;
-            return [
-                'siswa_id' => $siswa->id,
-                'nama_siswa' => $siswa->nama ?? null,
-                'kelas' => $siswa->kelas->nama_kelas ?? null,
-                'jurusan' => $siswa->jurusan->nama_jurusan ?? null,
-                'prestasi' => $items->map(function ($item) {
-                    return [
-                        'prestasi_id' => $item->id ?? null,
-                        'tahun_akademik_id' => $item->tahunAkademik->id ?? null,
-                        'nama_tahun_akademik' => $item->tahunAkademik->tahun_akademik ?? null,
-                        'prestasi_diraih' => $item->prestasi_diraih ?? null,
-                    ];
-                })->values(),
-            ];
-        })->values();
-
-        return ApiResponse::success($grouped, 'Prestasi semua siswa berhasil diambil');
-    }
-
-
-
-    /**
      * ✅ spa/tu
      */
     public function store(Request $request)
@@ -79,13 +45,14 @@ class PrestasiController extends Controller
             $prestasi->load(['siswa', 'tahunAkademik']);
 
             return ApiResponse::success([
-                'prestasi_id'           => $prestasi->id,
-                'siswa_id'              => $prestasi->siswa->id ?? null,
-                'nama_siswa'            => $prestasi->siswa->nama ?? null,
-                'tahun_akademik_id'     => $prestasi->tahunAkademik->id ?? null,
-                'nama_tahun_akademik'   => $prestasi->tahunAkademik->tahun_akademik ?? null,
-                'status_tahun_akademik' => $prestasi->tahunAkademik->status ?? null,
-                'prestasi_diraih'       => $prestasi->prestasi_diraih,
+                'siswa_id'                  => $prestasi->siswa->id ?? null,
+                'nama_siswa'                => $prestasi->siswa->nama ?? null,
+                'prestasi'                  => [
+                    'id'                    => $prestasi->id,
+                    'tahun_akademik'        => $prestasi->tahunAkademik->tahun_akademik,
+                    'status_tahun_akademik' => $prestasi->tahunAkademik->status,
+                    'prestasi_diraih'       => $prestasi->prestasi_diraih,
+                ],
             ], 'Data prestasi berhasil dibuat');
 
         } catch (ValidationException $e) {
@@ -95,36 +62,52 @@ class PrestasiController extends Controller
 
 
     /**
-     * spa/guru (SAMPE SINI)
+     * ✅ spa/tu (SAMPE SINI)
      */
     public function show(string $id)
     {
-        $prestasi = Prestasi::with('siswa.kelas', 'siswa.jurusan', 'tahunAkademik')->find($id);
+        $prestasi = Prestasi::with(['siswa', 'tahunAkademik'])
+            ->where('siswa_id', $id)
+            ->get();
 
-        if (!$prestasi) {
-            return ApiResponse::error('Not found', ['id' => 'Data tidak ditemukan']);
+        if ($prestasi->isEmpty()) {
+            return ApiResponse::error('Not found', [
+                'id' => 'Data prestasi siswa tidak ditemukan'
+            ]);
         }
 
+        $siswa = $prestasi->first()->siswa;
+
         $formatted = [
-            'siswa_id' => $prestasi->siswa->id ?? null,
-            'nama_siswa' => $prestasi->siswa->nama ?? null,
-            'kelas' => $prestasi->siswa->kelas->nama_kelas ?? null,
-            'jurusan' => $prestasi->siswa->jurusan->nama_jurusan ?? null,
-            'prestasi' => $prestasi->map(function ($item) {
-                return [
-                    'prestasi_id' => $item->id ?? null,
-                    'tahun_akademik_id' => $item->tahunAkademik->id ?? null,
-                    'nama_tahun_akademik' => $item->tahunAkademik->tahun_akademik ?? null,
-                    'prestasi_diraih' => $item->prestasi_diraih ?? null,
-                ];
-            })
+            'siswa_id'   => $siswa->id,
+            'nama_siswa'=> $siswa->nama,
+            'nisn'=> $siswa->nisn,
+            'nis'=> $siswa->nis,
+            'periode'   => $prestasi
+                ->groupBy('tahun_akademik_id')
+                ->map(function ($items) {
+                    $tahun = $items->first()->tahunAkademik;
+
+                    return [
+                        'tahun_akademik_id' => $tahun->id,
+                        'tahun_akademik'    => $tahun->tahun_akademik,
+                        'prestasi'          => $items->map(function ($p) {
+                            return [
+                                'id'               => $p->id,
+                                'prestasi_diraih'  => $p->prestasi_diraih,
+                            ];
+                        })->values(),
+                    ];
+                })
+                ->values(),
         ];
 
         return ApiResponse::success($formatted, 'Data prestasi berhasil diambil');
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * ✅ spa / tu
      */
     public function update(Request $request, string $id)
     {
@@ -147,27 +130,24 @@ class PrestasiController extends Controller
         ]);
 
         $prestasi->update($validated);
-        $prestasi->load('siswa.kelas', 'siswa.jurusan', 'tahunAkademik');
+
+        $prestasi->load(['siswa', 'tahunAkademik']);
         
         return ApiResponse::success(
             [
                 'siswa_id' => $prestasi->siswa->id ?? null,
                 'nama_siswa' => $prestasi->siswa->nama ?? null,
-                'kelas' => $prestasi->siswa->kelas->nama_kelas ?? null,
-                'jurusan' => $prestasi->siswa->jurusan->nama_jurusan ?? null,
-                'prestasi' => $prestasi->map(function ($item) {
-                return [
-                    'prestasi_id' => $item->id ?? null,
-                    'tahun_akademik_id' => $item->tahunAkademik->id ?? null,
-                    'nama_tahun_akademik' => $item->tahunAkademik->tahun_akademik ?? null,
-                    'prestasi_diraih' => $item->prestasi_diraih ?? null,
-                ];
-            })
+                'prestasi' => [
+                    'id' => $prestasi->id ?? null,
+                    'tahun_akademik' => $prestasi->tahunAkademik->tahun_akademik ?? null,
+                    'status_tahun_akademik' => $prestasi->tahunAkademik->status ?? null,
+                    'prestasi_diraih' => $prestasi->prestasi_diraih ?? null,
+                ],
             ], 'Data prestasi berhasil diperbarui');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * ✅ spa / tu
      */
     public function destroy(string $id)
     {
@@ -181,6 +161,7 @@ class PrestasiController extends Controller
         return ApiResponse::success(null, 'Data prestasi berhasil dihapus');
     }
 
+    // ✅ spa / tu
     public function dataSelect() {
         // siswa
         $data1 = Siswa::where('status', 'aktif')->get();

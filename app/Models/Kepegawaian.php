@@ -52,6 +52,11 @@ class Kepegawaian extends Authenticatable
         return $this->hasMany(Rombel::class, 'wali_rombel_id');
     }    
 
+    public function waliRombels()
+    {
+        return $this->hasMany(WaliRombel::class, 'wali_rombel_id');
+    }
+
     public function pembinaEkskul()
     {
         return $this->hasMany(PembinaEkskul::class, 'pembina_id');

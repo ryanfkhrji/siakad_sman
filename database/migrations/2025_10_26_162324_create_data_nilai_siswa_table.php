@@ -17,12 +17,7 @@ return new class extends Migration
             // Relasi
             $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
             
-            $table->foreignId('kurikulum_mata_pelajaran_id')->constrained('kurikulum_mata_pelajaran'); // sudah memuat mata_pelajaran_id dan jurusan_pelajaran_id
-            
-            // tidak ada, tapi get
-            // $table->foreignId('tahun_akademik_id')
-            // ->constrained('tahun_akademik')
-            // ->restrictOnDelete();
+            $table->foreignId('kurikulum_mata_pelajaran_id')->constrained('kurikulum_mata_pelajaran');           
 
             $table->foreignId('semester_id')
             ->constrained('semester')

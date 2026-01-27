@@ -19,26 +19,10 @@ return new class extends Migration
             ->constrained('kelas')
             ->restrictOnDelete();
 
-            // Tahun akademik
-            $table->foreignId('tahun_akademik_id')
-                ->constrained('tahun_akademik')
-                ->restrictOnDelete();
-
             // Identitas rombel
-            $table->string('nama_rombel'); // contoh: X-1, XI-IPA-2            
-
-            // Wali kelas
-            $table->foreignId('wali_rombel_id')
-                ->constrained('kepegawaians')
-                ->restrictOnDelete();
+            $table->string('nama_rombel')->unique(); // contoh: X-A, XI-A, XII-A 
 
             $table->timestamps();        
-            
-            // 1 rombel unik per tahun
-            $table->unique(['nama_rombel', 'tahun_akademik_id']);
-
-            // 1 guru hanya boleh jadi wali 1 rombel per tahun
-            $table->unique(['wali_rombel_id', 'tahun_akademik_id']);
         });
     }
 
