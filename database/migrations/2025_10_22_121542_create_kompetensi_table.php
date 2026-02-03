@@ -36,12 +36,20 @@ return new class extends Migration
 
             $table->unique([
                 'kurikulum_id',
+                'mata_pelajaran_id',
+                'jenis',
+                'kode',
+                'tingkat',
+                'aspek'
+            ], 'unik_k13');
+
+            $table->unique([
+                'kurikulum_id',
                 'jenis',
                 'mata_pelajaran_id',
                 'kode',
-                'tingkat',
-                'fase'
-            ], 'unik');
+                'fase',
+            ], 'unik_merdeka');
         
             $table->timestamps();
         });

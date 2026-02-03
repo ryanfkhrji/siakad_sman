@@ -252,6 +252,8 @@ class KurikulumController extends Controller
          * ❌ RULE BISNIS:
          * Tidak boleh mengubah status dari arsip ke aktif
          */
+        // $aktif = Kurikulum::where('status', 'aktif')->exists();
+
         if (
             $kurikulum->status === 'arsip' &&
             isset($validated['status']) &&
@@ -259,7 +261,7 @@ class KurikulumController extends Controller
         ) {
             return ApiResponse::error(
                 'Tidak diizinkan',
-                ['status' => ['Kurikulum yang sudah diarsipkan tidak dapat diaktifkan kembali']],
+                ['status' => ['Status arsip tidak bisa diubah ke aktif']],
                 422
             );
         }

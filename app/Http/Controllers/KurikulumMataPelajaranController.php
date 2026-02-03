@@ -193,7 +193,20 @@ class KurikulumMataPelajaranController extends Controller
             'tingkat'               => 'sometimes|required|numeric',
             'nilai_kkm'             => 'sometimes|required|numeric',
             'status_mata_pelajaran' => 'sometimes|required|in:wajib,pilihan,jurusan,mulok',
-            'status'                => 'sometimes|required|in:aktif,tidak_aktif,arsip',
+            'status'                => 'sometimes|required|in:aktif,arsip',
+        ], [
+            'kurikulum_id.required' => 'Kurikulum wajib diisi',
+            'kurikulum_id.exists'   => 'Kurikulum tidak ditemukan',
+            'mata_pelajaran_id.required' => 'Mata pelajaran wajib diisi',
+            'mata_pelajaran_id.exists'   => 'Mata pelajaran tidak ditemukan',
+            'tingkat.required'      => 'Tingkat wajib diisi',
+            'tingkat.numeric'       => 'Tingkat wajib berisi angka',
+            'nilai_kkm.required'    => 'Nilai kkm wajib diisi',
+            'nilai_kkm.numeric'     => 'Nilai kkm wajib berisi angka',
+            'status_mata_pelajaran.required'  => 'Status mata pelajaran wajib diisi',
+            'status_mata_pelajaran.in'        => 'Pilihan status mata pelajaran hanya wajib, pilihan, jurusan, dan mulok',
+            'status.required'       => 'Status aktif wajib diisi',
+            'status.in'             => 'Pilihan status aktif hanya aktif dan arsip',
         ]);
 
         /**
@@ -202,16 +215,16 @@ class KurikulumMataPelajaranController extends Controller
          * ==================================================
          */
         // ATURAN STATUS ARSIP (FINAL)
-        if (
-            $kurmap->status === 'arsip' &&
-            $request->has('status') &&
-            $request->status !== 'arsip'
-        ) {
-            return ApiResponse::error(
-                'Not supported',
-                ['status' => 'Status arsip tidak boleh diubah']
-            );
-        }
+        // if (
+        //     $kurmap->status === 'arsip' &&
+        //     $request->has('status') &&
+        //     $request->status !== 'arsip'
+        // ) {
+        //     return ApiResponse::error(
+        //         'Not supported',
+        //         ['status' => 'Status arsip tidak boleh diubah']
+        //     );
+        // }
 
 
         /**

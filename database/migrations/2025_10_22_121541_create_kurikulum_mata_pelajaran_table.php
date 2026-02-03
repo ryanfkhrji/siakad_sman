@@ -21,11 +21,8 @@ return new class extends Migration
             $table->decimal('nilai_kkm', 5, 2)->default(0);
 
             $table->enum('status_mata_pelajaran', ['wajib', 'pilihan', 'jurusan', 'mulok', ]);            
-            
-
-            // aktif = muncul di angket, jadwal, rombel
-            // tidak_aktif = disembunyikan total
-            $table->enum('status', ['aktif', 'tidak_aktif', 'arsip'])->default('aktif');
+                        
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
 
             $table->unique([
                 'kurikulum_id',

@@ -24,7 +24,7 @@ class Kompetensi extends Model
      // 1 Kompetensi punya banyak ATP Master
      public function atpMasters()
      {
-         return $this->hasMany(AtpMaster::class, 'kompetensi_id');
+         return $this->hasMany(AtpMaster::class, 'kompetensi_id')->orderBy('urutan');
      }
  
      // (opsional) shortcut ke ATP implementasi

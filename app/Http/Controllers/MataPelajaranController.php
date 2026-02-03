@@ -130,28 +130,28 @@ class MataPelajaranController extends Controller
             ],
             'status' => [
                 'sometimes',
-                'in:aktif,tidak_aktif,arsip',
+                'in:aktif,arsip',
             ],
         ], [
             'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',
             'kelompok.in' => 'Pilihan kelompok hanya umum, sains, ipa, sosial, ips, dan bahasa',
-            'status.in' => 'Pilihan status hanya aktif, tidak_aktif, dan arsip',
+            'status.in' => 'Pilihan status hanya aktif dan arsip',
         ]);
 
         // =========================
         // RULE STATUS (FIXED)
         // =========================
-        if (
-            array_key_exists('status', $validated) &&        // user kirim status
-            $matpel->status === 'arsip' &&                   // status lama arsip
-            $validated['status'] !== 'arsip'                 // mau keluar dari arsip
-        ) {
-            return ApiResponse::error(
-                'Tidak diizinkan',
-                ['status' => ['Kolom status arsip bersifat final dan tidak boleh diubah']],
-                422
-            );
-        }
+        // if (
+        //     array_key_exists('status', $validated) &&        // user kirim status
+        //     $matpel->status === 'arsip' &&                   // status lama arsip
+        //     $validated['status'] !== 'arsip'                 // mau keluar dari arsip
+        // ) {
+        //     return ApiResponse::error(
+        //         'Tidak diizinkan',
+        //         ['status' => ['Kolom status arsip bersifat final dan tidak boleh diubah']],
+        //         422
+        //     );
+        // }
 
         $matpel->update($validated);
 

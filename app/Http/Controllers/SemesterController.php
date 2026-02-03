@@ -170,15 +170,7 @@ class SemesterController extends Controller
                 ['status' => 'Semester yang sudah diarsipkan tidak dapat diaktifkan kembali'],
                 422
             );
-        }
-
-        // if ($semester->status == 'arsip') {            
-        //     return ApiResponse::error(
-        //         'Not supported',
-        //         ['data' => ['Tidak bisa mengubah data arsip']],
-        //         404
-        //     );
-        // }
+        }    
 
         if ($semester->tahunAkademik->status == 'arsip') {            
             return ApiResponse::error(

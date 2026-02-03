@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nama_pelajaran');
             $table->string('kode_mapel_diknas')->unique();
             $table->enum('kelompok', ['umum', 'sains', 'ipa', 'sosial', 'ips', 'bahasa', 'seni'])->default('umum');        
-            $table->enum('status', ['aktif', 'tidak_aktif', 'arsip'])->default('aktif');        
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');        
             $table->timestamps();
         });
     }

@@ -115,23 +115,24 @@ Perbaikan
           - ikutin insomnia
           - Buat tampilannya (untuk spa saja)
 --------------------------------------                          
-14. ♻️ kompetensi (1 mapel 2-4 CP):
+14. ♻️X kompetensi (1 mapel 2-4 CP):
     Target kemampuan siswa, lintas tahun
     - ☑️ Backend:        
         - ✅ samakan semua
         - ✅ send data untuk select
     - Frontend:
         - samakan dengan insomnia
-        - jika jenis = KD, tidak memiliki ATP (Alur Tujuan Pembelajaran)
-        - jika jenis = CP, maka memiliki ATP
+        - jika user pilih jenis = KD, inputan fase disable/hilang
+        - jika user pilih jenis = CP, inputan tingkat dan aspek disable/hilang
 --------------------------------------                                  
 15. ♻️ atp_master (1 CP 1-3 ATP)
     - Backend:
         - samakan semua
     - Frontend:
-16.  ❌ modul_ajar
-17.  ❌ asesmen
-18. ♻️ rombel:
+16. ♻️❌ tugas_tambahan_guru: (untuk guru yang tidak terpilih dalam jurusan oleh siswa)
+17. ❌ modul_ajar
+18. ❌ asesmen
+19. ♻️ rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya
           - ✅ API dan insomnia
@@ -142,25 +143,26 @@ Perbaikan
           - ikutin insomnia      
           - wali_rombel = wali_kelas
           - hitung jumlah siswa di rombel
-19. wali_rombel:
+20. wali_rombel:
     - ☑️ Backend:
           - Samakan semua
     - Frontend:
           - Ikutin insomnia
-20. siswa_rombel:
+21. siswa_rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya (M, S, C, R)          
           - ✅ data select
     - Frontend:
           - Ikutin insomnia
-21. jadwal_pelajarans:
+22. jadwal_pelajarans:
     - ☑️ Backend:
         - ✅ Guru: Tampilkan tahun_akademik dan semester aktif saja 
         - ✅ spa: tidak bisa hapus jika sudah digunakan pada siswa_jadwal_pelajaran dan absensi_pelajaran
         - ✅ send data untuk select
+        - ❌ Nambah kolom tahun_akademik_id
     - Frontend:
         - samakan dengan insomnia
-22. alur_tujuan_pembelajaran:
+23. alur_tujuan_pembelajaran:
     - ☑️ Backend:
         - ✅ samakan semua
         - ✅ route
@@ -172,8 +174,7 @@ Perbaikan
         - referensi tampilan ada di pdf e-raport halaman 143
         - Untuk UI guru silakan minta ke Winton
         - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, dan tambah hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
-23. ❌ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
-24. ❌ tugas_tambahan_guru: (untuk guru yang tidak terpilih dalam jurusan oleh siswa)
+24. ❌ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
 25. siswa_jadwal_pelajaran
    - ☑️ Backend:
         - ✅ spa
