@@ -21,9 +21,23 @@ class Kompetensi extends Model
         return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
     }
 
-    public function atps()
-    {
-        return $this->hasMany(AlurTujuanPembelajaran::class, 'kompetensi_id');
-    }
+     // 1 Kompetensi punya banyak ATP Master
+     public function atpMasters()
+     {
+         return $this->hasMany(AtpMaster::class, 'kompetensi_id');
+     }
+ 
+     // (opsional) shortcut ke ATP implementasi
+     public function alurTujuanPembelajarans()
+     {
+         return $this->hasManyThrough(
+             AlurTujuanPembelajaran::class,
+             AtpMaster::class,
+             'kompetensi_id',   // FK di atp_master
+             'atp_master_id',   // FK di alur_tujuan_pembelajaran
+             'id',
+             'id'
+         );
+     }
 
 }

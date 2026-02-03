@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('kondisi')->nullable(); // baik, rusak ringan, dll
             $table->string('lokasi')->nullable();
             $table->text('keterangan')->nullable();
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
             $table->timestamps();
         });
     }

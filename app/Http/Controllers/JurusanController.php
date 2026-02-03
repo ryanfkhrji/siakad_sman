@@ -30,7 +30,7 @@ class JurusanController extends Controller
 
     public function show($id)
     {
-        $jurusan = Jurusan::with('kelas')->find($id);
+        $jurusan = Jurusan::with('rombels.jurusan')->find($id);
 
         if (!$jurusan) {
             return ApiResponse::error('Jurusan tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
@@ -41,13 +41,22 @@ class JurusanController extends Controller
             'nama_jurusan' => $jurusan->nama_jurusan ?? null,
             'kode_jurusan' => $jurusan->kode_jurusan ?? null,
             'status' => $jurusan->status ?? null,
-            'kelas' => $jurusan->kelas->map(function ($kelas) {
+            'details' => $jurusan->rombels->groupBy('kelas_id')
+            ->map(function ($k) {
+                $kelas = $k->first()->kelas;
                 return [
-                    'kelas_id' => $kelas->id ?? null,
-                    'nama_kelas' => $kelas->nama_kelas ?? null,
-                    'tingkat' => $kelas->tingkat ?? null,                    
+                    'kelas_id'  => $kelas->id ?? null,
+                    'nama_kelas'=> $kelas->nama_kelas ?? null,
+                    'tingkat'   => $kelas->tingkat ?? null,      
+                    'rombel'    => $k->map(function ($r) {
+                        return [
+                            'rombel_id' => $r->id,
+                            'nama_rombel' => $r->nama_rombel,
+                            'jurusan_rombel' => $r->jurusan->nama_jurusan,
+                        ];
+                    })->values(),
                 ];
-            }),
+            })->values(),
         ];
         return ApiResponse::success($data, 'Detail jurusan berhasil diambil');
     }

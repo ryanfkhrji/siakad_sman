@@ -13,44 +13,47 @@ return new class extends Migration
     {        
         Schema::create('alur_tujuan_pembelajaran', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kompetensi_id')->constrained('kompetensi')->cascadeOnDelete();
-            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik')->cascadeOnDelete();
+        
+            $table->foreignId('atp_master_id')
+                ->constrained('atp_master')
+                ->cascadeOnDelete();
+        
             $table->foreignId('guru_id')
-            ->nullable()
-            ->constrained('kepegawaians')
-            ->nullOnDelete();
-            
-            $table->foreignId('semester_id')->constrained('semester')->cascadeOnDelete();
-            $table->text('tujuan_pembelajaran'); // TP
-            
-            $table->unsignedInteger('urutan'); // ATP
-            
-            // untuk spa
+                ->nullable()
+                ->constrained('kepegawaians')
+                ->nullOnDelete();
+        
+            $table->foreignId('tahun_akademik_id')
+                ->constrained('tahun_akademik')
+                ->cascadeOnDelete();
+        
+            $table->foreignId('semester_id')
+                ->constrained('semester')
+                ->cascadeOnDelete();
+        
+            // workflow
             $table->enum('approval_status', ['draft', 'diajukan', 'disetujui', 'ditolak'])
-            ->default('draft');
-      
+                ->default('draft');
+        
             $table->foreignId('approved_by')
-                    ->nullable()
-                    ->constrained('kepegawaians');
+                ->nullable()
+                ->constrained('kepegawaians');
         
             $table->timestamp('approved_at')->nullable();
 
             $table->text('catatan_penolakan')->nullable();
+            
+            $table->boolean('is_locked')->default(false);
         
-            $table->boolean('is_locked')->default(false); // diterima = true, ditolak = false
-
-            // cegah guru bikin ganda
             $table->unique([
-                'kompetensi_id',
+                'atp_master_id',
                 'tahun_akademik_id',
                 'guru_id',
                 'semester_id',
-                'urutan',
             ], 'unik');
-            
-
+        
             $table->timestamps();
-        });
+        });        
     }
 
     /**

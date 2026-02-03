@@ -21,12 +21,8 @@ class KurikulumController extends Controller
         $formatted = $data->map(function ($item) {
            return [
                 'id' => $item->id ?? null,
-                'nama_kurikulum' => $item->nama_kurikulum ?? null,
-                'kode_kurikulum' => $item->kode_kurikulum ?? null,
-                'tipe' => $item->tipe ?? null,
-                'tahun_mulai' => $item->tahun_mulai ?? null,
-                'tahun_selesai' => $item->tahun_selesai ?? null,
-                'deskripsi' => $item->deskripsi ?? null,
+                'nama_kurikulum' => $item->nama_kurikulum ?? null,                
+                'tipe' => $item->tipe ?? null,                
                 'status' => $item->status ?? null,
             ];
         });
@@ -43,7 +39,7 @@ class KurikulumController extends Controller
             $validated = $request->validate([
                 'nama_kurikulum' => 'required',
                 'kode_kurikulum' => 'required|unique:kurikulum,kode_kurikulum',
-                'tipe' => 'required|in:K13,MERDEKA',
+                'tipe' => 'required|in:KTSP,K13,MERDEKA',
                 'tahun_mulai' => 'nullable',
                 'tahun_selesai' => 'nullable',
                 'deskripsi' => 'nullable',
@@ -52,7 +48,7 @@ class KurikulumController extends Controller
                 'kode_kurikulum.required' => 'Kode kurikulum wajib diisi',
                 'kode_kurikulum.unique' => 'Kode kurikulum sudah ada',
                 'tipe.required' => 'Tipe wajib diisi',
-                'tipe.in' => 'Pilihan hanya K13 atau MERDEKA'
+                'tipe.in' => 'Pilihan hanya KTSP, K13 dan MERDEKA'
             ]);
 
             $kurikulumAktif = Kurikulum::where('status', 'aktif')->exists();
@@ -83,12 +79,117 @@ class KurikulumController extends Controller
      * kurikulum
      *  
      */
-    public function show(string $id)
-    {
-        $kurikulum = Kurikulum::with([
-            'kompetensi.mataPelajaran'
-        ])->find($id);
+    // public function show(string $id)
+    // {
+    //     $kurikulum = Kurikulum::with([
+    //         'kompetensi.mataPelajaran'
+    //     ])->find($id);
 
+    //     if (! $kurikulum) {
+    //         return ApiResponse::error(
+    //             'Data tidak ditemukan',
+    //             ['id' => ['Data tidak ditemukan']],
+    //             404
+    //         );
+    //     }
+
+    //     // =========================
+    //     // KURIKULUM KD
+    //     // =========================
+    //     if ($kurikulum->jenis === 'KD') {
+
+    //         $histori = $kurikulum->kompetensi
+    //             ->groupBy('tingkat')
+    //             ->map(function ($groupByTingkat) {
+
+    //                 return [
+    //                     'tingkat' => $groupByTingkat->first()->tingkat,
+
+    //                     // group by mapel
+    //                     'mata_pelajaran' => $groupByTingkat
+    //                         ->groupBy('mata_pelajaran_id')
+    //                         ->map(function ($groupByMapel) {
+
+    //                             $mapel = $groupByMapel->first()->mataPelajaran;
+
+    //                             return [
+    //                                 'mata_pelajaran_id' => $mapel->id,
+    //                                 'mata_pelajaran' => $mapel->nama_pelajaran,
+
+    //                                 // daftar kompetensi
+    //                                 'kompetensi' => $groupByMapel->map(function ($kompetensi) {
+    //                                     return [
+    //                                         'kompetensi_id' => $kompetensi->id,
+    //                                         'judul_kompetensi' => $kompetensi->judul_kompetensi,
+    //                                         'jenis' => $kompetensi->jenis,
+    //                                         'kode' => $kompetensi->kode,
+    //                                         'aspek' => $kompetensi->aspek,
+    //                                         // 'deskripsi' => $kompetensi->deskripsi,
+    //                                         'status_kompetensi' => $kompetensi->status,
+    //                                     ];
+    //                                 })->values(),
+    //                             ];
+    //                         })->values(),
+    //                 ];
+    //             })->values();
+
+    //     }
+    //     // =========================
+    //     // KURIKULUM CP (MERDEKA)
+    //     // =========================
+    //     else {
+
+    //         $histori = $kurikulum->kompetensi
+    //             ->groupBy('fase')
+    //             ->map(function ($groupByFase) {
+
+    //                 return [
+    //                     'fase' => $groupByFase->first()->fase,
+
+    //                     // group by mapel
+    //                     'mata_pelajaran' => $groupByFase
+    //                         ->groupBy('mata_pelajaran_id')
+    //                         ->map(function ($groupByMapel) {
+
+    //                             $mapel = $groupByMapel->first()->mataPelajaran;
+
+    //                             return [
+    //                                 'mata_pelajaran_id' => $mapel->id,
+    //                                 'mata_pelajaran' => $mapel->nama_pelajaran,
+
+    //                                 // daftar kompetensi
+    //                                 'kompetensi' => $groupByMapel->map(function ($kompetensi) {
+    //                                     return [
+    //                                         'kompetensi_id' => $kompetensi->id,
+    //                                         'judul_kompetensi' => $kompetensi->judul_kompetensi,
+    //                                         'jenis' => $kompetensi->jenis,
+    //                                         'kode' => $kompetensi->kode,
+    //                                         'deskripsi' => $kompetensi->deskripsi,
+    //                                         'status_kompetensi' => $kompetensi->status,
+    //                                     ];
+    //                                 })->values(),
+    //                             ];
+    //                         })->values(),
+    //                 ];
+    //             })->values();
+    //     }
+
+    //     return ApiResponse::success([
+    //         'id' => $kurikulum->id,
+    //         'nama_kurikulum' => $kurikulum->nama_kurikulum,
+    //         'kode_kurikulum' => $kurikulum->kode_kurikulum,
+    //         'tipe' => $kurikulum->tipe,
+    //         'tahun_mulai' => $kurikulum->tahun_mulai,
+    //         'tahun_selesai' => $kurikulum->tahun_selesai,
+    //         'deskripsi' => $kurikulum->deskripsi,
+    //         'status_kurikulum' => $kurikulum->status,
+    //         'histori_kompetensi' => $histori,
+    //     ], 'Detail kurikulum berhasil diambil');
+    // }
+
+    public function show(string $id) {
+        $kurikulum = Kurikulum::find($id);
+        
         if (! $kurikulum) {
             return ApiResponse::error(
                 'Data tidak ditemukan',
@@ -97,100 +198,20 @@ class KurikulumController extends Controller
             );
         }
 
-        // =========================
-        // KURIKULUM KD
-        // =========================
-        if ($kurikulum->jenis === 'KD') {
+        $formatted = [
+                'id'                => $kurikulum->id,
+                'nama_kurikulum'    => $kurikulum->nama_kurikulum,
+                'kode_kurikulum'    => $kurikulum->kode_kurikulum,
+                'tipe'              => $kurikulum->tipe,
+                'tahun_mulai'       => $kurikulum->tahun_mulai ?? null,
+                'tahun_selesai'     => $kurikulum->tahun_selesai ?? null,
+                'status'            => $kurikulum->status,
+                'deskripsi'         => $kurikulum->deskripsi ?? null,
 
-            $histori = $kurikulum->kompetensi
-                ->groupBy('tingkat')
-                ->map(function ($groupByTingkat) {
+        ];
 
-                    return [
-                        'tingkat' => $groupByTingkat->first()->tingkat,
-
-                        // group by mapel
-                        'mata_pelajaran' => $groupByTingkat
-                            ->groupBy('mata_pelajaran_id')
-                            ->map(function ($groupByMapel) {
-
-                                $mapel = $groupByMapel->first()->mataPelajaran;
-
-                                return [
-                                    'mata_pelajaran_id' => $mapel->id,
-                                    'mata_pelajaran' => $mapel->nama_pelajaran,
-
-                                    // daftar kompetensi
-                                    'kompetensi' => $groupByMapel->map(function ($kompetensi) {
-                                        return [
-                                            'kompetensi_id' => $kompetensi->id,
-                                            'judul_kompetensi' => $kompetensi->judul_kompetensi,
-                                            'jenis' => $kompetensi->jenis,
-                                            'kode' => $kompetensi->kode,
-                                            'aspek' => $kompetensi->aspek,
-                                            'deskripsi' => $kompetensi->deskripsi,
-                                            'status_kompetensi' => $kompetensi->status,
-                                        ];
-                                    })->values(),
-                                ];
-                            })->values(),
-                    ];
-                })->values();
-
-        }
-        // =========================
-        // KURIKULUM CP (MERDEKA)
-        // =========================
-        else {
-
-            $histori = $kurikulum->kompetensi
-                ->groupBy('fase')
-                ->map(function ($groupByFase) {
-
-                    return [
-                        'fase' => $groupByFase->first()->fase,
-
-                        // group by mapel
-                        'mata_pelajaran' => $groupByFase
-                            ->groupBy('mata_pelajaran_id')
-                            ->map(function ($groupByMapel) {
-
-                                $mapel = $groupByMapel->first()->mataPelajaran;
-
-                                return [
-                                    'mata_pelajaran_id' => $mapel->id,
-                                    'mata_pelajaran' => $mapel->nama_pelajaran,
-
-                                    // daftar kompetensi
-                                    'kompetensi' => $groupByMapel->map(function ($kompetensi) {
-                                        return [
-                                            'kompetensi_id' => $kompetensi->id,
-                                            'judul_kompetensi' => $kompetensi->judul_kompetensi,
-                                            'jenis' => $kompetensi->jenis,
-                                            'kode' => $kompetensi->kode,
-                                            'deskripsi' => $kompetensi->deskripsi,
-                                            'status_kompetensi' => $kompetensi->status,
-                                        ];
-                                    })->values(),
-                                ];
-                            })->values(),
-                    ];
-                })->values();
-        }
-
-        return ApiResponse::success([
-            'id' => $kurikulum->id,
-            'nama_kurikulum' => $kurikulum->nama_kurikulum,
-            'kode_kurikulum' => $kurikulum->kode_kurikulum,
-            'tipe' => $kurikulum->tipe,
-            'tahun_mulai' => $kurikulum->tahun_mulai,
-            'tahun_selesai' => $kurikulum->tahun_selesai,
-            'deskripsi' => $kurikulum->deskripsi,
-            'status_kurikulum' => $kurikulum->status,
-            'histori_kompetensi' => $histori,
-        ], 'Detail kurikulum berhasil diambil');
+        return ApiResponse::success($formatted, 'Detail kurikulum berhasil diambil');
     }
-
 
 
     /**
@@ -201,54 +222,62 @@ class KurikulumController extends Controller
         $kurikulum = Kurikulum::find($id);
 
         if (!$kurikulum) {
-            return ApiResponse::error('Kurikulum tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
-        }
-
-        if ($kurikulum->status == 'arsip') {
-            return ApiResponse::error('Tidak bisa', ['data' => ['Tidak bisa ubah data arsip']], 404);
+            return ApiResponse::error(
+                'Kurikulum tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
         $validated = $request->validate([
-            'nama_kurikulum' => [
-                'sometimes',
-                'required',                
-            ],
+            'nama_kurikulum' => 'sometimes|string|max:100',
             'kode_kurikulum' => [
                 'sometimes',
-                'required',
-                Rule::unique('kurikulum')->ignore($id)
+                'string',
+                'max:50',
+                Rule::unique('kurikulum', 'kode_kurikulum')->ignore($kurikulum->id),
             ],
-            'tipe' => 'sometimes|required|in:K13,MERDEKA',
-            'tahun_mulai' => 'sometimes|nullable',
-            'tahun_selesai' => 'sometimes|nullable',
-            'deskripsi' => 'sometimes|nullable',
-            'status' => 'sometimes|required|in:aktif,arsip',
+            'tipe' => 'sometimes|in:KTSP,K13,MERDEKA',
+            'tahun_mulai' => 'sometimes|nullable|integer',
+            'tahun_selesai' => 'sometimes|nullable|integer',
+            'deskripsi' => 'sometimes|nullable|string',
+            'status' => 'sometimes|in:aktif,arsip',
         ], [
-            'nama_kurikulum.required' => 'Nama kurikulum wajib diisi',
-            'kode_kurikulum.required' => 'Kode kurikulum wajib diisi',
             'kode_kurikulum.unique' => 'Kode kurikulum sudah ada',
-            'tipe.required' => 'Tipe kurikulum wajib diisi',
-            'tipe.in' => 'Pilihan tipe hanya K13 atau MERDEKA',
-            'status.required' => 'Status kurikulum wajib diisi',
-            'status.in' => 'Pilihan hanya aktif atau arsip'
+            'tipe.in' => 'Pilihan tipe hanya KTSP, K13 dan MERDEKA',
+            'status.in' => 'Pilihan status hanya aktif atau arsip',
         ]);
+
+        /**
+         * ❌ RULE BISNIS:
+         * Tidak boleh mengubah status dari arsip ke aktif
+         */
+        if (
+            $kurikulum->status === 'arsip' &&
+            isset($validated['status']) &&
+            $validated['status'] === 'aktif'
+        ) {
+            return ApiResponse::error(
+                'Tidak diizinkan',
+                ['status' => ['Kurikulum yang sudah diarsipkan tidak dapat diaktifkan kembali']],
+                422
+            );
+        }
 
         $kurikulum->update($validated);
 
-        return ApiResponse::success(
-            [
-                'id' => $kurikulum->id ?? null,
-                'nama_kurikulum' => $kurikulum->nama_kurikulum ?? null,
-                'kode_kurikulum' => $kurikulum->kode_kurikulum ?? null,
-                'tipe' => $kurikulum->tipe ?? null,
-                'tahun_mulai' => $kurikulum->tahun_mulai ?? null,
-                'tahun_selesai' => $kurikulum->tahun_selesai ?? null,
-                'deskripsi' => $kurikulum->deskripsi ?? null,
-                'status' => $kurikulum->status ?? null,
-            ], 
-            'Kurikulum berhasil diperbarui'
-        );
+        return ApiResponse::success([
+            'id' => $kurikulum->id,
+            'nama_kurikulum' => $kurikulum->nama_kurikulum,
+            'kode_kurikulum' => $kurikulum->kode_kurikulum,
+            'tipe' => $kurikulum->tipe,
+            'tahun_mulai' => $kurikulum->tahun_mulai,
+            'tahun_selesai' => $kurikulum->tahun_selesai,
+            'deskripsi' => $kurikulum->deskripsi,
+            'status' => $kurikulum->status,
+        ], 'Kurikulum berhasil diperbarui');
     }
+
 
     /**
      * ✅ untuk spa
@@ -267,15 +296,15 @@ class KurikulumController extends Controller
 
         // Cek apakah kurikulum sedang digunakan oleh kompetensi dasar
         if ($kurikulum->kompetensi()->exists()) {
-            return ApiResponse::error('Kurikulum tidak bisa dihapus karena masih digunakan pada kompetensi dasar', [
-                'nama_kurikulum' => ['Kurikulum ini masih digunakan pada kompetensi']
+            return ApiResponse::error('Not supported', [
+                'nama_kurikulum' => ['Kurikulum ini masih digunakan pada kompetensi, update status sebagai solusi']
             ], 422);
         }
         
         // Cek apakah kurikulum sedang digunakan oleh kurmap
         if ($kurikulum->kurikulumMataPelajaran()->exists()) {
-            return ApiResponse::error('Kurikulum tidak bisa dihapus karena masih digunakan pada kurikulum mata pelajaran', [
-                'nama_kurikulum' => ['Kurikulum masih digunakan']
+            return ApiResponse::error('Tidak bisa dihapus', [
+                'nama_kurikulum' => ['Kurikulum masih digunakan sebagai acuan mata pelajaran, update status sebagai solusi']
             ], 422);
         }
 

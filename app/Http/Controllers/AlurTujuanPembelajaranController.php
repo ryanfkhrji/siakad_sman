@@ -340,159 +340,159 @@ class AlurTujuanPembelajaranController extends Controller
         ], 'ATP berhasil dibuat (status: draft)');
     }
 
-    // ✅ guru    
-    public function cloneFromPreviousYear(Request $request)
-    {
-        // =========================
-        // 1. VALIDASI REQUEST
-        // =========================
-        $request->validate([
-            'kompetensi_id' => 'required|exists:kompetensi,id',
-            'from_tahun_akademik_id' => 'required|exists:tahun_akademik,id',
-            'from_semester_id' => 'required|exists:semester,id',
-        ]);
+    // // ✅ guru    
+    // public function cloneFromPreviousYear(Request $request)
+    // {
+    //     // =========================
+    //     // 1. VALIDASI REQUEST
+    //     // =========================
+    //     $request->validate([
+    //         'kompetensi_id' => 'required|exists:kompetensi,id',
+    //         'from_tahun_akademik_id' => 'required|exists:tahun_akademik,id',
+    //         'from_semester_id' => 'required|exists:semester,id',
+    //     ]);
 
-        // =========================
-        // 2. VALIDASI KOMPETENSI (HARUS CP)
-        // =========================
-        $kompetensi = Kompetensi::find($request->kompetensi_id);
+    //     // =========================
+    //     // 2. VALIDASI KOMPETENSI (HARUS CP)
+    //     // =========================
+    //     $kompetensi = Kompetensi::find($request->kompetensi_id);
 
-        if (! $kompetensi || $kompetensi->jenis !== 'CP') {
-            return ApiResponse::error(
-                'Tidak valid',
-                ['kompetensi' => 'ATP hanya untuk Kurikulum Merdeka (CP)'],
-                422
-            );
-        }
+    //     if (! $kompetensi || $kompetensi->jenis !== 'CP') {
+    //         return ApiResponse::error(
+    //             'Tidak valid',
+    //             ['kompetensi' => 'ATP hanya untuk Kurikulum Merdeka (CP)'],
+    //             422
+    //         );
+    //     }
 
-        // =========================
-        // 3. AMBIL TAHUN AKADEMIK AKTIF (TUJUAN)
-        // =========================
-        $toTahun = TahunAkademik::where('status', 'aktif')->first();
+    //     // =========================
+    //     // 3. AMBIL TAHUN AKADEMIK AKTIF (TUJUAN)
+    //     // =========================
+    //     $toTahun = TahunAkademik::where('status', 'aktif')->first();
 
-        if (! $toTahun) {
-            return ApiResponse::error(
-                'Tahun aktif tidak ditemukan',
-                ['tahun_akademik' => 'Tidak ada tahun akademik aktif'],
-                404
-            );
-        }
+    //     if (! $toTahun) {
+    //         return ApiResponse::error(
+    //             'Tahun aktif tidak ditemukan',
+    //             ['tahun_akademik' => 'Tidak ada tahun akademik aktif'],
+    //             404
+    //         );
+    //     }
 
-        if ($request->from_tahun_akademik_id == $toTahun->id) {
-            return ApiResponse::error(
-                'Kesalahan',
-                ['tahun' => 'Tidak bisa clone ke tahun yang sama'],
-                422
-            );
-        }
+    //     if ($request->from_tahun_akademik_id == $toTahun->id) {
+    //         return ApiResponse::error(
+    //             'Kesalahan',
+    //             ['tahun' => 'Tidak bisa clone ke tahun yang sama'],
+    //             422
+    //         );
+    //     }
 
-        // =========================
-        // 4. AMBIL SEMESTER AKTIF (TUJUAN)
-        // =========================
-        $toSemester = Semester::where('status', 'aktif')->first();
+    //     // =========================
+    //     // 4. AMBIL SEMESTER AKTIF (TUJUAN)
+    //     // =========================
+    //     $toSemester = Semester::where('status', 'aktif')->first();
 
-        if (! $toSemester) {
-            return ApiResponse::error(
-                'Semester aktif tidak ditemukan',
-                ['semester' => 'Tidak ada semester aktif'],
-                404
-            );
-        }
+    //     if (! $toSemester) {
+    //         return ApiResponse::error(
+    //             'Semester aktif tidak ditemukan',
+    //             ['semester' => 'Tidak ada semester aktif'],
+    //             404
+    //         );
+    //     }
 
-        // =========================
-        // 5. AMBIL ATP SUMBER (1 SEMESTER SAJA)
-        // =========================
-        $oldAtps = AlurTujuanPembelajaran::where('kompetensi_id', $request->kompetensi_id)
-            ->where('tahun_akademik_id', $request->from_tahun_akademik_id)
-            ->where('semester_id', $request->from_semester_id)
-            ->where('approval_status', 'disetujui')
-            ->orderBy('urutan')
-            ->get();
+    //     // =========================
+    //     // 5. AMBIL ATP SUMBER (1 SEMESTER SAJA)
+    //     // =========================
+    //     $oldAtps = AlurTujuanPembelajaran::where('kompetensi_id', $request->kompetensi_id)
+    //         ->where('tahun_akademik_id', $request->from_tahun_akademik_id)
+    //         ->where('semester_id', $request->from_semester_id)
+    //         ->where('approval_status', 'disetujui')
+    //         ->orderBy('urutan')
+    //         ->get();
 
-        if ($oldAtps->isEmpty()) {
-            return ApiResponse::error(
-                'Tidak ada data',
-                ['atp' => 'ATP semester sumber belum disetujui'],
-                422
-            );
-        }
+    //     if ($oldAtps->isEmpty()) {
+    //         return ApiResponse::error(
+    //             'Tidak ada data',
+    //             ['atp' => 'ATP semester sumber belum disetujui'],
+    //             422
+    //         );
+    //     }
 
-        // =========================
-        // 6. CEGAH CLONE JIKA SUDAH DIKUNCI
-        // =========================
-        // $locked = AlurTujuanPembelajaran::where('kompetensi_id', $request->kompetensi_id)
-        //     ->where('tahun_akademik_id', $toTahun->id)
-        //     ->where('semester_id', $toSemester->id)
-        //     ->where('is_locked', true)
-        //     ->exists();
+    //     // =========================
+    //     // 6. CEGAH CLONE JIKA SUDAH DIKUNCI
+    //     // =========================
+    //     // $locked = AlurTujuanPembelajaran::where('kompetensi_id', $request->kompetensi_id)
+    //     //     ->where('tahun_akademik_id', $toTahun->id)
+    //     //     ->where('semester_id', $toSemester->id)
+    //     //     ->where('is_locked', true)
+    //     //     ->exists();
 
-        // if ($locked) {
-        //     return ApiResponse::error(
-        //         'Dikunci',
-        //         ['atp' => 'ATP semester aktif sudah dikunci'],
-        //         403
-        //     );
-        // }
+    //     // if ($locked) {
+    //     //     return ApiResponse::error(
+    //     //         'Dikunci',
+    //     //         ['atp' => 'ATP semester aktif sudah dikunci'],
+    //     //         403
+    //     //     );
+    //     // }
 
-        // =========================
-        // 7. PROSES CLONE
-        // =========================
-        DB::beginTransaction();
+    //     // =========================
+    //     // 7. PROSES CLONE
+    //     // =========================
+    //     DB::beginTransaction();
 
-        try {
-            foreach ($oldAtps as $atp) {
+    //     try {
+    //         foreach ($oldAtps as $atp) {
 
-                $target = AlurTujuanPembelajaran::where([
-                    'kompetensi_id' => $atp->kompetensi_id,
-                    'tahun_akademik_id' => $toTahun->id,
-                    'semester_id' => $toSemester->id,
-                    'urutan' => $atp->urutan,
-                    'guru_id' => $atp->guru_id,
-                ])->first();
+    //             $target = AlurTujuanPembelajaran::where([
+    //                 'kompetensi_id' => $atp->kompetensi_id,
+    //                 'tahun_akademik_id' => $toTahun->id,
+    //                 'semester_id' => $toSemester->id,
+    //                 'urutan' => $atp->urutan,
+    //                 'guru_id' => $atp->guru_id,
+    //             ])->first();
             
-                // ⛔ jika sudah ada & dikunci → lewati
-                if ($target && $target->is_locked) {
-                    continue;
-                }
+    //             // ⛔ jika sudah ada & dikunci → lewati
+    //             if ($target && $target->is_locked) {
+    //                 continue;
+    //             }
             
-                // ⛔ jika sudah ada tapi belum dikunci → lewati (atau bisa update kalau mau)
-                if ($target) {
-                    continue;
-                }
+    //             // ⛔ jika sudah ada tapi belum dikunci → lewati (atau bisa update kalau mau)
+    //             if ($target) {
+    //                 continue;
+    //             }
             
-                // ✅ baru buat
-                AlurTujuanPembelajaran::create([
-                    'kompetensi_id' => $atp->kompetensi_id,
-                    'tahun_akademik_id' => $toTahun->id,
-                    'semester_id' => $toSemester->id,
-                    'guru_id' => $atp->guru_id,
-                    'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
-                    'urutan' => $atp->urutan,
-                    'approval_status' => 'draft',
-                    'is_locked' => false,
-                ]);
-            }
+    //             // ✅ baru buat
+    //             AlurTujuanPembelajaran::create([
+    //                 'kompetensi_id' => $atp->kompetensi_id,
+    //                 'tahun_akademik_id' => $toTahun->id,
+    //                 'semester_id' => $toSemester->id,
+    //                 'guru_id' => $atp->guru_id,
+    //                 'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
+    //                 'urutan' => $atp->urutan,
+    //                 'approval_status' => 'draft',
+    //                 'is_locked' => false,
+    //             ]);
+    //         }
             
 
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB::rollBack();
+    //         DB::commit();
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
 
-            return ApiResponse::error(
-                'Gagal clone',
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
+    //         return ApiResponse::error(
+    //             'Gagal clone',
+    //             ['error' => $e->getMessage()],
+    //             500
+    //         );
+    //     }
 
-        // =========================
-        // 8. RESPONSE
-        // =========================
-        return ApiResponse::success([
-            'tahun_akademik_tujuan' => $toTahun->tahun_akademik,
-            'semester_tujuan' => $toSemester->semester,
-        ], 'ATP berhasil di-clone ke semester aktif');
-    }
+    //     // =========================
+    //     // 8. RESPONSE
+    //     // =========================
+    //     return ApiResponse::success([
+    //         'tahun_akademik_tujuan' => $toTahun->tahun_akademik,
+    //         'semester_tujuan' => $toSemester->semester,
+    //     ], 'ATP berhasil di-clone ke semester aktif');
+    // }
 
 
     // ✅ guru

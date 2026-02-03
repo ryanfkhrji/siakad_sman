@@ -11,17 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kurikulum', function (Blueprint $table) {
+        Schema::create('atp_master', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kurikulum');
-            $table->string('kode_kurikulum')->unique();
-            $table->enum('tipe', ['KTSP','K13','MERDEKA']);
-            $table->year('tahun_mulai')->nullable();
-            $table->year('tahun_selesai')->nullable();
-            $table->text('deskripsi')->nullable();
+            $table->foreignId('kompetensi_id')->constrained('kompetensi')->cascadeOnDelete();
+            $table->unsignedInteger('urutan');
+            $table->text('tujuan_pembelajaran');
             $table->enum('status', ['aktif', 'arsip'])->default('aktif');
             $table->timestamps();
+        
+            $table->unique([
+                'kompetensi_id',
+                'urutan'
+            ]);
         });
+        
     }
 
     /**
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kurikulum');
+        Schema::dropIfExists('atp_master');
     }
 };

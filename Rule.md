@@ -1,90 +1,12 @@
-1. Tahun akademik:
-Create:
-  - ✅ Tidak bisa buat jika masih ada ta lain yang aktif
-Update
-  - ✅ Tidak bisa update jika status = 'arsip'
-  - ✅ Gabisa ubah status dari arsip menjadi aktif
-Delete:
-  - ✅ Gabisa diapus jika status = arsip
-  - ✅ Gabisa diapus jika sudah digunakan oleh semester
+SPA: Jadwal Pelajaran:
+1. print lembaran angket untuk siswa kelas 10 menuju 11 memilih mapel pilihan. ketentuan angket adalah maksimal pilih 3 mapel dengan 2 serumpun dan 1 berbeda rumpun, minimalnya pilih 1 mapel
+2. Setelah itu sortir angket sesuai pilihan, misal tim A untuk mayoritas Pilihan: bahasa, bahasa, sains, tim B untuk mayoritas pilihan: sains, sains, bahasa.
+3. Setelah disortir, buat rombel XI-A-1 untuk tim A, dan XI-A-2 untuk tim B.
+4. Lalu buat jadwal sesuai mapel yang masuk ke dalam rombel. Guru yang mapelnya (misal: B. jepang) tidak masuk ke dalam rombel tidak dibuatkan jadwal mapelnya (misal B. jepang), melainkan dialihkan mengajar mapel lain (baik mapel yang kelebihan peminat maupun yang tidak) atau menjadi pembina dan pelatih ekskul
+5. Setelah jadwal jadi, isi tabel beban_kerja_guru untuk mencatat tugas dan jp guru secara manual.
 
 
-2. Semester
-Create:
-  - ✅ Tidak bisa buat jika masih ada semester lain yang aktif
-  - ✅ Tahun akademik otomatis (pastikan sudah ada tahun akademik yang aktif)
-Update:
-  - ✅ Tidak bisa update jika status semester = arsip
-  - ✅ Tidak bisa update jika status tahun akademik = arsip
-  - ✅ Tidak bisa ubah status dari arsip menjadi aktif
-Delete:
-  - ✅ Tidak bisa hapus jika status = arsip
-  - ✅ Tidak bisa dihapus jika sudah digunakan pada jadwal pelajaran dan data berkas
+Kurikulum_mata_pelajaran:
+Baca di pdf catatan
 
 
-3. Kurikulum Mata Pelajaran
-Create:
-  - ✅ Tidak bisa buat jika belum ada tahun_akademik yang aktif
-  - ✅ Tahun akademik otomatis (pastikan sudah ada tahun akademik yang aktif)
-Update:
-  - ✅ Tidak bisa update jika status tahun akademik = arsip
-Delete:
-  - ✅ Tidak bisa hapus jika status tahun akademik = arsip
-  - ✅ Tidak bisa dihapus jika sudah digunakan pada jadwal pelajaran
-
-
-4. ATP
-Create:
-   - Guru: TA dan semester otomatis
-   - Guru: Harus kurikulum merdeka dan kompetensi = CP
-Clone:
-   - Guru: Clone per semester
-   - Guru: ATP yang hendak di clone harus sudah disetujui
-Update:
-   - Tidak bisa ubah jika sudah dikunci/disetujui
-   - Hanya bisa diubah pada tahun dan semester aktif
-Delete:
-   - Tidak bisa hapus jika sudah dikunci/disetujui
-   - Hanya bisa dihapus pada tahun dan semester aktif
-✅ Diterima
-✅ Ditolak
-
-
-5. Rombel
-Create:
-   - ✅ tahun_akademik otomatis
-   - ✅ tidak bisa jika tahun_akademik tidak ada yang aktif
-Update
-   - ✅ tahun_akademik tidak berubah
-   - ✅ tidak bisa jika tahun akademik sudah arsip
-Delete
-   - ✅ tidak bisa hapus jika tahun_akademik.status = arsip
-   - ✅ tidak bisa hapus jika sudah digunakan oleh siswa/jadwal
-
-
-6. Jadwal Pelajaran
-Create:
-   - Tahun akademik dan semester otomatis
-   - 1 guru hanya boleh 1 mapel
-Update:
-   - Gabisa update jika semester sudah arsip
-Delete:
-   - Gabisa dihapus bila sudah digunakan pada absensi
-   - Gabisa dihapus jika semester dan tahun akademik sudah arsip
-
-
-7. absensi_pelajaran
-Create:
-   - tahun_akademik otomatis dari jadwal_pelajaran
-   - Alur absensi pegawai adalah melalui get all jadwal_pelajaran_sendiri -> klik jadwal -> absen
-update
-    - tahun_akademik_tidak berubah
-delete
-    - tidak bisa dihapus jika tahun_akademik sudah arsip
-
-
-8. absensi_siswa:
-- Baca readme
-
-
-9. pembina, pelatih, dan ekskul_siswa, baca readme

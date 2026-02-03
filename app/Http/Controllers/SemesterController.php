@@ -116,6 +116,7 @@ class SemesterController extends Controller
 
             return ApiResponse::success([
                 'id' => $semester->id ?? null,
+                'semester' => $semester->semester ?? null,
                 'tahun_akademik' => $semester->tahunAkademik->tahun_akademik ?? null,                
                 'status' => $semester->status ?? null,
             ], 'Data semester berhasil dibuat');
@@ -171,13 +172,13 @@ class SemesterController extends Controller
             );
         }
 
-        if ($semester->status == 'arsip') {            
-            return ApiResponse::error(
-                'Not supported',
-                ['data' => ['Tidak bisa mengubah data arsip']],
-                404
-            );
-        }
+        // if ($semester->status == 'arsip') {            
+        //     return ApiResponse::error(
+        //         'Not supported',
+        //         ['data' => ['Tidak bisa mengubah data arsip']],
+        //         404
+        //     );
+        // }
 
         if ($semester->tahunAkademik->status == 'arsip') {            
             return ApiResponse::error(
@@ -216,8 +217,8 @@ class SemesterController extends Controller
 
         return ApiResponse::success([
             'id' => $semester->id,
-            'tahun_akademik' => $semester->tahunAkademik->tahun_akademik ?? null,
             'semester' => $semester->semester,
+            'tahun_akademik' => $semester->tahunAkademik->tahun_akademik ?? null,
             'status' => $semester->status,
         ], 'Data semester berhasil diperbarui');
     }
@@ -266,23 +267,5 @@ class SemesterController extends Controller
 
         $semester->delete();
         return ApiResponse::success(null, 'Semester berhasil dihapus');
-    }
-
-    // public function dataSelectSemester() {
-    //     $tahunAkademik = TahunAkademik::select('id', 'tahun_akademik', 'status')
-    //     ->where('status', 'aktif')
-    //     ->first();
-
-    //     if (!$tahunAkademik) {
-    //         return ApiResponse::error('Not found', ['data' => 'Tahun akademik aktif tidak ditemukan']);
-    //     }
-
-    //     $data = [
-    //         'tahun_akademik_id' => $tahunAkademik->id,
-    //         'tahun_akademik' => $tahunAkademik->tahun_akademik,
-    //         'status_tahun_akademik' => $tahunAkademik->status,
-    //     ];
-
-    //     return ApiResponse::success($data, 'Tahun akademik aktif berhasil diambil');
-    // }
+    }    
 }

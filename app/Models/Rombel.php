@@ -28,12 +28,7 @@ class Rombel extends Model
     {
         return $this->belongsTo(TahunAkademik::class);
     }
-
-    // public function waliRombel()
-    // {
-    //     return $this->belongsTo(Kepegawaian::class, 'wali_rombel_id');
-    // }
-
+    
     /**
      * ========================
      * KEANGGOTAAN SISWA
@@ -76,6 +71,11 @@ class Rombel extends Model
     public function absensiSiswas()
     {
         return $this->hasMany(AbsensiSiswa::class);
+    }
+
+    public function jurusan()
+    {
+        return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
 
     // Rapor siswa

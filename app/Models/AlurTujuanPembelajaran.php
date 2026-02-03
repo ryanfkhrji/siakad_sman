@@ -16,6 +16,13 @@ class AlurTujuanPembelajaran extends Model
         return $this->belongsTo(Kompetensi::class, 'kompetensi_id');
     } 
 
+    // Implementasi milik 1 ATP Master
+    public function atpMaster()
+    {
+        return $this->belongsTo(AtpMaster::class, 'atp_master_id');
+    }
+
+
     public function tahunAkademik()
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');

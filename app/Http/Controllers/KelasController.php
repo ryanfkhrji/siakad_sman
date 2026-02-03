@@ -14,16 +14,14 @@ class KelasController extends Controller
     // ✅ show all kelas oleh super admin
     public function index()
     {
-        $allKelas = Kelas::with([
-            'jurusan',            
-        ])->get();
+        $allKelas = Kelas::get();
 
         $formatted = $allKelas->map(function ($kelas) {
             return [
                 'kelas_id' => $kelas->id ?? null,
                 'nama_kelas' => $kelas->nama_kelas ?? null,
                 'tingkat' => $kelas->tingkat ?? null,
-                'jurusan_kelas' => $kelas->jurusan->nama_jurusan ?? null,            
+                'status' => $kelas->status ?? null,
             ];
         });
 
@@ -35,7 +33,7 @@ class KelasController extends Controller
     public function show($id)
     {
         $kelas = Kelas::with([
-            'jurusan',
+            'rombels.jurusan',
             'rombels.waliRombels.tahunAkademik',
             'rombels.waliRombels.wali'
         ])->find($id);
@@ -49,13 +47,14 @@ class KelasController extends Controller
         $formatted = [
             'kelas_id'       => $kelas->id,
             'nama_kelas'     => $kelas->nama_kelas,
-            'tingkat'        => $kelas->tingkat,
-            'jurusan_kelas'  => $kelas->jurusan?->nama_jurusan,
-
+            'kode_kelas'     => $kelas->kode_kelas,
+            'tingkat'        => $kelas->tingkat,            
+            'status'        => $kelas->status,            
             'daftar_rombel' => $kelas->rombels->map(function ($rombel) {
                 return [
                     'rombel_id'   => $rombel->id,
                     'nama_rombel' => $rombel->nama_rombel,
+                    'jurusan_rombel' => $rombel->jurusan->nama_jurusan ?? null,
 
                     'histori_wali_rombel' => $rombel->waliRombels->map(function ($wali) {
                         return [
@@ -79,26 +78,23 @@ class KelasController extends Controller
             $validated = $request->validate([
                 'nama_kelas' => 'required|string',
                 'kode_kelas' => 'required|unique:kelas,kode_kelas',
-                'tingkat' => 'required|numeric',
-                'jurusan_id' => 'nullable|exists:jurusans,id',                
+                'tingkat' => 'required|numeric',                
             ], [
                 'nama_kelas.required' => 'Nama kelas wajib diisi',
                 'kode_kelas.required' => 'Kode kelas wajib diisi',
                 'kode_kelas.unique' => 'Kode kelas sudah ada',
                 'tingkat.required' => 'Tingkat kelas wajib diisi',
-                'tingkat.numeric' => 'Tingkat kelas wajib berisi angka 10, 11, atau 12',
-                'jurusan_id.exists' => 'Jurusan tidak ditemukan',                
+                'tingkat.numeric' => 'Tingkat kelas wajib berisi angka 10, 11, atau 12',                
             ]);                      
     
-            $kelas = Kelas::create($validated);
-            $kelas->load('jurusan');
+            $kelas = Kelas::create($validated);            
             
             return ApiResponse::success([
                 'id' => $kelas->id ?? null,
                 'nama_kelas' => $kelas->nama_kelas ?? null,
                 'kode_kelas' => $kelas->kode_kelas ?? null,
-                'tingkat' => $kelas->tingkat ?? null,
-                'nama_jurusan' => $kelas->jurusan->nama_jurusan ?? null,                                
+                'tingkat' => $kelas->tingkat ?? null,                
+                'status' => 'aktif'
             ], 201);
     
         } catch (ValidationException $e) {
@@ -110,45 +106,47 @@ class KelasController extends Controller
     public function update(Request $request, $id)
     {
         $kelas = Kelas::find($id);
+
         if (!$kelas) {
-            return ApiResponse::error('Kelas tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error(
+                'Kelas tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
         $validated = $request->validate([
-            'nama_kelas' => [
-                'sometimes',
-                'required',
-            ],
+            'nama_kelas' => 'sometimes|string|max:50',
             'kode_kelas' => [
-                'sometimes',                
-                'required',
-                Rule::unique('kelas')->ignore($id)
-            ],
-            'tingkat' => [
                 'sometimes',
-                'required',
+                'string',
+                'max:20',
+                Rule::unique('kelas', 'kode_kelas')->ignore($kelas->id),
             ],
-            'jurusan_id' => 'sometimes|nullable|exists:jurusans,id',            
-        ],[
-            'nama_kelas.required' => 'Nama kelas wajib diisi',
-            'kode_kelas.required' => 'Kode kelas wajib diisi',            
-            'kode_kelas.unique' => 'Kode kelas sudah ada',            
-            'tingkat.required' => 'Tingkat kelas wajib diisi',            
-            'jurusan_id.exists' => 'Jurusan tidak ditemukan',            
+            'tingkat' => 'sometimes|integer|min:1|max:12',
+            'status' => 'sometimes|in:aktif,arsip',
+        ], [
+            'nama_kelas.string' => 'Nama kelas harus berupa teks',
+
+            'kode_kelas.string' => 'Kode kelas harus berupa teks',
+            'kode_kelas.unique' => 'Kode kelas sudah digunakan',
+
+            'tingkat.integer' => 'Tingkat kelas harus berupa angka',
+            'tingkat.min' => 'Tingkat kelas tidak valid',
+            'tingkat.max' => 'Tingkat kelas tidak valid',
+
+            'status.in' => 'Pilihan status hanya aktif dan arsip',
         ]);
-                
 
         $kelas->update($validated);
-        $kelas->load('jurusan');
-        
-        return ApiResponse::success(
-            [
-                'id' => $kelas->id ?? null,
-                'nama_kelas' => $kelas->nama_kelas ?? null,
-                'kode_kelas' => $kelas->kode_kelas ?? null,
-                'tingkat' => $kelas->tingkat ?? null,
-                'nama_jurusan' => $kelas->jurusan->nama_jurusan ?? null,                
-            ], 'Kelas berhasil diperbarui');
+
+        return ApiResponse::success([
+            'id' => $kelas->id,
+            'nama_kelas' => $kelas->nama_kelas,
+            'kode_kelas' => $kelas->kode_kelas,
+            'tingkat' => $kelas->tingkat,
+            'status' => $kelas->status,
+        ], 'Kelas berhasil diperbarui');
     }
 
     // ✅ destroy kelas oleh super admin
@@ -160,9 +158,9 @@ class KelasController extends Controller
         }
 
         // Cek apakah kelas masih punya siswa
-        if ($kelas->siswas()->exists()) {
-            return ApiResponse::error('Kelas tidak bisa dihapus karena masih memiliki siswa', [
-                'kelas_id' => ['Kelas ini masih digunakan oleh siswa']
+        if ($kelas->rombels()->exists()) {
+            return ApiResponse::error('Sudah digunakan oleh rombel', [
+                'kelas_id' => ['Tidak bisa dihapus, update status sebagai solusi']
             ], 422);
         }
 

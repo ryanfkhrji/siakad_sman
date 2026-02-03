@@ -22,7 +22,9 @@ return new class extends Migration
             // Identitas rombel
             $table->string('nama_rombel'); // contoh: X-A, XI-A, XII-A-IPA
 
-            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
+            $table->foreignId('jurusan_id')->nullable()->constrained('jurusans');            
+
+            $table->enum('status', ['aktif', 'tidak_aktif', 'arsip'])->default('aktif');
 
             $table->unique(['kelas_id', 'nama_rombel']);
 

@@ -12,9 +12,9 @@ class MataPelajaran extends Model
     protected $table = 'mata_pelajarans';
     protected $guarded = ['id'];
 
-    public function jadwalPelajarans()
+    public function kurikulumMataPelajarans()
     {
-        return $this->hasMany(JadwalPelajaran::class, 'mata_pelajaran_id');
+        return $this->hasMany(KurikulumMataPelajaran::class, 'mata_pelajaran_id');
     }
 
     public function absensiKepegawaians()

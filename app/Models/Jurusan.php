@@ -25,9 +25,9 @@ class Jurusan extends Model
         return $this->hasMany(DataNilaiSiswa::class, 'jurusan_pelajaran_id');
     }
 
-    public function kelas()
+    public function rombels()
     {
-        return $this->hasMany(Kelas::class, 'jurusan_id');
+        return $this->hasMany(Rombel::class, 'jurusan_id');
     }
     
     public function jadwalPelajarans()

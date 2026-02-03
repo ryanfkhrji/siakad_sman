@@ -18,6 +18,10 @@ return new class extends Migration
                 ->constrained('kurikulum_mata_pelajaran')
                 ->restrictOnDelete(); // tidak boleh hapus
 
+            $table->foreignId('tahun_akademik_id')
+                ->constrained('tahun_akademik')
+                ->restrictOnDelete(); // tidak boleh hapus
+
             $table->foreignId('semester_id')
                 ->constrained('semester')
                 ->restrictOnDelete(); // tidak boleh hapus
@@ -43,11 +47,32 @@ return new class extends Migration
             $table->unique([
                 'kurikulum_mata_pelajaran_id',
                 'rombel_id',
+                'tahun_akademik_id',
                 'semester_id',
                 'hari',
                 'jam_mulai',
                 'jam_selesai'
             ], 'uq_rmb_smt_har_jam');
+            
+            // megatasi 1 guru 2 kelas di jam yang sama
+            $table->unique([
+                'guru_id',
+                'tahun_akademik_id',
+                'semester_id',
+                'hari',
+                'jam_mulai',
+                'jam_selesai'
+            ], 'uq_guru_smt_har_jam');
+
+            // mengatasi 1 kelas 2 mapel di jam yang sama
+            $table->unique([
+                'rombel_id',
+                'tahun_akademik_id',
+                'semester_id',
+                'hari',
+                'jam_mulai',
+                'jam_selesai'
+            ], 'uq_rombel_smt_har_jam');
             
         });
     }    

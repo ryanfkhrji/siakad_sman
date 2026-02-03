@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // sains, sains, bahasa = diterima (maks 2 sama, 1 beda)
+        // sains, bahasa, sosial = ditolak (beda semua)
         Schema::create('mata_pelajarans', function (Blueprint $table) {
             $table->id();
             $table->string('nama_pelajaran');
             $table->string('kode_mapel_diknas')->unique();
-            $table->enum('status', ['aktif', 'arsip'])->default('aktif');        
+            $table->enum('kelompok', ['umum', 'sains', 'ipa', 'sosial', 'ips', 'bahasa', 'seni'])->default('umum');        
+            $table->enum('status', ['aktif', 'tidak_aktif', 'arsip'])->default('aktif');        
             $table->timestamps();
         });
     }

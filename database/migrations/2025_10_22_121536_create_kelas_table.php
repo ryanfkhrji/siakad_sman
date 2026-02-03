@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama_kelas'); // X, XI, XII
             $table->string('kode_kelas')->unique();
             $table->unsignedTinyInteger('tingkat'); // 10, 11, 12
-            $table->foreignId('jurusan_id')->nullable()->constrained('jurusans');            
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
             $table->timestamps();            
         });
     }

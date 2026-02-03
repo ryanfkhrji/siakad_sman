@@ -9,15 +9,16 @@ use App\Models\Ruangan;
 use Illuminate\Validation\Rule;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class RuanganController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * spa/tu
      */
     public function index()
     {
-        $ruangan = Ruangan::with('gedung')->get();
+        $ruangan = Ruangan::with('gedung')->get();        
 
         if (!$ruangan) {
             return ApiResponse::error('Not found', ['data' => 'Data ruangan tidak ditemukan']);
@@ -26,25 +27,19 @@ class RuanganController extends Controller
         $formatted = $ruangan->map(function ($item) {
             return [
                 'id' => $item->id ?? null,
-                'nama_gedung' => $item->gedung->nama_gedung ?? null,
-                'kode_ruangan' => $item->kode_ruangan ?? null,
                 'nama_ruangan' => $item->nama_ruangan ?? null,
+                'kode_ruangan' => $item->kode_ruangan ?? null,
                 'jenis_ruangan' => $item->jenis_ruangan ?? null,
                 'lantai' => $item->lantai ?? null,
-                'kapasitas' => $item->kapasitas ?? null,
-                'luas_ruangan' => $item->luas_ruangan ?? null,
-                'kondisi' => $item->kondisi ?? null,
-                'fasilitas' => $item->fasilitas ?? null,
-                'keterangan' => $item->keterangan ?? null,
+                'status' => $item->status ?? null,
             ];
         });
 
         return ApiResponse::success($formatted, 'Daftar ruangan berhasil diambil');
     }
-
-
+    
     /**
-     * Store a newly created resource in storage.
+     * spa/tu
      */
     public function store(Request $request)
     {
@@ -69,22 +64,37 @@ class RuanganController extends Controller
                 'nama_ruangan.unique' => 'Nama ruangan sudah ada',
             ]);
 
-            $lantaiGedung = Gedung::find($request->gedung_id)->jumlah_lantai;
+            if(isset($validated['gedung_id'])) {
+                $lantaiGedung = Gedung::find($validated['gedung_id']);
 
-            if ($validated['lantai'] > $lantaiGedung) {
-                return ApiResponse::error('Tidak valid', [
-                    'lantai' => 'Lantai ruangan lebih tinggi dari lantai gedung'
-                ]);
-            }            
+                if ($validated['lantai'] > $lantaiGedung->jumlah_lantai) {
+                    return ApiResponse::error('Tidak valid', [
+                        'lantai' => 'Lantai ruangan lebih tinggi dari lantai gedung'
+                    ]);
+                }            
+            }
 
-            $ruangan = Ruangan::create($validated);
+            $ruangan = Ruangan::create([
+                'gedung_id' => $validated['gedung_id'],
+                'kode_ruangan' => $validated['kode_ruangan'],
+                'nama_ruangan' => $validated['nama_ruangan'],
+                'jenis_ruangan' => $validated['jenis_ruangan'],
+                'lantai' => $validated['lantai'],
+                'kapasitas' => $validated['kapasitas'],
+                'luas_ruangan' => $validated['luas_ruangan'],
+                'kondisi' => $validated['kondisi'],
+                'fasilitas' => $validated['fasilitas'],
+                'keterangan' => $validated['keterangan'],
+                'status' => 'aktif',
+            ]);
+            
             $ruangan->load('gedung');
 
             return ApiResponse::success([
                 'id' => $ruangan->id ?? null,
                 'nama_gedung' => $ruangan->gedung->nama_gedung ?? null,
-                'kode_ruangan' => $ruangan->kode_ruangan ?? null,
                 'nama_ruangan' => $ruangan->nama_ruangan ?? null,
+                'kode_ruangan' => $ruangan->kode_ruangan ?? null,
                 'jenis_ruangan' => $ruangan->jenis_ruangan ?? null,
                 'lantai' => $ruangan->lantai ?? null,
                 'kapasitas' => $ruangan->kapasitas ?? null,
@@ -92,6 +102,7 @@ class RuanganController extends Controller
                 'kondisi' => $ruangan->kondisi ?? null,
                 'fasilitas' => $ruangan->fasilitas ?? null,
                 'keterangan' => $ruangan->keterangan ?? null,
+                'status' => $ruangan->status ?? 'aktif'
             ], 'Data ruangan berhasil dibuat');
 
         } catch (ValidationException $e) {
@@ -100,7 +111,7 @@ class RuanganController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * all
      */
     public function show(string $id)
     {
@@ -122,13 +133,14 @@ class RuanganController extends Controller
             'kondisi' => $ruangan->kondisi ?? null,
             'fasilitas' => $ruangan->fasilitas ?? null,
             'keterangan' => $ruangan->keterangan ?? null,
+            'status' => $ruangan->status ?? null,
         ];
 
         return ApiResponse::success($formatted, 'Detail ruangan berhasil diambil');
     }
 
     /**
-     * Update the specified resource in storage.
+     * spa/tu
      */
     public function update(Request $request, string $id)
     {
@@ -150,13 +162,14 @@ class RuanganController extends Controller
                 'required',
                 Rule::unique('ruangan')->ignore($id)
             ],
-            'jenis_ruangan' => 'nullable',
-            'lantai' => 'nullable',
-            'kapasitas' => 'nullable',
-            'luas_ruangan' => 'nullable',
-            'kondisi' => 'nullable',
-            'fasilitas' => 'nullable',
-            'keterangan' => 'nullable',
+            'jenis_ruangan' => 'sometimes|nullable',
+            'lantai' => 'sometimes|nullable',
+            'kapasitas' => 'sometimes|nullable',
+            'luas_ruangan' => 'sometimes|nullable',
+            'kondisi' => 'sometimes|nullable',
+            'fasilitas' => 'sometimes|nullable',
+            'keterangan' => 'sometimes|nullable',            
+            'status' => 'sometimes|nullable|in:aktif,arsip',
         ], [
             'gedung_id.required' => 'Gedung wajib diisi',
             'gedung_id.exists' => 'Gedung tidak ditemukan',
@@ -164,6 +177,7 @@ class RuanganController extends Controller
             'kode_ruangan.unique' => 'Kode ruangan sudah ada',
             'nama_ruangan.required' => 'Nama ruangan wajib diisi',
             'nama_ruangan.unique' => 'Nama ruangan sudah ada',
+            'status.in' => 'Status hanya boleh aktif atau arsip',
         ]);
 
         $lantaiGedung = Gedung::find($request->gedung_id)->jumlah_lantai;
@@ -189,11 +203,12 @@ class RuanganController extends Controller
             'kondisi' => $ruangan->kondisi ?? null,
             'fasilitas' => $ruangan->fasilitas ?? null,
             'keterangan' => $ruangan->keterangan ?? null,
+            'status' => $ruangan->status ?? null,
         ], 'Data ruangan berhasil diperbarui');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * spa/tu
      */
     public function destroy(string $id)
     {
@@ -206,14 +221,7 @@ class RuanganController extends Controller
         if ($ruangan->jadwalPelajarans()->exists()) {
             return ApiResponse::error(
                 'Tidak diizinkan',
-                ['jadwal' => 'Ruangan sudah digunakan pada jadwal pelajaran'],
-                403
-            );
-        }
-        if ($ruangan->gedung()->exists()) {
-            return ApiResponse::error(
-                'Tidak diizinkan',
-                ['gedung' => 'Ruangan sudah digunakan pada gedung'],
+                ['jadwal' => 'Ruangan sudah digunakan pada jadwal pelajaran, update status sebagai solusi'],
                 403
             );
         }
@@ -223,7 +231,7 @@ class RuanganController extends Controller
         return ApiResponse::success(null, 'Data ruangan berhasil dihapus');
     }
 
-     // data select
+     // spa/tu
      public function dataSelectRuangan()
      {
          $gedung = Gedung::select('id', 'nama_gedung', 'kode_gedung')->get();
@@ -237,6 +245,7 @@ class RuanganController extends Controller
                  'gedung_id' => $g->id,
                  'nama_gedung' => $g->nama_gedung,
                  'kode_gedung' => $g->kode_gedung,
+                 'status' => $g->status,
              ];
          });
  

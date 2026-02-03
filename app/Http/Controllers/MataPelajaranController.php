@@ -18,14 +18,25 @@ class MataPelajaranController extends Controller
     {
         $matpel = MataPelajaran::get();
 
-        $formatted = $matpel->map(function ($item) {
+        $formatted = $matpel->groupBy('status')
+        ->map(function ($item) {        
             return [
-                'id' => $item->id ?? null,
-                'nama_pelajaran' => $item->nama_pelajaran ?? null,
-                'kode_mapel_diknas' => $item->kode_mapel_diknas ?? null,
-                'status' => $item->status ?? null,
+                'status'                    => $item->first()->status ?? null,
+                'daftar_kelompok'           => $item->groupBy('kelompok')
+                ->map(function ($kel) {
+                    return [
+                        'kelompok'          => $kel->first()->kelompok ?? null,                    
+                        'mata_pelajarans'   => $kel->map(function ($m) {
+                            return [
+                                'id'                => $m->id ?? null,
+                                'nama_pelajaran'    => $m->nama_pelajaran ?? null,
+                                'kode_mapel_diknas' => $m->kode_mapel_diknas ?? null,
+                            ];
+                        })->values(),
+                    ];
+                })->values(),
             ];
-        });
+        })->values();
 
         return ApiResponse::success($formatted, 'Daftar mata pelajaran berhasil diambil');
     }
@@ -39,15 +50,19 @@ class MataPelajaranController extends Controller
             $validated = $request->validate([
                 'nama_pelajaran' => 'required|string',
                 'kode_mapel_diknas' => 'required|unique:mata_pelajarans,kode_mapel_diknas',                
+                'kelompok' => 'required|string|in:umum,sains,ipa,sosial,ips,bahasa',
             ], [
                 'nama_pelajaran.required' => 'Mata pelajaran wajib diisi',
                 'kode_mapel_diknas.required' => 'Kode mapel wajib diisi',                
                 'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',
+                'kelompok.required' => 'Kelompok mata pelajaran wajib diisi',
+                'kelompok.in' => 'Pilihan kelompok hanya umum, sains, ipa, sosial, ips, dan bahasa',
             ]);
     
             $matpel = MataPelajaran::create([
                 'nama_pelajaran' => $validated['nama_pelajaran'],
                 'kode_mapel_diknas' => $validated['kode_mapel_diknas'],
+                'kelompok' => $validated['kelompok'],
                 'status' => 'aktif'
             ]);
             
@@ -55,6 +70,7 @@ class MataPelajaranController extends Controller
                 'id' => $matpel->id ?? null,
                 'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
                 'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                
+                'kelompok' => $matpel->kelompok ?? null,                
                 'status' => $matpel->status ?? null
             ], 'Mata Pelajaran Berhasil Dibuat');
     
@@ -78,6 +94,7 @@ class MataPelajaranController extends Controller
             'id' => $find->id ?? null,
             'nama_pelajaran' => $find->nama_pelajaran ?? null,
             'kode_mapel_diknas' => $find->kode_mapel_diknas ?? null,
+            'kelompok' => $find->kelompok ?? null,
             'status' => $find->status ?? null,
         ];
 
@@ -92,42 +109,65 @@ class MataPelajaranController extends Controller
         $matpel = MataPelajaran::find($id);
 
         if (!$matpel) {
-            return ApiResponse::error('Mata pelajaran tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error(
+                'Mata pelajaran tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
         $validated = $request->validate([
             'nama_pelajaran' => [
                 'sometimes',
-                'required',                
             ],
             'kode_mapel_diknas' => [
                 'sometimes',
-                'required',
-                Rule::unique('mata_pelajarans')->ignore($id) // Periksa semua unik kecuali yang sedang diedit
-            ],            
+                Rule::unique('mata_pelajarans')->ignore($id),
+            ],
+            'kelompok' => [
+                'sometimes',
+                'in:umum,sains,ipa,sosial,ips,bahasa',
+            ],
             'status' => [
                 'sometimes',
-                'required',                
-                'in:aktif,arsip'
+                'in:aktif,tidak_aktif,arsip',
             ],
-        ],[
-            'nama_pelajaran.required' => 'Nama pelajaran wajib diisi',
-            'kode_mapel_diknas.required' => 'Kode mapel wajib diisi',
-            'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',            
-            'status.required' => 'Status wajib diisi',
-            'status.in' => 'Pilihan status hanya aktif dan arsip',
+        ], [
+            'kode_mapel_diknas.unique' => 'Kode mapel sudah ada',
+            'kelompok.in' => 'Pilihan kelompok hanya umum, sains, ipa, sosial, ips, dan bahasa',
+            'status.in' => 'Pilihan status hanya aktif, tidak_aktif, dan arsip',
         ]);
 
+        // =========================
+        // RULE STATUS (FIXED)
+        // =========================
+        if (
+            array_key_exists('status', $validated) &&        // user kirim status
+            $matpel->status === 'arsip' &&                   // status lama arsip
+            $validated['status'] !== 'arsip'                 // mau keluar dari arsip
+        ) {
+            return ApiResponse::error(
+                'Tidak diizinkan',
+                ['status' => ['Kolom status arsip bersifat final dan tidak boleh diubah']],
+                422
+            );
+        }
+
         $matpel->update($validated);
-        
+
         return ApiResponse::success(
             [
-                'id' => $matpel->id ?? null,
-                'nama_pelajaran' => $matpel->nama_pelajaran ?? null,
-                'kode_mapel_diknas' => $matpel->kode_mapel_diknas ?? null,                
-                'status' => $matpel->status ?? null,                
-            ], 'Mata pelajaran berhasil diperbarui');
+                'id' => $matpel->id,
+                'nama_pelajaran' => $matpel->nama_pelajaran,
+                'kode_mapel_diknas' => $matpel->kode_mapel_diknas,
+                'kelompok' => $matpel->kelompok,
+                'status' => $matpel->status,
+            ],
+            'Mata pelajaran berhasil diperbarui'
+        );
     }
+
+
 
     /**
      * ✅ untuk spa
@@ -144,18 +184,15 @@ class MataPelajaranController extends Controller
             );
         }
 
-        // Cek apakah sudah digunakan di jadwal
-        $dipakaiJadwal = $matpel->jadwalPelajarans()->exists();
+        // Cek apakah sudah digunakan di kurmap
+        $dipakaiKurmap = $matpel->kurikulumMataPelajarans()->exists();        
 
-        // Cek apakah sudah digunakan di absensi
-        $dipakaiAbsensi = $matpel->absensiKepegawaians()->exists();
-
-        if ($dipakaiJadwal || $dipakaiAbsensi) {
+        if ($dipakaiKurmap) {
             return ApiResponse::error(
                 'Mata pelajaran tidak dapat dihapus',
                 [
                     'mata_pelajaran' => [
-                        'Mata pelajaran sudah digunakan pada jadwal atau absensi'
+                        'Mata pelajaran sudah digunakan pada kurikulum mata pelajaran, update status sebagai solusi'
                     ]
                 ],
                 422

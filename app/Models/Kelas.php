@@ -20,11 +20,6 @@ class Kelas extends Model
         return $this->hasMany(Rombel::class);
     }
 
-    public function jurusan()
-    {
-        return $this->belongsTo(Jurusan::class, 'jurusan_id');
-    }
-
     public function siswas()
     {
         return $this->belongsToMany(Siswa::class, 'siswa_kelas')

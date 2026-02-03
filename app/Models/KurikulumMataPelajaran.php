@@ -31,16 +31,6 @@ class KurikulumMataPelajaran extends Model
             'kurikulum_mata_pelajaran_id'
         );
     }
-
-    public function jurusan()
-    {
-        return $this->belongsTo(Jurusan::class, 'jurusan_pelajaran_id');
-    }
-
-    public function tahunAkademik()
-    {
-        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
-    }
    
     public function dataNilaiSiswa()
     {

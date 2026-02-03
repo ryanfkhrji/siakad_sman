@@ -17,21 +17,14 @@ class TahunAkademikController extends Controller
      */
     public function index()
     {
-        $ta = TahunAkademik::with('semester')->orderBy('tahun_akademik', 'desc')->get();
+        $ta = TahunAkademik::orderBy('tahun_akademik', 'asc')->get();
 
         $formatted = $ta->map(function($item) {
             return [
-                'id_tahun_akademik' => $item->id ?? null,
-                'tahun_akademik' => $item->tahun_akademik ?? null,
-                'semester' => $item->semester->map(function ($semester) {
-                    return [
-                        'id_semester' => $semester->id ?? null,
-                        'semester' => $semester->semester ?? null,
-                        'status_semester' => $semester->status ?? null,
-                    ];
-                }),
-                'keterangan' => $item->keterangan ?? null,
-                'status_tahun_akademik' => $item->status ?? null,
+                'id'                => $item->id ?? null,
+                'tahun_akademik'    => $item->tahun_akademik ?? null,                
+                'keterangan'        => $item->keterangan ?? null,
+                'status'            => $item->status ?? null,
             ];
         });
 
@@ -39,7 +32,7 @@ class TahunAkademikController extends Controller
     }
 
     /**
-     * ✅ untuk spa
+     * ✅ untuk spa (SAMPE SINI)
      */
     public function store(Request $request)
     {
@@ -91,6 +84,8 @@ class TahunAkademikController extends Controller
         $formatted = [
                 'tahun_akademik_id' => $ta->id ?? null,
                 'tahun_akademik' => $ta->tahun_akademik ?? null,
+                'keterangan' => $ta->keterangan ?? null,
+                'status_tahun_akademik' => $ta->status ?? null,
                 'semester' => $ta->semester->map(function ($semester) {
                     return [
                         'semester_id' => $semester->id,   
@@ -98,8 +93,6 @@ class TahunAkademikController extends Controller
                         'status_semester' => $semester->status,   
                     ];
                 }) ?? null,                
-                'keterangan' => $ta->keterangan ?? null,
-                'status_tahun_akademik' => $ta->status ?? null,
             ];
 
         return ApiResponse::success($formatted, 'Detail tahun akademik berhasil diambil');
@@ -116,9 +109,9 @@ class TahunAkademikController extends Controller
             return ApiResponse::error('Not found', ['id' => ['Data tidak ditemukan']], 404);
         }
 
-        if ($ta->status == 'arsip') {
-            return ApiResponse::error('Not supported', ['data' => ['Sudah menjadi arsip, tidak boleh diubah']], 404);
-        }
+        // if ($ta->status == 'arsip') {
+        //     return ApiResponse::error('Not supported', ['data' => ['Sudah menjadi arsip, tidak boleh diubah']], 404);
+        // }
 
         $validated = $request->validate([
             'tahun_akademik' => [
@@ -161,21 +154,12 @@ class TahunAkademikController extends Controller
 
         $ta->update($validated);
 
-        $ta->load('semester');
-        
         return ApiResponse::success(
             [
                 'tahun_akademik_id' => $ta->id ?? null,
-                'tahun_akademik' => $ta->tahun_akademik ?? null,
-                'semester' => $ta->semester->map(function ($semester) {
-                    return [
-                        'semester_id' => $semester->id,
-                        'semester' => $semester->semester,
-                        'status_semester' => $semester->status,
-                    ];
-                }) ?? null,                
+                'tahun_akademik' => $ta->tahun_akademik ?? null,                
                 'keterangan' => $ta->keterangan ?? null,
-                'status_tahun_akademik' => $ta->status ?? null,
+                'status' => $ta->status ?? null,
             ], 'Tahun akademik berhasil diperbarui');
     }
 

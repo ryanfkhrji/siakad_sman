@@ -18,47 +18,63 @@ Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (Res
 ========================================================================================================================================
 Perbaikan
 
-1. identitas_sekolah: (independen)
-   - ☑️ Backend
+1. ♻️X identitas_sekolah: (independen)
+   - ☑️ Backend:
+         - 
    - Frontend:
          - ikutin insomnia
          - Ketika masih kosong, tombol tambah identitas muncul, ketika sudah ada data, tombol tambah identitas hilang
-2. gedung: (independen)
+--------------------------------------
+2. ♻️X gedung: (independen)
    - ☑️ Backend:
+         - ✅ Nambah kolom status pada (get all, detail, update) (create engga)
    - Frontend:
           - ikutin insomnia
-3. ruangan:
+          - Nambah kolom status pada (get all, detail, update) (create engga)
+          - penambahan kolom lokasi pada get detail, dan semua response sukses
+--------------------------------------
+3. ♻️X ruangan:
    - ☑️ Backend:
-          - ✅ send data untuk select
+          - ✅ nambah kolom status pada (get all, detail, update, data select) (create engga)
    - Frontend:
           - ikutin insomnia
-4. Kepegawaian: (independen)
+          - Nambah kolom status pada (get all, detail, update) (create engga)
+--------------------------------------
+4. ♻️X Kepegawaian: (independen)
     - ☑️ Backend:
           - ✅ samakan semua
     - Frontend: 
-          - samakan dengan insomnia          
+          - samakan dengan insomnia       
+--------------------------------------
 5. penerimaan_siswa_baru: (independen)
    - ☑️ Backend:
    - Frontend:
           - ikutin insomnia
-6. Siswa: (independen)
+--------------------------------------
+6. ♻️X Siswa: (independen)
     - ☑️ Backend:
           - ✅ samakan semua        
           - ❌ siswa: siswa tidak ada update dirinya sendiri (insomnia)
    - Frontend:
           - Samakan dengan insomnia
-7. Jurusan: (independen)
+          - Nambah kolom status pada selain create
+--------------------------------------            
+7. ♻️X Jurusan: (independen)
     - ☑️ Backend: 
           - ✅ samakan semua
     - Frontend
           - ikutin insomnia          
-8. Kelas: (independen)
+--------------------------------------        
+8. ♻️X Kelas: (independen) (sampe sini)
     - ☑️ Backend:
           - ✅ samakan semua
+          - ✅ hapus kolom jurusan_id
           - ❌ (insomnia) semua milik spa
     - Frontend:
-          - ikutin insomnia              
-9. Kurikulum: (independen) 
+          - ikutin insomnia
+          - Nambah kolom status pada selain create
+--------------------------------------           
+9. ♻️X Kurikulum: (independen) 
    aturan main, menentukan kompetensi KD/CP, 
     - ☑️ Backend:
         - ✅ samakan semua
@@ -67,13 +83,15 @@ Perbaikan
         - ikutin insomnia
         - jika tipe = MERDEKA, maka memiliki ATP (Alur Tujuan Pembelajaran)
         - jika tipe = K13, tidak memiliki ATP
-10. mata_pelajaran: (independen)
+--------------------------------------          
+10. ♻️X mata_pelajaran: (independen)
     - ☑️ Backend:
         - ✅ samakan semua
         - ❌ (insomnia) semua milik spa
     - Frontend:
         - ikutin insomnia
-        - selain super admin tidak ada bagian disini
+        - selain super admin tidak ada bagian
+--------------------------------------          
 11. tahun_akademik: (independen)
     - ☑️ Backend:
         - ✅ samakan semua
@@ -81,49 +99,45 @@ Perbaikan
     - Frontend:
         - ikutin insomnia
         - semua milik spa
+--------------------------------------                  
 12. semester:
     - ☑️ Backend:
-        - ✅ samakan semua
-        <!-- - ✅ send data untuk select (hanya tahun_akademik_id aktif saja) -->
+        - ✅ samakan semua        
     - Frontend:
         - Ikutin insomnia
-13. kurikulum_mata_pelajaran:
+--------------------------------------                  
+13. ♻️X kurikulum_mata_pelajaran:
    - ☑️ Backend:
           - ✅ samakan semua
-          <!-- - ✅ send data untuk select -->
+          - ✅ send data untuk select
+          - ✅ hapus kolom tahun_akademik dan jurusan
    - Frontend:
           - ikutin insomnia
           - Buat tampilannya (untuk spa saja)
-14. ☑️ kompetensi:
+--------------------------------------                          
+14. ♻️ kompetensi (1 mapel 2-4 CP):
     Target kemampuan siswa, lintas tahun
-    - Backend:        
+    - ☑️ Backend:        
         - ✅ samakan semua
         - ✅ send data untuk select
     - Frontend:
         - samakan dengan insomnia
         - jika jenis = KD, tidak memiliki ATP (Alur Tujuan Pembelajaran)
         - jika jenis = CP, maka memiliki ATP
-15. ☑️ alur_tujuan_pembelajaran:
-    - ✅ Backend:
-        - ✅ samakan semua
-        - ✅ route
-        - ✅ guru: data select
-        - ✅ fitur approve (spa)
-        - ✅ fitur clone (guru)    
+--------------------------------------                                  
+15. ♻️ atp_master (1 CP 1-3 ATP)
+    - Backend:
+        - samakan semua
     - Frontend:
-        - ikutin insomnia
-        - referensi tampilan ada di pdf e-raport halaman 143
-        - kasih tombol clone pada semester (fitur clone semester tahun lalu) untuk guru        
-        - Untuk UI guru silakan minta ke Winton
-        - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, tambah, dan clone hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
 16.  ❌ modul_ajar
 17.  ❌ asesmen
-18. rombel:
+18. ♻️ rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya
           - ✅ API dan insomnia
           - ✅ data select
           - ✅ sudah benar update dan storenya
+          - ✅ tambah kolom jurusan_id
     - Frontend:
           - ikutin insomnia      
           - wali_rombel = wali_kelas
@@ -146,25 +160,39 @@ Perbaikan
         - ✅ send data untuk select
     - Frontend:
         - samakan dengan insomnia
-22. siswa_jadwal_pelajaran
+22. alur_tujuan_pembelajaran:
+    - ☑️ Backend:
+        - ✅ samakan semua
+        - ✅ route
+        - ✅ guru: data select
+        - ✅ fitur approve (spa)
+        - ✅ hapus fitur clone (guru)    
+    - Frontend:
+        - ikutin insomnia
+        - referensi tampilan ada di pdf e-raport halaman 143
+        - Untuk UI guru silakan minta ke Winton
+        - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, dan tambah hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
+23. ❌ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
+24. ❌ tugas_tambahan_guru: (untuk guru yang tidak terpilih dalam jurusan oleh siswa)
+25. siswa_jadwal_pelajaran
    - ☑️ Backend:
         - ✅ spa
         - ✅ siswa: tahun dan semester aktif saja
    - Frontend:
         - samakan dengan insomnia
-23. absensi_pegawai:
+26. absensi_pegawai:
     - ☑️ Backend:
         - ✅ samakan dengan migrasi
     - Frontend:
         - ikutin insomnia (baca docs jika ada)
         - jika status pada tahun_akademik atau semester = 'arsip', maka button delete dan update hilang...update dan delete hanya berlaku saat TA dan semester aktif saja
-24. absensi_pelajaran:
+27. absensi_pelajaran:
     - ☑️ Backend:
         - ✅ samakan semua
         - ✅ show menggunakan id guru
     - Frontend
         - samakan dengan insomnia
-25.  absensi_siswa:
+28.  absensi_siswa:
     - ☑️ Backend:
         - ✅ samakan (seeder, controller) dengan migrasi
         - ❌ tambahkan fitur guru bisa absenkan siswa di controller        
@@ -180,13 +208,13 @@ Perbaikan
             b. Klik detail (nanti bisa dapet data siswanya)
             c. lalu absenkan siswa (jika bingung, baca AbsensiSiswaController, function guruAbsenkanSiswa)
             d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan rombel_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
-26. ekstrakurikuler:
+29. ♻️ ekstrakurikuler:
     - ☑️ Backend:
         - ✅ migrasi, seeder, controller
     - Frontend:
         - ikutin insomnia
         - filter jika ada lebih dari 1 tahun_akademik
-27. pembina_ekskul:
+30. pembina_ekskul:
     - ☑️ Backend:
         - (migrasi, model, seeder)
         - ✅ controller
@@ -194,7 +222,7 @@ Perbaikan
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-28. pelatih_ekskul:
+31. pelatih_ekskul:
     - ☑️ Backend:
         - ✅ (migrasi, model, seeder)
         - ✅ controller
@@ -202,109 +230,106 @@ Perbaikan
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-29. ☑️ ekskul_siswa_pivot:
+32. ☑️ ekskul_siswa_pivot:
     - Backend:
         - ✅ (Migrasi, Seeder, Controller)
         - ✅ data select
     - Frontend:
         - ikutin insomnia
         - alur siswa daftar sendiri: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)
-30. prestasi:
+33. prestasi:
     - ☑️ Backend:
         - ✅ (Seeder, Migrasi, Controller) Hapus kolom kelas_id dan jurusan_id
         - ✅ jangan otomatis, gunakan data select manual aja (takutnya mau ngedata prestasi yang lampau)
     - Frontend:
         - ikutin insomnia
-31. data_nilai_siswa:
+34. data_nilai_siswa:
     kumpulan hasil asesmen (uts/uas, absensi, dll)
     - Backend:
           - ❌samakan semua
     - Frontend:
           - Gua gatau ini gimana, coba cari referensi dari oss urindo
-32. rapor_nilai_siswa
+35. rapor_nilai_siswa
     hasil akhir data_nilai_siswa
     - Backend:
           - ❌
-33. projek_p5:
+36. projek_p5:
     - ❌ Backend:
-34. data_nilai_p5:
+37. data_nilai_p5:
     kumpulan hasil projek_p5
     - ❌ Backend:
-35. data_nilai_ekskul
+38. data_nilai_ekskul
     kumpulan hasil ekskul_siswa_pivot
     - Backend:
           - ❌
-36. rapor (wajib export excel)
+39. rapor (wajib export excel)
     hasil final rapor_nilai_siswa, ekskul, p5
     - Backend:
           - ❌
-37. membuat data_berkas:
+40. membuat data_berkas:
     - ❌ Backend:        
-38. keuangan:
+41. ♻️ keuangan:
     - ❌ Backend:        
-39. ❌⚠️ membuat jurnal_kbm
-40. ❌⚠️ membuat forum diskusi
-41. ❌⚠️ membuat tugas (lms)
-42. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
-43. ====================================================================================================================================
-44. ❌⚠️ modul_ajar: ()
+42. ❌⚠️ membuat jurnal_kbm
+43. ❌⚠️ membuat forum diskusi
+44. ❌⚠️ membuat tugas (lms)
+45. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
+46. ====================================================================================================================================
+47. ❌⚠️ modul_ajar: ()
     rencana pembelajaran untuk mencapai kompetensi, menciptakan asesmen (uts/uas), dibuat tiap tahun
-45. ❌⚠️ asesmen:
+48. ❌⚠️ asesmen:
     alat ukur modul ajar (uts/uas), menilai kompetensi
-46. ❌⚠️ asesmen_kompetensi:
+49. ❌⚠️ asesmen_kompetensi:
     menetapkan bobot kompetensi pada asesmen
-47. ❌⚠️ asesmen_siswa:
+50. ❌⚠️ asesmen_siswa:
     nilai mentah per asesmen
-48. ❌⚠️ nilai_kompetensi_siswa
+51. ❌⚠️ nilai_kompetensi_siswa
     hasil kalkulasi dari asesmen_kompetensi dan asesmen_siswa
 ========================================================================================================================================
 
 ❌ (belum dikerjakan)
 ✅ (sudah dikerjakan)
 ⬅️ (lakukan)
-⚠️(coming soon)
+⚠️ (coming soon)
 ☑️ (done)
-🎯 (target) 
+🎯 (target)
+♻️ (digunakan ulang)
 
 ==================================================
 - Digunakan ulang
-1. jurusan
-2. kurikulum
-3. mata_pelajaran
-4. Kompetensi
-5. Identitas sekolah
-6. Gedung
-7. Ruangan
-8. Keuangan
-9. pegawai
-10. siswa
-11. Ekstrakurikuler
-12. kelas
+1. Identitas sekolah
+2. Gedung
+3. Ruangan
+4. pegawai
+5. siswa
+6. jurusan
+7. kelas
+8. kurikulum (sampe ganti kurikulum)
+9. mata_pelajaran
+10. kurikulum_mata_pelajaran (sampe ganti kurikulum)
+11. Kompetensi (sampe ganti kurikulum)
+12. atp master (sampe ganti kurikulum)
+13. Ekstrakurikuler
+14. Keuangan
 
 
 - Dibuat tiap semester:
-1. semester
-4. Buka tutup penerimaan siswa baru
-5. jadwal_pelajaran
-6. siswa_jadwal_pelajaran
-7. absensi pegawai
-8. absensi pelajaran
-9. absensi siswa
-10. prestasi
-11. data_nilai_siswa
+1. SPA  : Buka tutup penerimaan siswa baru
+2. SPA  : semester
+3. Guru : alur_tujuan_pembelajaran
+4. SPA  : jadwal_pelajaran
+5. SPA  : siswa_jadwal_pelajaran
+<!-- <!-- 6. SPA  : data_nilai -->
+<!-- 1. SPA  : rapor --> -->
 
 
 - Dibuat tiap tahun (saat semester ganjil):
-1. tahun_kademik
-2. kurikulum_mata_pelajaran
-3. Alur Tujuan Pembelajaran (ATP)
-4. rombel
-5. siswa_rombel
-6. wali_rombel
-7. pelatih_ekskul
-8. pembina_ekskul
-9. ekskul_siswa_pivot
-
+1. SPA  : tahun_kademik
+2. SPA  : wali_rombel
+3. SPA  : siswa_rombel
+4. SPA  : pelatih_ekskul
+5. SPA  : pembina_ekskul
+6. SPA  : ekskul_siswa_pivot
 ==================================================
 
 
@@ -495,3 +520,61 @@ CONTOH:
    - rapor
      siswa_id       mapel               nilai_akhir     predikat        deskripsi
      1              "Matematika"        83              B               Mampu memahami dan menyelesaikan maasalah SPLDV dengan baik
+
+
+Jadwal:
+2013/2024,
+Ganjil: [
+    Jadwal: [
+        X: [
+            MTK, B. Jepang, Biologi
+        ],
+        XI: [
+            PKN, B. Korea
+        ],
+        XII: [
+            Algoritma, B. Inggris
+        ]
+    ]
+],
+Genap: [
+    Jadwal: [
+        X: [
+            TIK, B. Jepang Lanjut
+        ],
+        XI: [
+            Korespondensi, B. Korea Lanjut
+        ],
+        XII: [
+            Algoritma Lanjut, B. Inggris Lanjut
+        ]
+    ] 
+]
+
+
+X = (MTK), (B. Jepang), (Biologi) | (TIK), (B. Jepang Lanjut)
+XI = 
+
+Guru:
+5. MTK                  = MTK
+6. Korea Lanjutan       = Agama
+7. Sunda                = Bahasa Sunda
+8. Jepang               = Jepang, Jepang Lanjutan
+9. TIK                  = TIK, Informatika
+10. Korea               = Korea, Korea Lanjutan
+11. PKN                 = PKN
+12. Inggris             = Inggris, Inggris Lanjutan
+13. Korespondensi       = Korespondensi
+14. Guru tidak aktif    = Seni Budaya
+15. Inggris Lanjutan    = 
+16. Algoritma           = Algoritma, Algoritma Lanjutan
+17. Algortima Lanjutan  =
+18. Jepang Lanjutan     = 
+19. Informatika         = Informatika
+20. Biologi             = Biologi
+21. Fisika              = Fisika
+
+
+Guru MTK
+Mapel       Semester        Kelas
+MTK         Ganjil          X

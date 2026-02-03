@@ -14,29 +14,30 @@ use Illuminate\Support\Facades\Storage;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Validator;
 use File;
+use Illuminate\Support\Facades\Auth;
 
 class GedungController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * spa/tu
      */
     public function index()
     {
-        $gedung = Gedung::get();
+        $gedung = Gedung::get();            
+        
+        if (!$gedung) {
+            return ApiResponse::error('Not found', ['data' => 'Data gedung tidak ditemukan']);
+        }
 
         $formatted = $gedung->map(function ($item) {
             return [
                 'id' => $item->id,
                 'foto_gedung' => $item->foto_gedung ? asset(str_replace('public/', 'storage/', $item->foto_gedung)) : null,
-                'kode_gedung' => $item->kode_gedung,
                 'nama_gedung' => $item->nama_gedung,
-                'jumlah_lantai' => $item->jumlah_lantai,
-                'luas_bangunan' => $item->luas_bangunan,
-                'tahun_dibangun' => $item->tahun_dibangun,
-                'kondisi' => $item->kondisi,
-                'keterangan' => $item->keterangan,
+                'kode_gedung' => $item->kode_gedung,                
+                'status' => $item->status,
             ];
-        });
+        })->values();
 
         return ApiResponse::success($formatted, 'Daftar gedung berhasil diambil');
 
@@ -60,7 +61,7 @@ class GedungController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Spa/tu
      */
     public function store(Request $request)
     {
@@ -93,19 +94,31 @@ class GedungController extends Controller
                 );
             }
 
-            $gedung = Gedung::create($validated);
+            $gedung = Gedung::create([
+                'foto_gedung' => $validated['foto_gedung'],
+                'kode_gedung' => $validated['kode_gedung'],
+                'nama_gedung' => $validated['nama_gedung'],
+                'jumlah_lantai' => $validated['jumlah_lantai'] ?? null,
+                'luas_bangunan' => $validated['luas_bangunan'] ?? null,
+                'tahun_dibangun' => $validated['tahun_dibangun'] ?? null,
+                'kondisi' => $validated['kondisi'] ?? null,
+                'lokasi' => $validated['lokasi'] ?? null,
+                'keterangan' => $validated['keterangan'] ?? null,
+                'status' => 'aktif',
+            ]);
             
             return ApiResponse::success([
                 'id' => $gedung->id,
                 'foto_gedung' => $gedung->foto_gedung ? asset(str_replace('public/', 'storage/', $gedung->foto_gedung)) : null,            
                 'kode_gedung' => $gedung->kode_gedung,
                 'nama_gedung' => $gedung->nama_gedung,
-                'jumlah_lantai' => $gedung->jumlah_lantai,
-                'luas_bangunan' => $gedung->luas_bangunan,
-                'tahun_dibangun' => $gedung->tahun_dibangun,
-                'kondisi' => $gedung->kondisi,
-                'lokasi' => $gedung->lokasi,
-                'keterangan' => $gedung->keterangan,
+                'jumlah_lantai' => $gedung->jumlah_lantai ?? null,
+                'luas_bangunan' => $gedung->luas_bangunan ?? null,
+                'tahun_dibangun' => $gedung->tahun_dibangun ?? null,
+                'kondisi' => $gedung->kondisi ?? null,
+                'lokasi' => $gedung->lokasi ?? null,
+                'keterangan' => $gedung->keterangan ?? null,
+                'status' => $gedung->status,
             ], 'Data gedung berhasil dibuat');
     
         } catch (ValidationException $e) {
@@ -114,7 +127,7 @@ class GedungController extends Controller
     }   
 
     /**
-     * Display the specified resource.
+     * spa/tu
      */
     public function show(string $id)
     {
@@ -127,13 +140,15 @@ class GedungController extends Controller
         $formatted = [
                 'id' => $gedung->id,
                 'foto_gedung' => $gedung->foto_gedung ? asset(str_replace('public/', 'storage/', $gedung->foto_gedung)) : null,
-                'kode_gedung' => $gedung->kode_gedung,
-                'nama_gedung' => $gedung->nama_gedung,
-                'jumlah_lantai' => $gedung->jumlah_lantai,
-                'luas_bangunan' => $gedung->luas_bangunan,
-                'tahun_dibangun' => $gedung->tahun_dibangun,
-                'kondisi' => $gedung->kondisi,
-                'keterangan' => $gedung->keterangan,
+                'nama_gedung' => $gedung->nama_gedung ?? null,
+                'kode_gedung' => $gedung->kode_gedung ?? null,
+                'jumlah_lantai' => $gedung->jumlah_lantai ?? null,
+                'luas_bangunan' => $gedung->luas_bangunan ?? null,
+                'tahun_dibangun' => $gedung->tahun_dibangun ?? null,
+                'kondisi' => $gedung->kondisi ?? null,
+                'lokasi' => $gedung->lokasi ?? null,
+                'keterangan' => $gedung->keterangan ?? null,
+                'status_gedung' => $gedung->status ?? null,
                 'ruangan' => $gedung->ruangan->map(function ($item) {
                     return [
                         'id' => $item->id ?? null,
@@ -146,6 +161,7 @@ class GedungController extends Controller
                         'kondisi' => $item->kondisi ?? null,
                         'fasilitas' => $item->fasilitas ?? null,
                         'keterangan' => $item->keterangan ?? null,
+                        'status_ruangan' => $item->status ?? null,
                     ];
                 }),
         ];
@@ -154,75 +170,92 @@ class GedungController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     */
+     * spa/tu
+     */    
     public function update(Request $request, string $id)
     {
         $gedung = Gedung::find($id);
 
         if (!$gedung) {
-            return ApiResponse::error('Data gedung tidak ditemukan', ['id' => ['Data tidak ditemukan']], 404);
+            return ApiResponse::error(
+                'Data gedung tidak ditemukan',
+                ['id' => ['Data tidak ditemukan']],
+                404
+            );
         }
 
         $validated = $request->validate([
             'foto_gedung' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
             'kode_gedung' => [
-                'required',
                 'sometimes',
-                Rule::unique('gedung')->ignore($id)
+                'filled',
+                Rule::unique('gedung', 'kode_gedung')->ignore($id),
             ],
+
             'nama_gedung' => [
-                'required',
                 'sometimes',
-                Rule::unique('gedung')->ignore($id)
+                'filled',
+                Rule::unique('gedung', 'nama_gedung')->ignore($id),
             ],
-            'jumlah_lantai' => 'nullable',
-            'luas_bangunan' => 'nullable',
-            'tahun_dibangun' => 'nullable',
-            'kondisi' => 'nullable',
-            'lokasi' => 'nullable',
-            'keterangan' => 'nullable',
+
+            'jumlah_lantai' => 'sometimes|nullable|integer|min:1',
+            'luas_bangunan' => 'sometimes|nullable|string|max:50',
+            'tahun_dibangun' => 'sometimes|nullable|digits:4',
+            'kondisi' => 'sometimes|nullable|string|max:100',
+            'lokasi' => 'sometimes|nullable|string|max:255',
+            'keterangan' => 'sometimes|nullable|string',
+            'status' => 'sometimes|nullable|in:aktif,arsip',
+
         ], [
-            'foto_gedung.image' => 'Hanya boleh berisi gambar atau foto',
-            'foto_gedung.mimes' => 'Format foto harus jpg, jpeg, atau webp',
-            'foto_gedung.max' => 'Maksimal ukuran foto 2 mb',
-            'kode_gedung.required' => 'Kode gedung wajib diisi',
-            'kode_gedung.unique' => 'Kode gedung sudah ada',
-            'nama_gedung.required' => 'Nama gedung wajib diisi',
-            'nama_gedung.unique' => 'Nama gedung sudah ada',
+            'foto_gedung.image' => 'Hanya boleh berisi gambar',
+            'foto_gedung.mimes' => 'Format foto harus jpg, jpeg, png, atau webp',
+            'foto_gedung.max' => 'Ukuran foto maksimal 2 MB',
+
+            'kode_gedung.filled' => 'Kode gedung wajib diisi',
+            'kode_gedung.unique' => 'Kode gedung sudah digunakan',
+
+            'nama_gedung.filled' => 'Nama gedung wajib diisi',
+            'nama_gedung.unique' => 'Nama gedung sudah digunakan',
+
+            'jumlah_lantai.integer' => 'Jumlah lantai harus berupa angka',
+            'tahun_dibangun.digits' => 'Tahun dibangun harus 4 digit',
+            'status.in' => 'Status hanya boleh aktif atau arsip',
         ]);
 
+        // Handle upload foto
         if ($request->hasFile('foto_gedung')) {
 
-            // Ambil path lama dari database
             $oldPath = $gedung->foto_gedung;
-        
-            // Simpan file baru
+
             $validated['foto_gedung'] = $this->simpanFoto(
                 $request->file('foto_gedung'),
-                'foto_gedung',      // folder
-                $request->nama_gedung ?? $gedung->nama_gedung,
+                'foto_gedung',
+                $request->nama_gedung ?? $gedung->nama_gedung
             );
-        
-            try {
-                if ($oldPath) {
-                    // Hilangkan prefix 'public/' agar sesuai dengan disk
+
+            if ($oldPath) {
+                try {
                     $relativePath = str_replace('public/', '', $oldPath);
-        
+
                     if (Storage::disk('public')->exists($relativePath)) {
                         Storage::disk('public')->delete($relativePath);
                     }
+                } catch (\Exception $e) {
+                    \Log::warning("Gagal hapus foto gedung lama: {$oldPath}", [
+                        'error' => $e->getMessage()
+                    ]);
                 }
-            } catch (\Exception $e) {
-                \Log::warning("Gagal hapus file lama {$oldPath}: " . $e->getMessage());
             }
         }
-        
+
         $gedung->update($validated);
 
         return ApiResponse::success([
             'id' => $gedung->id,
-            'foto_gedung' => $gedung->foto_gedung ? asset(str_replace('public/', 'storage/', $gedung->foto_gedung)) : null,            
+            'foto_gedung' => $gedung->foto_gedung
+                ? asset('storage/' . str_replace('public/', '', $gedung->foto_gedung))
+                : null,
             'kode_gedung' => $gedung->kode_gedung,
             'nama_gedung' => $gedung->nama_gedung,
             'jumlah_lantai' => $gedung->jumlah_lantai,
@@ -231,11 +264,13 @@ class GedungController extends Controller
             'kondisi' => $gedung->kondisi,
             'lokasi' => $gedung->lokasi,
             'keterangan' => $gedung->keterangan,
+            'status' => $gedung->status,
         ], 'Data gedung berhasil diperbarui');
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * spa/tu
      */
     public function destroy($id)
     {
@@ -248,7 +283,7 @@ class GedungController extends Controller
         if ($gedung->ruangan()->exists()) {
             return ApiResponse::error(
                 'Tidak diizinkan',
-                ['ruangan' => 'Gedung sudah digunakan pada ruangan'],
+                ['ruangan' => 'Gedung sudah digunakan pada ruangan, update status sebagai solusi'],
                 403
             );
         }

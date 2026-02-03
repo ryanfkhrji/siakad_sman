@@ -28,15 +28,3 @@ return new class extends Migration
         Schema::dropIfExists('tahun_akademik');
     }
 };
-
-
-/**
- * ekskulSiswaPivots (hasMany)
- * pembinaEkskul (hasMany)
- * pelatihEkskul (hasMany)
- * prestasi (hasMany)
- * semester (hasMany)
- * dataBerkas (hasMany)
- * rombels (hasMany)
- * siswaRombel (hasMany)
- */

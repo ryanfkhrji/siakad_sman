@@ -31,10 +31,11 @@ return new class extends Migration
             $table->enum('status_akhir', [
                 'naik_kelas',
                 'tinggal_kelas',
-                'lulus',
                 'pindah',
+                'pindahan',
                 'berhenti',
-                'diberhentikan'
+                'diberhentikan',
+                'lulus',
             ])->nullable();
         
             $table->text('catatan')->nullable();
