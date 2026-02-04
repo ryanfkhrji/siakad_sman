@@ -1482,7 +1482,7 @@ class DatabaseSeeder extends Seeder
                 'aspek' => 'keterampilan',
                 'fase' => null,
                 'deskripsi' => 'Mahir menggunakan bahasa Sunda dalam kehidupan sehari-hari',
-                'status' => 'arsip'
+                'status' => 'aktif'
             ],            
             // ============================================== 
 
@@ -1843,14 +1843,14 @@ class DatabaseSeeder extends Seeder
                 'kompetensi_id' => 3, // Ganjil || Aljabar dan Bilangan real
                 'urutan' => 1,
                 'tujuan_pembelajaran' => 'Memahami sifat-sifat bilangan real dan operasinya.',
-                'status' => 'aktif'
+                'status' => 'arsip'
             ],
             [
                 // 2
                 'kompetensi_id' => 3,
                 'urutan' => 2,
                 'tujuan_pembelajaran' => 'Menyusun dan menyederhanakan bentuk aljabar.',
-                'status' => 'aktif'
+                'status' => 'arsip'
             ],
             [
                 // 3

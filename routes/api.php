@@ -10,6 +10,7 @@ use App\Http\Controllers\JadwalPelajaranController;
 use App\Http\Controllers\SiswaJadwalPelajaranController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\KompetensiController;
+use App\Http\Controllers\AtpMasterController;
 use App\Http\Controllers\AlurTujuanPembelajaranController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\RuanganController;
@@ -122,6 +123,10 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅☑️ CRUD kompetensi
     Route::apiResource('/spa/kompetensi', KompetensiController::class);     
     Route::get('/spa/data-select/kompetensi', [KompetensiController::class, 'dataSelectKompetensi']);
+
+    // ✅☑️ CRUD ATP Master
+    Route::apiResource('/spa/atp-master', AtpMasterController::class);     
+    Route::get('/spa/data-select/atp-master', [AtpMasterController::class, 'dataSelect']);
     
     // ✅☑️ CRUD ATP
     Route::apiResource('/spa/atp', AlurTujuanPembelajaranController::class)->only(['index', 'show']);  
