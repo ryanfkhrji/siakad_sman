@@ -26,7 +26,7 @@ return new class extends Migration
 
             $table->enum('status', ['aktif', 'tidak_aktif', 'arsip'])->default('aktif');
 
-            $table->unique(['kelas_id', 'nama_rombel']);
+            $table->unique(['kelas_id', 'nama_rombel', 'jurusan_id']);
 
             $table->timestamps();        
         });

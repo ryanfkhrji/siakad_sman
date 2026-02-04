@@ -44,6 +44,34 @@ return new class extends Migration
 
             $table->timestamps();
 
+             /**
+             * 1️⃣ 1 ROMBEL tidak boleh 2 pelajaran di jam sama
+             */
+            $table->unique([
+                'rombel_id',
+                'tahun_akademik_id',
+                'semester_id',
+                'hari',
+                'jam_mulai',
+                'jam_selesai'
+            ], 'uq_rombel_jadwal');
+
+            /**
+             * 2️⃣ 1 GURU tidak boleh ngajar 2 kelas di jam sama
+             */
+            $table->unique([
+                'guru_id',
+                'tahun_akademik_id',
+                'semester_id',
+                'hari',
+                'jam_mulai',
+                'jam_selesai'
+            ], 'uq_guru_jadwal');
+
+            /**
+             * 3️⃣ 1 MAPEL tidak boleh dobel di rombel & jam yang sama
+             * (opsional tapi aman)
+             */
             $table->unique([
                 'kurikulum_mata_pelajaran_id',
                 'rombel_id',
@@ -52,27 +80,7 @@ return new class extends Migration
                 'hari',
                 'jam_mulai',
                 'jam_selesai'
-            ], 'uq_rmb_smt_har_jam');
-            
-            // megatasi 1 guru 2 kelas di jam yang sama
-            $table->unique([
-                'guru_id',
-                'tahun_akademik_id',
-                'semester_id',
-                'hari',
-                'jam_mulai',
-                'jam_selesai'
-            ], 'uq_guru_smt_har_jam');
-
-            // mengatasi 1 kelas 2 mapel di jam yang sama
-            $table->unique([
-                'rombel_id',
-                'tahun_akademik_id',
-                'semester_id',
-                'hari',
-                'jam_mulai',
-                'jam_selesai'
-            ], 'uq_rombel_smt_har_jam');
+            ], 'uq_mapel_rombel_jadwal');
             
         });
     }    

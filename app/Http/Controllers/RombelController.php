@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Rombel;
 use App\Models\Kelas;
+use App\Models\Jurusan;
 use App\Models\TahunAkademik;
 use App\Models\Kepegawaian;
 use App\Helpers\ApiResponse;
@@ -19,28 +20,45 @@ class RombelController extends Controller
      */
     public function index()
     {
-        $rombel = Rombel::with('kelas.jurusan')->get();
+        $rombels = Rombel::with([
+            'kelas',
+            'jurusan'
+        ])->get();
 
-        if ($rombel->isEmpty()) {
-            return ApiResponse::error('No data', ['data' => 'Belum ada data rombel']);
+        if ($rombels->isEmpty()) {
+            return ApiResponse::error(
+                'No data',
+                ['data' => 'Belum ada data rombel']
+            );
         }
 
-        $formatted = $rombel->map(function ($r) {
-            return [                
-                'rombel_id'   => $r->id,
-                'nama_rombel' => $r->nama_rombel,
-                'status'      => $r->status,
+        $formatted = $rombels->map(function ($r) {
+            return [
+                'rombel_id'     => $r->id,
+                'nama_rombel'   => $r->nama_rombel,
+                'status_rombel' => $r->status,
+
                 'kelas' => [
-                    'kelas_id'   => $r->kelas?->id,
-                    'nama_kelas' => $r->kelas?->nama_kelas,
-                    'tingkat'    => $r->kelas?->tingkat,
-                    'jurusan'    => $r->kelas?->jurusan?->nama_jurusan,
+                    'kelas_id'     => $r->kelas?->id,
+                    'nama_kelas'   => $r->kelas?->nama_kelas,
+                    'tingkat'      => $r->kelas?->tingkat,
+                    'status_kelas' => $r->kelas?->status,
+                ],
+
+                'jurusan' => [
+                    'jurusan_id'     => $r->jurusan?->id,
+                    'nama_jurusan'   => $r->jurusan?->nama_jurusan,
+                    'status_jurusan' => $r->jurusan?->status,
                 ],
             ];
         })->values();
 
-            return ApiResponse::success($formatted, 'Data rombel berhasil diambil');
+        return ApiResponse::success(
+            $formatted,
+            'Data rombel berhasil diambil'
+        );
     }
+
 
 
     /**
@@ -51,17 +69,20 @@ class RombelController extends Controller
         try {
             // 1. Validasi input
             $validated = $request->validate([
-                'kelas_id' => 'required|exists:kelas,id',
-                'nama_rombel' => 'required|string',                
+                'kelas_id'    => 'required|exists:kelas,id',
+                'nama_rombel' => 'required|string',        
+                'jurusan_id'  => 'nullable|exists:jurusans,id'
             ], [
-                'kelas_id.required' => 'Kelas wajib diisi',
-                'kelas_id.exists' => 'Kelas tidak ditemukan',
-                'nama_rombel.required' => 'Nama rombel wajib diisi',                                
+                'kelas_id.required'      => 'Kelas wajib diisi',
+                'kelas_id.exists'        => 'Kelas tidak ditemukan',
+                'nama_rombel.required'   => 'Nama rombel wajib diisi',                                
+                'jurusan_id.exists'      => 'Jurusan tidak ditemukan',
             ]);                 
 
             // 2. Unik nama rombel per tahun akademik
             $existsNama = Rombel::where('nama_rombel', $validated['nama_rombel'])
                 ->where('kelas_id', $validated['kelas_id'])
+                ->where('jurusan_id', $validated['jurusan_id'])
                 ->exists();
 
             if ($existsNama) {
@@ -75,11 +96,12 @@ class RombelController extends Controller
             $rombel = Rombel::create([
                 'kelas_id' => $validated['kelas_id'],
                 'nama_rombel' => $validated['nama_rombel'],
+                'jurusan_id' => $validated['jurusan_id'] ?? null,
                 'status' => 'aktif'
             ]);
 
             // 7. Load relasi
-            $rombel->load('kelas.jurusan');
+            $rombel->load('kelas', 'jurusan');
 
             // 8. Response
             return ApiResponse::success([
@@ -87,7 +109,7 @@ class RombelController extends Controller
                 'nama_rombel' => $rombel->nama_rombel,
                 'kelas' => $rombel->kelas->nama_kelas ?? null,
                 'tingkat' => $rombel->kelas->tingkat ?? null,
-                'jurusan' => $rombel->kelas->jurusan->nama_jurusan ?? null,
+                'jurusan' => $rombel->jurusan->nama_jurusan ?? null,
                 'status_rombel' => $rombel->status ?? null,
             ], 'Berhasil membuat rombel');
 
@@ -103,7 +125,8 @@ class RombelController extends Controller
     public function show($id)
     {
         $rombel = Rombel::with([
-            'kelas.jurusan',
+            'kelas',
+            'jurusan',
             'waliRombels.wali',
             'waliRombels.tahunAkademik',
             'siswaRombels.siswa',
@@ -112,7 +135,6 @@ class RombelController extends Controller
             'jadwalPelajarans.guru',
             'jadwalPelajarans.ruangan',
             'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
-            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
         ])->find($id);
 
         if (!$rombel) {
@@ -123,31 +145,19 @@ class RombelController extends Controller
             );
         }
 
-        /**
-         * Ambil semua tahun akademik unik
-         */
-        $tahunAkademikIds = collect()
-            ->merge($rombel->waliRombels->pluck('tahun_akademik_id'))
-            ->merge($rombel->siswaRombels->pluck('tahun_akademik_id'))
-            ->merge(
-                $rombel->jadwalPelajarans
-                    ->pluck('kurikulumMataPelajaran.tahun_akademik_id')
-            )
-            ->unique()
-            ->values();
+        // 🔑 Ambil SEMUA tahun akademik (periode utama)
+        $tahunAkademiks = TahunAkademik::orderBy('tahun_akademik')->get();
 
-        $periode = $tahunAkademikIds->map(function ($taId) use ($rombel) {
+        $periode = $tahunAkademiks->map(function ($ta) use ($rombel) {
 
-            $tahunAkademik = TahunAkademik::find($taId);
-
-            // wali rombel per tahun akademik
+            // wali rombel per tahun akademik (boleh null)
             $wali = $rombel->waliRombels
-                ->where('tahun_akademik_id', $taId)
+                ->where('tahun_akademik_id', $ta->id)
                 ->first();
 
-            // siswa per tahun akademik
+            // siswa rombel per tahun akademik (boleh kosong)
             $siswa = $rombel->siswaRombels
-                ->where('tahun_akademik_id', $taId)
+                ->where('tahun_akademik_id', $ta->id)
                 ->map(function ($sr) {
                     return [
                         'siswa_id'   => $sr->siswa?->id,
@@ -158,11 +168,11 @@ class RombelController extends Controller
                 })
                 ->values();
 
-            // jadwal per tahun akademik
-            $jadwalTA = $rombel->jadwalPelajarans->filter(function ($jadwal) use ($taId) {
-                return $jadwal->kurikulumMataPelajaran?->tahun_akademik_id === $taId;
-            });
+            // jadwal rombel per tahun akademik
+            $jadwalTA = $rombel->jadwalPelajarans
+                ->where('tahun_akademik_id', $ta->id);
 
+            // semester (boleh kosong)
             $semester = $jadwalTA
                 ->groupBy('semester_id')
                 ->map(function ($jadwals) {
@@ -174,16 +184,16 @@ class RombelController extends Controller
                         'semester'    => $semester?->semester,
                         'jadwal_pelajaran' => $jadwals->map(function ($j) {
                             return [
-                                'jadwal_id'       => $j->id,
-                                'mata_pelajaran'  => $j->kurikulumMataPelajaran
+                                'jadwal_id'      => $j->id,
+                                'mata_pelajaran' => $j->kurikulumMataPelajaran
                                     ?->mataPelajaran
                                     ?->nama_pelajaran,
-                                'hari'            => $j->hari,
-                                'guru_pengajar'   => $j->guru?->nama,
-                                'jam_mulai'       => $j->jam_mulai,
-                                'jam_selesai'     => $j->jam_selesai,
-                                'ruangan'         => $j->ruangan?->nama_ruangan,
-                                'link_opsional'   => $j->link_opsional,
+                                'hari'           => $j->hari,
+                                'guru_pengajar'  => $j->guru?->nama,
+                                'jam_mulai'      => $j->jam_mulai,
+                                'jam_selesai'    => $j->jam_selesai,
+                                'ruangan'        => $j->ruangan?->nama_ruangan,
+                                'link_opsional'  => $j->link_opsional,
                             ];
                         })->values(),
                     ];
@@ -191,9 +201,9 @@ class RombelController extends Controller
                 ->values();
 
             return [
-                'tahun_akademik_id'      => $tahunAkademik?->id,
-                'tahun_akademik'         => $tahunAkademik?->tahun_akademik,
-                'status_tahun_akademik'  => $tahunAkademik?->status,                
+                'tahun_akademik_id'     => $ta->id,
+                'tahun_akademik'        => $ta->tahun_akademik,
+                'status_tahun_akademik' => $ta->status,
 
                 'wali' => $wali ? [
                     'wali_id'   => $wali->wali?->id,
@@ -206,25 +216,31 @@ class RombelController extends Controller
         });
 
         $data = [
-            [
-                'rombel_id'     => $rombel->id,
-                'nama_rombel'   => $rombel->nama_rombel,
-                'status_rombel' => $rombel->status,
-                'kelas'         => [
-                    'kelas_id'  => $rombel->kelas->id,
-                    'kelas'  => $rombel->kelas->nama_kelas,
-                    'tingkat'  => $rombel->kelas->tingkat,
-                    'jurusan'  => $rombel->kelas->jurusan->nama_jurusan ?? null,
-                ],
-                'periode'       => $periode,
-            ]
+            'rombel_id'     => $rombel->id,
+            'nama_rombel'   => $rombel->nama_rombel,
+            'status_rombel' => $rombel->status,
+
+            'kelas' => [
+                'kelas_id' => $rombel->kelas?->id,
+                'kelas'    => $rombel->kelas?->nama_kelas,
+                'tingkat'  => $rombel->kelas?->tingkat,
+            ],
+
+            'jurusan' => [
+                'jurusan_id'   => $rombel->jurusan?->id,
+                'nama_jurusan' => $rombel->jurusan?->nama_jurusan,
+            ],
+
+            'periode' => $periode,
         ];
 
         return ApiResponse::success(
-            ['data' => $data],
+            $data,
             'Detail rombel berhasil diambil'
         );
     }
+
+
 
     
     // ✅ untuk guru (diambil yang aktif aja)
@@ -290,7 +306,7 @@ class RombelController extends Controller
     
 
     /**
-     * ✅ untuk spa
+     * ! ✅ untuk spa (masuk sini)
      */
     public function update(Request $request, string $id)
     {
@@ -413,9 +429,7 @@ class RombelController extends Controller
 
     public function dataSelect() {
         // kelas
-        $data = Kelas::select('id', 'nama_kelas', 'tingkat', 'jurusan_id')
-        ->with('jurusan')
-        ->get();
+        $data = Kelas::where('status', 'aktif')->select('id', 'nama_kelas', 'tingkat')->get();
 
         if ($data->isEmpty()) {
             return ApiResponse::error('Not found', ['data' => null]);
@@ -425,13 +439,24 @@ class RombelController extends Controller
             return [
                 'kelas_id' => $k->id ?? null,
                 'nama_kelas' => $k->nama_kelas ?? null,
-                'tingkat_kelas' => $k->tingkat ?? null,
-                'jurusan_kelas' => $k->jurusan->nama_jurusan ?? null,
+                'tingkat_kelas' => $k->tingkat ?? null,                
             ];
         })->values();        
 
+
+        // Jurusan
+        $data2 = Jurusan::where('status', 'aktif')->get();
+
+        $jurusan = $data2->map(function ($j) {
+            return [
+                'jurusan_id'    => $j->id,
+                'nama_jurusan'  => $j->nama_jurusan,
+            ];
+        })->values();
+
         return ApiResponse::success([
-            'kelas' => $kelas,
+            'kelas'   => $kelas,
+            'jurusan' => $jurusan
         ], 'Data select berhasil diambil');
     }
 }

@@ -125,13 +125,16 @@ Perbaikan
         - jika user pilih jenis = KD, inputan fase disable/hilang
         - jika user pilih jenis = CP, inputan tingkat dan aspek disable/hilang
 --------------------------------------                                  
-15. ♻️ atp_master (1 CP 1-3 ATP)
+15. ♻️X atp_master (1 CP 1-3 ATP)
     - Backend:
         - samakan semua
     - Frontend:
-16. ♻️❌ tugas_tambahan_guru: (untuk guru yang tidak terpilih dalam jurusan oleh siswa)
-17. ❌ modul_ajar
-18. ❌ asesmen
+        - Ikutin Insomnia
+--------------------------------------                                  
+16. ♻️❌⚠️ tugas_tambahan_guru: (untuk guru yang tidak terpilih dalam jurusan oleh siswa)
+17. ❌⚠️ modul_ajar
+18. ❌⚠️ asesmen
+--------------------------------------                                  
 19. ♻️ rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya
@@ -143,6 +146,7 @@ Perbaikan
           - ikutin insomnia      
           - wali_rombel = wali_kelas
           - hitung jumlah siswa di rombel
+--------------------------------------                                            
 20. wali_rombel:
     - ☑️ Backend:
           - Samakan semua

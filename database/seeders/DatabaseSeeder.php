@@ -828,7 +828,7 @@ class DatabaseSeeder extends Seeder
                 'nama_pelajaran' => 'Bahasa Perancis',
                 'kode_mapel_diknas' => '164',                
                 'kelompok' => 'bahasa',
-                'status' => 'tidak_aktif',                
+                'status' => 'arsip',                
             ],            
             [
                 // 26
@@ -1352,7 +1352,7 @@ class DatabaseSeeder extends Seeder
                 'tingkat' => 11,
                 'nilai_kkm' => 70,
                 'status_mata_pelajaran' => 'pilihan',                
-                'status' => 'tidak_aktif'
+                'status' => 'arsip'
             ],            
             // Kelas 12
             [
@@ -1407,7 +1407,7 @@ class DatabaseSeeder extends Seeder
                 'tingkat' => 12,
                 'nilai_kkm' => 70,
                 'status_mata_pelajaran' => 'pilihan',                
-                'status' => 'tidak_aktif'
+                'status' => 'arsip'
             ],            
         ]);
 
@@ -1447,6 +1447,11 @@ class DatabaseSeeder extends Seeder
                 'tahun_akademik_id' => 2,
                 'semester' => 'Ganjil',
                 'status' => 'aktif'
+            ],
+            [
+                'tahun_akademik_id' => 2,
+                'semester' => 'Genap',
+                'status' => 'arsip'
             ],
         ]);
 
@@ -1835,7 +1840,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // 🎯 spa/tu
+        // 🎯✅ spa/tu
         AtpMaster::insert([
             // MTK (E) (10)
             [
@@ -2566,7 +2571,7 @@ class DatabaseSeeder extends Seeder
             // X (24/25)
             [
                 'siswa_id' => 3, // Sanita
-                'rombel_id' => 1, // X-A-1
+                'rombel_id' => 2, // X-B-1
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => null,
                 'catatan' => null
@@ -2589,7 +2594,7 @@ class DatabaseSeeder extends Seeder
             ],                      
             [
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 2, // X-A-1
+                'rombel_id' => 2, // X-B-1
                 'tahun_akademik_id' => 1, // 2013/2024
                 'status_akhir' => 'naik_kelas',
                 'catatan' => 'Naik ke kelas XI'
@@ -2896,99 +2901,171 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => 'www.youtube.com', 
             ],     
 
-            // XI-B-1
+
+            // X-B-1 (2024/2025)
             // Ganjil
             [
-                // 21
-                'kurikulum_mata_pelajaran_id' => 16, // K13 - MTK
+                // 11
+                'kurikulum_mata_pelajaran_id' => 6, // K13 - MTK
                 'tahun_akademik_id' => 2, // 2024/2025
                 'semester_id' => 3, // Ganjil
-                'hari' => 'Senin',
+                'hari' => 'Minggu',
                 'guru_id' => 9, // Guru MTK
-                'rombel_id' => 5, // X-B-1
+                'rombel_id' => 2, // X-B-1
                 'jam_mulai' => '07:30',
                 'jam_selesai' => '08:30',
                 'ruangan_id' => 2,
                 'link_opsional' => '',              
             ],        
             [
-                // 22
-                'kurikulum_mata_pelajaran_id' => 14, // K13 - Indo
+                // 12
+                'kurikulum_mata_pelajaran_id' => 4, // K13 - Indo
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3,
-                'hari' => 'Senin',
+                'hari' => 'Sabtu',
                 'guru_id' => 7, // Guru Indo
-                'rombel_id' => 5, // X-B-1
-                'jam_mulai' => '08:30',
-                'jam_selesai' => '10:00',
-                'ruangan_id' => 2,
-                'link_opsional' => '',              
-            ],        
-            [
-                // 23
-                'kurikulum_mata_pelajaran_id' => 12, // K13 - PAI
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
-                'hari' => 'Selasa',
-                'guru_id' => 5, // Guru PAI
-                'rombel_id' => 5, // X-B-1
-                'jam_mulai' => '07:00',
-                'jam_selesai' => '08:30',
-                'ruangan_id' => 2,
-                'link_opsional' => '',              
-            ],        
-            [
-                // 24
-                'kurikulum_mata_pelajaran_id' => 13, // K13 - PPKn
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
-                'hari' => 'Selasa',
-                'guru_id' => 6, // Guru PPKn
-                'rombel_id' => 5, // X-B-1
+                'rombel_id' => 2, // X-B-1
                 'jam_mulai' => '08:30',
                 'jam_selesai' => '10:00',
                 'ruangan_id' => 2,
                 'link_opsional' => '',              
             ],                    
+
+            // Genap
             [
-                // 25
-                'kurikulum_mata_pelajaran_id' => 15, // merdeka - Inggris
+                // 17
+                'kurikulum_mata_pelajaran_id' => 7, // merdeka - Sejarah
                 'tahun_akademik_id' => 2,
-                'semester_id' => 3,
-                'hari' => 'Rabu',
-                'guru_id' => 8, // Guru Inggris
-                'rombel_id' => 5, // X-B-1
-                'jam_mulai' => '07:30',
-                'jam_selesai' => '08:30',
-                'ruangan_id' => 1,                
-                'link_opsional' => 'www.youtube.com',                
-            ],
-            [
-                // 26
-                'kurikulum_mata_pelajaran_id' => 20, // merdeka - Informatika
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
-                'hari' => 'Rabu',
-                'guru_id' => 13, // Guru Informatika
-                'rombel_id' => 5, // X-B-1
-                'jam_mulai' => '08:30',
-                'jam_selesai' => '10:00',
-                'ruangan_id' => 2,
-                'link_opsional' => 'www.youtube.com',                
-            ],
-            [
-                // 27
-                'kurikulum_mata_pelajaran_id' => 17, // merdeka - Sejarah
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
-                'hari' => 'Kamis',
+                'semester_id' => 4,
+                'hari' => 'Minggu',
                 'guru_id' => 10, // Guru Sejarah
-                'rombel_id' => 5, // X-B-1
+                'rombel_id' => 2, // X-B-1
                 'jam_mulai' => '07:30',
                 'jam_selesai' => '08:30',
                 'ruangan_id' => 2,
                 'link_opsional' => 'www.youtube.com', 
-            ],    
+            ],                
+            [
+                // 19
+                'kurikulum_mata_pelajaran_id' => 8, // merdeka - PJOK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'hari' => 'Minggu',
+                'guru_id' => 11, // Guru PJOK
+                'rombel_id' => 2, // X-B-1
+                'jam_mulai' => '09:00',
+                'jam_selesai' => '10:30',
+                'ruangan_id' => 2,
+                'link_opsional' => 'www.youtube.com',                
+            ],            
+
+
+            // XI-B-1
+            // Ganjil
+            // [
+            //     // 21
+            //     'kurikulum_mata_pelajaran_id' => 16, // K13 - MTK
+            //     'tahun_akademik_id' => 2, // 2024/2025
+            //     'semester_id' => 3, // Ganjil
+            //     'hari' => 'Senin',
+            //     'guru_id' => 9, // Guru MTK
+            //     'rombel_id' => 5, // XI-B-1
+            //     'jam_mulai' => '07:30',
+            //     'jam_selesai' => '08:30',
+            //     'ruangan_id' => 2,
+            //     'link_opsional' => '',              
+            // ],        
+            // [
+            //     // 22
+            //     'kurikulum_mata_pelajaran_id' => 14, // K13 - Indo
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 3,
+            //     'hari' => 'Senin',
+            //     'guru_id' => 7, // Guru Indo
+            //     'rombel_id' => 5, // XI-B-1
+            //     'jam_mulai' => '08:30',
+            //     'jam_selesai' => '10:00',
+            //     'ruangan_id' => 2,
+            //     'link_opsional' => '',              
+            // ],        
+            // [
+            //     // 23
+            //     'kurikulum_mata_pelajaran_id' => 12, // K13 - PAI
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 3,
+            //     'hari' => 'Selasa',
+            //     'guru_id' => 5, // Guru PAI
+            //     'rombel_id' => 5, // XI-B-1
+            //     'jam_mulai' => '07:00',
+            //     'jam_selesai' => '08:30',
+            //     'ruangan_id' => 2,
+            //     'link_opsional' => '',              
+            // ],        
+            // [
+            //     // 24
+            //     'kurikulum_mata_pelajaran_id' => 13, // K13 - PPKn
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 3,
+            //     'hari' => 'Selasa',
+            //     'guru_id' => 6, // Guru PPKn
+            //     'rombel_id' => 5, // XI-B-1
+            //     'jam_mulai' => '08:30',
+            //     'jam_selesai' => '10:00',
+            //     'ruangan_id' => 2,
+            //     'link_opsional' => '',              
+            // ],                    
+            // [
+            //     // 25
+            //     'kurikulum_mata_pelajaran_id' => 15, // merdeka - Inggris
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 3,
+            //     'hari' => 'Rabu',
+            //     'guru_id' => 8, // Guru Inggris
+            //     'rombel_id' => 5, // XI-B-1
+            //     'jam_mulai' => '07:30',
+            //     'jam_selesai' => '08:30',
+            //     'ruangan_id' => 1,                
+            //     'link_opsional' => 'www.youtube.com',                
+            // ],
+            // [
+            //     // 26
+            //     'kurikulum_mata_pelajaran_id' => 20, // merdeka - Informatika
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 3,
+            //     'hari' => 'Rabu',
+            //     'guru_id' => 13, // Guru Informatika
+            //     'rombel_id' => 5, // XI-B-1
+            //     'jam_mulai' => '08:30',
+            //     'jam_selesai' => '10:00',
+            //     'ruangan_id' => 2,
+            //     'link_opsional' => 'www.youtube.com',                
+            // ],
+            // [
+            //     // 27
+            //     'kurikulum_mata_pelajaran_id' => 17, // merdeka - Sejarah
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 3,
+            //     'hari' => 'Kamis',
+            //     'guru_id' => 10, // Guru Sejarah
+            //     'rombel_id' => 5, // XI-B-1
+            //     'jam_mulai' => '07:30',
+            //     'jam_selesai' => '08:30',
+            //     'ruangan_id' => 2,
+            //     'link_opsional' => 'www.youtube.com', 
+            // ],    
+            [
+                // 18
+                'kurikulum_mata_pelajaran_id' => 9, // merdeka - Seni Budaya
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'hari' => 'Minggu',
+                'guru_id' => 12, // Guru Senbud
+                'rombel_id' => 5, // XI-B-1
+                'jam_mulai' => '01:00',
+                'jam_selesai' => '15:00',
+                'ruangan_id' => 1,                
+                'link_opsional' => 'www.youtube.com',                
+            ],
             [
                 // 28
                 'kurikulum_mata_pelajaran_id' => 32, // Fisika
@@ -3027,7 +3104,9 @@ class DatabaseSeeder extends Seeder
                 'jam_selesai' => '10:00',
                 'ruangan_id' => 2,
                 'link_opsional' => 'www.youtube.com', 
-            ],                                                                                                                 
+            ],                       
+
+            
         ]);              
 
         /**
