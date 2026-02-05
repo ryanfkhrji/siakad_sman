@@ -72,10 +72,11 @@ class SiswaJadwalPelajaranController extends Controller
     public function getAllSiswaAktif()
     {
         $siswa = Siswa::with([
-                'siswaRombels.rombel.kelas.jurusan',
-                'siswaRombels.rombel.tahunAkademik',
+                'siswaRombels.tahunAkademik',
+                'siswaRombels.rombel.kelas',
+                'siswaRombels.rombel.jurusan',
             ])
-            ->whereHas('siswaRombels.rombel.tahunAkademik', function ($q) {
+            ->whereHas('siswaRombels.tahunAkademik', function ($q) {
                 $q->where('status', 'aktif');
             })
             ->get();
@@ -85,64 +86,77 @@ class SiswaJadwalPelajaranController extends Controller
         }
 
         /**
-         * Ambil data siswa + rombel aktif
+         * Mapping siswa + rombel aktif
          */
         $mapped = $siswa->map(function ($item) {
 
-            $rombelAktif = $item->siswaRombels
-                ->filter(fn ($sr) =>
+            $srAktif = $item->siswaRombels->first(function ($sr) {
+                return
                     $sr->rombel !== null &&
-                    $sr->rombel->tahunAkademik !== null &&
-                    $sr->rombel->tahunAkademik->status === 'aktif'
-                )
-                ->first()
-                ?->rombel;
+                    $sr->tahunAkademik !== null &&
+                    $sr->tahunAkademik->status === 'aktif';
+            });
 
-            if (! $rombelAktif) {
+            if (! $srAktif || ! $srAktif->rombel) {
                 return null;
             }
 
-            return [
-                'kelas_id' => $rombelAktif->kelas->id,
-                'nama_kelas' => $rombelAktif->kelas->nama_kelas,
-                'jurusan' => $rombelAktif->kelas->jurusan->nama_jurusan ?? null,
+            $rombel = $srAktif->rombel;
 
-                'rombel_id' => $rombelAktif->id,
-                'nama_rombel' => $rombelAktif->nama_rombel,
+            return [
+                'kelas_id'   => $rombel->kelas->id,
+                'nama_kelas' => $rombel->kelas->nama_kelas,
+
+                'rombel_id'   => $rombel->id,
+                'nama_rombel' => $rombel->nama_rombel,
+                'jurusan_rombel' => $rombel->jurusan->nama_jurusan ?? null,
+
+                // 🔑 tahun akademik dari siswa_rombel
+                // 'tahun_akademik' => [
+                //     'id'     => $srAktif->tahunAkademik->id,
+                //     'nama'   => $srAktif->tahunAkademik->tahun_akademik,
+                //     'status' => $srAktif->tahunAkademik->status,
+                // ],
+                'tahun_akademik' => $srAktif->tahunAkademik->tahun_akademik,
 
                 'siswa' => [
                     'siswa_id' => $item->id,
-                    'nisn' => $item->nisn,
-                    'nama' => $item->nama,
-                    'nis' => $item->nis,
-                    'email' => $item->email,
-                    'role' => $item->role,
+                    'nama'     => $item->nama,
+                    'nisn'     => $item->nisn,
+                    'nis'      => $item->nis,
+                    // 'email'    => $item->email,
+                    // 'role'     => $item->role,
                     'status_siswa' => $item->status,
-                ]
+                ],
             ];
         })->filter();
 
         /**
          * GROUPING:
-         * kelas -> rombel -> siswa
+         * kelas → rombel → siswa
          */
         $grouped = $mapped
             ->groupBy('kelas_id')
+            ->sortKeys()
             ->map(function ($kelasItems) {
 
                 return [
-                    'kelas_id' => $kelasItems->first()['kelas_id'],
+                    'kelas_id'   => $kelasItems->first()['kelas_id'],
                     'nama_kelas' => $kelasItems->first()['nama_kelas'],
-                    'jurusan' => $kelasItems->first()['jurusan'],
 
                     'rombels' => $kelasItems
                         ->groupBy('rombel_id')
                         ->map(function ($rombelItems) {
 
                             return [
-                                'rombel_id' => $rombelItems->first()['rombel_id'],
+                                'rombel_id'   => $rombelItems->first()['rombel_id'],
                                 'nama_rombel' => $rombelItems->first()['nama_rombel'],
-                                'total_siswa' => $rombelItems->count(),
+                                'jurusan'     => $rombelItems->first()['jurusan_rombel'],
+
+                                // ✅ ditaruh sebelum total_siswa
+                                'tahun_akademik' => $rombelItems->first()['tahun_akademik'],
+
+                                // 'total_siswa' => $rombelItems->count(),
 
                                 'siswa' => $rombelItems
                                     ->pluck('siswa')
@@ -154,12 +168,13 @@ class SiswaJadwalPelajaranController extends Controller
             })
             ->values();
 
-        return ApiResponse::success($grouped, 'Daftar siswa aktif berhasil diambil');
+        return ApiResponse::success(
+            $grouped,
+            'Daftar siswa aktif berhasil diambil'
+        );
     }
 
-
-
-
+    
 
     // spa (get siswa->ta->rombel->jadwal)
     public function showSiswaJadwal($id)

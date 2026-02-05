@@ -160,15 +160,23 @@ Perbaikan
     - Frontend:
           - Ikutin insomnia
 --------------------------------------                                            
-22. jadwal_pelajarans:
+22. X jadwal_pelajarans:
     - ☑️ Backend:
         - ✅ Guru: Tampilkan tahun_akademik dan semester aktif saja 
         - ✅ spa: tidak bisa hapus jika sudah digunakan pada siswa_jadwal_pelajaran dan absensi_pelajaran
         - ✅ send data untuk select
-        - ❌ Nambah kolom tahun_akademik_id
+        - ✅ Nambah kolom tahun_akademik_id
     - Frontend:
         - samakan dengan insomnia
-23. alur_tujuan_pembelajaran:
+--------------------------------------                                            
+--------------------------------------                                            
+23. siswa_jadwal_pelajaran:
+    - ☑️ Backend:
+        - ✅ Cuma bisa view aja
+    - Frontend:
+        - samakan dengan insomnia
+--------------------------------------                                            
+24. alur_tujuan_pembelajaran:
     - ☑️ Backend:
         - ✅ samakan semua
         - ✅ route
@@ -180,8 +188,7 @@ Perbaikan
         - referensi tampilan ada di pdf e-raport halaman 143
         - Untuk UI guru silakan minta ke Winton
         - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, dan tambah hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
-24. ❌ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
-25. siswa_jadwal_pelajaran
+25. ❌ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
    - ☑️ Backend:
         - ✅ spa
         - ✅ siswa: tahun dan semester aktif saja

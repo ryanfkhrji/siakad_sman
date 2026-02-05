@@ -152,14 +152,14 @@ class DatabaseSeeder extends Seeder
             'gedung_id' => 2, // GD_02
             'kode_ruangan' => '2.2.2', // gedung, lantai, ruangan
             'nama_ruangan' => 'Lab Komputer',
-            'jenis_ruangan' => 'Kantor',
+            'jenis_ruangan' => 'Lab',
             'lantai' => 2,
             'kapasitas' => 42,
             'luas_ruangan' => 30,
             'kondisi' => 'Baik',
             'fasilitas' => 'Komputer',
             'keterangan' => 'Khusus praktik dan ujian',
-            'status' => 'arsip'
+            'status' => 'aktif'
            ]
         ]);
 
@@ -485,7 +485,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'siswa',
                 'remember_token' => Str::random(10),
-                'status' => 'aktif'
+                'status' => 'tidak aktif'
             ],
             [
                 // 5
@@ -507,7 +507,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'siswa',
                 'remember_token' => Str::random(10),
-                'status' => 'tidak aktif'
+                'status' => 'aktif'
             ],
             [
                 // 7
@@ -850,7 +850,7 @@ class DatabaseSeeder extends Seeder
                 'tingkat' => 10,
                 'nilai_kkm' => 75.55,
                 'status_mata_pelajaran' => 'wajib',
-                'status' => 'arsip'
+                'status' => 'aktif'
             ],
             // ==========================================
             [
@@ -2534,7 +2534,7 @@ class DatabaseSeeder extends Seeder
             // XI (24/25)
             [
                 'siswa_id' => 1, // Bagas
-                'rombel_id' => 5, // XI-A-1
+                'rombel_id' => 5, // XI-B-1
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => 'berhenti',
                 'catatan' => 'Siswa berhenti sekolah pada pertengahan tahun 2024'
