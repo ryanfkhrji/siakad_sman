@@ -147,17 +147,19 @@ Perbaikan
           - wali_rombel = wali_kelas
           - hitung jumlah siswa di rombel
 --------------------------------------                                            
-20. wali_rombel:
+20. X wali_rombel:
     - ☑️ Backend:
           - Samakan semua
     - Frontend:
           - Ikutin insomnia
-21. siswa_rombel:
+--------------------------------------                                            
+21. X siswa_rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya (M, S, C, R)          
           - ✅ data select
     - Frontend:
           - Ikutin insomnia
+--------------------------------------                                            
 22. jadwal_pelajarans:
     - ☑️ Backend:
         - ✅ Guru: Tampilkan tahun_akademik dan semester aktif saja 
