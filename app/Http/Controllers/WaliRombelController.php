@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 class WaliRombelController extends Controller
 {
     /**
-     * ✅ spa/tu (SAMPE SINI)
+     * ✅ spa/tu
      * get guru dan histori menjadi wali
      */
     public function show(string $id)
@@ -22,7 +22,8 @@ class WaliRombelController extends Controller
         // 1. Ambil semua data wali rombel berdasarkan guru
         $waliRombel = WaliRombel::with([
             'wali',
-            'rombel.kelas.jurusan',
+            'rombel.kelas',
+            'rombel.jurusan',
             'tahunAkademik'
         ])
         ->where('wali_rombel_id', $id)
@@ -50,7 +51,7 @@ class WaliRombelController extends Controller
                             'wali_rombel_id' => $item->id,
                             'rombel'         => $item->rombel->nama_rombel,
                             'kelas'          => $item->rombel->kelas->nama_kelas,
-                            'jurusan'        => $item->rombel->kelas->jurusan->nama_jurusan ?? null,
+                            'jurusan'        => $item->rombel->jurusan->nama_jurusan ?? null,
                             'tingkat'        => $item->rombel->kelas->tingkat,
                         ];
                     })->values(),
@@ -303,14 +304,14 @@ class WaliRombelController extends Controller
         });
 
         // semua rombel
-        $data2 = Rombel::with('kelas.jurusan')->where('status', 'aktif')->get();
+        $data2 = Rombel::with('kelas', 'jurusan')->where('status', 'aktif')->get();
 
         $rombel = $data2->map(function ($r) {
             return [
                 'rombel_id' => $r->id,
                 'nama_rombel' => $r->nama_rombel,
                 'kelas' => $r->kelas->nama_kelas,
-                'jurusan' => $r->kelas->jurusan->nama_jurusan ?? null,
+                'jurusan' => $r->jurusan->nama_jurusan ?? null,
                 'tingkat' => $r->kelas->tingkat,
             ];
         })->values();

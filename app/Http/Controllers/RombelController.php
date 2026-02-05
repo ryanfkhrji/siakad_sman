@@ -311,7 +311,7 @@ class RombelController extends Controller
     public function update(Request $request, string $id)
     {
         // 1. Ambil rombel + relasi kelas & jurusan
-        $rombel = Rombel::with('kelas.jurusan')->find($id);
+        $rombel = Rombel::with('kelas', 'jurusan')->find($id);
 
         if (!$rombel) {
             return ApiResponse::error(
@@ -322,23 +322,25 @@ class RombelController extends Controller
         }
 
         // 2. Cek status rombel (BUKAN tahun akademik)
-        if ($rombel->status === 'arsip') {
-            return ApiResponse::error(
-                'Arsip',
-                ['status' => 'Rombel sudah berstatus arsip, tidak bisa diubah'],
-                422
-            );
-        }
+        // if ($rombel->status === 'arsip') {
+        //     return ApiResponse::error(
+        //         'Arsip',
+        //         ['status' => 'Rombel sudah berstatus arsip, tidak bisa diubah'],
+        //         422
+        //     );
+        // }
 
         // 3. Validasi input (update parsial)
         $validated = $request->validate([
             'kelas_id'    => 'sometimes|required|exists:kelas,id',
             'nama_rombel' => 'sometimes|required|string|max:50',
+            'jurusan_id'  => 'sometimes|nullable|exists:jurusans,id',
             'status'      => 'sometimes|required|in:aktif,arsip',
         ], [
             'kelas_id.required'    => 'Kelas wajib diisi',
             'kelas_id.exists'      => 'Kelas tidak ditemukan',
             'nama_rombel.required' => 'Nama rombel wajib diisi',
+            'jurusan_id.exists'    => 'Jurusan tidak ditemukan',
             'status.required'      => 'Status wajib diisi',
             'status.in'            => 'Status hanya boleh aktif atau arsip',
         ]);
@@ -346,17 +348,19 @@ class RombelController extends Controller
         // 4. Tentukan nilai final (lama / baru)
         $kelasIdFinal  = $validated['kelas_id']    ?? $rombel->kelas_id;
         $namaRombelFinal = $validated['nama_rombel'] ?? $rombel->nama_rombel;
+        $jurusan = $validated['jurusan_id'] ?? $rombel->jurusan_id;
 
         // 5. Cek unik nama rombel per kelas
         $existsNama = Rombel::where('kelas_id', $kelasIdFinal)
             ->where('nama_rombel', $namaRombelFinal)
+            ->where('jurusan_id', $jurusan)
             ->where('id', '!=', $rombel->id)
             ->exists();
 
         if ($existsNama) {
             return ApiResponse::error(
                 'Duplicated',
-                ['nama_rombel' => 'Rombel dengan nama tersebut sudah ada di kelas ini'],
+                ['nama_rombel' => 'Rombel dengan nama dan jurusan tersebut sudah ada di kelas ini'],
                 422
             );
         }
@@ -365,22 +369,23 @@ class RombelController extends Controller
         $rombel->update([
             'kelas_id'    => $kelasIdFinal,
             'nama_rombel' => $namaRombelFinal,
+            'jurusan_id'  => $jurusan,
             'status'      => $validated['status'] ?? $rombel->status,
         ]);
 
         // 7. Reload relasi terbaru
-        $rombel->load('kelas.jurusan');
+        $rombel->load('kelas', 'jurusan');
 
         // 8. Response
         return ApiResponse::success([
             'rombel_id'   => $rombel->id,
             'nama_rombel' => $rombel->nama_rombel,
+            'jurusan'     => $rombel->jurusan->nama_jurusan,
             'status'      => $rombel->status,
             'kelas' => [
                 'kelas_id'   => $rombel->kelas?->id,
                 'nama_kelas' => $rombel->kelas?->nama_kelas,
                 'tingkat'    => $rombel->kelas?->tingkat,
-                'jurusan'    => $rombel->kelas?->jurusan?->nama_jurusan,
             ],
         ], 'Berhasil mengubah data rombel');
     }
@@ -422,7 +427,7 @@ class RombelController extends Controller
 
         $rombel->delete();
 
-        return ApiResponse::success('null', 'Data rombel berhasil dihapus');
+        return ApiResponse::success(null, 'Data rombel berhasil dihapus');
     }
 
 

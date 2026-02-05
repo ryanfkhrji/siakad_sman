@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->foreignId('jurusan_id')->nullable()->constrained('jurusans');            
 
-            $table->enum('status', ['aktif', 'tidak_aktif', 'arsip'])->default('aktif');
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
 
             $table->unique(['kelas_id', 'nama_rombel', 'jurusan_id']);
 
