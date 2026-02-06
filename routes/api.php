@@ -90,12 +90,12 @@ Route::middleware('auth:kepegawaian')->group(function () {
     // ✅☑️ CRUD Penerimaan Siswa Baru Oleh  Super Admin
     Route::delete('/psb/destroy-multiple/{id?}', [PsbController::class, 'destroyMultiple']);
     Route::apiResource('psb', PsbController::class)->except('destroy');
-
+    
     // ✅☑️ Ubah password siswa oleh super admin
     Route::post('/spa/ubah-password/siswa', [SiswaController::class, 'ubahPassword']);
     
     // ✅☑️ CRUD Siswa
-    Route::apiResource('/spa/siswa', SiswaController::class);
+    Route::apiResource('/spa/siswa', SiswaController::class);    
 
     // ✅☑️ CRUD Jurusan
     Route::apiResource('/spa/jurusan', JurusanController::class);
@@ -130,7 +130,8 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ✅☑️ CRUD ATP
     Route::apiResource('/spa/atp', AlurTujuanPembelajaranController::class)->only(['index', 'show']);  
-    Route::put('/spa/atp-diterima/{id}', [AlurTujuanPembelajaranController::class, 'diterima']);   
+    Route::get('/spa/atp-disetujui', [AlurTujuanPembelajaranController::class, 'disetujui']);   
+    Route::put('/spa/atp-disetujui/{id}', [AlurTujuanPembelajaranController::class, 'diterima']);   
     Route::put('/spa/atp-ditolak/{id}', [AlurTujuanPembelajaranController::class, 'ditolak']);   
     
     // ✅☑️ CRUD rombel

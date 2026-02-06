@@ -48,11 +48,12 @@ class JurusanController extends Controller
                     'kelas_id'  => $kelas->id ?? null,
                     'nama_kelas'=> $kelas->nama_kelas ?? null,
                     'tingkat'   => $kelas->tingkat ?? null,      
+                    'status'    => $kelas->status ?? null,      
                     'rombel'    => $k->map(function ($r) {
                         return [
-                            'rombel_id' => $r->id,
-                            'nama_rombel' => $r->nama_rombel,
-                            'jurusan_rombel' => $r->jurusan->nama_jurusan,
+                            'rombel_id'     => $r->id,
+                            'nama_rombel'   => $r->nama_rombel,                            
+                            'status'        => $r->status,                            
                         ];
                     })->values(),
                 ];

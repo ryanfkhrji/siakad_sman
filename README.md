@@ -135,7 +135,7 @@ Perbaikan
 17. ❌⚠️ modul_ajar
 18. ❌⚠️ asesmen
 --------------------------------------                                  
-19. ♻️ rombel:
+19. ♻️X rombel:
     - ☑️ Backend:
           - ✅ samakan semuanya
           - ✅ API dan insomnia
@@ -160,7 +160,7 @@ Perbaikan
     - Frontend:
           - Ikutin insomnia
 --------------------------------------                                            
-22. X jadwal_pelajarans:
+22. X guru_jadwal_pelajarans:
     - ☑️ Backend:
         - ✅ Guru: Tampilkan tahun_akademik dan semester aktif saja 
         - ✅ spa: tidak bisa hapus jika sudah digunakan pada siswa_jadwal_pelajaran dan absensi_pelajaran
@@ -169,14 +169,13 @@ Perbaikan
     - Frontend:
         - samakan dengan insomnia
 --------------------------------------                                            
---------------------------------------                                            
-23. siswa_jadwal_pelajaran:
+23. X siswa_jadwal_pelajaran:
     - ☑️ Backend:
         - ✅ Cuma bisa view aja
     - Frontend:
         - samakan dengan insomnia
 --------------------------------------                                            
-24. alur_tujuan_pembelajaran:
+24. X alur_tujuan_pembelajaran:
     - ☑️ Backend:
         - ✅ samakan semua
         - ✅ route
@@ -188,13 +187,14 @@ Perbaikan
         - referensi tampilan ada di pdf e-raport halaman 143
         - Untuk UI guru silakan minta ke Winton
         - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, dan tambah hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
+--------------------------------------                                            
 25. ❌ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
    - ☑️ Backend:
         - ✅ spa
         - ✅ siswa: tahun dan semester aktif saja
    - Frontend:
         - samakan dengan insomnia
-26. absensi_pegawai:
+26. absensi_pegawai: (MASUK SINI)
     - ☑️ Backend:
         - ✅ samakan dengan migrasi
     - Frontend:

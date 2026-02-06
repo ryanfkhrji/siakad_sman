@@ -24,40 +24,60 @@ class RombelController extends Controller
             'kelas',
             'jurusan'
         ])->get();
-
+    
         if ($rombels->isEmpty()) {
             return ApiResponse::error(
                 'No data',
                 ['data' => 'Belum ada data rombel']
             );
         }
-
-        $formatted = $rombels->map(function ($r) {
-            return [
-                'rombel_id'     => $r->id,
-                'nama_rombel'   => $r->nama_rombel,
-                'status_rombel' => $r->status,
-
-                'kelas' => [
-                    'kelas_id'     => $r->kelas?->id,
-                    'nama_kelas'   => $r->kelas?->nama_kelas,
-                    'tingkat'      => $r->kelas?->tingkat,
-                    'status_kelas' => $r->kelas?->status,
-                ],
-
-                'jurusan' => [
-                    'jurusan_id'     => $r->jurusan?->id,
-                    'nama_jurusan'   => $r->jurusan?->nama_jurusan,
-                    'status_jurusan' => $r->jurusan?->status,
-                ],
-            ];
-        })->values();
-
+    
+        $formatted = $rombels
+            ->filter(fn ($rombel) => $rombel->kelas)
+            ->groupBy('kelas_id')
+            ->map(function ($groupByKelas) {
+    
+                $kelas = $groupByKelas->first()->kelas;
+    
+                return [
+                    'kelas_id'     => $kelas->id,
+                    'nama_kelas'   => $kelas->nama_kelas,
+                    'tingkat'      => $kelas->tingkat,
+                    'status_kelas' => $kelas->status,
+    
+                    'jurusans' => $groupByKelas
+                        ->groupBy('jurusan_id')
+                        ->map(function ($groupByJurusan) {
+    
+                            $jurusan = $groupByJurusan->first()->jurusan;
+    
+                            return [
+                                'jurusan_id'     => $jurusan?->id,
+                                'nama_jurusan'   => $jurusan?->nama_jurusan,
+                                'status_jurusan' => $jurusan?->status,
+    
+                                'rombels' => $groupByJurusan
+                                    ->map(function ($r) {
+                                        return [
+                                            'rombel_id'     => $r->id,
+                                            'nama_rombel'   => $r->nama_rombel,
+                                            'status_rombel' => $r->status,
+                                        ];
+                                    })
+                                    ->values(),
+                            ];
+                        })
+                        ->values(),
+                ];
+            })
+            ->values();
+    
         return ApiResponse::success(
             $formatted,
             'Data rombel berhasil diambil'
         );
     }
+    
 
 
 
@@ -164,6 +184,8 @@ class RombelController extends Controller
                         'nama_siswa' => $sr->siswa?->nama,
                         'nisn'       => $sr->siswa?->nisn,
                         'nis'        => $sr->siswa?->nis,
+                        'status_akhir'  => $sr->status_akhir ?? null,
+                        'catatan'       => $sr->catatan ?? null,
                     ];
                 })
                 ->values();
@@ -306,7 +328,7 @@ class RombelController extends Controller
     
 
     /**
-     * ! ✅ untuk spa (masuk sini)
+     * ✅ untuk spa
      */
     public function update(Request $request, string $id)
     {

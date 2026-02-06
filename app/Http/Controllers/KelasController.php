@@ -34,8 +34,8 @@ class KelasController extends Controller
     {
         $kelas = Kelas::with([
             'rombels.jurusan',
-            'rombels.waliRombels.tahunAkademik',
-            'rombels.waliRombels.wali'
+            // 'rombels.waliRombels.tahunAkademik',
+            // 'rombels.waliRombels.wali'
         ])->find($id);
 
         if (!$kelas) {
@@ -50,19 +50,25 @@ class KelasController extends Controller
             'kode_kelas'     => $kelas->kode_kelas,
             'tingkat'        => $kelas->tingkat,            
             'status'        => $kelas->status,            
-            'daftar_rombel' => $kelas->rombels->map(function ($rombel) {
+            'daftar_rombel' => $kelas->rombels->groupBy('jurusan_id')
+            ->map(function ($rombel) {
                 return [
-                    'rombel_id'   => $rombel->id,
-                    'nama_rombel' => $rombel->nama_rombel,
-                    'jurusan_rombel' => $rombel->jurusan->nama_jurusan ?? null,
-
-                    'histori_wali_rombel' => $rombel->waliRombels->map(function ($wali) {
+                    'jurusan_id'    => $rombel->first()->jurusan->id ?? null,
+                    'jurusan'       => $rombel->first()->jurusan->nama_jurusan ?? null,
+                    'rombel'        => $rombel->map(function ($rm) {
                         return [
-                            'wali_rombel_id' => $wali->id,
-                            'wali_rombel'    => $wali->wali?->nama,
-                            'tahun_akademik' => $wali->tahunAkademik?->tahun_akademik,
+                            'rombel_id'   => $rm->id,
+                            'nama_rombel' => $rm->nama_rombel,                            
                         ];
                     })->values(),
+
+                    // 'histori_wali_rombel' => $rombel->waliRombels->map(function ($wali) {
+                    //     return [
+                    //         'wali_rombel_id' => $wali->id,
+                    //         'wali_rombel'    => $wali->wali?->nama,
+                    //         'tahun_akademik' => $wali->tahunAkademik?->tahun_akademik,
+                    //     ];
+                    // })->values(),
                 ];
             })->values(),
         ];

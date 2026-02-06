@@ -136,12 +136,89 @@ class SiswaRombelController extends Controller
 
 
      /**
-     * ✅ tidak ada show
+     * ✅ histori rombel (siswa/spa/tu)
      */
-    public function show()
+    public function show($id)
     {
-        
+        $siswaRombel = SiswaRombel::with([
+            'siswa',
+            'tahunAkademik',
+            'rombel.jurusan',
+            'rombel.waliRombels.wali',
+            'rombel.kelas',
+        ])
+        ->where('siswa_id', $id)
+        ->get();
+
+        if ($siswaRombel->isEmpty()) {
+            return ApiResponse::error('Not found', ['data' => 'Belum ada data histori rombel']);
+        }
+
+        $siswa = $siswaRombel->first()->siswa;
+
+        $formatted = [[
+            'siswa_id'     => $siswa->id,
+            'nama_siswa'   => $siswa->nama,
+            'nisn'         => $siswa->nisn,
+            'nis'          => $siswa->nis,
+            'status_siswa' => $siswa->status,
+
+            'periode' => $siswaRombel
+                ->groupBy('tahun_akademik_id')
+                ->map(function ($ta) {
+
+                    $tahunAkademik = $ta->first()->tahunAkademik;
+                    $tahunId = $tahunAkademik->id;
+
+                    return [
+                        'tahun_akademik_id'     => $tahunAkademik->id ?? null,
+                        'tahun_akademik'        => $tahunAkademik->tahun_akademik ?? null,
+                        'status_tahun_akademik' => $tahunAkademik->status ?? null,
+
+                        'histori_rombel' => $ta->map(function ($hr) use ($tahunId) {
+
+                            $waliRombel = $hr->rombel
+                                ->waliRombels
+                                ->where('tahun_akademik_id', $tahunId)
+                                ->first();
+
+                            $wali = $waliRombel?->wali;
+
+                            return [
+                                'siswa_rombel_id' => $hr->id,
+                                'status_akhir'    => $hr->status_akhir ?? null,
+                                'catatan'         => $hr->catatan ?? null,
+
+                                'rombel' => [
+                                    'id'          => $hr->rombel->id,
+                                    'nama_rombel' => $hr->rombel->nama_rombel,
+                                    'jurusan'     => $hr->rombel->jurusan->nama_jurusan ?? null,
+                                    'status'      => $hr->rombel->status,
+
+                                    'kelas' => [
+                                        'id'         => $hr->rombel->kelas->id,
+                                        'nama_kelas' => $hr->rombel->kelas->nama_kelas,
+                                        'tingkat'    => $hr->rombel->kelas->tingkat,
+                                        'status'     => $hr->rombel->kelas->status,
+                                    ],
+
+                                    'wali_rombel' => [
+                                        'id'     => $wali?->id,
+                                        'nama'   => $wali?->nama,
+                                        'nip'    => $wali?->nip ?? null,
+                                        'nuptk'  => $wali?->nuptk ?? null,
+                                        'status' => $wali?->status,
+                                    ],
+                                ],                                
+                            ];
+                        })->values(),
+                    ];
+                })->values(),
+        ]];
+
+        return ApiResponse::success($formatted, 'Histori rombel siswa berhasil diambil');
     }
+
 
     /**
      * ✅ tidak ada update, jika salah, hapus saja

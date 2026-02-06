@@ -250,42 +250,98 @@ class JadwalPelajaranController extends Controller
     public function show(string $id)
     {
         $jadwal = JadwalPelajaran::with([
-            'kurikulumMataPelajaran.mataPelajaran',
+            'guru',
             'tahunAkademik',
             'semester',
-            'guru',
+            'kurikulumMataPelajaran.mataPelajaran',
             'rombel.jurusan',
+            'rombel.kelas',
             'ruangan'
-        ])->find($id);
-
-        if (!$jadwal) {
+        ])
+        ->where('guru_id', $id)
+        ->get();
+    
+        if ($jadwal->isEmpty()) {
             return ApiResponse::error(
                 'Jadwal pelajaran tidak ditemukan',
                 ['id' => ['Data tidak ditemukan']],
                 404
             );
         }
-
-        $formatted = [
-            'mata_pelajaran' => $jadwal->kurikulumMataPelajaran->mataPelajaran->nama_pelajaran,
-            'tahun_akademik' => $jadwal->tahunAkademik->tahun_akademik,            
-            'semester' => $jadwal->semester->semester,
-            'guru' => $jadwal->guru->nama,
-            'hari' => $jadwal->hari,
-            'rombel' => $jadwal->rombel->nama_rombel,
-            'jurusan_rombel' => $jadwal->rombel->jurusan->nama_jurusan,
-            'jam_mulai' => $jadwal->jam_mulai,
-            'jam_selesai' => $jadwal->jam_selesai,
-            'ruangan' => $jadwal->ruangan->nama_ruangan,
-            'link_opsional' => $jadwal->link_opsional,            
-        ];
-
+    
+        $formatted = $jadwal
+            ->filter(fn ($j) => $j->guru)
+            ->groupBy('guru_id')
+            ->map(function ($groupByGuru) {
+    
+                $guru = $groupByGuru->first()->guru;
+    
+                return [
+                    'guru_id' => $guru->id,
+                    'nama'    => $guru->nama,
+                    'nip'     => $guru->nip ?? null,
+                    'nuptk'   => $guru->nuptk ?? null,
+    
+                    'periode' => $groupByGuru
+                        ->groupBy('tahun_akademik_id')
+                        ->map(function ($groupByTA) {
+    
+                            $tahun = $groupByTA->first()->tahunAkademik;
+    
+                            return [
+                                'tahun_akademik_id' => $tahun?->id,
+                                'tahun_akademik'    => $tahun?->tahun_akademik,
+                                'status_tahun'      => $tahun?->status,
+    
+                                'semesters' => $groupByTA
+                                    ->groupBy('semester_id')
+                                    ->map(function ($groupBySemester) {
+    
+                                        $semester = $groupBySemester->first()->semester;
+    
+                                        return [
+                                            'semester_id'     => $semester?->id,
+                                            'semester'        => $semester?->semester,
+                                            'status_semester' => $semester?->status,
+    
+                                            'jadwal_pelajarans' => $groupBySemester
+                                                ->map(function ($jadwal) {
+    
+                                                    return [
+                                                        'jadwal_pelajaran_id' => $jadwal->id,
+                                                        'mata_pelajaran'      => $jadwal->kurikulumMataPelajaran
+                                                                                    ?->mataPelajaran
+                                                                                    ?->nama_pelajaran,
+    
+                                                        'hari'        => $jadwal->hari,
+                                                        'rombel'      => $jadwal->rombel?->nama_rombel,
+                                                        'jurusan'     => $jadwal->rombel?->jurusan?->nama_jurusan,
+                                                        'tingkat'     => $jadwal->rombel?->kelas?->tingkat,
+    
+                                                        'jam_mulai'   => $jadwal->jam_mulai,
+                                                        'jam_selesai' => $jadwal->jam_selesai,
+    
+                                                        'ruangan'     => $jadwal->ruangan?->nama_ruangan,
+                                                        'link_opsional' => $jadwal->link_opsional,
+                                                    ];
+                                                })
+                                                ->values(),
+                                        ];
+                                    })
+                                    ->values(),
+                            ];
+                        })
+                        ->values(),
+                ];
+            })
+            ->values();
+    
         return ApiResponse::success(
             $formatted,
             'Detail jadwal pelajaran berhasil diambil'
         );
     }
-
+    
 
     // ✅ guru (hanya tahun dan semester aktif saja)
     public function getAllJadwalSendiri()

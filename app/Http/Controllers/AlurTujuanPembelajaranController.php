@@ -18,16 +18,15 @@ class AlurTujuanPembelajaranController extends Controller
 {
     /**    
         * ✅ index (spa), hanya bisa melihat yang status = diajukan
-        * yang sudah disetujui masuk ke show kompetensi        
     */
     public function index()
     {
         $atps = AlurTujuanPembelajaran::with([
-            'kompetensi.mataPelajaran',
+            'atpMaster.kompetensi.mataPelajaran',
             'tahunAkademik',
             'semesterRelasi',
             'approved',
-            'guru'
+            'guru',
         ])
         ->where('approval_status', 'diajukan')
         ->get();
@@ -37,67 +36,69 @@ class AlurTujuanPembelajaranController extends Controller
         }
 
         $formatted = $atps
-            ->groupBy('kompetensi_id')
+            ->filter(fn ($atp) => $atp->atpMaster && $atp->atpMaster->kompetensi)
+            ->groupBy(fn ($atp) => $atp->atpMaster->kompetensi->id)
             ->map(function ($groupByKompetensi) {
 
-                $kompetensi = $groupByKompetensi->first()->kompetensi;
+                $kompetensi = $groupByKompetensi->first()->atpMaster->kompetensi;
 
                 return [
-                    'kompetensi_id' => $kompetensi->id,
-                    'mata_pelajaran' => $kompetensi->mataPelajaran->nama_pelajaran,
-                    'judul_kompetensi' => $kompetensi->judul_kompetensi,
-                    'jenis_kompetensi' => $kompetensi->jenis,
-                    'fase' => $kompetensi->fase,
+                    'kompetensi_id'     => $kompetensi->id,
+                    'mata_pelajaran'    => $kompetensi->mataPelajaran->nama_pelajaran ?? null,
+                    'judul_kompetensi'  => $kompetensi->judul_kompetensi,
+                    'jenis_kompetensi'  => $kompetensi->jenis,
+                    'fase'              => $kompetensi->fase,
                     'status_kompetensi' => $kompetensi->status,
 
                     'periode' => $groupByKompetensi
+                        ->filter(fn ($atp) => $atp->tahunAkademik)
                         ->groupBy('tahun_akademik_id')
                         ->map(function ($groupByTahun) {
 
                             $tahun = $groupByTahun->first()->tahunAkademik;
 
                             return [
-                                'tahun_akademik_id' => $tahun->id,
-                                'tahun_akademik' => $tahun->tahun_akademik,
+                                'tahun_akademik_id'     => $tahun->id,
+                                'tahun_akademik'        => $tahun->tahun_akademik,
                                 'status_tahun_akademik' => $tahun->status,
 
                                 'semesters' => $groupByTahun
+                                    ->filter(fn ($atp) => $atp->semesterRelasi)
                                     ->groupBy('semester_id')
                                     ->map(function ($groupBySemester) {
 
                                         $semester = $groupBySemester->first()->semesterRelasi;
 
-                                        if (!$semester) {
-                                            return null;
-                                        }
-
                                         return [
-                                            'semester_id' => $semester->id,
-                                            'semester' => $semester->semester,
+                                            'semester_id'       => $semester->id,
+                                            'semester'          => $semester->semester,
+                                            'status_semester'   => $semester->status,
 
                                             'guru' => $groupBySemester
+                                                ->filter(fn ($atp) => $atp->guru)
                                                 ->groupBy('guru_id')
                                                 ->map(function ($groupByGuru) {
 
                                                     $guru = $groupByGuru->first()->guru;
 
                                                     return [
-                                                        'guru_id' => $guru->id,
+                                                        'guru_id'   => $guru->id,
                                                         'nama_guru' => $guru->nama,
 
                                                         'histori_atp' => $groupByGuru
-                                                            ->sortBy('urutan')
+                                                            ->sortBy(fn ($atp) => $atp->atpMaster->urutan)
                                                             ->values()
                                                             ->map(function ($atp) {
                                                                 return [
-                                                                    'atp_id' => $atp->id,
-                                                                    'tujuan_pembelajaran' => $atp->tujuan_pembelajaran,
-                                                                    'urutan' => $atp->urutan,
-                                                                    'approval_status' => $atp->approval_status,
-                                                                    'approved_by' => $atp->approved_by,
-                                                                    'approved_at' => $atp->approved_at,
-                                                                    'catatan_penolakan' => $atp->catatan_penolakan,
-                                                                    'is_locked' => $atp->is_locked,
+                                                                    'atp_id'              => $atp->id,
+                                                                    'atp_master_id'       => $atp->atpMaster->id,
+                                                                    'tujuan_pembelajaran' => $atp->atpMaster->tujuan_pembelajaran,
+                                                                    'urutan'              => $atp->atpMaster->urutan,
+                                                                    'approval_status'     => $atp->approval_status,
+                                                                    'approved_by'         => $atp->approved_by,
+                                                                    'approved_at'         => $atp->approved_at,
+                                                                    'catatan_penolakan'   => $atp->catatan_penolakan,
+                                                                    'is_locked'           => $atp->is_locked,
                                                                 ];
                                                             }),
                                                     ];
@@ -105,7 +106,6 @@ class AlurTujuanPembelajaranController extends Controller
                                                 ->values(),
                                         ];
                                     })
-                                    ->filter()
                                     ->values(),
                             ];
                         })
@@ -115,6 +115,108 @@ class AlurTujuanPembelajaranController extends Controller
             ->values();
 
         return ApiResponse::success($formatted, 'Data ATP (diajukan) berhasil diambil');
+    }
+
+
+    /**    
+        * ✅ index (spa), hanya bisa melihat yang status = disetujui
+    */
+    public function disetujui()
+    {
+        $atps = AlurTujuanPembelajaran::with([
+            'atpMaster.kompetensi.mataPelajaran',
+            'tahunAkademik',
+            'semesterRelasi',
+            'approved',
+            'guru',
+        ])
+        ->where('approval_status', 'disetujui')
+        ->get();
+
+        if ($atps->isEmpty()) {
+            return ApiResponse::error('No data', ['data' => null]);
+        }
+
+        $formatted = $atps
+            ->filter(fn ($atp) => $atp->atpMaster && $atp->atpMaster->kompetensi)
+            ->groupBy(fn ($atp) => $atp->atpMaster->kompetensi->id)
+            ->map(function ($groupByKompetensi) {
+
+                $kompetensi = $groupByKompetensi->first()->atpMaster->kompetensi;
+
+                return [
+                    'kompetensi_id'     => $kompetensi->id,
+                    'mata_pelajaran'    => $kompetensi->mataPelajaran->nama_pelajaran ?? null,
+                    'judul_kompetensi'  => $kompetensi->judul_kompetensi,
+                    'jenis_kompetensi'  => $kompetensi->jenis,
+                    'fase'              => $kompetensi->fase,
+                    'status_kompetensi' => $kompetensi->status,
+
+                    'periode' => $groupByKompetensi
+                        ->filter(fn ($atp) => $atp->tahunAkademik)
+                        ->groupBy('tahun_akademik_id')
+                        ->map(function ($groupByTahun) {
+
+                            $tahun = $groupByTahun->first()->tahunAkademik;
+
+                            return [
+                                'tahun_akademik_id'     => $tahun->id,
+                                'tahun_akademik'        => $tahun->tahun_akademik,
+                                'status_tahun_akademik' => $tahun->status,
+
+                                'semesters' => $groupByTahun
+                                    ->filter(fn ($atp) => $atp->semesterRelasi)
+                                    ->groupBy('semester_id')
+                                    ->map(function ($groupBySemester) {
+
+                                        $semester = $groupBySemester->first()->semesterRelasi;
+
+                                        return [
+                                            'semester_id'       => $semester->id,
+                                            'semester'          => $semester->semester,
+                                            'status_semester'   => $semester->status,
+
+                                            'guru' => $groupBySemester
+                                                ->filter(fn ($atp) => $atp->guru)
+                                                ->groupBy('guru_id')
+                                                ->map(function ($groupByGuru) {
+
+                                                    $guru = $groupByGuru->first()->guru;
+
+                                                    return [
+                                                        'guru_id'   => $guru->id,
+                                                        'nama_guru' => $guru->nama,
+
+                                                        'histori_atp' => $groupByGuru
+                                                            ->sortBy(fn ($atp) => $atp->atpMaster->urutan)
+                                                            ->values()
+                                                            ->map(function ($atp) {
+                                                                return [
+                                                                    'atp_id'              => $atp->id,
+                                                                    'atp_master_id'       => $atp->atpMaster->id,
+                                                                    'tujuan_pembelajaran' => $atp->atpMaster->tujuan_pembelajaran,
+                                                                    'urutan'              => $atp->atpMaster->urutan,
+                                                                    'approval_status'     => $atp->approval_status,
+                                                                    'approved_by'         => $atp->approved_by,
+                                                                    'approved_at'         => $atp->approved_at,
+                                                                    'catatan_penolakan'   => $atp->catatan_penolakan,
+                                                                    'is_locked'           => $atp->is_locked,
+                                                                ];
+                                                            }),
+                                                    ];
+                                                })
+                                                ->values(),
+                                        ];
+                                    })
+                                    ->values(),
+                            ];
+                        })
+                        ->values(),
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success($formatted, 'Data ATP (disetujui) berhasil diambil');
     }
 
 

@@ -452,7 +452,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'siswa',
                 'remember_token' => Str::random(10),
-                'status' => 'aktif'
+                'status' => 'tidak aktif'
             ],
             [
                 // 2
@@ -496,7 +496,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'siswa',
                 'remember_token' => Str::random(10),
-                'status' => 'aktif'
+                'status' => 'tidak aktif'
             ],
             [
                 // 6
@@ -518,7 +518,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('K3ps3k.'),
                 'role' => 'siswa',
                 'remember_token' => Str::random(10),
-                'status' => 'tidak aktif'
+                'status' => 'aktif'
             ],
             [
                 // 8
@@ -2267,7 +2267,7 @@ class DatabaseSeeder extends Seeder
                 'atp_master_id' => 1,
                 'guru_id' => 9, // Guru MTK
                 'tahun_akademik_id' => 1, // 2013/2024
-                'semester_id' => 1, // Ganjil                
+                'semester_id' => 2, // Ganjil                
                 'approval_status' => 'disetujui',
                 'approved_by' => 1,
                 'approved_at' => '2026-01-14 21:35:51',
@@ -2279,7 +2279,7 @@ class DatabaseSeeder extends Seeder
                 'atp_master_id' => 2,
                 'guru_id' => 9, // Guru MTK
                 'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil                
+                'semester_id' => 2, // Ganjil                
                 'approval_status' => 'disetujui',
                 'approved_by' => 1,
                 'approved_at' => '2026-01-14 21:35:51',
@@ -2291,49 +2291,100 @@ class DatabaseSeeder extends Seeder
                 'atp_master_id' => 3,
                 'guru_id' => 9, // Guru MTK
                 'tahun_akademik_id' => 1,
-                'semester_id' => 1,   
-                'approval_status' => 'disetujui',
-                'approved_by' => null,
-                'approved_at' => null,
-                'catatan_penolakan' => null,
-                'is_locked' => false,                
-            ],
-            [
-                // 4
-                'atp_master_id' => 4,
-                'guru_id' => 9,
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap  
-                'approval_status' => 'diajukan',
-                'approved_by' => null,
-                'approved_at' => null,
-                'catatan_penolakan' => null,
-                'is_locked' => false,                
-            ],
-            [
-                // 5
-                'atp_master_id' => 5,
-                'guru_id' => 9,
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2,   
-                'approval_status' => 'ditolak',
-                'approved_by' => 1,
-                'approved_at' => '2026-01-14 21:35:51',
-                'catatan_penolakan' => 'Semester genap belum dimulai',
-                'is_locked' => false,                
-            ],
-            [
-                // 6
-                'atp_master_id' => 6,
-                'guru_id' => 9,
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2,   
+                'semester_id' => 2, // Genap
                 'approval_status' => 'disetujui',
                 'approved_by' => 1,
                 'approved_at' => '2026-01-14 21:35:51',
                 'catatan_penolakan' => null,
                 'is_locked' => true,                
-            ],                        
+            ],
+            [
+                // 4
+                'atp_master_id' => 4,
+                'guru_id' => 9,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,  
+                'approval_status' => 'diajukan',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],    
+            [
+                // 6
+                'atp_master_id' => 5,
+                'guru_id' => 9,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,   
+                'approval_status' => 'ditolak',
+                'approved_by' => 1,
+                'approved_at' => '2026-01-14 21:35:51',
+                'catatan_penolakan' => 'ATP master terlalu banyak',
+                'is_locked' => false,                
+            ],
+            [
+                // 7
+                'atp_master_id' => 6,
+                'guru_id' => 9,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,   
+                'approval_status' => 'diajukan',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],         
+            
+            // --------------------
+
+            [
+                // 2
+                'atp_master_id' => 23,
+                'guru_id' => 7, // Guru Indon
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+                'approval_status' => 'disetujui',
+                'approved_by' => 1,
+                'approved_at' => '2026-01-14 21:35:51',
+                'catatan_penolakan' => null,
+                'is_locked' => true,                
+            ],
+            [
+                // 3
+                'atp_master_id' => 24,
+                'guru_id' => 7, // Guru Indon
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,   
+                'approval_status' => 'disetujui',
+                'approved_by' => 1,
+                'approved_at' => '2026-01-14 21:35:51',
+                'catatan_penolakan' => null,
+                'is_locked' => true,                
+            ],
+            [
+                // 4
+                'atp_master_id' => 25,
+                'guru_id' => 7,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+                'approval_status' => 'diajukan',
+                'approved_by' => null,
+                'approved_at' => null,
+                'catatan_penolakan' => null,
+                'is_locked' => false,                
+            ],    
+            [
+                // 6
+                'atp_master_id' => 26,
+                'guru_id' => 7,
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,   
+                'approval_status' => 'ditolak',
+                'approved_by' => 1,
+                'approved_at' => '2026-01-14 21:35:51',
+                'catatan_penolakan' => 'ATP master terlalu banyak',
+                'is_locked' => false,                
+            ],
         ]);        
 
         // modul_ajar
@@ -2487,8 +2538,15 @@ class DatabaseSeeder extends Seeder
             [
                 // 19
                 'kelas_id' => 1, // X
-                'nama_rombel' => 'X-A-IPS-ARSIP',
-                'jurusan_id' => 2,
+                'nama_rombel' => 'X-A-IPA-ARSIP',
+                'jurusan_id' => 1,
+                'status' => 'arsip',
+            ],                        
+            [
+                // 21
+                'kelas_id' => 4,
+                'nama_rombel' => 'XII-A-IPA-ARSIP',
+                'jurusan_id' => 1,
                 'status' => 'arsip',
             ],                        
         ]);
@@ -2544,7 +2602,7 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 5, // XI-B-1
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => 'pindah',
-                'catatan' => 'Pindah ke jurusan IPS',
+                'catatan' => 'Pindah ke jurusan IPA',
             ],   
             [
                 'siswa_id' => 4, // Rehan
@@ -2558,14 +2616,14 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 14, // XI-B-2
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => 'pindah',
-                'catatan' => 'Siswa pindah sekolah pada tahun 2024'
+                'catatan' => 'Siswa pindah sekolah pada semester genap tahun 2025'
             ],          
             [
                 'siswa_id' => 7, // Selma
                 'rombel_id' => 14, // XI-B-2
                 'tahun_akademik_id' => 2, // 2024/2025
                 'status_akhir' => 'pindahan',
-                'catatan' => 'Siswa bergabung pada pertengahan tahun 2024'
+                'catatan' => 'Siswa bergabung pada semester genap tahun 2025'
             ],          
             
             // X (24/25)
@@ -2584,7 +2642,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => null
             ],                       
             
-            // X (13/24)
+            // X 23/24
             [
                 'siswa_id' => 1, // Bagas
                 'rombel_id' => 1, // X-A-1
@@ -2905,7 +2963,7 @@ class DatabaseSeeder extends Seeder
             // X-B-1 (2024/2025)
             // Ganjil
             [
-                // 11
+                // 21
                 'kurikulum_mata_pelajaran_id' => 6, // K13 - MTK
                 'tahun_akademik_id' => 2, // 2024/2025
                 'semester_id' => 3, // Ganjil
@@ -2918,7 +2976,20 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => '',              
             ],        
             [
-                // 12
+                // 21
+                'kurikulum_mata_pelajaran_id' => 6, // K13 - MTK
+                'tahun_akademik_id' => 2, // 2024/2025
+                'semester_id' => 3, // Ganjil
+                'hari' => 'Rabu',
+                'guru_id' => 9, // Guru MTK
+                'rombel_id' => 3, // X-C-1
+                'jam_mulai' => '15:30',
+                'jam_selesai' => '17:30',
+                'ruangan_id' => 2,
+                'link_opsional' => '',              
+            ],        
+            [
+                // 22
                 'kurikulum_mata_pelajaran_id' => 4, // K13 - Indo
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3,
@@ -2933,7 +3004,7 @@ class DatabaseSeeder extends Seeder
 
             // Genap
             [
-                // 17
+                // 23
                 'kurikulum_mata_pelajaran_id' => 7, // merdeka - Sejarah
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4,
@@ -2946,7 +3017,7 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => 'www.youtube.com', 
             ],                
             [
-                // 19
+                // 24
                 'kurikulum_mata_pelajaran_id' => 8, // merdeka - PJOK
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4,
@@ -3054,7 +3125,7 @@ class DatabaseSeeder extends Seeder
             //     'link_opsional' => 'www.youtube.com', 
             // ],    
             [
-                // 18
+                // 25
                 'kurikulum_mata_pelajaran_id' => 9, // merdeka - Seni Budaya
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3,
@@ -3067,7 +3138,7 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => 'www.youtube.com',                
             ],
             [
-                // 28
+                // 26
                 'kurikulum_mata_pelajaran_id' => 32, // Fisika
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3,
@@ -3080,7 +3151,7 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => 'www.youtube.com',                
             ],
             [
-                // 29
+                // 27
                 'kurikulum_mata_pelajaran_id' => 50, // Bahasa Jepang
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3,
@@ -3093,7 +3164,7 @@ class DatabaseSeeder extends Seeder
                 'link_opsional' => 'www.youtube.com',                
             ],
             [
-                // 30
+                // 28
                 'kurikulum_mata_pelajaran_id' => 54, // Bahasa Jerman
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3,

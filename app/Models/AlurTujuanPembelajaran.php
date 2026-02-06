@@ -9,12 +9,7 @@ class AlurTujuanPembelajaran extends Model
 {
     use HasFactory;
     protected $table = 'alur_tujuan_pembelajaran';
-    protected $guarded = ['id'];
-
-    public function kompetensi() 
-    {
-        return $this->belongsTo(Kompetensi::class, 'kompetensi_id');
-    } 
+    protected $guarded = ['id'];    
 
     // Implementasi milik 1 ATP Master
     public function atpMaster()
