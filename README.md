@@ -188,24 +188,27 @@ Perbaikan
         - Untuk UI guru silakan minta ke Winton
         - jika status = disetujui (karna sudah disetujui admin/lock), maka tombol update, dan tambah hilang dari guru (spa gabisa crud, cuma bisa approve aja), kalo bingung, tanya Winton
 --------------------------------------                                            
-25. ❌ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
+25. ❌⚠️ beban_kerja_guru: (untuk menentukan total JP (jam pelajaran) guru)
    - ☑️ Backend:
         - ✅ spa
         - ✅ siswa: tahun dan semester aktif saja
    - Frontend:
         - samakan dengan insomnia
-26. absensi_pegawai: (MASUK SINI)
+--------------------------------------                                            
+26. X absensi_pegawai: (MASUK SINI)
     - ☑️ Backend:
         - ✅ samakan dengan migrasi
     - Frontend:
         - ikutin insomnia (baca docs jika ada)
         - jika status pada tahun_akademik atau semester = 'arsip', maka button delete dan update hilang...update dan delete hanya berlaku saat TA dan semester aktif saja
+--------------------------------------                                            
 27. absensi_pelajaran:
     - ☑️ Backend:
         - ✅ samakan semua
         - ✅ show menggunakan id guru
     - Frontend
         - samakan dengan insomnia
+--------------------------------------                                            
 28.  absensi_siswa:
     - ☑️ Backend:
         - ✅ samakan (seeder, controller) dengan migrasi

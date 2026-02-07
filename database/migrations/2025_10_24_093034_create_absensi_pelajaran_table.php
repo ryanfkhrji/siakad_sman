@@ -34,7 +34,8 @@ return new class extends Migration
                 'guru_pengajar_id',
                 'jadwal_pelajaran_id',
                 'hari',
-                // 'tahun_akademik_id'
+                'tahun_akademik_id',
+                'semester_id'
             ], 'unik');
         });
     }

@@ -158,11 +158,10 @@ class AbsensiPelajaranController extends Controller
             'jadwalPelajaran.rombel',
             'jadwalPelajaran.ruangan',
             'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
-            'jadwalPelajaran.kurikulumMataPelajaran.tahunAkademik',
             'jadwalPelajaran.semester',
         ])
         ->where('guru_pengajar_id', $id)
-        ->orderBy('hari', 'desc')
+        ->orderBy('hari', 'asc')
         ->get();
 
         if ($absens->isEmpty()) {
@@ -185,6 +184,7 @@ class AbsensiPelajaranController extends Controller
 
                     'periode' => $guruAbsens
                         ->groupBy('tahun_akademik_id')
+                        ->sortKeys()
                         ->map(function ($tahunAbsens) {
 
                             $ta = $tahunAbsens->first()->tahunAkademik;
@@ -207,7 +207,7 @@ class AbsensiPelajaranController extends Controller
                                 'semesters' => $tahunAbsens
                                     ->groupBy('semester_id')
                                     ->sortBy(function ($semesterAbsens) {
-                                        return $semesterAbsens->first()->semester->semester === 'Genap' ? 1 : 2;
+                                        return $semesterAbsens->first()->semester->semester === 'Ganjil' ? 1 : 2;
                                     })
                                     ->map(function ($semesterAbsens) {
 
@@ -391,18 +391,18 @@ class AbsensiPelajaranController extends Controller
          if (!$absensi->semester || $absensi->semester->status === 'arsip') {
             return ApiResponse::error(
                 'Not supported',
-                ['data' => ['Absensi sudah berstatus arsip']],
+                'Semester sudah tidak aktif',
                 404
             );
         }     
         
-         if (!$absensi->tahunAkademik || $absensi->tahunAkademik->status === 'arsip') {
-            return ApiResponse::error(
-                'Not supported',
-                ['data' => ['Absensi sudah berstatus arsip']],
-                404
-            );
-        }     
+        //  if (!$absensi->tahunAkademik || $absensi->tahunAkademik->status === 'arsip') {
+        //     return ApiResponse::error(
+        //         'Not supported',
+        //         'Tahun akademik sudah tidak aktif',
+        //         404
+        //     );
+        // }     
 
         $validated = $request->validate([            
             'status' => 'sometimes|required|in:hadir,tidak hadir',            
@@ -483,11 +483,7 @@ class AbsensiPelajaranController extends Controller
         if ($adaArsip) {
             return ApiResponse::error(
                 'Not supported',
-                [
-                    'data' => [
-                        'Penghapusan dibatalkan. Terdapat absensi dengan tahun akademik atau semester berstatus arsip.'
-                    ]
-                ],
+                'Penghapusan dibatalkan. Terdapat absensi dengan tahun akademik atau semester berstatus arsip',
                 403
             );
         }
