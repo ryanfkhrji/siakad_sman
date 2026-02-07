@@ -3196,42 +3196,34 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'guru_id' => 9, // Guru MTK
-                'jadwal_pelajaran_id' => null,
-                'hari' => '2025-05-24',
-                'status' => 'hadir',
-                'tahun_akademik_id' => 2, 
-                'semester_id' => 3, // Ganjil
-            ],
-            [
-                'guru_id' => 9, // Guru MTK
-                'jadwal_pelajaran_id' => null,
-                'hari' => '2025-05-25',
-                'status' => 'hadir',
-                'tahun_akademik_id' => 2, 
-                'semester_id' => 3, // Ganjil
+                'jadwal_pelajaran_id' => 1,
+                'hari' => '2026-02-24',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 1, 
+                'semester_id' => 1, // Ganjil
             ],
             [
                 'guru_id' => 9, // Guru MTK
                 'jadwal_pelajaran_id' => 1,
-                'hari' => '2025-05-26',
-                'status' => 'tidak hadir',
-                'tahun_akademik_id' => 2, 
-                'semester_id' => 3, // Ganjil
+                'hari' => '2014-02-25',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 1,  // 13/24
+                'semester_id' => 1, // Ganjil
             ],
             [
                 'guru_id' => 9, // Guru MTK
                 'jadwal_pelajaran_id' => 1,
-                'hari' => '2026-01-23',
+                'hari' => '2026-01-30',
                 'status' => 'tidak hadir',
-                'tahun_akademik_id' => 2, 
-                'semester_id' => 2, // Genap
+                'tahun_akademik_id' => 1, 
+                'semester_id' => 1, // Ganjil
             ],
             [
                 'guru_id' => 9, // Guru MTK
                 'jadwal_pelajaran_id' => null,
                 'hari' => '2026-01-24',
                 'status' => 'hadir',
-                'tahun_akademik_id' => 2, 
+                'tahun_akademik_id' => 1, 
                 'semester_id' => 2, // Genap
             ],
             [
@@ -3239,33 +3231,65 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1,
                 'hari' => '2026-01-25',
                 'status' => 'hadir',
-                'tahun_akademik_id' => 2, 
+                'tahun_akademik_id' => 1, 
                 'semester_id' => 2, // Genap
             ],
+            [
+                'guru_id' => 9, // Guru MTK
+                'jadwal_pelajaran_id' => null,
+                'hari' => '2025-05-24',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 3, // Ganjil
+            ],
+            [
+                'guru_id' => 9, // Guru MTK
+                'jadwal_pelajaran_id' => null,
+                'hari' => '2025-05-25',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 3, // Ganjil
+            ],
+            [
+                'guru_id' => 9, // Guru MTK
+                'jadwal_pelajaran_id' => 1,
+                'hari' => '2025-05-26',
+                'status' => 'tidak hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 4, // Genap
+            ],            
+            [
+                'guru_id' => 9, // Guru MTK
+                'jadwal_pelajaran_id' => 1,
+                'hari' => '2025-05-27',
+                'status' => 'hadir',
+                'tahun_akademik_id' => 2, 
+                'semester_id' => 4, // Genap
+            ],            
             // ---------------------------------------------------
             [
                 'guru_id' => 7,
                 'jadwal_pelajaran_id' => 2, // Indon
                 'hari' => '2025-05-24',
                 'status' => 'tidak hadir',
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
             ],
             [
                 'guru_id' => 7,
                 'jadwal_pelajaran_id' => 2,
                 'hari' => '2025-05-25',
                 'status' => 'hadir',
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
             ],
             [
                 'guru_id' => 7,
                 'jadwal_pelajaran_id' => 2,
                 'hari' => '2025-05-26',
                 'status' => 'hadir',
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
             ],
             [
                 'guru_id' => 7,
@@ -3273,7 +3297,7 @@ class DatabaseSeeder extends Seeder
                 'hari' => '2026-01-01',
                 'status' => 'tidak hadir',
                 'tahun_akademik_id' => 2,
-                'semester_id' => 2,
+                'semester_id' => 3,
             ],
             [
                 'guru_id' => 7,
@@ -3281,7 +3305,7 @@ class DatabaseSeeder extends Seeder
                 'hari' => '2026-01-02',
                 'status' => 'hadir',
                 'tahun_akademik_id' => 2,
-                'semester_id' => 2,
+                'semester_id' => 4,
             ],
             [
                 'guru_id' => 7,
@@ -3289,7 +3313,7 @@ class DatabaseSeeder extends Seeder
                 'hari' => '2026-01-03',
                 'status' => 'hadir',
                 'tahun_akademik_id' => 2,
-                'semester_id' => 2,
+                'semester_id' => 4,
             ],            
         ]);
 

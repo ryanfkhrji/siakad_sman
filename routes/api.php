@@ -126,13 +126,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
 
     // ✅☑️ CRUD ATP Master
     Route::apiResource('/spa/atp-master', AtpMasterController::class);     
-    Route::get('/spa/data-select/atp-master', [AtpMasterController::class, 'dataSelect']);
-    
-    // ✅☑️ CRUD ATP
-    Route::apiResource('/spa/atp', AlurTujuanPembelajaranController::class)->only(['index', 'show']);  
-    Route::get('/spa/atp-disetujui', [AlurTujuanPembelajaranController::class, 'disetujui']);   
-    Route::put('/spa/atp-disetujui/{id}', [AlurTujuanPembelajaranController::class, 'diterima']);   
-    Route::put('/spa/atp-ditolak/{id}', [AlurTujuanPembelajaranController::class, 'ditolak']);   
+    Route::get('/spa/data-select/atp-master', [AtpMasterController::class, 'dataSelect']);     
     
     // ✅☑️ CRUD rombel
     Route::apiResource('/spa/rombel', RombelController::class);    
@@ -154,9 +148,15 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/spa/siswa/jadwal-pelajaran/all', [SiswaJadwalPelajaranController::class, 'getAllSiswaAktif']);       
     Route::get('/spa/siswa/jadwal-pelajaran/{id}', [SiswaJadwalPelajaranController::class, 'showSiswaJadwal']);       
 
+    // ✅☑️ CRUD Alur Tujuan Pembelajaran
+    Route::apiResource('/spa/atp', AlurTujuanPembelajaranController::class)->only(['index', 'show']);  
+    Route::get('/spa/atp-disetujui', [AlurTujuanPembelajaranController::class, 'disetujui']);   
+    Route::put('/spa/atp-disetujui/{id}', [AlurTujuanPembelajaranController::class, 'diterima']);   
+    Route::put('/spa/atp-ditolak/{id}', [AlurTujuanPembelajaranController::class, 'ditolak']);  
+
     // ✅☑️ Absensi Pegawai Ke Sekolah    
-    Route::get('/spa/pegawai/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
-    Route::delete('/spa/absensi/guru/pelajaran/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
+    Route::get('/spa/absensi/pegawai/sekolah/export', [AbsensiPegawaiController::class, 'export']);
+    Route::delete('/spa/absensi/pegawai/sekolah/destroy/{id?}', [AbsensiPegawaiController::class, 'destroyData']);
     Route::apiResource('/spa/absensi/pegawai/sekolah', AbsensiPegawaiController::class)->except('store', 'destroy');  
 
     // ✅☑️ Absensi guru ke Pelajaran

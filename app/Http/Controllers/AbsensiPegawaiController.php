@@ -34,7 +34,7 @@ class AbsensiPegawaiController extends Controller
         if ($absen->isEmpty()) {
             return ApiResponse::error(
                 'Not found',
-                ['data' => 'Data absensi tidak ditemukan']
+                'Data absensi tidak ditemukan'
             );
         }
 
@@ -49,10 +49,10 @@ class AbsensiPegawaiController extends Controller
                     'nama' => $guru->nama ?? null,
                     'nip' => $guru->nip ?? null,
                     'nuptk' => $guru->nuptk ?? null,
-                    'role' => $guru->role ?? null,
-
+                    'role' => $guru->role ?? null,                                
                     'periode' => $absGuru
                         ->groupBy('tahun_akademik_id')
+                        ->sortKeys()
                         ->map(function ($taItems) {
 
                             $tahunAkademik = $taItems->first()->tahunAkademik;
@@ -62,8 +62,12 @@ class AbsensiPegawaiController extends Controller
                                 'tahun_akademik' => $tahunAkademik->tahun_akademik ?? null,
                                 'status_tahun_akademik' => $tahunAkademik->status ?? null,
 
+                                'total_hadir' => $taItems->where('status', 'hadir')->count(),
+                                'total_tidak_hadir' => $taItems->where('status', 'tidak hadir')->count(),
+
                                 'semester' => $taItems
                                     ->groupBy('semester_id')
+                                    ->sortKeys()
                                     ->map(function ($smtItems) {
 
                                         $semester = $smtItems->first()->semester;
@@ -73,7 +77,11 @@ class AbsensiPegawaiController extends Controller
                                             'semester' => $semester->semester ?? null,
                                             'status_semester' => $semester->status ?? null,
 
-                                            'absensis' => $smtItems
+                                            'total_hadir' => $smtItems->where('status', 'hadir')->count(),
+                                            'total_tidak_hadir' => $smtItems->where('status', 'tidak hadir')->count(),
+
+                                            'absensi' => $smtItems
+                                            ->sortBy('hari')
                                                 ->map(function ($abs) {
 
                                                     // mata pelajaran OPSIONAL
@@ -138,7 +146,7 @@ class AbsensiPegawaiController extends Controller
             ->first();
 
             if ($hari) {
-                return ApiResponse::error('Gagal', ['pesan' => 'Anda sudah absen hari ini'], 422);
+                return ApiResponse::error('Gagal', 'Anda sudah absen hari ini', 422);
             }
 
             $absensi = AbsensiPegawai::create(
@@ -182,7 +190,7 @@ class AbsensiPegawaiController extends Controller
                 'semester',
             ])
             ->where('guru_id', $id)
-            ->orderBy('hari', 'desc')
+            ->orderBy('hari', 'asc')
             ->get();
 
         if ($absensi->isEmpty()) {
@@ -196,57 +204,50 @@ class AbsensiPegawaiController extends Controller
 
         $groupedByYear = $absensi
             ->groupBy(fn ($abs) => $abs->tahunAkademik?->tahun_akademik)
+            ->sortKeys()
             ->map(function ($itemsYear, $tahunAkademik) {
 
-                // 🔹 TOTAL PER TAHUN
+                // 🔹 TOTAL PER TAHUN AKADEMIK
                 $totalHadirYear = $itemsYear->where('status', 'hadir')->count();
                 $totalTidakHadirYear = $itemsYear->where('status', 'tidak hadir')->count();
 
-                // 🔹 GROUP MAPEL (dari kurikulum_mata_pelajaran)
-                $mataPelajaran = $itemsYear
-                    ->groupBy(fn ($abs) =>
-                        $abs->jadwalPelajaran
-                            ?->kurikulumMataPelajaran
-                            ?->mata_pelajaran_id
-                    )
-                    ->map(function ($itemsMapel) {
+                // 🔹 GROUP LANGSUNG PER SEMESTER (GANJIL / GENAP)
+                $semester = $itemsYear
+                    ->groupBy(fn ($abs) => $abs->semester?->semester)
+                    ->sortKeys() // ganjil → genap
+                    ->map(function ($itemsSemester, $semester) {
 
-                        $mapel = $itemsMapel->first()
-                            ->jadwalPelajaran
-                            ?->kurikulumMataPelajaran
-                            ?->mataPelajaran;
-
-                        // 🔹 GROUP PER SEMESTER
-                        $semester = $itemsMapel
-                            ->groupBy(fn ($abs) => $abs->semester?->semester)
-                            ->map(function ($itemsSemester, $semester) {
-
-                                $totalHadirSemester = $itemsSemester->where('status', 'hadir')->count();
-                                $totalTidakHadirSemester = $itemsSemester->where('status', 'tidak hadir')->count();
-
-                                return [
-                                    'semester' => $semester,
-                                    'status_semester' => $itemsSemester->first()->semester->status ?? null,
-
-                                    'total_hadir' => $totalHadirSemester,
-                                    'total_tidak_hadir' => $totalTidakHadirSemester,
-
-                                    'rincian' => $itemsSemester->map(function ($abs) {
-                                        return [
-                                            'absensi_id' => $abs->id,
-                                            'hari' => Carbon::parse($abs->hari)
-                                                ->translatedFormat('l, d F Y'),
-                                            'status' => $abs->status,
-                                        ];
-                                    })->values(),
-                                ];
-                            })
-                            ->values();
+                        $totalHadirSemester = $itemsSemester->where('status', 'hadir')->count();
+                        $totalTidakHadirSemester = $itemsSemester->where('status', 'tidak hadir')->count();
 
                         return [
-                            'mata_pelajaran_id' => $mapel->id ?? null,
-                            'nama_mata_pelajaran' => $mapel->nama_pelajaran ?? null,
                             'semester' => $semester,
+                            'status_semester' => $itemsSemester->first()->semester->status ?? null,
+
+                            'total_hadir' => $totalHadirSemester,
+                            'total_tidak_hadir' => $totalTidakHadirSemester,
+
+                            // 🔹 RINCIAN ABSENSI (MAPEL DI LEVEL PALING BAWAH)
+                            'absensi' => $itemsSemester
+                                ->sortBy('hari')
+                                ->map(function ($abs) {
+
+                                    $mapel = $abs->jadwalPelajaran
+                                        ?->kurikulumMataPelajaran
+                                        ?->mataPelajaran;
+
+                                    return [
+                                        'absensi_id' => $abs->id,
+                                        'hari' => \Carbon\Carbon::parse($abs->hari)
+                                            ->translatedFormat('l, d F Y'),
+                                        'status' => $abs->status,
+
+                                        // mapel setelah status
+                                        'mata_pelajaran_id' => $mapel->id ?? null,
+                                        'nama_mata_pelajaran' => $mapel->nama_pelajaran ?? null,
+                                    ];
+                                })
+                                ->values(),
                         ];
                     })
                     ->values();
@@ -258,7 +259,8 @@ class AbsensiPegawaiController extends Controller
                     'total_hadir' => $totalHadirYear,
                     'total_tidak_hadir' => $totalTidakHadirYear,
 
-                    'mata_pelajaran' => $mataPelajaran,
+                    // 🔥 SEMESTER SUDAH FIX: [ganjil, genap]
+                    'semester' => $semester,
                 ];
             })
             ->values();
@@ -266,7 +268,7 @@ class AbsensiPegawaiController extends Controller
         $formatted = [
             'guru_id' => $guru->id,
             'nama' => $guru->nama ?? null,
-            'absensi' => $groupedByYear,
+            'periode' => $groupedByYear,
         ];
 
         return ApiResponse::success(
@@ -274,7 +276,6 @@ class AbsensiPegawaiController extends Controller
             'Absensi pegawai berhasil diambil'
         );
     }
-
 
 
     // ✅ show all absen sendiri (untuk pegawai)
@@ -362,18 +363,22 @@ class AbsensiPegawaiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $absensi = AbsensiPegawai::find($id);
+        $absensi = AbsensiPegawai::with('semester')->find($id);
 
         if (!$absensi) {
             return ApiResponse::error('Not found', ['id', 'Data tidak ditemukan']);
         }
-
+        
         $validated = $request->validate([            
             'status' => 'sometimes|required|in:hadir,tidak hadir',
         ], [            
             'status.required' => 'Status wajib diisi',
             'status.in' => 'Pilihan hanya hadir atau tidak hadir'
-        ]);                
+        ]);        
+        
+        if($absensi->semester->status == 'arsip') {
+            return ApiResponse::error('Tidak bisa', 'Semester sudah tidak aktif');
+        }
 
         $absensi->update($validated);
 
@@ -385,8 +390,8 @@ class AbsensiPegawaiController extends Controller
         ]);           
 
         return ApiResponse::success([
-            'id' => $absensi->id ?? null,
-            'guru_id' => $absensi->guru->nama ?? null,                
+            'absensi_id' => $absensi->id ?? null,
+            'guru' => $absensi->guru->nama ?? null,                
             'mata_pelajaran' => $absensi->jadwalPelajaran->kurikulumMataPelajaran->mataPelajaran->nama_pelajaran ?? null,                
             'hari' => Carbon::parse($absensi->hari)->translatedFormat('l, d F Y') ?? null,   // Senin, 24 September 2026
             'status' => $absensi->status ?? null,                   
@@ -452,8 +457,7 @@ class AbsensiPegawaiController extends Controller
 
         if ($tidakAktif) {
             return ApiResponse::error(
-                'Tidak bisa dihapus',
-                ['data' => 'Absensi hanya bisa dihapus jika tahun akademik dan semester masih aktif']
+                'Tidak bisa dihapus', 'Absensi hanya bisa dihapus jika tahun akademik dan semester masih aktif'
             );
         }
 
