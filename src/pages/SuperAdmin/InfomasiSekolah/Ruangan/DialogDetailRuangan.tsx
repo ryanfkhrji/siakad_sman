@@ -39,6 +39,19 @@ export function DialogDetailRuangan({ ruanganId }: DialogDetailRuanganProps) {
     return color;
   };
 
+  const getStatusBadge = (status: string) => {
+    let color = "";
+
+    if (status === "aktif") color = "bg-green-100 text-green-700 border-green-300";
+    else color = "bg-gray-100 text-gray-600 border-gray-300";
+
+    return (
+      <Badge variant="outline" className={`${color}`}>
+        {status}
+      </Badge>
+    );
+  };
+
   return (
     <Dialog onOpenChange={(open) => open && handleOpen()}>
       <DialogTrigger asChild>
@@ -84,6 +97,11 @@ export function DialogDetailRuangan({ ruanganId }: DialogDetailRuanganProps) {
                       <AlertCircle className="w-3 h-3 mr-1" />
                       {ruangan.kondisi}
                     </Badge>
+                  </div>
+
+                  <div className="mt-4 flex justify-center items-center w-full">
+                    <p className="text-sm text-gray-500 mr-2">Status:</p>
+                    <p className="text-sm text-gray-500">{getStatusBadge(ruangan.status)}</p>
                   </div>
                 </div>
               </CardContent>

@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { Ruangan } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { DialogDetailRuangan } from "./DialogDetailRuangan";
+import type { Ruangan } from "@/types/ruangan";
 import { Badge } from "@/components/ui/badge";
 
 const DataRuangan = () => {
@@ -122,22 +122,33 @@ const DataRuangan = () => {
     }
   };
 
-  const getKondisiBadge = (kondisi: string) => {
+  // const getKondisiBadge = (kondisi: string) => {
+  //   let color = "";
+
+  //   if (kondisi === "Baik") color = "bg-green-100 text-green-700 border-green-300";
+  //   else if (kondisi === "Rusak Ringan") color = "bg-yellow-100 text-yellow-700 border-yellow-300";
+  //   else if (kondisi === "Rusak Berat") color = "bg-red-100 text-red-700 border-red-300";
+  //   else color = "bg-blue-100 text-blue-600 border-blue-300";
+
+  //   return (
+  //     <Badge variant="outline" className={`${color}`}>
+  //       {kondisi}
+  //     </Badge>
+  //   );
+  // };
+
+  const getStatusBadge = (status: string) => {
     let color = "";
 
-    if (kondisi === "Baik") color = "bg-green-100 text-green-700 border-green-300";
-    else if (kondisi === "Rusak Ringan") color = "bg-yellow-100 text-yellow-700 border-yellow-300";
-    else if (kondisi === "Rusak Berat") color = "bg-red-100 text-red-700 border-red-300";
-    else color = "bg-blue-100 text-blue-600 border-blue-300";
+    if (status === "aktif") color = "bg-green-100 text-green-700 border-green-300";
+    else color = "bg-gray-100 text-gray-600 border-gray-300";
 
     return (
       <Badge variant="outline" className={`${color}`}>
-        {kondisi}
+        {status}
       </Badge>
     );
   };
-
-
 
   return (
     <SidebarProvider>
@@ -177,17 +188,12 @@ const DataRuangan = () => {
                   <TableHeader className="bg-primary">
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
-                      <TableHead className="font-semibold text-white">Nama Gedung</TableHead>
-                      <TableHead className="font-semibold text-white">Kode Ruangan</TableHead>
+                      <TableHead className="font-semibold text-white text-center">Kode Ruangan</TableHead>
                       <TableHead className="font-semibold text-white">Nama Ruangan</TableHead>
                       <TableHead className="font-semibold text-white">Jenis Ruangan</TableHead>
-                      <TableHead className="font-semibold text-white">Lantai</TableHead>
-                      <TableHead className="font-semibold text-white">Kapasitas</TableHead>
-                      {/* <TableHead className="font-semibold text-white">Luas Ruangan</TableHead> */}
-                      <TableHead className="font-semibold text-white">Kondisi</TableHead>
-                      {/* <TableHead className="font-semibold text-white">Fasilitas</TableHead>
-                      <TableHead className="font-semibold text-white">Keterangan</TableHead> */}
-                      <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
+                      <TableHead className="font-semibold text-white text-center">Lantai</TableHead>
+                      <TableHead className="font-semibold text-white text-center">Status</TableHead>
+                      <TableHead className="font-semibold text-white text-center">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
 
@@ -196,16 +202,11 @@ const DataRuangan = () => {
                       paginated.map((ruangan, index) => (
                         <TableRow key={ruangan.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{ruangan.nama_gedung || "-"}</TableCell>
-                          <TableCell>{ruangan.kode_ruangan || "-"}</TableCell>
-                          <TableCell>{ruangan.nama_ruangan || "-"}</TableCell>
-                          <TableCell>{ruangan.jenis_ruangan || "-"}</TableCell>
-                          <TableCell>{ruangan.lantai || "-"}</TableCell>
-                          <TableCell>{ruangan.kapasitas || "-"}</TableCell>
-                          {/* <TableCell>{ruangan.luas_ruangan || "-"}</TableCell> */}
-                          <TableCell>{getKondisiBadge(ruangan.kondisi || "-")}</TableCell>
-                          {/* <TableCell>{ruangan.fasilitas || "-"}</TableCell>
-                          <TableCell>{ruangan.keterangan || "-"}</TableCell> */}
+                          <TableCell className="text-center">{ruangan.kode_ruangan || "Tidak ada data"}</TableCell>
+                          <TableCell>{ruangan.nama_ruangan || "Tidak ada data"}</TableCell>
+                          <TableCell>{ruangan.jenis_ruangan || "Tidak ada data"}</TableCell>
+                          <TableCell className="text-center">{ruangan.lantai || "Tidak ada data"}</TableCell>
+                          <TableCell className="text-center">{getStatusBadge(ruangan.status || "Tidak ada data")}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
                             <DialogDetailRuangan ruanganId={ruangan.id} />

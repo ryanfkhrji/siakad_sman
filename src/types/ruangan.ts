@@ -10,9 +10,10 @@ export interface Ruangan {
   kondisi: string;
   fasilitas: string;
   keterangan: string;
+  status: string;
 }
 
-export interface FormRuanganPayload {
+export interface FormCreateRuanganPayload {
   gedung_id: number;
   kode_ruangan: string;
   nama_ruangan: string;
@@ -23,6 +24,20 @@ export interface FormRuanganPayload {
   kondisi: string;
   fasilitas: string;
   keterangan: string;
+}
+
+export interface FormEditRuanganPayload {
+  gedung_id: number;
+  kode_ruangan: string;
+  nama_ruangan: string;
+  jenis_ruangan: string;
+  lantai: number;
+  kapasitas: number;
+  luas_ruangan: string;
+  kondisi: string;
+  fasilitas: string;
+  keterangan: string;
+  status: string;
 }
 
 export interface GedungSelectOption {

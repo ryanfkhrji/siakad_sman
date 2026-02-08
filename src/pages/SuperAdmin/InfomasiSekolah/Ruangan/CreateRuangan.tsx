@@ -9,13 +9,13 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
-import type { FormRuanganPayload, GedungSelectOption } from "@/types/ruangan";
+import type { FormCreateRuanganPayload, GedungSelectOption } from "@/types/ruangan";
 
 const CreateRuangan = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [gedungList, setGedungList] = useState<GedungSelectOption[]>([]);
 
-  const [formData, setFormData] = useState<FormRuanganPayload>({
+  const [formData, setFormData] = useState<FormCreateRuanganPayload>({
     gedung_id: 0,
     kode_ruangan: "",
     nama_ruangan: "",
@@ -96,7 +96,7 @@ const CreateRuangan = () => {
     setLoading(true);
 
     try {
-      const submitData: FormRuanganPayload = {
+      const submitData: FormCreateRuanganPayload = {
         gedung_id: formData.gedung_id,
         kode_ruangan: formData.kode_ruangan,
         nama_ruangan: formData.nama_ruangan,

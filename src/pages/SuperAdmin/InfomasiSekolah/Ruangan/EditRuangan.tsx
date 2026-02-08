@@ -9,14 +9,14 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
-import type { FormRuanganPayload, GedungSelectOption } from "@/types/ruangan";
+import type { FormEditRuanganPayload, GedungSelectOption } from "@/types/ruangan";
 
 const EditRuangan = () => {
   const { id } = useParams<{ id: string }>();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [gedungList, setGedungList] = useState<GedungSelectOption[]>([]);
 
-  const [formData, setFormData] = useState<FormRuanganPayload>({
+  const [formData, setFormData] = useState<FormEditRuanganPayload>({
     gedung_id: 0,
     kode_ruangan: "",
     nama_ruangan: "",
@@ -27,6 +27,7 @@ const EditRuangan = () => {
     kondisi: "",
     fasilitas: "",
     keterangan: "",
+    status: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -93,6 +94,7 @@ const EditRuangan = () => {
           kondisi: data.kondisi || "",
           fasilitas: data.fasilitas || "",
           keterangan: data.keterangan || "",
+          status: data.status || "",
         });
       }
     } catch (error: any) {
@@ -162,7 +164,7 @@ const EditRuangan = () => {
     setLoading(true);
 
     try {
-      const submitData: FormRuanganPayload = {
+      const submitData: FormEditRuanganPayload = {
         gedung_id: formData.gedung_id,
         kode_ruangan: formData.kode_ruangan,
         nama_ruangan: formData.nama_ruangan,
@@ -173,6 +175,7 @@ const EditRuangan = () => {
         kondisi: formData.kondisi,
         fasilitas: formData.fasilitas,
         keterangan: formData.keterangan,
+        status: formData.status,
       };
 
       const res = await api.put(`/spa/ruangan/${id}`, submitData);
@@ -348,6 +351,26 @@ const EditRuangan = () => {
                     </SelectContent>
                   </Select>
                   {errors.kondisi && errors.kondisi.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kondisi[0]}</p>}
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="block font-semibold mb-2">
+                    Status <span className="text-red-500">*</span>
+                  </label>
+                  <Select onValueChange={(value) => setFormData({ ...formData, status: value })} value={formData.status}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="-- Pilih Status --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Pilih Status</SelectLabel>
+                        <SelectItem value="aktif">Aktif</SelectItem>
+                        <SelectItem value="arsip">Arsip</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {errors.status && errors.status.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
                 </div>
               </div>
 
