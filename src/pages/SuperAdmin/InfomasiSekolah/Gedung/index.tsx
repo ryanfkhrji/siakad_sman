@@ -7,21 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { Gedung } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { DialogDetailGedung } from "./DialogDetailGedung";
 import { Badge } from "@/components/ui/badge";
+import type { GetAllGedung } from "@/types/gedung";
 
 const DataGedung = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [dataGedung, setDataGedung] = useState<Gedung[]>([]);
+  const [dataGedung, setDataGedung] = useState<GetAllGedung[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<Gedung[]>([]);
+  const [filteredData, setFilteredData] = useState<GetAllGedung[]>([]);
 
   // Ambil data dari backend
   useEffect(() => {
@@ -122,17 +122,15 @@ const DataGedung = () => {
     }
   };
 
-const getKondisiBadge = (kondisi: string) => {
+const getStatusBadge = (status: string) => {
   let color = "";
 
-  if (kondisi === "Baik") color = "bg-green-100 text-green-700 border-green-300";
-  else if (kondisi === "Rusak Ringan") color = "bg-yellow-100 text-yellow-700 border-yellow-300";
-  else if (kondisi === "Rusak Berat") color = "bg-red-100 text-red-700 border-red-300";
-  else color = "bg-blue-100 text-blue-600 border-blue-300";
+  if (status === "aktif") color = "bg-green-100 text-green-700 border-green-300";
+  else color = "bg-gray-100 text-gray-600 border-gray-300";
 
   return (
     <Badge variant="outline" className={`${color}`}>
-      {kondisi}
+      {status}
     </Badge>
   );
 };
@@ -177,13 +175,9 @@ const getKondisiBadge = (kondisi: string) => {
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">Foto Gedung</TableHead>
-                      <TableHead className="font-semibold text-white">Kode Gedung</TableHead>
+                      <TableHead className="font-semibold text-white text-center">Kode Gedung</TableHead>
                       <TableHead className="font-semibold text-white">Nama Gedung</TableHead>
-                      <TableHead className="font-semibold text-white">Jumlah Lantai</TableHead>
-                      <TableHead className="font-semibold text-white">Luas Bangunan</TableHead>
-                      <TableHead className="font-semibold text-white">Tahun Dibangun</TableHead>
-                      <TableHead className="font-semibold text-white">Kondisi</TableHead>
-                      <TableHead className="font-semibold text-white">Keterangan</TableHead>
+                      <TableHead className="font-semibold text-white text-center">Status</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -210,13 +204,9 @@ const getKondisiBadge = (kondisi: string) => {
                               <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">No Image</div>
                             )}
                           </TableCell>
-                          <TableCell>{gedung.kode_gedung || "-"}</TableCell>
-                          <TableCell>{gedung.nama_gedung || "-"}</TableCell>
-                          <TableCell>{gedung.jumlah_lantai || "-"}</TableCell>
-                          <TableCell>{gedung.luas_bangunan || "-"}</TableCell>
-                          <TableCell>{gedung.tahun_dibangun || "-"}</TableCell>
-                          <TableCell>{getKondisiBadge(gedung.kondisi || "-")}</TableCell>
-                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{gedung.keterangan || "-"}</TableCell>
+                          <TableCell className="text-center">{gedung.kode_gedung || "Tidak ada data"}</TableCell>
+                          <TableCell>{gedung.nama_gedung || "Tidak ada data"}</TableCell>
+                          <TableCell className="text-center">{getStatusBadge(gedung.status) || "Tidak ada data"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
                             <DialogDetailGedung gedungId={gedung.id} />

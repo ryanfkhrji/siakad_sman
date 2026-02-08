@@ -18,6 +18,7 @@ interface FormErrors {
   luas_bangunan?: string[];
   tahun_dibangun?: string[];
   kondisi?: string[];
+  lokasi?: string[];
   keterangan?: string[];
 }
 
@@ -31,6 +32,7 @@ const CreateGedung = () => {
     luas_bangunan: "",
     tahun_dibangun: "",
     kondisi: "",
+    lokasi: "",
     keterangan: "",
   });
 
@@ -98,6 +100,7 @@ const CreateGedung = () => {
       submitData.append("luas_bangunan", formData.luas_bangunan);
       submitData.append("tahun_dibangun", formData.tahun_dibangun);
       submitData.append("kondisi", formData.kondisi);
+      submitData.append("lokasi", formData.lokasi);
       submitData.append("keterangan", formData.keterangan);
 
       const res = await api.post("/spa/gedung", submitData, {
@@ -234,6 +237,18 @@ const CreateGedung = () => {
                   </Select>
                   {errors.kondisi && errors.kondisi.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kondisi[0]}</p>}
                 </div>
+              </div>
+
+              {/* Likasi */}
+              <div className="mb-6">
+                <label className="block font-semibold">Lokasi</label>
+                <textarea
+                  placeholder="cth: Jl. Kebon Jeruk No. 123, Jakarta Selatan"
+                  value={formData.lokasi}
+                  onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                  className="border p-2 w-full mt-2 rounded h-24 resize-none"
+                ></textarea>
+                {errors.lokasi && errors.lokasi.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.lokasi[0]}</p>}
               </div>
 
               {/* Keterangan */}

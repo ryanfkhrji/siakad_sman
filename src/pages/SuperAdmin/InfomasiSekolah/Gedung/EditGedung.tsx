@@ -18,7 +18,9 @@ interface FormErrors {
   luas_bangunan?: string[];
   tahun_dibangun?: string[];
   kondisi?: string[];
+  lokasi?: string[];
   keterangan?: string[];
+  status?: string[];
 }
 
 const EditGedung = () => {
@@ -32,7 +34,9 @@ const EditGedung = () => {
     luas_bangunan: "",
     tahun_dibangun: "",
     kondisi: "",
+    lokasi: "",
     keterangan: "",
+    status: "",
   });
 
   const [fotoGedung, setFotoGedung] = useState<File | null>(null);
@@ -61,7 +65,9 @@ const EditGedung = () => {
             luas_bangunan: data.luas_bangunan || "",
             tahun_dibangun: data.tahun_dibangun || "",
             kondisi: data.kondisi || "",
+            lokasi: data.lokasi || "",
             keterangan: data.keterangan || "",
+            status: data.status_gedung || "",
           });
 
           // Set existing foto URL
@@ -145,7 +151,9 @@ const EditGedung = () => {
       submitData.append("luas_bangunan", formData.luas_bangunan);
       submitData.append("tahun_dibangun", formData.tahun_dibangun);
       submitData.append("kondisi", formData.kondisi);
+      submitData.append("lokasi", formData.lokasi);
       submitData.append("keterangan", formData.keterangan);
+      submitData.append("status", formData.status);
 
       // Laravel method spoofing untuk PUT request dengan FormData
       submitData.append("_method", "PUT");
@@ -306,6 +314,36 @@ const EditGedung = () => {
                   </Select>
                   {errors.kondisi && errors.kondisi.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kondisi[0]}</p>}
                 </div>
+
+                {/* Status */}
+                <div>
+                  <label className="block font-semibold">Status</label>
+                  <Select onValueChange={(value) => setFormData({ ...formData, status: value })} value={formData.status}>
+                    <SelectTrigger className="w-full mt-2">
+                      <SelectValue placeholder="-- pilih status --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Pilih Status</SelectLabel>
+                        <SelectItem value="aktif">Aktif</SelectItem>
+                        <SelectItem value="arsip">Arsip</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {errors.status && errors.status.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
+                </div>
+              </div>
+
+              {/* Lokasi */}
+              <div className="mb-6">
+                <label className="block font-semibold">Lokasi</label>
+                <textarea
+                  placeholder="cth: Jl. Kebon Jeruk No. 123, Jakarta Selatan"
+                  value={formData.lokasi}
+                  onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                  className="border p-2 w-full mt-2 rounded h-24 resize-none"
+                ></textarea>
+                {errors.lokasi && errors.lokasi.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.lokasi[0]}</p>}
               </div>
 
               {/* Keterangan */}

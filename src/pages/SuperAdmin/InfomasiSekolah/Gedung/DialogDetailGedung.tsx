@@ -39,6 +39,19 @@ export function DialogDetailGedung({ gedungId }: DialogDetailGedungProps) {
     return color;
   };
 
+  const getStatusBadge = (status: string) => {
+    let color = "";
+
+    if (status === "aktif") color = "bg-green-100 text-green-700 border-green-300";
+    else color = "bg-gray-100 text-gray-600 border-gray-300";
+
+    return (
+      <Badge variant="outline" className={`${color}`}>
+        {status}
+      </Badge>
+    );
+  };
+
   return (
     <Dialog onOpenChange={(open) => open && handleOpen()}>
       <DialogTrigger asChild>
@@ -146,19 +159,32 @@ export function DialogDetailGedung({ gedungId }: DialogDetailGedungProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-1">Nama Gedung</p>
                     <p className="text-lg font-semibold text-gray-900">{gedung.nama_gedung}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-1">Kondisi</p>
-                    <Badge className={`${getKondisiBadge(gedung.kondisi)} border px-3 py-1 text-sm font-semibold`}>
+                    <Badge className={`${getKondisiBadge(gedung.kondisi)}`}>
                       <AlertCircle className="w-4 h-4 mr-1" />
                       {gedung.kondisi}
                     </Badge>
                   </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Status Gedung</p>
+                    {getStatusBadge(gedung.status_gedung)}
+                  </div>
                 </div>
+
+                {gedung.lokasi && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-2">Lokasi Gedung</p>
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{gedung.lokasi}</p>
+                    </div>
+                  </div>
+                )}
 
                 {gedung.keterangan && (
                   <div>
@@ -180,7 +206,7 @@ export function DialogDetailGedung({ gedungId }: DialogDetailGedungProps) {
                     Daftar Ruangan ({gedung.ruangan.length})
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6">
+                <CardContent className="pt-2">
                   <div className="grid gap-4">
                     {gedung.ruangan.map((ruangan) => (
                       <Card key={ruangan.id} className="border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
@@ -246,6 +272,13 @@ export function DialogDetailGedung({ gedungId }: DialogDetailGedungProps) {
                             <div className="mt-3 pt-3 border-t border-gray-100">
                               <p className="text-xs font-medium text-gray-600 mb-1">Keterangan</p>
                               <p className="text-sm text-gray-700 whitespace-pre-wrap">{ruangan.keterangan}</p>
+                            </div>
+                          )}
+
+                          {ruangan.keterangan && (
+                            <div className="mt-3 pt-3 border-t border-gray-100">
+                              <p className="text-xs font-medium text-gray-600 mb-1">Status Ruangan</p>
+                              {getStatusBadge(ruangan.status_ruangan)}
                             </div>
                           )}
                         </CardContent>

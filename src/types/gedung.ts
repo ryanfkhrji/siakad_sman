@@ -3,11 +3,7 @@ export interface GetAllGedung {
   foto_gedung: string | null;
   kode_gedung: string;
   nama_gedung: string;
-  jumlah_lantai: number;
-  luas_bangunan: string;
-  tahun_dibangun: string;
-  kondisi: string;
-  keterangan: string;
+  status: string;
 }
 
 export interface GedungDetail {
@@ -20,6 +16,8 @@ export interface GedungDetail {
   tahun_dibangun: string;
   kondisi: string;
   keterangan: string;
+  status_gedung: string;
+  lokasi: string;
   ruangan: [
     {
       id: number;
@@ -32,6 +30,7 @@ export interface GedungDetail {
       kondisi: string;
       fasilitas: string;
       keterangan: string;
+      status_ruangan: string;
     },
   ];
 }
@@ -44,5 +43,6 @@ export interface FormGedungPayload {
   luas_bangunan: string;
   tahun_dibangun: string;
   kondisi: string;
+  lokasi: string;
   keterangan: string;
 }
