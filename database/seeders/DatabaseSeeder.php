@@ -3454,120 +3454,20 @@ class DatabaseSeeder extends Seeder
             [
                 // 1
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
+                'rombel_id' => 2,  // X-B-1
                 'jadwal_pelajaran_id' => 1, // MTK
-                'hari' => '2024-12-02',
+                'hari' => '2023-12-02',
                 'status' => 'hadir',
                 'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
-            [
-                // 2
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // XI-A-1
-                'jadwal_pelajaran_id' => 2, // Indonesia
-                'hari' => '2024-12-02',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 3
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 3, // PAI
-                'hari' => '2024-12-03',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 4
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 4, // PPKn
-                'hari' => '2024-12-03',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 5
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 5, // Inggris
-                'hari' => '2024-12-04',
-                'status' => 'izin',
-                'bukti' => 'izin.jpg',                                
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 6
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 6, // Informatika
-                'hari' => '2024-12-04',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 7
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 7, // Sejarah
-                'hari' => '2024-12-05',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 8
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 8, // Seni Budaya
-                'hari' => '2024-05-05',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 9
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 9, // PJOK
-                'hari' => '2024-12-06',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],            
-            [
-                // 9
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 10, // P5
-                'hari' => '2024-12-06',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],
-            // -------------------------------------------------------------      
             [
                 // 1
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
+                'rombel_id' => 2,  // X-B-1
                 'jadwal_pelajaran_id' => 1, // MTK
-                'hari' => '2024-12-09',
+                'hari' => '2023-12-09',
                 'status' => 'alfa',
                 'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 1,
@@ -3576,325 +3476,392 @@ class DatabaseSeeder extends Seeder
             [
                 // 2
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // XI-A-1
+                'rombel_id' => 2,  // XI-B-1
                 'jadwal_pelajaran_id' => 2, // Indonesia
-                'hari' => '2024-12-09',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'hari' => '2023-12-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
             [
                 // 3
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
+                'rombel_id' => 2,  // X-B-1
                 'jadwal_pelajaran_id' => 3, // PAI
-                'hari' => '2024-12-10',
-                'status' => 'alfa',
+                'hari' => '2023-12-03',
+                'status' => 'hadir',
                 'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
-            ],            
+            ],                        
             [
-                // 4
+                // 1
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 4, // PPKn
-                'hari' => '2024-12-10',
-                'status' => 'izin',
+                'rombel_id' => 2,  // X-B-1
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2024-01-09',
+                'status' => 'hadir',
                 'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
+                'semester_id' => 2, // Genap
             ],            
             [
-                // 5
+                // 2
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 5, // Inggris
-                'hari' => '2024-12-11',
+                'rombel_id' => 2,  // XI-B-1
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg',                                
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
+                'semester_id' => 2, // Genap
             ],            
             [
-                // 6
+                // 3
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 6, // Informatika
-                'hari' => '2024-12-11',
+                'rombel_id' => 2,  // X-B-1
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null,  
+                'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
+                'semester_id' => 2, // Genap
+            ],                        
+            [
+                // 1
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2024-12-02',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
             ],            
             [
-                // 7
+                // 2
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 7, // Sejarah
-                'hari' => '2024-12-12',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
+                'rombel_id' => 5,  // XI-B-1
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2023-12-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
             ],            
             [
-                // 8
+                // 3
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 8, // Seni Budaya
-                'hari' => '2024-12-12',
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2023-12-03',
                 'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],                        
+            [
+                // 1
+                'siswa_id' => 2, // Winton
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2024-01-02',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
             ],            
             [
-                // 9
+                // 2
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 9, // PJOK
-                'hari' => '2024-12-13',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
+                'rombel_id' => 5,  // XI-B-1
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2024-01-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
             ],            
             [
-                // 9
+                // 3
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 10, // P5
-                'hari' => '2024-12-13',
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 1,
-                'semester_id' => 1, // Ganjil
-            ],                   
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],         
             
-            // Genap
+            // Bagas
             [
                 // 1
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 2,  // X-B-1
                 'jadwal_pelajaran_id' => 1, // MTK
-                'hari' => '2025-01-13',
+                'hari' => '2023-12-02',
+                'status' => 'alfa',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],            
+            [
+                // 2
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 2,  // XI-B-1
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2023-12-02',
                 'status' => 'hadir',
                 'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],            
+            [
+                // 3
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 2,  // X-B-1
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2023-12-03',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],                        
+            [
+                // 1
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 2,  // X-B-1
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2024-01-02',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
             [
                 // 2
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // XI-A-1
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 2,  // XI-B-1
                 'jadwal_pelajaran_id' => 2, // Indonesia
-                'hari' => '2025-01-13',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 3
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 3, // PAI
-                'hari' => '2025-01-14',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 4
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 4, // PPKn
-                'hari' => '2025-01-14',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 5
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 5, // Inggris
-                'hari' => '2025-01-15',
-                'status' => 'hadir',
-                'bukti' => null,
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 6
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 6, // Informatika
-                'hari' => '2025-01-15',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 7
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 7, // Sejarah
-                'hari' => '2025-01-16',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 8
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 8, // Seni Budaya
-                'hari' => '2025-01-16',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 9
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 9, // PJOK
-                'hari' => '2025-01-17',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 9
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 10, // P5
-                'hari' => '2025-01-17',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],
-            // -------------------------------------------------------------      
-            [
-                // 1
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 1, // MTK
-                'hari' => '2025-01-20',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 2
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // XI-A-1
-                'jadwal_pelajaran_id' => 2, // Indonesia
-                'hari' => '2025-01-20',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 3
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 3, // PAI
-                'hari' => '2025-01-21',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 4
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 4, // PPKn
-                'hari' => '2025-01-21',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
-                'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
-            [
-                // 5
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 5, // Inggris
-                'hari' => '2025-01-22',
+                'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg',                                
-                'tahun_akademik_id' => 2,
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
             [
-                // 6
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 6, // Informatika
-                'hari' => '2025-01-22',
+                // 3
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 2,  // X-B-1
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 2,
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
-            ],            
+            ],                        
             [
-                // 7
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 7, // Sejarah
-                'hari' => '2025-01-23',
+                // 1
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2023-12-02',
                 'status' => 'hadir',
-                'bukti' => null,  
+                'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
+                'semester_id' => 3, // Ganjil
             ],            
             [
-                // 8
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 8, // Seni Budaya
-                'hari' => '2025-01-23',
+                // 2
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 5,  // XI-B-1
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2023-12-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],            
+            [
+                // 3
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2023-12-03',
                 'status' => 'hadir',
-                'bukti' => null,  
+                'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 2,
-                'semester_id' => 2, // Genap
-            ],            
+                'semester_id' => 3, // Ganjil
+            ],                        
             [
-                // 9
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 9, // PJOK
-                'hari' => '2025-01-24',
+                // 1
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2024-01-02',
                 'status' => 'alfa',
-                'bukti' => null,  
+                'bukti' => null, // hadir, izin, sakit, alfa                            
                 'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],            
+            [
+                // 2
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 5,  // XI-B-1
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2024-01-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],            
+            [
+                // 3
+                'siswa_id' => 1, // Bagas
+                'rombel_id' => 5,  // X-B-1
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2024-01-03',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],    
+
+            // Yuli
+            [
+                // 1
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 10,  // X-B-2
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2023-12-02',
+                'status' => 'alfa',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],            
+            [
+                // 2
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 10,  // XI-B-2
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2023-12-02',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],            
+            [
+                // 3
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 10,  // X-B-2
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2023-12-03',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1, // Ganjil
+            ],                        
+            [
+                // 1
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 10,  // X-B-2
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2024-01-02',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
             [
-                // 9
-                'siswa_id' => 2, // Winton
-                'rombel_id' => 1,  // X-A-1
-                'jadwal_pelajaran_id' => 10, // P5
-                'hari' => '2025-01-24',
-                'status' => 'hadir',
-                'bukti' => null,  
-                'tahun_akademik_id' => 2,
+                // 2
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 10,  // XI-B-2
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2024-01-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
-            ],                   
+            ],            
+            [
+                // 3
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 10,  // X-B-2
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2024-01-03',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2, // Genap
+            ],                        
+            [
+                // 1
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 14,  // X-B-1
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2023-12-02',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],            
+            [
+                // 2
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 14,  // XII-B-2
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2023-12-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],            
+            [
+                // 3
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 14,  // XI-B-2
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2023-12-03',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3, // Ganjil
+            ],                        
+            [
+                // 1
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 14,  // XI-B-2
+                'jadwal_pelajaran_id' => 1, // MTK
+                'hari' => '2024-01-02',
+                'status' => 'alfa',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],            
+            [
+                // 2
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 14,  // XII-B-2
+                'jadwal_pelajaran_id' => 2, // Indonesia
+                'hari' => '2024-01-02',
+                'status' => 'izin',
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],            
+            [
+                // 3
+                'siswa_id' => 5, // Yuli
+                'rombel_id' => 14,  // XI-B-2
+                'jadwal_pelajaran_id' => 3, // PAI
+                'hari' => '2024-01-03',
+                'status' => 'hadir',
+                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4, // Genap
+            ],    
                       
         ]);        
 

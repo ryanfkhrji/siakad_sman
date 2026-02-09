@@ -22,65 +22,70 @@ class AbsensiSiswaController extends Controller
 {
     /**
      * ✅ Untuk spa
-     * tahun->rombel->siswa
      */
     public function index()
     {
-        $siswaRombel = SiswaRombel::with([
+        $absensiSiswa = AbsensiSiswa::with([
+            'rombel.kelas',
             'tahunAkademik',
-            'rombel.waliRombel',
+            'semester',
+            'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
             'siswa',
         ])
-        ->orderBy('tahun_akademik_id', 'desc')
         ->get();
 
-        if ($siswaRombel->isEmpty()) {
-            return ApiResponse::error('Not found', [
-                'data' => 'Tidak ada data'
-            ]);
+        if ($absensiSiswa->isEmpty()) {
+            return ApiResponse::error('Not found', 'Belum ada data absensi');
         }
 
-        $result = $siswaRombel
-            ->groupBy('tahun_akademik_id')
-            ->map(function ($tahun) {
+        $result = $absensiSiswa->groupBy('tahun_akademik_id')
+        ->sortKeys()
+        ->map(function ($absen) {
+            $tahun = $absen->first()->tahunAkademik;            
 
-                $ta = $tahun->first()->tahunAkademik;
+            return [
+                'tahun_akademik_id' => $tahun->id,
+                'tahun_akademik'    => $tahun->tahun_akademik,
+                'status_tahun'      => $tahun->status,
+                'rombel'            => $absen->groupBy('rombel_id')
+                ->map(function ($abs) {
+                    $rombel = $abs->first()->rombel;
 
-                return [
-                    'tahun_akademik_id' => $ta->id ?? null,
-                    'tahun_akademik' => $ta->tahun_akademik ?? null,
-                    'status_tahun_akademik' => $ta->status ?? null,
+                    return [
+                        'rombel_id'     => $rombel->id,
+                        'nama_rombel'   => $rombel->nama_rombel,
+                        'tingkat'       => $rombel->kelas->tingkat,
+                        'siswa'         => $abs->groupBy('siswa_id')
+                        ->map(function ($ab) {
+                            $siswa = $ab->first()->siswa;
 
-                    'rombels' => $tahun
-                        ->groupBy('rombel_id')
-                        ->map(function ($rombel) {
-
-                            $rmbl = $rombel->first()->rombel;
+                            $totalHadirTahun = $ab
+                                ->where('status', 'hadir')
+                                ->count();
+                            $totalIzinTahun = $ab
+                                ->where('status', 'izin')
+                                ->count();
+                            $totalSakitTahun = $ab
+                                ->where('status', 'sakit')
+                                ->count();
+                            $totalAlfaTahun = $ab
+                                ->where('status', 'alfa')
+                                ->count();
 
                             return [
-                                'rombel_id' => $rmbl->id ?? null,
-                                'nama_rombel' => $rmbl->nama_rombel ?? null,
-                                'wali_rombel' => $rmbl->waliRombel->nama ?? null,
-
-                                'siswas' => $rombel
-                                    ->map(function ($item) {
-                                        $siswa = $item->siswa;
-
-                                        return [
-                                            'siswa_id' => $siswa->id,
-                                            'nama_siswa' => $siswa->nama,
-                                            'nisn' => $siswa->nisn,
-                                            'nis' => $siswa->nis,
-                                            'status' => $siswa->status,
-                                        ];
-                                    })
-                                    ->values(),
+                                'siswa_id'  => $siswa->id,
+                                'nama'      => $siswa->nama,
+                                'nisn'      => $siswa->nisn,
+                                'hadir_pertahun' => $totalHadirTahun ?? null,
+                                'izin_pertahun'  => $totalIzinTahun ?? null,
+                                'sakit_pertahun' => $totalSakitTahun ?? null,
+                                'alfa_pertahun'  => $totalAlfaTahun ?? null,
                             ];
-                        })
-                        ->values(),
-                ];
-            })
-            ->values();
+                        })->values(),
+                    ];
+                })->values(),
+            ];
+        })->values();
 
         return ApiResponse::success($result, 'Data berhasil diambil');
     }
@@ -290,23 +295,19 @@ class AbsensiSiswaController extends Controller
 
 
     /**
-     * ✅ untuk spa
-     * siswa, tahun, semester, rombel, jadwal, absensi
+     * ! ✅ untuk spa (masuk kesini, indexnya udah)
      */   
     public function show($id)
     {
         $absensi = AbsensiSiswa::with([
-            'siswa',
             'rombel',
             'tahunAkademik',
             'semester',
-            'jadwalPelajaran.ruangan',
-            'jadwalPelajaran.rombel',
-            'jadwalPelajaran.guru',
             'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
+            'siswa'
         ])
         ->where('siswa_id', $id)
-        ->orderBy('hari', 'desc')
+        ->orderBy('hari', 'asc')
         ->get();
 
         if ($absensi->isEmpty()) {
@@ -318,72 +319,60 @@ class AbsensiSiswaController extends Controller
         $siswa = $absensi->first()->siswa;
 
         $result = [
-            'siswa_id' => $siswa->id,
-            'nama_siswa' => $siswa->nama,
-            'nisn' => $siswa->nisn,
-            'nis' => $siswa->nis,
+            'siswa_id'          => $siswa->id,
+            'nama_siswa'        => $siswa->nama,
+            'nisn'              => $siswa->nisn,
+            'nis'               => $siswa->nis,
+            'histori_rombel'    => $absensi->groupBy('rombel_id')
+            ->map(function ($absen) {
+                $rombel = $absen->first()->rombel;
 
-            'tahun_akademik' => $absensi
-                ->groupBy('tahun_akademik_id')
-                ->map(function ($taGroup) {
+                return [
+                    'rombel_id'     => $rombel->id,
+                    'nama_rombel'   => $rombel->nama_rombel,
+                    'periode'       => $absen->groupBy('tahun_akademik_id')
+                    ->sortKeys()
+                    ->map(function ($abs) {
+                        $tahun = $abs->first()->tahunAkademik;
 
-                    $ta = $taGroup->first()->tahunAkademik;
-
-                    return [
-                        'tahun_akademik_id' => $ta->id,
-                        'tahun_akademik' => $ta->tahun_akademik,
-                        'status_tahun_akademik' => $ta->status,
-
-                        'semester' => $taGroup
-                            ->groupBy('semester_id')
-                            ->map(function ($semesterGroup) {
-
-                                $semester = $semesterGroup->first()->semester;
+                        return [
+                            'tahun_akademik_id' => $tahun->id,
+                            'tahun_akademik'    => $tahun->tahun_akademik,
+                            'status_tahun'      => $tahun->status,
+                            'semester'          => $abs->groupBy('semester_id')
+                            ->sortKeys()
+                            ->map(function ($ab) {
+                                $semester = $ab->first()->semester;
 
                                 return [
-                                    'semester_id' => $semester->id,
-                                    'semester' => $semester->semester,
-                                    'status_semester' => $semester->status,
+                                    'semester_id'       => $semester->id,
+                                    'semester'          => $semester->semester,
+                                    'status_semester'   => $semester->status,
 
-                                    'jadwal_pelajaran' => $semesterGroup
-                                        ->groupBy('jadwal_pelajaran_id')
-                                        ->map(function ($jadwalGroup) {
+                                    'mata_pelajarans'   => $ab->groupBy('jadwal_pelajaran_id')
+                                    ->map(function ($a) {
+                                        $mapel = $a->first()->jadwalPelajaran->kurikulumMataPelajaran->mataPelajaran;
 
-                                            $jadwal = $jadwalGroup->first()->jadwalPelajaran;
-                                            $mapel = $jadwal->kurikulumMataPelajaran->mataPelajaran;
-
-                                            return [
-                                                'jadwal_pelajaran_id' => $jadwal->id,
-                                                'mata_pelajaran' => $mapel->nama_pelajaran ?? null,
-                                                'guru_pengajar' => $jadwal->guru->nama ?? null,
-                                                'hari' => $jadwal->hari ?? null,
-                                                'jam_mulai' => $jadwal->jam_mulai ?? null,
-                                                'jam_selesai' => $jadwal->jam_selesai ?? null,
-                                                'rombel_jadwal' => $jadwal->rombel->nama_rombel ?? null,
-                                                'ruangan' => $jadwal->ruangan->nama_ruangan ?? null,
-                                                'link_opsional' => $jadwal->link_opsional ?? null,
-
-                                                'absensi' => $jadwalGroup
-                                                    ->map(function ($absen) {
-                                                        return [
-                                                            'absensi_id' => $absen->id,
-                                                            'rombel_siswa' => $absen->rombel->nama_rombel ?? null,           
-                                                            'hari' => Carbon::parse($absen->hari)
-                                                            ->translatedFormat('l, d F Y'),
-                                                            'status' => $absen->status,
-                                                            'bukti' => $absen->bukti ? asset(str_replace('public/', 'storage/', $absen->bukti)) : null,
-                                                        ];
-                                                    })
-                                                    ->values(),
-                                            ];
-                                        })
-                                        ->values(),
+                                        return [
+                                            'jadwal_pelajaran_id'   => $a->first()->jadwalPelajaran->id,
+                                            'mata_pelajaran'        => $mapel->nama_pelajaran,
+                                            'absensi'               => $a->map(function ($absensiMapel) {
+                                                return [
+                                                    'absensi_id'    => $absensiMapel->id,
+                                                    'hari'          => $absensiMapel->hari,
+                                                    'status'        => $absensiMapel->status,
+                                                    'bukti'         => $absensiMapel->bukti ?? null,
+                                                    // mantap
+                                                ];
+                                            })->values(),
+                                        ];
+                                    })->values(),
                                 ];
-                            })
-                            ->values(),
-                    ];
-                })
-                ->values(),
+                            })->values(),
+                        ];
+                    })->values(),
+                ];
+            })->values(),
         ];
 
         return ApiResponse::success($result, 'Detail absensi siswa berhasil diambil');

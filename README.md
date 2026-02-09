@@ -202,14 +202,14 @@ Perbaikan
         - ikutin insomnia (baca docs jika ada)
         - jika status pada tahun_akademik atau semester = 'arsip', maka button delete dan update hilang...update dan delete hanya berlaku saat TA dan semester aktif saja
 --------------------------------------                                            
-27. absensi_pelajaran:
+27. X absensi_pelajaran:
     - ☑️ Backend:
         - ✅ samakan semua
         - ✅ show menggunakan id guru
     - Frontend
         - samakan dengan insomnia
 --------------------------------------                                            
-28.  absensi_siswa:
+28. absensi_siswa:
     - ☑️ Backend:
         - ✅ samakan (seeder, controller) dengan migrasi
         - ❌ tambahkan fitur guru bisa absenkan siswa di controller        
@@ -225,6 +225,7 @@ Perbaikan
             b. Klik detail (nanti bisa dapet data siswanya)
             c. lalu absenkan siswa (jika bingung, baca AbsensiSiswaController, function guruAbsenkanSiswa)
             d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan rombel_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
+--------------------------------------                                            
 29. ♻️ ekstrakurikuler:
     - ☑️ Backend:
         - ✅ migrasi, seeder, controller

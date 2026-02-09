@@ -23,10 +23,10 @@ class AbsensiSiswaExport implements FromCollection, WithHeadings
         $query = $this->ids
             ? AbsensiSiswa::whereIn('id', $this->ids)->with([
                 'siswa',
-                'tahunAkademik',
-                'semester',
                 'rombel',
                 'jadwalPelajaran.kurikulumMataPelajaran.mataPelajaran',
+                'tahunAkademik',
+                'semester',
             ])->get()
             : AbsensiSiswa::with([
                 'siswa',

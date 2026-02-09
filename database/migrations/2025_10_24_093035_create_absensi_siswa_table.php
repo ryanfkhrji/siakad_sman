@@ -49,3 +49,9 @@ return new class extends Migration
         Schema::dropIfExists('absensi_siswa');
     }
 };
+
+/**
+ * foto dihapus maka kolomnya berubah jadi : Bukti sudah dihapus admin pada now()
+ * batasi ukuran foto
+ * convert foto jadi format webp biar kecil
+ */
