@@ -11,13 +11,14 @@ import api from "@/api/axios";
 
 interface FormErrors {
   nama_jurusan?: string[];
+  kode_jurusan?: string[];
 }
 
 const CreateJurusan = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [formData, setFormData] = useState({
     nama_jurusan: "",
-    jumlah_siswa: 0,
+    kode_jurusan: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -75,6 +76,22 @@ const CreateJurusan = () => {
 
           <div className="bg-white rounded shadow p-5">
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
+              {/* Kode Jurusan */}
+              <div className="mb-6">
+                <label htmlFor="kode_jurusan" className="block font-semibold text-foreground">
+                  Kode Jurusan
+                </label>
+                <input
+                  type="text"
+                  name="kode_jurusan"
+                  placeholder="cth: AKL / FIS / SBD"
+                  value={formData.kode_jurusan}
+                  onChange={(e) => setFormData({ ...formData, kode_jurusan: e.target.value })}
+                  className="border p-2 w-full mt-2 rounded"
+                />
+                {errors.kode_jurusan && <p className="text-red-500 text-sm mt-1">{errors.kode_jurusan[0]}</p>}
+              </div>
+
               {/* Nama Jurusan */}
               <div className="mb-6">
                 <label htmlFor="nama_jurusan" className="block font-semibold text-foreground">
@@ -89,15 +106,6 @@ const CreateJurusan = () => {
                   className="border p-2 w-full mt-2 rounded"
                 />
                 {errors.nama_jurusan && <p className="text-red-500 text-sm mt-1">{errors.nama_jurusan[0]}</p>}
-              </div>
-
-              {/* Jumlah Siswa (readonly) */}
-              <div className="mb-6">
-                <label htmlFor="jumlah_siswa" className="block font-semibold text-foreground">
-                  Jumlah Siswa
-                </label>
-                <input type="number" name="jumlah_siswa" value={formData.jumlah_siswa} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100 text-gray-600 cursor-not-allowed" disabled />
-                <p className="text-xs text-gray-500 mt-1">Nilai ini akan diperbarui otomatis dari data siswa.</p>
               </div>
 
               {/* Tombol Aksi */}

@@ -7,14 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { Jurusan } from "@/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Jurusan, JurusanListResponse, JurusanErrorResponse } from "@/types/jurusan";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { DialogDetailJurusan } from "./DialogDetailJurusan";
+import { Badge } from "@/components/ui/badge";
 
 const DataJurusan = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [dataJurusan, setDataJurusan] = useState<Jurusan[]>([]);
+  const [filteredJurusan, setFilteredJurusan] = useState<Jurusan[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -24,12 +28,19 @@ const DataJurusan = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/spa/jurusan");
+        const res = await api.get<JurusanListResponse>("/spa/jurusan");
+
         if (res.data.status === "success") {
           setDataJurusan(res.data.data);
+          setFilteredJurusan(res.data.data);
         }
       } catch (error) {
         console.error("Gagal mengambil data jurusan:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Gagal mengambil data jurusan",
+        });
       } finally {
         setLoading(false);
       }
@@ -38,12 +49,24 @@ const DataJurusan = () => {
     fetchData();
   }, []);
 
+  // Filter berdasarkan status
+  useEffect(() => {
+    let filtered = dataJurusan;
+
+    if (selectedStatus) {
+      filtered = filtered.filter((jurusan) => jurusan.status === selectedStatus);
+    }
+
+    setFilteredJurusan(filtered);
+    setCurrentPage(1);
+  }, [selectedStatus, dataJurusan]);
+
   // Pagination logic
-  const totalPages = Math.ceil(dataJurusan.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredJurusan.length / rowsPerPage);
   const paginatedJurusan = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
-    return dataJurusan.slice(start, start + rowsPerPage);
-  }, [dataJurusan, currentPage, rowsPerPage]);
+    return filteredJurusan.slice(start, start + rowsPerPage);
+  }, [filteredJurusan, currentPage, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -68,6 +91,7 @@ const DataJurusan = () => {
 
       if (res.data.status === "success") {
         setDataJurusan((prev) => prev.filter((j) => j.id !== id));
+        setFilteredJurusan((prev) => prev.filter((j) => j.id !== id));
 
         Swal.fire({
           icon: "success",
@@ -84,17 +108,28 @@ const DataJurusan = () => {
         });
       }
     } catch (err: any) {
-      if (err.response?.data?.status === "error") {
+      const errorData = err.response?.data as JurusanErrorResponse;
+
+      if (err.response?.status === 404) {
         Swal.fire({
           icon: "error",
-          title: "Gagal menghapus!",
-          text: err.response.data.message || "Jurusan tidak ditemukan.",
+          title: "Tidak Ditemukan",
+          text: "Jurusan tidak ditemukan.",
+        });
+      } else if (err.response?.status === 422 && errorData?.errors) {
+        // Handle constraint errors (kelas atau siswa masih ada)
+        const errorMessages = Object.values(errorData.errors).flat().join("\n");
+
+        Swal.fire({
+          icon: "error",
+          title: "Tidak Bisa Dihapus",
+          text: errorMessages || errorData.message,
         });
       } else {
         Swal.fire({
           icon: "error",
           title: "Koneksi gagal!",
-          text: "Terjadi kesalahan koneksi ke server.",
+          text: err.response?.data?.message || "Terjadi kesalahan koneksi ke server.",
         });
       }
       console.error("Gagal menghapus jurusan:", err);
@@ -120,14 +155,38 @@ const DataJurusan = () => {
             </div>
           ) : (
             <>
-              {/* Tombol Tambah */}
-              <div className="mb-6 flex justify-between items-center w-full">
+              {/* Toolbar */}
+              <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                 <Link to="/superadmin/informasi-sekolah/jurusan/create" className="w-full md:w-auto">
-                  <Button className="bg-primary w-full mx-auto">
+                  <Button className="bg-primary w-full md:w-auto">
                     <PlusIcon size={18} />
                     Tambah Jurusan
                   </Button>
                 </Link>
+
+                {/* Filter Status */}
+                <Select value={selectedStatus ?? ""} onValueChange={(value) => setSelectedStatus(value || null)}>
+                  <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
+                    <SelectValue placeholder="Filter Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="aktif">Aktif</SelectItem>
+                    <SelectItem value="arsip">Arsip</SelectItem>
+                    <div className="px-2 py-1 border-t border-gray-200">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedStatus(null);
+                        }}
+                      >
+                        Tampilkan Semua
+                      </Button>
+                    </div>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Tabel Data */}
@@ -135,9 +194,10 @@ const DataJurusan = () => {
                 <Table className="min-w-full border border-gray-200 rounded shadow-sm bg-white">
                   <TableHeader className="bg-primary">
                     <TableRow>
-                      <TableHead className="text-center font-semibold text-white">No</TableHead>
+                      <TableHead className="w-[60px] text-center font-semibold text-white">No</TableHead>
+                      <TableHead className="font-semibold text-white">Kode Jurusan</TableHead>
                       <TableHead className="font-semibold text-white">Nama Jurusan</TableHead>
-                      <TableHead className="font-semibold text-white">Jumlah Siswa</TableHead>
+                      <TableHead className="font-semibold text-white">Status</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -147,8 +207,11 @@ const DataJurusan = () => {
                       paginatedJurusan.map((jurusan, index) => (
                         <TableRow key={jurusan.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
+                          <TableCell>{jurusan.kode_jurusan ?? "-"}</TableCell>
                           <TableCell>{jurusan.nama_jurusan ?? "-"}</TableCell>
-                          <TableCell>{jurusan.jumlah_siswa ?? "0"}</TableCell>
+                          <TableCell>
+                            <Badge className={jurusan.status === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-gray-100 text-gray-700 border-gray-300"}>{jurusan.status}</Badge>
+                          </TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
                             <DialogDetailJurusan jurusanId={jurusan.id} />
@@ -167,7 +230,7 @@ const DataJurusan = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-gray-500 py-4">
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-4">
                           Tidak ada data jurusan yang ditemukan
                         </TableCell>
                       </TableRow>
@@ -178,21 +241,25 @@ const DataJurusan = () => {
 
               {/* Pagination */}
               <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span>Tampilkan:</span>
-                  <select
-                    value={rowsPerPage}
-                    onChange={(e) => {
-                      setRowsPerPage(Number(e.target.value));
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Tampilkan:</span>
+                  <Select
+                    value={rowsPerPage.toString()}
+                    onValueChange={(val) => {
+                      setRowsPerPage(Number(val));
                       setCurrentPage(1);
                     }}
-                    className="border border-gray-300 rounded px-2 py-1"
                   >
-                    <option value="10">10</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                  </select>
-                  <span>data per halaman</span>
+                    <SelectTrigger className="w-auto cursor-pointer">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm text-gray-600">data per halaman</span>
                 </div>
 
                 <div className="flex items-center gap-2">

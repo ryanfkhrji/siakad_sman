@@ -1,5 +1,3 @@
-
-
 export interface Jurusan {
   id: number;
   nama_jurusan: string;
