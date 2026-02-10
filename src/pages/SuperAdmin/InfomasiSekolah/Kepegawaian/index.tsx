@@ -33,8 +33,16 @@ const DataKepegawaian = () => {
         setLoading(true);
         const res = await api.get("/spa/kepegawaian");
         if (res.data.status === "success") {
-          setDataKepegawaian(res.data.data);
-          setFilteredKepegawaian(res.data.data);
+          const flattened = res.data.data.flatMap((group: any) =>
+            group.pegawai.map((pegawai: any) => ({
+              ...pegawai,
+              status: group.status,
+              email: pegawai.email ?? "",
+            })),
+          );
+
+          setDataKepegawaian(flattened);
+          setFilteredKepegawaian(flattened);
         }
       } catch (error) {
         console.error("Gagal mengambil data kepegawaian:", error);
@@ -230,13 +238,7 @@ const DataKepegawaian = () => {
                   {/* Search */}
                   <div className="relative w-full md:w-64">
                     <Search className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                    <Input
-                      type="text"
-                      placeholder="Cari nama, NIP, NUPTK, email..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8"
-                    />
+                    <Input type="text" placeholder="Cari Nama, NIP, NUPTK..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
                   </div>
                 </div>
               </div>
@@ -250,9 +252,9 @@ const DataKepegawaian = () => {
                       <TableHead className="font-semibold text-white">NIP</TableHead>
                       <TableHead className="font-semibold text-white">NUPTK</TableHead>
                       <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
-                      <TableHead className="font-semibold text-white">Email</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Email</TableHead> */}
                       <TableHead className="font-semibold text-white">Role</TableHead>
-                      <TableHead className="font-semibold text-white">Status</TableHead>
+                      {/* <TableHead className="font-semibold text-white">Status</TableHead> */}
                       <TableHead className="font-semibold text-white">Keterangan</TableHead>
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
                     </TableRow>
@@ -266,23 +268,14 @@ const DataKepegawaian = () => {
                           <TableCell>{item.nip ?? "-"}</TableCell>
                           <TableCell>{item.nuptk ?? "-"}</TableCell>
                           <TableCell>{item.nama}</TableCell>
-                          <TableCell>{item.email ?? "-"}</TableCell>
+                          {/* <TableCell>{item.email ?? "-"}</TableCell> */}
                           <TableCell>
                             <Badge variant="outline" className="capitalize">
-                              {item.role.replace("_", " ")}
-                            </Badge>
+                              {item.role?.replace("_", " ") ?? "-"}                            </Badge>
                           </TableCell>
-                          <TableCell>
-                            <Badge
-                              className={
-                                item.status === "aktif"
-                                  ? "bg-green-100 text-green-700 border-green-300"
-                                  : "bg-red-100 text-red-700 border-red-300"
-                              }
-                            >
-                              {item.status}
-                            </Badge>
-                          </TableCell>
+                          {/* <TableCell>
+                            <Badge className={item.status === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>{item.status}</Badge>
+                          </TableCell> */}
                           <TableCell>{item.keterangan ?? "-"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             <DialogDetailKepegawaian kepegawaianId={item.id} />
@@ -293,11 +286,7 @@ const DataKepegawaian = () => {
                               </Button>
                             </Link>
 
-                            <Button
-                              className="bg-muted-foreground hover:bg-muted-foreground/90"
-                              size="sm"
-                              onClick={() => handleDelete(item.id)}
-                            >
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(item.id)}>
                               <Trash2 size={16} />
                             </Button>
                           </TableCell>
@@ -344,11 +333,7 @@ const DataKepegawaian = () => {
                   <span className="text-sm">
                     Halaman <strong>{currentPage}</strong> dari <strong>{totalPages || 1}</strong>
                   </span>
-                  <Button
-                    size="sm"
-                    disabled={currentPage === totalPages || totalPages === 0}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  >
+                  <Button size="sm" disabled={currentPage === totalPages || totalPages === 0} onClick={() => handlePageChange(currentPage + 1)}>
                     Next
                   </Button>
                 </div>

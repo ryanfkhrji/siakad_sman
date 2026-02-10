@@ -90,9 +90,9 @@ export interface JadwalPelajaran {
 export interface Kepegawaian {
   id: number;
   nama: string;
-  email: string;
-  nip?: string;
-  nuptk?: string;
+  email?: string;
+  nip: string;
+  nuptk: string;
   keterangan?: string;
   role: string;
   status: string;
