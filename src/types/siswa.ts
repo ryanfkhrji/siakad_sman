@@ -136,11 +136,11 @@ export interface SiswaDetailResponse {
   message: string;
   data: {
     siswa_id: number;
-    nama_siswa: string;
+    nama: string;
     nisn: string;
     nis: string;
     email: string;
-    status_siswa: string;
+    status: string;
     jurusan_siswa?: string;
     histori_rombel: HistoriRombel[];
     histori_ekstrakurikuler: HistoriEkstrakurikuler[];

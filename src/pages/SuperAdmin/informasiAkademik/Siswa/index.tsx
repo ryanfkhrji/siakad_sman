@@ -6,7 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { PenBoxIcon, Trash2Icon, SearchIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
-import { Select, SelectContent, /*SelectGroup*/SelectItem, /*SelectLabel*/ SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, /*SelectGroup*/ SelectItem, /*SelectLabel*/ SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import api from "@/api/axios";
@@ -19,7 +19,8 @@ const DataSiswa = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [dataSiswa, setDataSiswa] = useState<Siswa[]>([]);
   const [filteredSiswa, setFilteredSiswa] = useState<Siswa[]>([]);
-  const [selectedJenjang, /*setSelectedJenjang*/] = useState<string | null>(null);
+  const [selectedJenjang /*setSelectedJenjang*/] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,11 +32,16 @@ const DataSiswa = () => {
       try {
         setLoading(true);
         const res = await api.get<SiswaListResponse>("/spa/siswa");
-
         if (res.data.status === "success") {
           // Backend mengembalikan data dalam format grouped by status
           // Flatten array untuk mendapatkan semua siswa
-          const allSiswa = res.data.data.flatMap((group) => group.siswa);
+          const allSiswa = res.data.data.flatMap((group) =>
+            group.siswa.map((siswa) => ({
+              ...siswa,
+              status: group.status, // Tambahkan status dari group
+              id: siswa.siswa_id as number,
+            })),
+          );
           setDataSiswa(allSiswa);
           setFilteredSiswa(allSiswa);
         }
@@ -54,7 +60,7 @@ const DataSiswa = () => {
     fetchData();
   }, []);
 
-  // Filter berdasarkan jenjang dan pencarian
+  // Filter berdasarkan jenjang, status, dan pencarian
   useEffect(() => {
     let filtered = dataSiswa;
 
@@ -62,9 +68,12 @@ const DataSiswa = () => {
       filtered = filtered.filter((siswa) => {
         // Cek dari nama_jurusan atau dari relasi siswaRombels
         const jurusanName = siswa.nama_jurusan || siswa.siswaRombels?.[0]?.rombel?.kelas?.jurusan?.nama_jurusan;
-
         return jurusanName?.includes(selectedJenjang);
       });
+    }
+
+    if (selectedStatus) {
+      filtered = filtered.filter((siswa) => siswa.status === selectedStatus);
     }
 
     if (searchTerm.trim() !== "") {
@@ -74,7 +83,7 @@ const DataSiswa = () => {
 
     setFilteredSiswa(filtered);
     setCurrentPage(1);
-  }, [selectedJenjang, searchTerm, dataSiswa]);
+  }, [selectedJenjang, selectedStatus, searchTerm, dataSiswa]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredSiswa.length / rowsPerPage);
@@ -188,38 +197,36 @@ const DataSiswa = () => {
                   </Button>
                 </Link>
 
-                {/* Filter Jenjang */}
-                {/* <Select value={selectedJenjang ?? ""} onValueChange={(value) => setSelectedJenjang(value)}>
-                  <SelectTrigger className="w-full md:w-1/3 cursor-pointer">
-                    <SelectValue placeholder="Filter Berdasarkan Kelas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Pilih Jenjang</SelectLabel>
-                      <SelectItem value="X">Kelas 10</SelectItem>
-                      <SelectItem value="XI">Kelas 11</SelectItem>
-                      <SelectItem value="XII">Kelas 12</SelectItem>
-                    </SelectGroup>
-                    <div className="px-2 py-1 border-t border-gray-200">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedJenjang(null);
-                        }}
-                      >
-                        Tampilkan Semua
-                      </Button>
-                    </div>
-                  </SelectContent>
-                </Select> */}
+                <div className="flex gap-4 w-full md:flex-row flex-col md:w-auto">
+                  {/* Filter Status */}
+                  <Select value={selectedStatus ?? ""} onValueChange={(value) => setSelectedStatus(value || null)}>
+                    <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
+                      <SelectValue placeholder="Filter Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="aktif">Aktif</SelectItem>
+                      <SelectItem value="tidak aktif">Tidak Aktif</SelectItem>
+                      <div className="px-2 py-1 border-t border-gray-200">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedStatus(null);
+                          }}
+                        >
+                          Tampilkan Semua
+                        </Button>
+                      </div>
+                    </SelectContent>
+                  </Select>
 
-                {/* Search */}
-                <div className="relative w-full md:w-1/3">
-                  <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari berdasarkan nama, NISN, atau NIS..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  {/* Search */}
+                  <div className="relative w-full md:w-[300px]">
+                    <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
+                    <Input type="text" placeholder="Cari berdasarkan nama, NISN, atau NIS..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  </div>
                 </div>
               </div>
 
@@ -232,7 +239,6 @@ const DataSiswa = () => {
                       <TableHead className="font-semibold text-white">NISN</TableHead>
                       <TableHead className="font-semibold text-white">NIS</TableHead>
                       <TableHead className="font-semibold text-white">Nama Lengkap</TableHead>
-                      <TableHead className="font-semibold text-white">Email</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
                     </TableRow>
@@ -246,7 +252,6 @@ const DataSiswa = () => {
                           <TableCell>{siswa.nisn ?? "-"}</TableCell>
                           <TableCell>{siswa.nis ?? "-"}</TableCell>
                           <TableCell>{siswa.nama ?? "-"}</TableCell>
-                          <TableCell>{siswa.email ?? "-"}</TableCell>
                           <TableCell>
                             <Badge className={siswa.status === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>{siswa.status}</Badge>
                           </TableCell>
@@ -259,7 +264,7 @@ const DataSiswa = () => {
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.id)}>
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(siswa.siswa_id || siswa.id)}>
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>

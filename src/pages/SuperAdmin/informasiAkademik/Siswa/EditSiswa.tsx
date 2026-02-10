@@ -46,19 +46,19 @@ const EditSiswa = () => {
           // Set form values dari response backend
           setNisn(data.nisn);
           setNis(data.nis);
-          setNama(data.nama_siswa);
+          setNama(data.nama);
           setEmail(data.email);
-          setStatus(data.status_siswa);
+          setStatus(data.status);
 
           // Set siswa object untuk referensi
           setSiswa({
             id: data.siswa_id,
             nisn: data.nisn,
             nis: data.nis,
-            nama: data.nama_siswa,
+            nama: data.nama,
             email: data.email,
             role: "siswa",
-            status: data.status_siswa,
+            status: data.status,
             nama_jurusan: data.jurusan_siswa,
           });
         }

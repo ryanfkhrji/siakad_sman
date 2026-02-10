@@ -150,7 +150,7 @@ export function DialogDetailSiswa({ siswa }: DialogDetailSiswaProps) {
                   <Separator />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Nama Lengkap</p>
-                    <p className="text-base font-semibold">{detailData?.nama_siswa || siswa.nama || "-"}</p>
+                    <p className="text-base font-semibold">{detailData?.nama || siswa.nama || "-"}</p>
                   </div>
                   <Separator />
                   <div>
@@ -165,7 +165,7 @@ export function DialogDetailSiswa({ siswa }: DialogDetailSiswaProps) {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Status</p>
-                      <Badge className={detailData?.status_siswa === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>{detailData?.status_siswa || siswa.status || "-"}</Badge>
+                      <Badge className={detailData?.status === "aktif" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>{detailData?.status || siswa.status || "-"}</Badge>
                     </div>
                   </div>
                 </CardContent>
