@@ -8,23 +8,24 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
-// import type { Kelas } from "@/types";
 
 interface FormErrors {
   nama_kelas?: string[];
-  jam_masuk?: string[];
+  kode_kelas?: string[];
+  tingkat?: string[];
+  status?: string[];
 }
 
 const EditKelas = () => {
   const { id } = useParams<{ id: string }>();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     nama_kelas: "",
-    jam_masuk: "",
-    wali_kelas: null as number | null,
-    wali_nama: "",
+    kode_kelas: "",
+    tingkat: "",
+    status: "aktif",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -43,22 +44,17 @@ const EditKelas = () => {
             title: "Gagal!",
             text: res.data.message || "Data kelas tidak ditemukan.",
           });
+          navigate("/superadmin/informasi-sekolah/kelas");
           return;
         }
 
         const kelas = res.data.data;
 
-        // Ambil data wali dari respons
-        const waliData = kelas.wali ?? null;
-        const waliNama = waliData?.nama ?? "-";
-        const waliId = waliData?.id ?? null;
-
-        // Set form data
         setFormData({
           nama_kelas: kelas.nama_kelas ?? "",
-          jam_masuk: kelas.jam_masuk ? kelas.jam_masuk.replace(".", ":") : "",
-          wali_kelas: waliId,
-          wali_nama: waliNama,
+          kode_kelas: kelas.kode_kelas ?? "",
+          tingkat: kelas.tingkat?.toString() ?? "",
+          status: kelas.status ?? "aktif",
         });
       } catch (error) {
         console.error(error);
@@ -67,64 +63,35 @@ const EditKelas = () => {
           title: "Koneksi gagal!",
           text: "Tidak dapat terhubung ke server.",
         });
+        navigate("/superadmin/informasi-sekolah/kelas");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchKelas();
-  }, [id]);
+    if (id) {
+      fetchKelas();
+    }
+  }, [id, navigate]);
 
-  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setErrors({});
-  //   setLoading(true);
-
-  //   try {
-  //     const payload = {
-  //       nama_kelas: formData.nama_kelas,
-  //       jam_masuk: formData.jam_masuk,
-  //     };
-
-  //     const res = await api.put(`/kelas/${id}`, payload);
-
-  //     if (res.data.status === "success") {
-  //       Swal.fire("Berhasil", res.data.message, "success").then(() => {
-  //         navigate("/superadmin/informasi-sekolah/kelas");
-  //       });
-  //     } else if (res.data.errors) {
-  //       setErrors(res.data.errors);
-  //     } else {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Gagal menyimpan!",
-  //         text: res.data.message || "Terjadi kesalahan saat memperbarui kelas.",
-  //       });
-  //     }
-  //   } catch {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Koneksi gagal!",
-  //       text: "Tidak dapat terhubung ke server.",
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors({}); // reset error
+    setErrors({});
     setLoading(true);
 
-    // 🔹 Validasi sederhana di sisi frontend
+    // Validasi sederhana di sisi frontend
     const newErrors: FormErrors = {};
 
     if (!formData.nama_kelas.trim()) {
       newErrors.nama_kelas = ["Nama kelas wajib diisi"];
     }
 
-    if (!formData.jam_masuk.trim()) {
-      newErrors.jam_masuk = ["Jam masuk wajib diisi"];
+    if (!formData.kode_kelas.trim()) {
+      newErrors.kode_kelas = ["Kode kelas wajib diisi"];
+    }
+
+    if (!formData.tingkat) {
+      newErrors.tingkat = ["Tingkat kelas wajib dipilih"];
     }
 
     // Jika ada error → hentikan submit dan tampilkan pesan
@@ -135,27 +102,40 @@ const EditKelas = () => {
       Swal.fire({
         icon: "warning",
         title: "Validasi Gagal!",
-        text: "Field inputan harus diisi.",
+        text: "Semua field wajib diisi.",
         confirmButtonColor: "#EAB308",
       });
 
-      return; // stop kirim ke backend
+      return;
     }
 
     try {
       const payload = {
         nama_kelas: formData.nama_kelas,
-        jam_masuk: formData.jam_masuk,
+        kode_kelas: formData.kode_kelas,
+        tingkat: Number(formData.tingkat),
+        status: formData.status,
       };
 
       const res = await api.put(`/spa/kelas/${id}`, payload);
 
       if (res.data.status === "success") {
-        Swal.fire("Berhasil", res.data.message, "success").then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: res.data.message || "Data kelas berhasil diperbarui.",
+          showConfirmButton: false,
+          timer: 1800,
+        }).then(() => {
           navigate("/superadmin/informasi-sekolah/kelas");
         });
-      } else if (res.data.errors) {
+      } else if (res.data.status === "error" && res.data.errors) {
         setErrors(res.data.errors);
+        Swal.fire({
+          icon: "error",
+          title: "Validasi Gagal!",
+          text: "Periksa kembali form Anda.",
+        });
       } else {
         Swal.fire({
           icon: "error",
@@ -163,12 +143,21 @@ const EditKelas = () => {
           text: res.data.message || "Terjadi kesalahan saat memperbarui kelas.",
         });
       }
-    } catch {
-      Swal.fire({
-        icon: "error",
-        title: "Koneksi gagal!",
-        text: "Tidak dapat terhubung ke server.",
-      });
+    } catch (err: any) {
+      if (err.response?.data?.errors) {
+        setErrors(err.response.data.errors);
+        Swal.fire({
+          icon: "error",
+          title: "Validasi Gagal!",
+          text: err.response.data.message || "Periksa kembali form Anda.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Koneksi gagal!",
+          text: "Tidak dapat terhubung ke server.",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -197,28 +186,59 @@ const EditKelas = () => {
                 {/* Nama Kelas */}
                 <div className="mb-6">
                   <label htmlFor="nama_kelas" className="block font-semibold text-foreground">
-                    Nama Kelas
+                    Nama Kelas <span className="text-red-500">*</span>
                   </label>
-                  <input type="text" name="nama_kelas" placeholder="cth: 10 IPA 1" value={formData.nama_kelas} onChange={(e) => setFormData({ ...formData, nama_kelas: e.target.value })} className="border p-2 w-full mt-2 rounded" />
+                  <input
+                    type="text"
+                    name="nama_kelas"
+                    placeholder="Contoh: X, XI, XII"
+                    value={formData.nama_kelas}
+                    onChange={(e) => setFormData({ ...formData, nama_kelas: e.target.value })}
+                    className="border p-2 w-full mt-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
                   {errors.nama_kelas && <p className="text-red-500 text-sm mt-1">{errors.nama_kelas[0]}</p>}
                 </div>
 
-                {/* Jam Masuk */}
+                {/* Kode Kelas */}
                 <div className="mb-6">
-                  <label htmlFor="jam_masuk" className="block font-semibold text-foreground">
-                    Jam Masuk
+                  <label htmlFor="kode_kelas" className="block font-semibold text-foreground">
+                    Kode Kelas <span className="text-red-500">*</span>
                   </label>
-                  <input type="time" name="jam_masuk" value={formData.jam_masuk} onChange={(e) => setFormData({ ...formData, jam_masuk: e.target.value })} className="border p-2 w-full mt-2 rounded" />
-                  {errors.jam_masuk && <p className="text-red-500 text-sm mt-1">{errors.jam_masuk[0]}</p>}
+                  <input
+                    type="text"
+                    name="kode_kelas"
+                    placeholder="Contoh: K10, K11, K12"
+                    value={formData.kode_kelas}
+                    onChange={(e) => setFormData({ ...formData, kode_kelas: e.target.value })}
+                    className="border p-2 w-full mt-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  {errors.kode_kelas && <p className="text-red-500 text-sm mt-1">{errors.kode_kelas[0]}</p>}
                 </div>
 
-                {/* Wali Kelas - Read Only */}
+                {/* Tingkat */}
                 <div className="mb-6">
-                  <label htmlFor="wali_kelas" className="block font-semibold text-foreground">
-                    Wali Kelas
+                  <label htmlFor="tingkat" className="block font-semibold text-foreground">
+                    Tingkat <span className="text-red-500">*</span>
                   </label>
-                  <input type="text" name="wali_kelas" value={formData.wali_nama || "-"} readOnly className="border p-2 w-full mt-2 rounded bg-gray-100 text-gray-600 cursor-not-allowed" disabled />
-                  <p className="text-sm mt-1 text-red-500 italic">Data wali kelas tidak dapat diubah di halaman ini.</p>
+                  <select name="tingkat" value={formData.tingkat} onChange={(e) => setFormData({ ...formData, tingkat: e.target.value })} className="border p-2 w-full mt-2 rounded focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">Pilih Tingkat</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                  </select>
+                  {errors.tingkat && <p className="text-red-500 text-sm mt-1">{errors.tingkat[0]}</p>}
+                </div>
+
+                {/* Status */}
+                <div className="mb-6">
+                  <label htmlFor="status" className="block font-semibold text-foreground">
+                    Status <span className="text-red-500">*</span>
+                  </label>
+                  <select name="status" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="border p-2 w-full mt-2 rounded focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="aktif">Aktif</option>
+                    <option value="arsip">Arsip</option>
+                  </select>
+                  {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
                 </div>
 
                 {/* Tombol Aksi */}

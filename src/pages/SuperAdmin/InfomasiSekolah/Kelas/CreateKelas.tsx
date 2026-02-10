@@ -4,76 +4,48 @@ import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/pages/Footer";
 import { CircleXIcon, FilePlus } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
-import type { Pegawai } from "@/types";
 
 interface FormErrors {
   nama_kelas?: string[];
-  jam_masuk?: string[];
-  wali_kelas?: string[];
+  kode_kelas?: string[];
+  tingkat?: string[];
 }
 
 const CreateKelas = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [guruList, setGuruList] = useState<Pegawai[]>([]);
-  const [formData, setFormData] = useState<{
-    nama_kelas: string;
-    jam_masuk: string;
-    wali_kelas: number | null;
-  }>({
+  const [formData, setFormData] = useState({
     nama_kelas: "",
-    jam_masuk: "",
-    wali_kelas: null,
+    kode_kelas: "",
+    tingkat: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Ambil daftar guru dari backend dan filter otomatis hanya yang belum jadi wali kelas
-  useEffect(() => {
-    const fetchGuru = async () => {
-      try {
-        const res = await api.get("/spa/kepegawaian");
-        if (res.data.status === "success") {
-          const guruOnly = res.data.data.filter((p: Pegawai) => p.role === "guru" && (!p.kelas || !p.kelas?.jam_masuk));
-          setGuruList(guruOnly);
-        }
-      } catch {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal memuat data guru",
-          text: "Terjadi kesalahan koneksi ke server.",
-        });
-      }
-    };
-
-    fetchGuru();
-  }, []);
-
-  // 2️ Handle submit
+  // Handle submit
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({});
     setLoading(true);
 
-    // 🔹 Validasi input di frontend
+    // Validasi input di frontend
     const newErrors: FormErrors = {};
 
     if (!formData.nama_kelas.trim()) {
       newErrors.nama_kelas = ["Nama kelas wajib diisi"];
     }
 
-    if (!formData.jam_masuk.trim()) {
-      newErrors.jam_masuk = ["Jam masuk wajib diisi"];
+    if (!formData.kode_kelas.trim()) {
+      newErrors.kode_kelas = ["Kode kelas wajib diisi"];
     }
 
-    if (!formData.wali_kelas) {
-      newErrors.wali_kelas = ["Wali kelas wajib dipilih"];
+    if (!formData.tingkat) {
+      newErrors.tingkat = ["Tingkat kelas wajib dipilih"];
     }
 
     // Kalau ada error, tampilkan pesan dan hentikan submit
@@ -84,15 +56,21 @@ const CreateKelas = () => {
       Swal.fire({
         icon: "warning",
         title: "Validasi Gagal!",
-        text: "Field inputan harus diisi.",
+        text: "Semua field wajib diisi.",
         confirmButtonColor: "#EAB308",
       });
 
-      return; // stop kirim ke backend
+      return;
     }
 
     try {
-      const res = await api.post("/spa/kelas", formData);
+      const payload = {
+        nama_kelas: formData.nama_kelas,
+        kode_kelas: formData.kode_kelas,
+        tingkat: Number(formData.tingkat),
+      };
+
+      const res = await api.post("/spa/kelas", payload);
 
       if (res.data.status === "success") {
         Swal.fire({
@@ -103,21 +81,40 @@ const CreateKelas = () => {
           timer: 1800,
         });
         navigate("/superadmin/informasi-sekolah/kelas");
-      } else if (res.data.status === "error" && res.data.errors) {
-        setErrors(res.data.errors);
-      } else {
+      }
+    } catch (err: any) {
+      console.error("Error response:", err.response);
+
+      // Tangani error dari backend
+      if (err.response?.status === 422) {
+        // Validasi gagal dari backend
+        const backendErrors = err.response.data?.errors || {};
+        setErrors(backendErrors);
+
+        // Tampilkan pesan error pertama
+        const firstError = Object.values(backendErrors)[0];
+        const errorMessage = Array.isArray(firstError) ? firstError[0] : "Periksa kembali form Anda.";
+
         Swal.fire({
           icon: "error",
-          title: "Gagal menyimpan!",
-          text: res.data.message || "Terjadi kesalahan saat menyimpan data kelas.",
+          title: "Validasi Gagal!",
+          text: errorMessage,
+        });
+      } else if (err.response?.data?.message) {
+        // Error lainnya dengan message
+        Swal.fire({
+          icon: "error",
+          title: "Gagal!",
+          text: err.response.data.message,
+        });
+      } else {
+        // Error koneksi atau lainnya
+        Swal.fire({
+          icon: "error",
+          title: "Koneksi gagal!",
+          text: "Tidak dapat terhubung ke server.",
         });
       }
-    } catch {
-      Swal.fire({
-        icon: "error",
-        title: "Koneksi gagal!",
-        text: "Tidak dapat terhubung ke server.",
-      });
     } finally {
       setLoading(false);
     }
@@ -140,46 +137,70 @@ const CreateKelas = () => {
               {/* Nama Kelas */}
               <div className="mb-6">
                 <label htmlFor="nama_kelas" className="block font-semibold text-foreground">
-                  Nama Kelas
+                  Nama Kelas <span className="text-red-500">*</span>
                 </label>
-                <input type="text" name="nama_kelas" placeholder="cth: 10 IPA 1" value={formData.nama_kelas} onChange={(e) => setFormData({ ...formData, nama_kelas: e.target.value })} className="border p-2 w-full mt-2 rounded" />
+                <input
+                  type="text"
+                  name="nama_kelas"
+                  placeholder="Contoh: X, XI, XII"
+                  value={formData.nama_kelas}
+                  onChange={(e) => {
+                    setFormData({ ...formData, nama_kelas: e.target.value });
+                    // Clear error saat user mengetik
+                    if (errors.nama_kelas) {
+                      setErrors({ ...errors, nama_kelas: undefined });
+                    }
+                  }}
+                  className={`border p-2 w-full mt-2 rounded focus:outline-none focus:ring-2 focus:ring-primary ${errors.nama_kelas ? "border-red-500" : ""}`}
+                />
                 {errors.nama_kelas && <p className="text-red-500 text-sm mt-1">{errors.nama_kelas[0]}</p>}
               </div>
 
-              {/* Jam Masuk */}
+              {/* Kode Kelas */}
               <div className="mb-6">
-                <label htmlFor="jam_masuk" className="block font-semibold text-foreground">
-                  Jam Masuk
+                <label htmlFor="kode_kelas" className="block font-semibold text-foreground">
+                  Kode Kelas <span className="text-red-500">*</span>
                 </label>
-                <input type="time" name="jam_masuk" value={formData.jam_masuk} onChange={(e) => setFormData({ ...formData, jam_masuk: e.target.value })} className="border p-2 w-full mt-2 rounded" />
-                {errors.jam_masuk && <p className="text-red-500 text-sm mt-1">{errors.jam_masuk[0]}</p>}
+                <input
+                  type="text"
+                  name="kode_kelas"
+                  placeholder="Contoh: K10, K11, K12"
+                  value={formData.kode_kelas}
+                  onChange={(e) => {
+                    setFormData({ ...formData, kode_kelas: e.target.value });
+                    // Clear error saat user mengetik
+                    if (errors.kode_kelas) {
+                      setErrors({ ...errors, kode_kelas: undefined });
+                    }
+                  }}
+                  className={`border p-2 w-full mt-2 rounded focus:outline-none focus:ring-2 focus:ring-primary ${errors.kode_kelas ? "border-red-500" : ""}`}
+                />
+                {errors.kode_kelas && <p className="text-red-500 text-sm mt-1">{errors.kode_kelas[0]}</p>}
               </div>
 
-              {/* Wali Kelas */}
+              {/* Tingkat */}
               <div className="mb-6">
-                <label htmlFor="wali_kelas" className="block font-semibold text-foreground">
-                  Wali Kelas
+                <label htmlFor="tingkat" className="block font-semibold text-foreground">
+                  Tingkat <span className="text-red-500">*</span>
                 </label>
-                <Select onValueChange={(value) => setFormData({ ...formData, wali_kelas: Number(value) })} value={formData.wali_kelas?.toString() || ""}>
-                  <SelectTrigger className="w-full mt-2">
-                    <SelectValue placeholder="Pilih Wali Kelas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Daftar Guru</SelectLabel>
-                      {guruList.length > 0 ? (
-                        guruList.map((guru) => (
-                          <SelectItem key={guru.id} value={guru.id.toString()}>
-                            {guru.nama}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="text-muted-foreground p-2 text-sm">Semua guru sudah menjadi wali kelas</div>
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                {errors.wali_kelas && <p className="text-red-500 text-sm mt-1">{errors.wali_kelas[0]}</p>}
+                <select
+                  name="tingkat"
+                  value={formData.tingkat}
+                  onChange={(e) => {
+                    setFormData({ ...formData, tingkat: e.target.value });
+                    // Clear error saat user memilih
+                    if (errors.tingkat) {
+                      setErrors({ ...errors, tingkat: undefined });
+                    }
+                  }}
+                  className={`border p-2 w-full mt-2 rounded focus:outline-none focus:ring-2 focus:ring-primary ${errors.tingkat ? "border-red-500" : ""}`}
+                >
+                  <option value="">Pilih Tingkat</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                </select>
+                {errors.tingkat && <p className="text-red-500 text-sm mt-1">{errors.tingkat[0]}</p>}
               </div>
 
               {/* Tombol Aksi */}

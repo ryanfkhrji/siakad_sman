@@ -8,21 +8,22 @@ import { Loader2Icon, PenBoxIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
-import type { Kelas } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { DialogDetailKelas } from "./DialogDetailKelas";
+import type { Kelas } from "@/types/kelas";
 
 const DataKelas = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selectedJenjang, setSelectedJenjang] = useState<string | null>(null);
+  const [selectedTingkat, setSelectedTingkat] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [dataKelas, setDataKelas] = useState<Kelas[]>([]);
   const [filteredKelas, setFilteredKelas] = useState<Kelas[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  // ambil data dari backend
+  // Ambil data dari backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -35,6 +36,11 @@ const DataKelas = () => {
         }
       } catch (error) {
         console.error("Gagal mengambil data kelas:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal!",
+          text: "Tidak dapat mengambil data kelas dari server.",
+        });
       } finally {
         setLoading(false);
       }
@@ -43,15 +49,21 @@ const DataKelas = () => {
     fetchData();
   }, []);
 
-  // filter berdasarkan jenjang
+  // Filter berdasarkan tingkat dan status
   useEffect(() => {
-    if (selectedJenjang) {
-      const filtered = dataKelas.filter((kelas) => kelas.nama_kelas?.startsWith(selectedJenjang));
-      setFilteredKelas(filtered);
-    } else {
-      setFilteredKelas(dataKelas);
+    let filtered = dataKelas;
+
+    if (selectedTingkat) {
+      filtered = filtered.filter((kelas) => kelas.tingkat === Number(selectedTingkat));
     }
-  }, [selectedJenjang, dataKelas]);
+
+    if (selectedStatus) {
+      filtered = filtered.filter((kelas) => kelas.status === selectedStatus);
+    }
+
+    setFilteredKelas(filtered);
+    setCurrentPage(1); // Reset ke halaman pertama saat filter berubah
+  }, [selectedTingkat, selectedStatus, dataKelas]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredKelas.length / rowsPerPage);
@@ -84,8 +96,8 @@ const DataKelas = () => {
 
       if (res.data.status === "success") {
         // Hapus dari state agar tabel langsung update tanpa reload
-        setDataKelas((prev) => prev.filter((kelas) => kelas.id !== id));
-        setFilteredKelas((prev) => prev.filter((kelas) => kelas.id !== id));
+        setDataKelas((prev) => prev.filter((kelas) => kelas.kelas_id !== id));
+        setFilteredKelas((prev) => prev.filter((kelas) => kelas.kelas_id !== id));
 
         Swal.fire({
           icon: "success",
@@ -116,7 +128,7 @@ const DataKelas = () => {
           text: "Terjadi kesalahan koneksi ke server.",
         });
       }
-      console.error("Gagal menghapus guru:", err);
+      console.error("Gagal menghapus kelas:", err);
     } finally {
       setLoading(false);
     }
@@ -128,9 +140,9 @@ const DataKelas = () => {
 
       <main
         className={`
-    w-full min-h-screen bg-background transition-all duration-300
-    ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}
-  `}
+          w-full min-h-screen bg-background transition-all duration-300
+          ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}
+        `}
       >
         <PageTitle title="Data Kelas" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
@@ -144,7 +156,7 @@ const DataKelas = () => {
             </div>
           ) : (
             <>
-              {/* Toolbar: Tambah + Filter + Search */}
+              {/* Toolbar: Tambah + Filter */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                 <Link to="/superadmin/informasi-sekolah/kelas/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full md:w-auto">
@@ -153,34 +165,64 @@ const DataKelas = () => {
                   </Button>
                 </Link>
 
-                {/* Filter Jenjang */}
-                <Select value={selectedJenjang ?? ""} onValueChange={(value) => setSelectedJenjang(value)}>
-                  <SelectTrigger className="w-full md:w-1/3 cursor-pointer">
-                    <SelectValue placeholder="Filter Berdasarkan Kelas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Pilih Jenjang</SelectLabel>
-                      <SelectItem value="10">Kelas 10</SelectItem>
-                      <SelectItem value="11">Kelas 11</SelectItem>
-                      <SelectItem value="12">Kelas 12</SelectItem>
-                    </SelectGroup>
-                    <div className="px-2 py-1 border-t border-gray-200">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedJenjang(null);
-                        }}
-                      >
-                        Tampilkan Semua
-                      </Button>
-                    </div>
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                  {/* Filter Tingkat */}
+                  <Select value={selectedTingkat ?? ""} onValueChange={(value) => setSelectedTingkat(value || null)}>
+                    <SelectTrigger className="w-full md:w-[180px] cursor-pointer">
+                      <SelectValue placeholder="Filter Tingkat" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Pilih Tingkat</SelectLabel>
+                        <SelectItem value="10">Tingkat 10</SelectItem>
+                        <SelectItem value="11">Tingkat 11</SelectItem>
+                        <SelectItem value="12">Tingkat 12</SelectItem>
+                      </SelectGroup>
+                      <div className="px-2 py-1 border-t border-gray-200">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTingkat(null);
+                          }}
+                        >
+                          Tampilkan Semua
+                        </Button>
+                      </div>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Filter Status */}
+                  <Select value={selectedStatus ?? ""} onValueChange={(value) => setSelectedStatus(value || null)}>
+                    <SelectTrigger className="w-full md:w-[180px] cursor-pointer">
+                      <SelectValue placeholder="Filter Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Pilih Status</SelectLabel>
+                        <SelectItem value="aktif">Aktif</SelectItem>
+                        <SelectItem value="arsip">Arsip</SelectItem>
+                      </SelectGroup>
+                      <div className="px-2 py-1 border-t border-gray-200">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedStatus(null);
+                          }}
+                        >
+                          Tampilkan Semua
+                        </Button>
+                      </div>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
               {/* Tabel Data */}
               <div className="w-full overflow-x-auto rounded">
                 <Table className="min-w-full border border-gray-200 rounded shadow-sm bg-white">
@@ -188,8 +230,8 @@ const DataKelas = () => {
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">Nama Kelas</TableHead>
-                      <TableHead className="font-semibold text-white">Jam Masuk</TableHead>
-                      <TableHead className="font-semibold text-white">Wali Kelas</TableHead>
+                      <TableHead className="font-semibold text-white">Tingkat</TableHead>
+                      <TableHead className="font-semibold text-white">Status</TableHead>
                       <TableHead className="font-semibold text-center text-white">Action</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -197,22 +239,24 @@ const DataKelas = () => {
                   <TableBody>
                     {paginatedKelas.length > 0 ? (
                       paginatedKelas.map((kelas, index) => (
-                        <TableRow key={kelas.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                        <TableRow key={kelas.kelas_id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{kelas.nama_kelas}</TableCell>
-                          <TableCell>{kelas.jam_masuk}</TableCell>
-                          <TableCell>{kelas.wali_kelas?.nama ?? "Tidak ada wali kelas"}</TableCell>
+                          <TableCell>{kelas.tingkat}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${kelas.status === "aktif" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>{kelas.status}</span>
+                          </TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
-                            <DialogDetailKelas kelas={kelas} />
+                            <DialogDetailKelas kelasId={kelas.kelas_id} />
 
-                            <Link to={`/superadmin/informasi-sekolah/kelas/edit/${kelas.id}`}>
+                            <Link to={`/superadmin/informasi-sekolah/kelas/edit/${kelas.kelas_id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(kelas.id)}>
+                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(kelas.kelas_id)}>
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>
