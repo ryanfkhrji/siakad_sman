@@ -12,45 +12,61 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 
 interface FormErrors {
   nama_kurikulum: string[];
-  tahun_berlaku: string[];
-  status: string[];
+  kode_kurikulum: string[];
+  tipe: string[];
+  tahun_mulai: string[];
+  tahun_selesai: string[];
   deskripsi: string[];
 }
 
 const CreateKurikulum = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     nama_kurikulum: "",
-    tahun_berlaku: "",
-    status: "",
+    kode_kurikulum: "",
+    tipe: "",
+    tahun_mulai: "",
+    tahun_selesai: "",
     deskripsi: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({
     nama_kurikulum: [],
-    tahun_berlaku: [],
-    status: [],
+    kode_kurikulum: [],
+    tipe: [],
+    tahun_mulai: [],
+    tahun_selesai: [],
     deskripsi: [],
   });
-
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setErrors({
       nama_kurikulum: [],
-      tahun_berlaku: [],
-      status: [],
+      kode_kurikulum: [],
+      tipe: [],
+      tahun_mulai: [],
+      tahun_selesai: [],
       deskripsi: [],
     });
 
     setLoading(true);
 
     try {
-      const res = await api.post("/spa/kurikulum", formData);
+      const payload = {
+        nama_kurikulum: formData.nama_kurikulum,
+        kode_kurikulum: formData.kode_kurikulum,
+        tipe: formData.tipe,
+        tahun_mulai: formData.tahun_mulai ? Number(formData.tahun_mulai) : null,
+        tahun_selesai: formData.tahun_selesai ? Number(formData.tahun_selesai) : null,
+        deskripsi: formData.deskripsi || null,
+      };
+
+      const res = await api.post("/spa/kurikulum", payload);
 
       if (res.data.status === "success") {
         Swal.fire({
@@ -60,13 +76,22 @@ const CreateKurikulum = () => {
           showConfirmButton: false,
           timer: 1800,
         });
-
         navigate("/superadmin/informasi-sekolah/kurikulum");
       }
     } catch (error: any) {
-      // HANDLE VALIDATION ERROR 422
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
+        setLoading(false);
+        return;
+      }
+
+      // Cek error bisnis (kurikulum aktif sudah ada)
+      if (error.response?.data?.status === "error") {
+        Swal.fire({
+          icon: "error",
+          title: "Tidak bisa menyimpan!",
+          text: error.response.data.errors?.data || error.response.data.message,
+        });
         setLoading(false);
         return;
       }
@@ -98,43 +123,61 @@ const CreateKurikulum = () => {
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
               {/* Nama Kurikulum */}
               <div className="mb-6">
-                <label className="block font-semibold">Nama Kurikulum</label>
+                <label className="block font-semibold">
+                  Nama Kurikulum <span className="text-red-500">*</span>
+                </label>
                 <input type="text" placeholder="cth: Kurikulum Merdeka" value={formData.nama_kurikulum} onChange={(e) => setFormData({ ...formData, nama_kurikulum: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                 {errors.nama_kurikulum?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.nama_kurikulum[0]}</p>}
               </div>
 
-              {/* Tahun Berlaku */}
+              {/* Kode Kurikulum */}
               <div className="mb-6">
-                <label className="block font-semibold">Tahun Berlaku</label>
-                <input type="text" placeholder="cth: 2023" value={formData.tahun_berlaku} onChange={(e) => setFormData({ ...formData, tahun_berlaku: e.target.value })} className="border p-2 w-full mt-2 rounded" />
-                {errors.tahun_berlaku?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tahun_berlaku[0]}</p>}
+                <label className="block font-semibold">
+                  Kode Kurikulum <span className="text-red-500">*</span>
+                </label>
+                <input type="text" placeholder="cth: 2027" value={formData.kode_kurikulum} onChange={(e) => setFormData({ ...formData, kode_kurikulum: e.target.value })} className="border p-2 w-full mt-2 rounded" />
+                {errors.kode_kurikulum?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kode_kurikulum[0]}</p>}
               </div>
 
-              {/* Status */}
+              {/* Tipe */}
               <div className="mb-6">
-                <label className="block font-semibold text-foreground">Status</label>
-
-                <Select onValueChange={(value) => setFormData({ ...formData, status: value })} value={formData.status}>
+                <label className="block font-semibold">
+                  Tipe <span className="text-red-500">*</span>
+                </label>
+                <Select value={formData.tipe} onValueChange={(value) => setFormData({ ...formData, tipe: value })}>
                   <SelectTrigger className="w-full mt-2">
-                    <SelectValue placeholder="-- pilih status --" />
+                    <SelectValue placeholder="-- pilih tipe --" />
                   </SelectTrigger>
-
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Pilih Status</SelectLabel>
-                      <SelectItem value="aktif">Aktif</SelectItem>
-                      <SelectItem value="tidak aktif">Tidak Aktif</SelectItem>
+                      <SelectLabel>Pilih Tipe</SelectLabel>
+                      <SelectItem value="KTSP">KTSP</SelectItem>
+                      <SelectItem value="K13">Kurikulum 2013 (K13)</SelectItem>
+                      <SelectItem value="MERDEKA">Kurikulum Merdeka</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+                {errors.tipe?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tipe[0]}</p>}
+              </div>
 
-                {errors.status?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
+              {/* Tahun Mulai & Selesai */}
+              <div className="mb-6 flex gap-4">
+                <div className="flex-1">
+                  <label className="block font-semibold">Tahun Mulai</label>
+                  <input type="number" placeholder="cth: 2022" value={formData.tahun_mulai} onChange={(e) => setFormData({ ...formData, tahun_mulai: e.target.value })} className="border p-2 w-full mt-2 rounded" />
+                  {errors.tahun_mulai?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tahun_mulai[0]}</p>}
+                </div>
+                <div className="flex-1">
+                  <label className="block font-semibold">Tahun Selesai</label>
+                  <input type="number" placeholder="cth: 2029" value={formData.tahun_selesai} onChange={(e) => setFormData({ ...formData, tahun_selesai: e.target.value })} className="border p-2 w-full mt-2 rounded" />
+                  {errors.tahun_selesai?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tahun_selesai[0]}</p>}
+                </div>
               </div>
 
               {/* Deskripsi */}
               <div className="mb-6">
                 <label className="block font-semibold">Deskripsi</label>
-                <textarea placeholder="Deskripsi kurikulum..." value={formData.deskripsi} onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })} className="border p-2 w-full mt-2 rounded h-32 resize-none"></textarea>
+                <textarea placeholder="Deskripsi kurikulum..." value={formData.deskripsi} onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })} className="border p-2 w-full mt-2 rounded h-32 resize-none" />
                 {errors.deskripsi?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.deskripsi[0]}</p>}
               </div>
 

@@ -11,26 +11,31 @@ import api from "@/api/axios";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FormErrors {
-  nama_pelajaran: string;
-  status: string;
-  nilai_kkm?: string[];
+  nama_pelajaran: string[];
+  kode_mapel_diknas: string[];
+  kelompok: string[];
 }
 
 const CreateMataPelajaran = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [formData, setFormData] = useState({
-    nama_pelajaran: "",
-    status: "",
-    nilai_kkm: 0,
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({ nama_pelajaran: "", status: "", nilai_kkm: [] });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const [formData, setFormData] = useState({
+    nama_pelajaran: "",
+    kode_mapel_diknas: "",
+    kelompok: "",
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({
+    nama_pelajaran: [],
+    kode_mapel_diknas: [],
+    kelompok: [],
+  });
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors({ nama_pelajaran: "", status: "", nilai_kkm: [] });
+    setErrors({ nama_pelajaran: [], kode_mapel_diknas: [], kelompok: [] });
     setLoading(true);
 
     try {
@@ -45,16 +50,14 @@ const CreateMataPelajaran = () => {
           timer: 1800,
         });
         navigate("/superadmin/informasi-akademik/mata-pelajaran");
-      } else if (res.data.status === "error" && res.data.errors) {
-        setErrors(res.data.errors);
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal menyimpan!",
-          text: res.data.message || "Terjadi kesalahan saat menyimpan data mata pelajaran.",
-        });
       }
-    } catch {
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        setErrors(error.response.data.errors);
+        setLoading(false);
+        return;
+      }
+
       Swal.fire({
         icon: "error",
         title: "Koneksi gagal!",
@@ -81,49 +84,44 @@ const CreateMataPelajaran = () => {
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
               {/* Nama Mata Pelajaran */}
               <div className="mb-6">
-                <label htmlFor="nama_pelajaran" className="block font-semibold text-foreground">
-                  Nama Mata Pelajaran
+                <label className="block font-semibold text-foreground">
+                  Nama Mata Pelajaran <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="nama_pelajaran"
-                  placeholder="cth: IPA / IPS / Bahasa Indonesia"
-                  value={formData.nama_pelajaran}
-                  onChange={(e) => setFormData({ ...formData, nama_pelajaran: e.target.value })}
-                  className="border p-2 w-full mt-2 rounded"
-                />
-                {errors.nama_pelajaran && <p className="text-red-500 text-sm mt-1">{errors.nama_pelajaran[0]}</p>}
+                <input type="text" placeholder="cth: Bahasa Indonesia" value={formData.nama_pelajaran} onChange={(e) => setFormData({ ...formData, nama_pelajaran: e.target.value })} className="border p-2 w-full mt-2 rounded" />
+                {errors.nama_pelajaran?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.nama_pelajaran[0]}</p>}
               </div>
 
-              {/* Status */}
+              {/* Kode Mapel Diknas */}
               <div className="mb-6">
-                <label className="block font-semibold text-foreground">Status</label>
+                <label className="block font-semibold text-foreground">
+                  Kode Mapel Diknas <span className="text-red-500">*</span>
+                </label>
+                <input type="text" placeholder="cth: 156" value={formData.kode_mapel_diknas} onChange={(e) => setFormData({ ...formData, kode_mapel_diknas: e.target.value })} className="border p-2 w-full mt-2 rounded" />
+                {errors.kode_mapel_diknas?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kode_mapel_diknas[0]}</p>}
+              </div>
 
-                <Select onValueChange={(value) => setFormData({ ...formData, status: value })} value={formData.status}>
+              {/* Kelompok */}
+              <div className="mb-6">
+                <label className="block font-semibold text-foreground">
+                  Kelompok <span className="text-red-500">*</span>
+                </label>
+                <Select value={formData.kelompok} onValueChange={(value) => setFormData({ ...formData, kelompok: value })}>
                   <SelectTrigger className="w-full mt-2">
-                    <SelectValue placeholder="Pilih Status" />
+                    <SelectValue placeholder="-- pilih kelompok --" />
                   </SelectTrigger>
-
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Pilih Status</SelectLabel>
-                      <SelectItem value="wajib">Wajib</SelectItem>
-                      <SelectItem value="pilihan">Pilihan</SelectItem>
-                      <SelectItem value="jurusan">Jurusan</SelectItem>
+                      <SelectLabel>Pilih Kelompok</SelectLabel>
+                      <SelectItem value="umum">Umum</SelectItem>
+                      <SelectItem value="sains">Sains</SelectItem>
+                      <SelectItem value="ipa">IPA</SelectItem>
+                      <SelectItem value="sosial">Sosial</SelectItem>
+                      <SelectItem value="ips">IPS</SelectItem>
+                      <SelectItem value="bahasa">Bahasa</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-
-                {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
-              </div>
-
-              {/* nilai KKM */}
-              <div className="mb-6">
-                <label htmlFor="nilai_kkm" className="block font-semibold text-foreground">
-                  Nilai KKM
-                </label>
-                <input type="number" name="nilai_kkm" placeholder="cth: 75" value={formData.nilai_kkm} onChange={(e) => setFormData({ ...formData, nilai_kkm: Number(e.target.value) })} className="border p-2 w-full mt-2 rounded" />
-                {errors.nilai_kkm && <p className="text-red-500 text-sm mt-1">{errors.nilai_kkm[0]}</p>}
+                {errors.kelompok?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kelompok[0]}</p>}
               </div>
 
               {/* Tombol Aksi */}

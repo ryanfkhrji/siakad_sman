@@ -4,13 +4,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { MataPelajaran } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
+import type { MataPelajaran, MataPelajaranGroup } from "@/types/mataPelajaran";
+import { DialogDetailMataPelajaran } from "./DialogDetailMataPelajaran";
+
+const kelompokLabel: Record<string, string> = {
+  umum: "Umum",
+  sains: "Sains",
+  ipa: "IPA",
+  sosial: "Sosial",
+  ips: "IPS",
+  bahasa: "Bahasa",
+};
 
 const DataMataPelajaran = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -21,17 +32,34 @@ const DataMataPelajaran = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState<MataPelajaran[]>([]);
 
-  // Ambil data dari backend
+  // Ambil data dari backend dan flatten struktur grouped
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const res = await api.get("/spa/mata-pelajaran");
         if (res.data.status === "success") {
-          setDataMapel(res.data.data);
+          // Flatten: MataPelajaranGroup[] → MataPelajaran[]
+          const grouped: MataPelajaranGroup[] = res.data.data;
+          const flat: MataPelajaran[] = grouped.flatMap((group) =>
+            group.daftar_kelompok.flatMap((kel) =>
+              kel.mata_pelajarans.map((m) => ({
+                id: m.id,
+                nama_pelajaran: m.nama_pelajaran,
+                kode_mapel_diknas: m.kode_mapel_diknas,
+                kelompok: kel.kelompok,
+                status: group.status,
+              })),
+            ),
+          );
+          setDataMapel(flat);
         }
       } catch (error) {
-        console.error("Gagal mengambil data mata pelajaran:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal memuat data!",
+          text: "Tidak dapat memuat data mata pelajaran.",
+        });
       } finally {
         setLoading(false);
       }
@@ -46,7 +74,7 @@ const DataMataPelajaran = () => {
       setFilteredData(datamapel);
     } else {
       const lower = searchTerm.toLowerCase();
-      setFilteredData(datamapel.filter((item) => item.nama_pelajaran.toLowerCase().includes(lower)));
+      setFilteredData(datamapel.filter((item) => item.nama_pelajaran.toLowerCase().includes(lower) || item.kode_mapel_diknas.toLowerCase().includes(lower) || item.kelompok.toLowerCase().includes(lower)));
     }
     setCurrentPage(1);
   }, [searchTerm, datamapel]);
@@ -81,7 +109,6 @@ const DataMataPelajaran = () => {
 
       if (res.data.status === "success") {
         setDataMapel((prev) => prev.filter((j) => j.id !== id));
-
         Swal.fire({
           icon: "success",
           title: "Berhasil!",
@@ -133,7 +160,7 @@ const DataMataPelajaran = () => {
             </div>
           ) : (
             <>
-              {/* Tombol Tambah */}
+              {/* Tombol Tambah + Search */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                 <Link to="/superadmin/informasi-akademik/mata-pelajaran/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
@@ -155,8 +182,9 @@ const DataMataPelajaran = () => {
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">Nama Mata Pelajaran</TableHead>
+                      <TableHead className="font-semibold text-white">Kode Diknas</TableHead>
+                      <TableHead className="font-semibold text-white">Kelompok</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
-                      <TableHead className="font-semibold text-white">Nilai KKM</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -167,18 +195,23 @@ const DataMataPelajaran = () => {
                         <TableRow key={mapel.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{mapel.nama_pelajaran}</TableCell>
-                          <TableCell>{mapel.status}</TableCell>
-                          <TableCell>{mapel.nilai_kkm}</TableCell>
+                          <TableCell>{mapel.kode_mapel_diknas}</TableCell>
+                          <TableCell>{kelompokLabel[mapel.kelompok] ?? mapel.kelompok}</TableCell>
+                          <TableCell>
+                            <Badge className={mapel.status === "aktif" ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-gray-100 text-gray-600 hover:bg-gray-100"}>{mapel.status === "aktif" ? "Aktif" : "Arsip"}</Badge>
+                          </TableCell>
                           <TableCell className="flex gap-1 justify-center">
                             {/* Tombol Detail */}
-                            {/* <DialogDetailJurusan jurusanId={jurusan.id} /> */}
+                            <DialogDetailMataPelajaran mapel={mapel} />
 
+                            {/* Tombol Edit */}
                             <Link to={`/superadmin/informasi-akademik/mata-pelajaran/edit/${mapel.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
                             </Link>
 
+                            {/* Tombol Hapus */}
                             <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(mapel.id)}>
                               <Trash2Icon size={16} />
                             </Button>
@@ -187,7 +220,7 @@ const DataMataPelajaran = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-gray-500 py-4">
+                        <TableCell colSpan={6} className="text-center text-gray-500 py-4">
                           Tidak ada data mata pelajaran yang ditemukan
                         </TableCell>
                       </TableRow>

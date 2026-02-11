@@ -4,13 +4,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { Kurikulum } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
+import { DialogDetailKurikulum } from "./DialogDetailKurikulum";
+import type { Kurikulum } from "@/types/kurikulum";
 
 const DataKurikulum = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -50,7 +52,13 @@ const DataKurikulum = () => {
       setFilteredData(datakurikulum);
     } else {
       const lower = searchTerm.toLowerCase();
-      setFilteredData(datakurikulum.filter((item) => item.nama_kurikulum.toLowerCase().includes(lower)));
+      setFilteredData(
+        datakurikulum.filter(
+          (item) =>
+            item.nama_kurikulum.toLowerCase().includes(lower) ||
+            item.tipe.toLowerCase().includes(lower)
+        )
+      );
     }
     setCurrentPage(1);
   }, [searchTerm, datakurikulum]);
@@ -120,6 +128,12 @@ const DataKurikulum = () => {
     }
   };
 
+  const tipeLabel: Record<string, string> = {
+    KTSP: "KTSP",
+    K13: "K-2013",
+    MERDEKA: "Merdeka",
+  };
+
   return (
     <SidebarProvider>
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
@@ -137,7 +151,7 @@ const DataKurikulum = () => {
             </div>
           ) : (
             <>
-              {/* Tombol Tambah */}
+              {/* Tombol Tambah + Search */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                 <Link to="/superadmin/informasi-sekolah/kurikulum/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full mx-auto">
@@ -148,7 +162,13 @@ const DataKurikulum = () => {
 
                 <div className="relative w-full md:w-1/3">
                   <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari kurikulum..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  <Input
+                    type="text"
+                    placeholder="Cari kurikulum..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
                 </div>
               </div>
 
@@ -159,9 +179,8 @@ const DataKurikulum = () => {
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">Nama Kurikulum</TableHead>
-                      <TableHead className="font-semibold text-white">Tahun Berlaku</TableHead>
+                      <TableHead className="font-semibold text-white">Tipe</TableHead>
                       <TableHead className="font-semibold text-white">Status</TableHead>
-                      <TableHead className="font-semibold text-white">Deskripsi</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -170,19 +189,39 @@ const DataKurikulum = () => {
                     {paginated.length > 0 ? (
                       paginated.map((kurikulum, index) => (
                         <TableRow key={kurikulum.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
-                          <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
+                          <TableCell className="text-center font-medium">
+                            {(currentPage - 1) * rowsPerPage + index + 1}
+                          </TableCell>
                           <TableCell>{kurikulum.nama_kurikulum}</TableCell>
-                          <TableCell>{kurikulum.tahun_berlaku}</TableCell>
-                          <TableCell>{kurikulum.status}</TableCell>
-                          <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{kurikulum.deskripsi || "-"}</TableCell>
+                          <TableCell>{tipeLabel[kurikulum.tipe] ?? kurikulum.tipe}</TableCell>
+                          <TableCell>
+                            <Badge
+                              className={
+                                kurikulum.status === "aktif"
+                                  ? "bg-green-100 text-green-700 hover:bg-green-100"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-100"
+                              }
+                            >
+                              {kurikulum.status === "aktif" ? "Aktif" : "Arsip"}
+                            </Badge>
+                          </TableCell>
                           <TableCell className="flex gap-1 justify-center">
+                            {/* Tombol Detail */}
+                            <DialogDetailKurikulum kurikulum={kurikulum} />
+
+                            {/* Tombol Edit */}
                             <Link to={`/superadmin/informasi-sekolah/kurikulum/edit/${kurikulum.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
                               </Button>
                             </Link>
 
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(kurikulum.id)}>
+                            {/* Tombol Hapus */}
+                            <Button
+                              className="bg-muted-foreground hover:bg-muted-foreground/90"
+                              size="sm"
+                              onClick={() => handleDelete(kurikulum.id)}
+                            >
                               <Trash2Icon size={16} />
                             </Button>
                           </TableCell>
@@ -190,7 +229,7 @@ const DataKurikulum = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-gray-500 py-4">
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-4">
                           Tidak ada data kurikulum yang ditemukan
                         </TableCell>
                       </TableRow>
@@ -225,7 +264,11 @@ const DataKurikulum = () => {
                   <span className="text-sm">
                     Halaman <strong>{currentPage}</strong> dari <strong>{totalPages || 1}</strong>
                   </span>
-                  <Button size="sm" disabled={currentPage === totalPages || totalPages === 0} onClick={() => handlePageChange(currentPage + 1)}>
+                  <Button
+                    size="sm"
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
                     Next
                   </Button>
                 </div>
