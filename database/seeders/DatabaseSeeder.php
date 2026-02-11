@@ -2582,6 +2582,7 @@ class DatabaseSeeder extends Seeder
         SiswaRombel::insert([
             // XII (24/25)
             [
+                // 1
                 'siswa_id' => 8, // Devi
                 'rombel_id' => 7, // XII-A-1
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2591,6 +2592,7 @@ class DatabaseSeeder extends Seeder
 
             // XI (24/25)
             [
+                // 2
                 'siswa_id' => 1, // Bagas
                 'rombel_id' => 5, // XI-B-1
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2598,6 +2600,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Siswa berhenti sekolah pada pertengahan tahun 2024'
             ],
             [
+                // 3
                 'siswa_id' => 2, // Winton
                 'rombel_id' => 5, // XI-B-1
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2605,6 +2608,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Pindah ke jurusan IPA',
             ],   
             [
+                // 4
                 'siswa_id' => 4, // Rehan
                 'rombel_id' => 13, // XI-A-2
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2612,6 +2616,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Siswa terkena DO oleh pihak sekolah pada tahun 2024',
             ],   
             [
+                // 5
                 'siswa_id' => 5, // Yuli
                 'rombel_id' => 14, // XI-B-2
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2619,6 +2624,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Siswa pindah sekolah pada semester genap tahun 2025'
             ],          
             [
+                // 6
                 'siswa_id' => 7, // Selma
                 'rombel_id' => 14, // XI-B-2
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2628,6 +2634,7 @@ class DatabaseSeeder extends Seeder
             
             // X (24/25)
             [
+                // 7
                 'siswa_id' => 3, // Sanita
                 'rombel_id' => 2, // X-B-1
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2635,6 +2642,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => null
             ],                       
             [
+                // 8
                 'siswa_id' => 6, // Danang
                 'rombel_id' => 11, // X-B-2
                 'tahun_akademik_id' => 2, // 2024/2025
@@ -2644,6 +2652,7 @@ class DatabaseSeeder extends Seeder
             
             // X 23/24
             [
+                // 9
                 'siswa_id' => 1, // Bagas
                 'rombel_id' => 1, // X-A-1
                 'tahun_akademik_id' => 1, // 2013/2024
@@ -2651,6 +2660,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Naik ke kelas XI'
             ],                      
             [
+                // 10
                 'siswa_id' => 2, // Winton
                 'rombel_id' => 2, // X-B-1
                 'tahun_akademik_id' => 1, // 2013/2024
@@ -2658,6 +2668,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Naik ke kelas XI'
             ],            
             [
+                // 11
                 'siswa_id' => 3, // Sanita
                 'rombel_id' => 2, // X-B-1
                 'tahun_akademik_id' => 1, // 2013/2024
@@ -2665,6 +2676,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Belum memenuhi syarat untuk naik ke kelas XI'
             ],                      
             [
+                // 12
                 'siswa_id' => 4, // Rehan
                 'rombel_id' => 10, // X-A-2
                 'tahun_akademik_id' => 1, // 2013/2024
@@ -2672,6 +2684,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Naik ke kelas XI',
             ],              
             [
+                // 13
                 'siswa_id' => 5, // Yuli
                 'rombel_id' => 10, // X-A-2
                 'tahun_akademik_id' => 1, // 2013/2024
@@ -2679,6 +2692,7 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Naik ke kelas XI',
             ],              
             [
+                // 14
                 'siswa_id' => 6, // Danang
                 'rombel_id' => 11, // X-B-2
                 'tahun_akademik_id' => 1, // 2013/2024
@@ -4025,41 +4039,530 @@ class DatabaseSeeder extends Seeder
          * kepsek:
          * guru: CRUD
          */
-        // DataNilaiSiswa::insert([
-        //     [
-        //         'siswa_id' => 1, // Bagas jurusan IPA
-        //         'kurikulum_mata_pelajaran_id' => 2, // Fisika jurusan IPA                           
-        //         'semester_id' => 1, // Fisika jurusan IPA           
-        //         'guru_id' => 5, // Guru IPA
-        //         'point_absensi' => 78.5,
-        //         'point_tugas' => 80.0,
-        //         'point_uts' => 90.5,
-        //         'point_uas' => 88.5,                
-        //         'sikap' => 'Cukup'
-        //     ],
-        //     [
-        //         'siswa_id' => 2, // Winton
-        //         'kurikulum_mata_pelajaran_id' => 3, // B.Indo jurusan IPS                
-        //         'semester_id' => 1, // B.Indo jurusan IPS
-        //         'guru_id' => 6, // Guru IPS
-        //         'point_absensi' => 90,
-        //         'point_tugas' => 80,
-        //         'point_uts' => 70,
-        //         'point_uas' => 88,                
-        //         'sikap' => 'Baik'
-        //     ],
-        //     [
-        //         'siswa_id' => 2, // Winton
-        //         'kurikulum_mata_pelajaran_id' => 4, // Sunda jurusan IPS                
-        //         'semester_id' => 2, // Sunda jurusan IPS
-        //         'guru_id' => 6, // Guru IPS
-        //         'point_absensi' => 90,
-        //         'point_tugas' => 90,
-        //         'point_uts' => 90,
-        //         'point_uas' => 90,                
-        //         'sikap' => 'Sangat Baik'
-        //     ]
-        // ]);
+        DataNilaiSiswa::insert([
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 10, // X-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80.50,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,          
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 10,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 10,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 90,
+                'point_tugas' => 90,
+                'point_uts' => 0,
+                'point_uas' => 90,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 10,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 100,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 90,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Tingkat 11
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 3, // XI-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,           
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 3,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 80,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 3,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 90,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 2, // Winton
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 3,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 100,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 90,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Sanita
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 11, // X-B11
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 60.60,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,               
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 11,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 60,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 11,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 60,
+                'point_tugas' => 90,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 11,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 60,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Tahun 2024
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 7, // X-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 60,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,               
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 7,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 60,
+                'point_tugas' => 80,
+                'point_uts' => 80,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 7,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 60,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 3, // Sanita
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 7,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' =>6,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Yuli
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 13, // X-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80.50,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,          
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 13,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 13,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 90,
+                'point_tugas' => 90,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 13,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 100,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Tingkat 11
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 5, // XI-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80,
+                'point_tugas' => 80.00,
+                'point_uts' => 80.50,
+                'point_uas' => 0,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 5,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 5,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 5, // Yuli
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 5,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Bagas
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 9, // X-A-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 70.50,
+                'point_tugas' => 70.00,
+                'point_uts' => 80.50,
+                'point_uas' => 0,             
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 9,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 9,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 90,
+                'point_tugas' => 90,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 9,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 70,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Tingkat 11
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 2, // XI-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,               
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 2,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 80,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 2,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 2,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+
+            // Devi
+            // Tingkat 12
+            [
+                'siswa_id' => 8, // Devi
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 1, // XII-A-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80,
+                'point_tugas' => 80.00,
+                'point_uts' => 70.50,
+                'point_uas' => 0,             
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 8, // Devi
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 1,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 80,
+                'point_uas' => 0,              
+                'sikap' => 'Baik'
+            ],
+            [
+                'siswa_id' => 8, // Devi
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 1,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ],
+            [
+                'siswa_id' => 8, // Devi
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 1,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 80,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 80,              
+                'sikap' => 'Sangat Baik'
+            ]
+
+        ]);
 
         /**
          * 🎯 SPA: CRUD

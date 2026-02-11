@@ -155,18 +155,11 @@ class JurusanController extends Controller
         }
 
         // Cek apakah jurusan masih dipakai kelas
-        if ($jurusan->kelas()->exists()) {
+        if ($jurusan->rombels()->exists()) {
             return ApiResponse::error('Tidak bisa', [
-                'nama_jurusan' => ['Ada kelas yang telah menggunakan jurusan ini']
+                'nama_jurusan' => ['Ada rombel yang telah menggunakan jurusan ini']
             ], 422);
-        }
-
-        // Cek apakah jurusan masih punya siswa
-        if ($jurusan->siswas()->exists()) {
-            return ApiResponse::error('Jurusan tidak bisa dihapus karena masih memiliki siswa', [
-                'nama_jurusan' => ['Jurusan ini masih digunakan oleh siswa']
-            ], 422);
-        }
+        }        
 
         $jurusan->delete();
         return ApiResponse::success(null, 'Jurusan berhasil dihapus');

@@ -168,6 +168,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/spa/absensi/siswa/pelajaran/export', [AbsensiSiswaController::class, 'export']);
     Route::get('/spa/absensi/siswa/pelajaran/zip', [AbsensiSiswaController::class, 'exportBerkasZip']);
     Route::delete('/spa/absensi/siswa/pelajaran/destroy/{id?}', [AbsensiSiswaController::class, 'destroyData']);
+    Route::delete('/spa/absensi/siswa/bukti/destroy/{id?}', [AbsensiSiswaController::class, 'hapusBuktiAbsensi']);
     Route::apiResource('/spa/absensi/siswa/pelajaran', AbsensiSiswaController::class)->except('store', 'destroy');  
 
     // ✅☑️ CRUD Ekstrakurikuler
@@ -185,12 +186,13 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::apiResource('/spa/siswa/ekskul', EkskulSiswaPivotController::class)->except('index');            
     Route::get('/spa/data-select/siswa/ekskul', [EkskulSiswaPivotController::class, 'dataSelect']);
     
-    // ✅ Prestasi
+    // ✅☑️ Prestasi
     Route::apiResource('/spa/prestasi', PrestasiController::class);   
     Route::get('/spa/data-select/siswa/prestasi', [PrestasiController::class, 'dataSelect']);
     
     // ✅ Data Nilai Siswa (belum masuk tahap ini)
-    Route::get('/spa/data-nilai-siswa/all', [DataNilaiSiswaController::class, 'All']);   
+    Route::get('/spa/data-nilai-siswa/select-referensi', [DataNilaiSiswaController::class, 'selectDanReferensi']);   
+    Route::get('/spa/data-nilai-siswa/leger', [DataNilaiSiswaController::class, 'index']);   
     Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');           
     
     // ✅ Keuangan

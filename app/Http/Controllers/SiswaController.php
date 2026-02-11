@@ -650,14 +650,8 @@ class SiswaController extends Controller
 
         // Daftar relasi yang harus dicek
         $relations = [
-            'ekskulSiswa',
-            'jurusan',
-            'kelas',
-            'siswaRombels',
-            'pengajar',
-            'jadwalPelajarans',
-            'absensis',
-            'kurikulumMataPelajarans',
+            'ekskulSiswa',            
+            'absensis',            
             'dataNilaiSiswas',
             'prestasis'
         ];

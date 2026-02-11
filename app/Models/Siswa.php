@@ -69,6 +69,7 @@ class Siswa extends Authenticatable
             ->whereHas('rombel.tahunAkademik', fn ($q) => $q->where('status', 'aktif'));
     }
 
+
     public function pengajar()
     {
         return $this->belongsTo(Kepegawaian::class, 'pengajar_id');

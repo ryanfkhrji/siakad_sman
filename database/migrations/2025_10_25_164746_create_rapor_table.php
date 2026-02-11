@@ -22,18 +22,24 @@ return new class extends Migration
                 ->constrained('tahun_akademik')
                 ->restrictOnDelete();
         
-            $table->enum('semester', ['ganjil', 'genap']);
+            $table->foreignId('semester_id')
+                ->constrained('semester')
+                ->restrictOnDelete();
         
             // wali rombel yang mengesahkan
             $table->foreignId('wali_rombel_id')
                 ->constrained('kepegawaians')
                 ->restrictOnDelete();
+
+            $table->enum('jenis_rapor', ['PTS', 'PAS'])
+                ->default('PAS');            
         
             // status rapor
             $table->enum('status', ['draft', 'final'])
                 ->default('draft');
         
             $table->date('tanggal_terbit')->nullable();
+
             $table->text('catatan_wali')->nullable();
         
             $table->timestamps();
@@ -42,7 +48,7 @@ return new class extends Migration
             $table->unique([
                 'siswa_id',
                 'tahun_akademik_id',
-                'semester'
+                'semester_id'
             ], 'unik');
         });
            
@@ -56,3 +62,5 @@ return new class extends Migration
         Schema::dropIfExists('rapor');
     }
 };
+
+// kelas->tahun->semester->siswa->datanilaisiswa->absensi

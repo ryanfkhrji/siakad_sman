@@ -9,20 +9,46 @@ class DataNilaiSiswa extends Model
 {
     use HasFactory;
     protected $table = 'data_nilai_siswa';
-    protected $guarded = ['id'];
+    protected $guarded = ['id'];   
+
+
+    public function siswaRombel()
+     {
+         return $this->belongsTo(SiswaRombel::class, 'siswa_rombel_id');
+     }
 
      // Data nilai dimiliki oleh siswa
      public function siswa()
      {
          return $this->belongsTo(Siswa::class, 'siswa_id');
      }
+
+     public function kurikulumMataPelajaran()
+     {
+         return $this->belongsTo(KurikulumMataPelajaran::class);
+     }
  
+     public function tahunAkademik()
+     {
+         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+     }
+
+     public function semester()
+     {
+         return $this->belongsTo(Semester::class, 'semester_id');
+     }
+
+     public function guru()
+     {
+         return $this->belongsTo(Kepegawaian::class, 'guru_id');
+     } 
+
      // Data nilai dimiliki oleh kelas
      public function kelas()
      {
          return $this->belongsTo(Kelas::class, 'kelas_id');
      }
- 
+
      // Data nilai dimiliki oleh jurusan
      public function jurusan()
      {
@@ -39,17 +65,7 @@ class DataNilaiSiswa extends Model
      public function mataPelajaran()
      {
          return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
-     }     
-
-     public function guru()
-     {
-         return $this->belongsTo(Kepegawaian::class, 'guru_id');
-     }     
-
-    public function kurikulumMataPelajaran()
-    {
-        return $this->belongsTo(KurikulumMataPelajaran::class);
-    }
+     }                 
 
     // public function ekskulSiswaPivot()
     // {

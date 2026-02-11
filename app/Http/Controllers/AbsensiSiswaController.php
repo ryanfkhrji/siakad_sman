@@ -295,7 +295,7 @@ class AbsensiSiswaController extends Controller
 
 
     /**
-     * ! ✅ untuk spa (masuk kesini, indexnya udah)
+     * ✅ untuk spa
      */   
     public function show($id)
     {
@@ -319,64 +319,99 @@ class AbsensiSiswaController extends Controller
         $siswa = $absensi->first()->siswa;
 
         $result = [
-            'siswa_id'          => $siswa->id,
-            'nama_siswa'        => $siswa->nama,
-            'nisn'              => $siswa->nisn,
-            'nis'               => $siswa->nis,
-            'histori_rombel'    => $absensi->groupBy('rombel_id')
-            ->map(function ($absen) {
-                $rombel = $absen->first()->rombel;
+            'siswa_id'   => $siswa->id,
+            'nama_siswa' => $siswa->nama,
+            'nisn'       => $siswa->nisn,
+            'nis'        => $siswa->nis,
 
-                return [
-                    'rombel_id'     => $rombel->id,
-                    'nama_rombel'   => $rombel->nama_rombel,
-                    'periode'       => $absen->groupBy('tahun_akademik_id')
-                    ->sortKeys()
-                    ->map(function ($abs) {
-                        $tahun = $abs->first()->tahunAkademik;
+            'histori_rombel' => $absensi
+                ->groupBy('rombel_id')
+                ->map(function ($absenRombel) {
 
-                        return [
-                            'tahun_akademik_id' => $tahun->id,
-                            'tahun_akademik'    => $tahun->tahun_akademik,
-                            'status_tahun'      => $tahun->status,
-                            'semester'          => $abs->groupBy('semester_id')
+                    $rombel = $absenRombel->first()->rombel;
+
+                    return [
+                        'rombel_id'   => $rombel->id,
+                        'nama_rombel' => $rombel->nama_rombel,
+
+                        'periode' => $absenRombel
+                            ->groupBy('tahun_akademik_id')
                             ->sortKeys()
-                            ->map(function ($ab) {
-                                $semester = $ab->first()->semester;
+                            ->map(function ($absenTahun) {
+
+                                $tahun = $absenTahun->first()->tahunAkademik;
 
                                 return [
-                                    'semester_id'       => $semester->id,
-                                    'semester'          => $semester->semester,
-                                    'status_semester'   => $semester->status,
+                                    'tahun_akademik_id' => $tahun->id,
+                                    'tahun_akademik'    => $tahun->tahun_akademik,
+                                    'status_tahun'      => $tahun->status,
 
-                                    'mata_pelajarans'   => $ab->groupBy('jadwal_pelajaran_id')
-                                    ->map(function ($a) {
-                                        $mapel = $a->first()->jadwalPelajaran->kurikulumMataPelajaran->mataPelajaran;
+                                    // ✅ TOTAL PER TAHUN AKADEMIK
+                                    'total_status_tahun' => [
+                                        'hadir' => $absenTahun->where('status', 'hadir')->count(),
+                                        'izin'  => $absenTahun->where('status', 'izin')->count(),
+                                        'sakit' => $absenTahun->where('status', 'sakit')->count(),
+                                        'alfa'  => $absenTahun->where('status', 'alfa')->count(),
+                                    ],
 
-                                        return [
-                                            'jadwal_pelajaran_id'   => $a->first()->jadwalPelajaran->id,
-                                            'mata_pelajaran'        => $mapel->nama_pelajaran,
-                                            'absensi'               => $a->map(function ($absensiMapel) {
-                                                return [
-                                                    'absensi_id'    => $absensiMapel->id,
-                                                    'hari'          => $absensiMapel->hari,
-                                                    'status'        => $absensiMapel->status,
-                                                    'bukti'         => $absensiMapel->bukti ?? null,
-                                                    // mantap
-                                                ];
-                                            })->values(),
-                                        ];
-                                    })->values(),
+                                    'semester' => $absenTahun
+                                        ->groupBy('semester_id')
+                                        ->sortKeys()
+                                        ->map(function ($absenSemester) {
+
+                                            $semester = $absenSemester->first()->semester;
+
+                                            return [
+                                                'semester_id'     => $semester->id,
+                                                'semester'        => $semester->semester,
+                                                'status_semester' => $semester->status,
+
+                                                // ✅ TOTAL PER SEMESTER
+                                                'total_status' => [
+                                                    'hadir' => $absenSemester->where('status', 'hadir')->count(),
+                                                    'izin'  => $absenSemester->where('status', 'izin')->count(),
+                                                    'sakit' => $absenSemester->where('status', 'sakit')->count(),
+                                                    'alfa'  => $absenSemester->where('status', 'alfa')->count(),
+                                                ],
+
+                                                'mata_pelajarans' => $absenSemester
+                                                    ->groupBy('jadwal_pelajaran_id')
+                                                    ->map(function ($absenMapel) {
+
+                                                        $jadwal = $absenMapel->first()->jadwalPelajaran;
+                                                        $mapel  = $jadwal->kurikulumMataPelajaran->mataPelajaran;
+
+                                                        return [
+                                                            'jadwal_pelajaran_id' => $jadwal->id,
+                                                            'mata_pelajaran'      => $mapel->nama_pelajaran,
+
+                                                            'absensi' => $absenMapel
+                                                                ->map(function ($item) {
+                                                                    return [
+                                                                        'absensi_id' => $item->id,
+                                                                        'hari'       => $item->hari,
+                                                                        'status'     => $item->status,
+                                                                        'bukti'      => $item->bukti ?? null,
+                                                                    ];
+                                                                })
+                                                                ->values(),
+                                                        ];
+                                                    })
+                                                    ->values(),
+                                            ];
+                                        })
+                                        ->values(),
                                 ];
-                            })->values(),
-                        ];
-                    })->values(),
-                ];
-            })->values(),
+                            })
+                            ->values(),
+                    ];
+                })
+                ->values(),
         ];
 
         return ApiResponse::success($result, 'Detail absensi siswa berhasil diambil');
     }
+
     
 
     // ✅ show all absen sendiri (untuk siswa)
@@ -618,6 +653,59 @@ class AbsensiSiswaController extends Controller
         AbsensiSiswa::whereIn('id', $ids)->delete();
 
         return ApiResponse::success(null, 'Data absensi berhasil dihapus');
+    }
+
+
+    // Hapus foto bukti saja
+    public function hapusBuktiAbsensi(Request $request, $id = null)
+    {
+        // Ambil ID: bisa single (URL) atau bulk (request)
+        $ids = $request->input('ids') ?? ($id ? [$id] : []);
+
+        if (empty($ids)) {
+            return ApiResponse::error('Invalid Request', [
+                'ids' => 'Tidak ada ID yang dikirim'
+            ]);
+        }
+
+        // Ambil data absensi
+        $absensis = AbsensiSiswa::whereIn('id', $ids)->get();
+
+        // Validasi ID tidak ditemukan
+        $foundIds   = $absensis->pluck('id')->toArray();
+        $missingIds = array_values(array_diff($ids, $foundIds));
+
+        if (!empty($missingIds)) {
+            return ApiResponse::error('Not Found', [
+                'missing_ids' => $missingIds
+            ]);
+        }
+
+        foreach ($absensis as $absensi) {
+
+            // Skip jika tidak ada bukti
+            if (!$absensi->bukti) {
+                continue;
+            }
+
+            // Ambil path relatif
+            $relativePath = ltrim(
+                Str::of($absensi->bukti)->replaceFirst('public/', ''),
+                '/'
+            );
+
+            // Hapus file jika ada
+            if (Storage::disk('public')->exists($relativePath)) {
+                Storage::disk('public')->delete($relativePath);
+            }
+
+            // Update kolom bukti (audit trail)
+            $absensi->update([
+                'bukti' => 'Bukti dihapus pada ' . Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+        }
+
+        return ApiResponse::success(null, 'Bukti absensi berhasil dihapus');
     }
 
 

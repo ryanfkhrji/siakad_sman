@@ -209,7 +209,7 @@ Perbaikan
     - Frontend
         - samakan dengan insomnia
 --------------------------------------                                            
-28. absensi_siswa:
+28. X absensi_siswa:
     - ☑️ Backend:
         - ✅ samakan (seeder, controller) dengan migrasi
         - ❌ tambahkan fitur guru bisa absenkan siswa di controller        
@@ -226,13 +226,14 @@ Perbaikan
             c. lalu absenkan siswa (jika bingung, baca AbsensiSiswaController, function guruAbsenkanSiswa)
             d. guru isi manual cuma siswa_id, status, dan bukti. sedangkan rombel_id, jadwal_pelajaran_id, dan tahun_akademik_id terisi otomatis dari poin b
 --------------------------------------                                            
-29. ♻️ ekstrakurikuler:
+29. ♻️X ekstrakurikuler:
     - ☑️ Backend:
         - ✅ migrasi, seeder, controller
     - Frontend:
         - ikutin insomnia
         - filter jika ada lebih dari 1 tahun_akademik
-30. pembina_ekskul:
+--------------------------------------                                            
+30. X pembina_ekskul:
     - ☑️ Backend:
         - (migrasi, model, seeder)
         - ✅ controller
@@ -240,7 +241,8 @@ Perbaikan
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-31. pelatih_ekskul:
+--------------------------------------                                                    
+31. X pelatih_ekskul:
     - ☑️ Backend:
         - ✅ (migrasi, model, seeder)
         - ✅ controller
@@ -248,48 +250,53 @@ Perbaikan
         - ✅ data select
     - Frontend:
         - ikutin insomnia
-32. ☑️ ekskul_siswa_pivot:
-    - Backend:
+--------------------------------------                                                    
+32. X ekskul_siswa_pivot:
+    - ☑️ Backend:
         - ✅ (Migrasi, Seeder, Controller)
         - ✅ data select
     - Frontend:
         - ikutin insomnia
         - alur siswa daftar sendiri: get all ekskul -> klik daftar, sehingga siswa tidak menginputkan apapun secara manual (semua otomatis terisi)
-33. prestasi:
+--------------------------------------                                                    
+33. X prestasi:
     - ☑️ Backend:
         - ✅ (Seeder, Migrasi, Controller) Hapus kolom kelas_id dan jurusan_id
         - ✅ jangan otomatis, gunakan data select manual aja (takutnya mau ngedata prestasi yang lampau)
     - Frontend:
         - ikutin insomnia
+--------------------------------------                                                    
 34. data_nilai_siswa:
     kumpulan hasil asesmen (uts/uas, absensi, dll)
     - Backend:
           - ❌samakan semua
     - Frontend:
-          - Gua gatau ini gimana, coba cari referensi dari oss urindo
-35. rapor_nilai_siswa
+          - Desain coba ikutin excel leger ya. Atau kalo ada yang lebih baik, silakan aja dicoba
+          - Baca docs insomnia ya          
+--------------------------------------                                                              
+1.  rapor_nilai_siswa
     hasil akhir data_nilai_siswa
     - Backend:
           - ❌
-36. projek_p5:
+2.  projek_p5:
     - ❌ Backend:
-37. data_nilai_p5:
+3.  data_nilai_p5:
     kumpulan hasil projek_p5
     - ❌ Backend:
-38. data_nilai_ekskul
+4.  data_nilai_ekskul
     kumpulan hasil ekskul_siswa_pivot
     - Backend:
           - ❌
-39. rapor (wajib export excel)
+5.  rapor (wajib export excel)
     hasil final rapor_nilai_siswa, ekskul, p5
     - Backend:
           - ❌
-40. membuat data_berkas:
+6.  membuat data_berkas:
     - ❌ Backend:        
-41. ♻️ keuangan:
+7.  ♻️ keuangan:
     - ❌ Backend:        
-42. ❌⚠️ membuat jurnal_kbm
-43. ❌⚠️ membuat forum diskusi
+8.  ❌⚠️ membuat jurnal_kbm
+9.  ❌⚠️ membuat forum diskusi
 44. ❌⚠️ membuat tugas (lms)
 45. ❌⚠️ membuat K1 (Kompetensi Inti) = (atasannya KD/Kompetensi)
 46. ====================================================================================================================================

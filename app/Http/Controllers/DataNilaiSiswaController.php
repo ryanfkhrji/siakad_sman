@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DataNilaiSiswa;
+use App\Models\SiswaRombel;
 use App\Models\JadwalPelajaran;
 use App\Models\Siswa;
 use App\Helpers\ApiResponse;
@@ -14,125 +15,114 @@ use Carbon\Carbon;
 
 class DataNilaiSiswaController extends Controller
 {
-    // ✅ untuk spa
+    // ! ✅ untuk spa (MASUK SINI)
     public function index()
     {
-        $siswas = Siswa::with([
-            'kelas',
-            'jurusan',
-            'dataNilaiSiswas',
-            'jadwalPelajarans.guru',
-            'jadwalPelajarans.kelas',
-            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
-            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
-            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
-            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
-        ])->get();
+        $data = DataNilaiSiswa::with([
+            'tahunAkademik',
+            'semester',
+            'siswa',
+            'siswaRombel.rombel.kelas',
+            'kurikulumMataPelajaran.mataPelajaran'
+        ])
+        ->orderBy('tahun_akademik_id')
+        ->orderBy('semester_id')
+        ->orderBy('siswa_id')
+        ->get();
 
-        /**
-         * 🔹 STEP 1: Flatten ke level jadwal + siswa
-         */
-        $rows = $siswas->flatMap(function ($siswa) {
-            return $siswa->jadwalPelajarans->map(function ($jadwal) use ($siswa) {
+        if ($data->isEmpty()) {
+            return ApiResponse::error('Not Found', 'Belum ada data nilai siswa');
+        }
 
-                $kmp = $jadwal->kurikulumMataPelajaran;
-                $ta  = $kmp->tahunAkademik;
-
-                $nilai = $siswa->dataNilaiSiswas
-                    ->firstWhere('kurikulum_mata_pelajaran_id', $kmp->id);
-
-                return [
-                    'tahun_akademik_id' => $ta->id,
-                    'tahun_akademik'    => $ta,
-                    'kurikulum_mapel'   => $kmp,
-                    'jadwal'            => $jadwal,
-                    'siswa'             => $siswa,
-                    'nilai'             => $nilai,
-                ];
-            });
-        });
-
-        /**
-         * 🔹 STEP 2: GROUP BY TAHUN AKADEMIK
-         */
-        $result = $rows
+        $result = $data
             ->groupBy('tahun_akademik_id')
-            ->map(function ($perTahun) {
-
-                $ta = $perTahun->first()['tahun_akademik'];
-
-                /**
-                 * 🔹 GROUP BY KURIKULUM MAPEL
-                 */
-                $kurikulum = $perTahun
-                    ->groupBy(fn ($i) => $i['kurikulum_mapel']->id)
-                    ->map(function ($perMapel) {
-
-                        $kmp = $perMapel->first()['kurikulum_mapel'];
-                        $jadwal = $perMapel->first()['jadwal'];
-
-                        return [
-                            'kurikulum_mata_pelajaran_id' => $kmp->id,
-                            'mata_pelajaran' => $kmp->mataPelajaran->nama_pelajaran ?? null,
-                            'kurikulum' => $kmp->kurikulum->nama_kurikulum ?? null,
-                            'jurusan' => $kmp->jurusan->nama_jurusan ?? null,
-                            'tingkat' => $kmp->tingkat,
-                            'nilai_kkm' => $kmp->nilai_kkm,
-
-                            /**
-                             * 🔹 SATU KURIKULUM = SATU JADWAL
-                             */
-                            'jadwal_pelajaran' => [
-                                'hari' => $jadwal->hari,
-                                'jam_mulai' => $jadwal->jam_mulai,
-                                'jam_selesai' => $jadwal->jam_selesai,
-                                'kelas' => $jadwal->kelas->nama_kelas ?? null,
-                                'guru' => [
-                                    'id' => $jadwal->guru->id ?? null,
-                                    'nama' => $jadwal->guru->nama ?? null,
-                                ],
-
-                                /**
-                                 * 🔹 BANYAK SISWA
-                                 */
-                                'siswa' => $perMapel->map(function ($row) {
-
-                                    $siswa = $row['siswa'];
-                                    $nilai = $row['nilai'];
-
-                                    return [
-                                        'siswa_id' => $siswa->id,
-                                        'nis' => $siswa->nis,
-                                        'nama' => $siswa->nama,
-                                        'kelas' => $siswa->kelas->nama_kelas ?? null,
-
-                                        'nilai' => $nilai ? [
-                                            'point_absensi' => $nilai->point_absensi,
-                                            'point_tugas'   => $nilai->point_tugas,
-                                            'point_uts'     => $nilai->point_uts,
-                                            'point_uas'     => $nilai->point_uas,
-                                            'point_ekskul'  => $nilai->point_ekskul,
-                                            'sikap'         => $nilai->sikap,
-                                        ] : null,
-                                    ];
-                                })->values(),
-                            ],
-                        ];
-                    })->values();
+            ->map(function ($tahunGroup) {
 
                 return [
-                    'tahun_akademik_id' => $ta->id,
-                    'tahun_akademik' => $ta->tahun_akademik,
-                    'semester' => $ta->semester,
-                    'status' => $ta->status,
-                    'kurikulum_mata_pelajaran' => $kurikulum,
-                ];
-            })->values();
+                    'tahun_akademik_id' => $tahunGroup->first()->tahunAkademik->id,
+                    'tahun_akademik'    => $tahunGroup->first()->tahunAkademik->tahun_akademik,
+                    'status_tahun'      => $tahunGroup->first()->tahunAkademik->status,
 
-        return ApiResponse::success($result, 'Data nilai berhasil ditampilkan');
+                    'semesters' => $tahunGroup
+                        ->groupBy('semester_id')
+                        ->sortKeys()
+                        ->map(function ($semesterGroup) {
+
+                            return [
+                                'semester_id'     => $semesterGroup->first()->semester->id,
+                                'semester'        => $semesterGroup->first()->semester->semester,
+                                'status_semester' => $semesterGroup->first()->semester->status,
+
+                                'rombels' => $semesterGroup
+                                    ->groupBy(fn ($item) =>
+                                        $item->siswaRombel->rombel_id
+                                    )
+                                    ->map(function ($rombelGroup) {
+
+                                        return [
+                                            'rombel_id'   => $rombelGroup->first()->siswaRombel->rombel->id,
+                                            'nama_rombel' => $rombelGroup->first()->siswaRombel->rombel->nama_rombel,
+
+                                            'siswas' => $rombelGroup
+                                                ->groupBy('siswa_id')
+                                                ->map(function ($siswaGroup) {
+
+                                                    return [
+                                                        'siswa_id'   => $siswaGroup->first()->siswa->id,
+                                                        'nama_siswa' => $siswaGroup->first()->siswa->nama,
+                                                        'nisn'       => $siswaGroup->first()->siswa->nisn,
+                                                        'nis'        => $siswaGroup->first()->siswa->nis,
+
+                                                        'mata_pelajaran' => $siswaGroup
+                                                            ->groupBy('kurikulum_mata_pelajaran_id')
+                                                            ->map(function ($mapelGroup) {
+
+                                                                $nilai = $mapelGroup->first();
+                                                                $mapel = $nilai->kurikulumMataPelajaran->mataPelajaran;
+
+                                                                if ($nilai->jenis_penilaian == 'PTS') {
+                                                                    return [
+                                                                        'mapel'             => $mapel->nama_pelajaran,
+                                                                        'jenis_penilaian'   => $nilai->jenis_penilaian,
+                                                                        'point'             => [
+                                                                            'absensi'     => $nilai->point_absensi,
+                                                                            'tugas'       => $nilai->point_tugas,
+                                                                            'uts'         => $nilai->point_uts,
+                                                                        ],
+                                                                        'sikap'             => $nilai->sikap ?? null,
+                                                                    ];
+                                                                }
+
+                                                                return [
+                                                                    'mapel'             => $mapel->nama_pelajaran,
+                                                                    'jenis_penilaian'   => $nilai->jenis_penilaian,
+                                                                    'point'             => [
+                                                                        'absensi'     => $nilai->point_absensi,
+                                                                        'tugas'       => $nilai->point_tugas,
+                                                                        'uas'         => $nilai->point_uas,
+                                                                    ],
+                                                                    'sikap'             => $nilai->sikap ?? null,
+                                                                ];
+
+                                                            })
+                                                            ->values()
+                                                    ];
+                                                })
+                                                ->values()
+                                        ];
+                                    })
+                                    ->values()
+                            ];
+                        })
+                        ->values()
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success($result, 'Data nilai siswa berhasil ditampilkan');
     }
 
-    
+
 
     /**
      * ✅ untuk guru
@@ -591,4 +581,60 @@ class DataNilaiSiswaController extends Controller
         ], 422);
     }    
 
+    // spa/tu/guru (digunakan untuk mengambil absensi)
+    public function selectDanReferensi()
+    {
+        // ambil hanya siswa rombel pada tahun akademik yang aktif
+        $data = SiswaRombel::with([
+                'tahunAkademik',
+                'rombel.kelas',
+                'siswa',
+            ])
+            ->whereHas('tahunAkademik', function ($ta) {
+                $ta->where('status', 'aktif');
+            })
+            ->get();
+
+        if ($data->isEmpty()) {
+            return ApiResponse::error('Not found', 'Belum ada data siswa dan rombel pada tahun aktif');
+        }
+
+        $siswaRombel = $data->groupBy('tahun_akademik_id')
+            ->sortKeys()
+            ->map(function ($siswaRmbl) {
+
+                $tahun = $siswaRmbl->first()->tahunAkademik;
+
+                return [
+                    'tahun_akademik_id' => $tahun->id,
+                    'tahun_akademik'    => $tahun->tahun_akademik,
+                    'status_tahun'      => $tahun->status,
+
+                    'rombel' => $siswaRmbl->groupBy('rombel_id')
+                        ->sortKeys()
+                        ->map(function ($siswaR) {
+
+                            $rombel = $siswaR->first()->rombel;
+
+                            return [
+                                'rombel_id' => $rombel->id,
+                                'rombel'    => $rombel->nama_rombel,
+
+                                'siswa' => $siswaR->map(function ($item) {
+                                    return [
+                                        'siswa_id'     => $item->siswa->id,
+                                        'nama'         => $item->siswa->nama,
+                                        'nisn'         => $item->siswa->nisn,
+                                        'nis'          => $item->siswa->nis,
+                                        'status_akhir' => $item->status_akhir,
+                                        'catatan'      => $item->catatan,
+                                    ];
+                                })->values(),
+                            ];
+                        })->values(),
+                ];
+            })->values();
+
+        return ApiResponse::success($siswaRombel, 'Data select dan referensi absensi berhasil diambil');
+    }    
 }
