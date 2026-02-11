@@ -4052,7 +4052,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,          
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 2, // Winton
@@ -4066,7 +4066,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 2, // Winton
@@ -4080,7 +4080,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 90,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 2, // Winton
@@ -4094,7 +4094,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 90,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Tingkat 11
@@ -4110,7 +4110,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,           
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 2, // Winton
@@ -4124,7 +4124,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 2, // Winton
@@ -4138,7 +4138,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 90,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 2, // Winton
@@ -4152,7 +4152,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 90,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Sanita
@@ -4168,7 +4168,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,               
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 3, // Sanita
@@ -4182,7 +4182,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 3, // Sanita
@@ -4196,7 +4196,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 3, // Sanita
@@ -4210,7 +4210,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Tahun 2024
@@ -4226,7 +4226,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,               
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 3, // Sanita
@@ -4240,7 +4240,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 3, // Sanita
@@ -4254,7 +4254,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 3, // Sanita
@@ -4268,7 +4268,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Yuli
@@ -4284,7 +4284,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,          
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 5, // Yuli
@@ -4298,7 +4298,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 5, // Yuli
@@ -4312,7 +4312,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 5, // Yuli
@@ -4326,7 +4326,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Tingkat 11
@@ -4342,7 +4342,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 80.50,
                 'point_uas' => 0,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 5, // Yuli
@@ -4356,7 +4356,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 5, // Yuli
@@ -4370,7 +4370,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 5, // Yuli
@@ -4384,7 +4384,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Bagas
@@ -4400,7 +4400,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 70.00,
                 'point_uts' => 80.50,
                 'point_uas' => 0,             
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 1, // Bagas
@@ -4414,7 +4414,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 1, // Bagas
@@ -4428,7 +4428,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 1, // Bagas
@@ -4442,7 +4442,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Tingkat 11
@@ -4458,7 +4458,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,               
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 1, // Bagas
@@ -4472,7 +4472,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 1, // Bagas
@@ -4486,7 +4486,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 1, // Bagas
@@ -4500,7 +4500,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
 
             // Devi
@@ -4517,7 +4517,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 70.50,
                 'point_uas' => 0,             
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 8, // Devi
@@ -4531,7 +4531,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                'sikap' => 'Baik'
+                // 'sikap' => 'Baik'
             ],
             [
                 'siswa_id' => 8, // Devi
@@ -4545,7 +4545,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ],
             [
                 'siswa_id' => 8, // Devi
@@ -4559,7 +4559,7 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                'sikap' => 'Sangat Baik'
+                // 'sikap' => 'Sangat Baik'
             ]
 
         ]);

@@ -29,17 +29,14 @@ return new class extends Migration
             ->restrictOnDelete();
                         
             $table->enum('jenis_penilaian', ['PTS','PAS','Susulan PTS','Susulan PAS','Remedial PTS','Remedial PAS']);
-
-            // Point nilai (gunakan rumus)            
+                        
             $table->decimal('point_absensi', 5, 2)->default(0);
 
             $table->decimal('point_tugas', 5, 2)->default(0);
 
             $table->decimal('point_uts', 5, 2)->default(0);
 
-            $table->decimal('point_uas', 5, 2)->default(0);
-            
-            $table->enum('sikap', ['Sangat Baik','Baik','Cukup','Kurang'])->nullable();
+            $table->decimal('point_uas', 5, 2)->default(0);            
 
             $table->unique([
                 'siswa_id',

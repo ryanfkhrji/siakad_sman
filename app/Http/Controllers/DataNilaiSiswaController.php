@@ -15,112 +15,134 @@ use Carbon\Carbon;
 
 class DataNilaiSiswaController extends Controller
 {
-    // ! ✅ untuk spa (MASUK SINI)
+    // ✅ untuk spa
     public function index()
-    {
-        $data = DataNilaiSiswa::with([
-            'tahunAkademik',
-            'semester',
-            'siswa',
-            'siswaRombel.rombel.kelas',
-            'kurikulumMataPelajaran.mataPelajaran'
-        ])
-        ->orderBy('tahun_akademik_id')
-        ->orderBy('semester_id')
-        ->orderBy('siswa_id')
-        ->get();
+{
+    $data = DataNilaiSiswa::with([
+        'tahunAkademik',
+        'semester',
+        'siswa',
+        'siswaRombel.rombel.kelas',
+        'kurikulumMataPelajaran.mataPelajaran'
+    ])
+    ->orderBy('tahun_akademik_id')
+    ->orderBy('semester_id')
+    ->orderBy('siswa_id')
+    ->get();
 
-        if ($data->isEmpty()) {
-            return ApiResponse::error('Not Found', 'Belum ada data nilai siswa');
-        }
+    if ($data->isEmpty()) {
+        return ApiResponse::error('Not Found', 'Belum ada data nilai siswa');
+    }
 
-        $result = $data
-            ->groupBy('tahun_akademik_id')
-            ->map(function ($tahunGroup) {
+    $result = $data
+        ->groupBy('tahun_akademik_id')
+        ->map(function ($tahunGroup) {
 
-                return [
-                    'tahun_akademik_id' => $tahunGroup->first()->tahunAkademik->id,
-                    'tahun_akademik'    => $tahunGroup->first()->tahunAkademik->tahun_akademik,
-                    'status_tahun'      => $tahunGroup->first()->tahunAkademik->status,
+            return [
+                'tahun_akademik_id' => $tahunGroup->first()->tahunAkademik->id,
+                'tahun_akademik'    => $tahunGroup->first()->tahunAkademik->tahun_akademik,
+                'status_tahun'      => $tahunGroup->first()->tahunAkademik->status,
 
-                    'semesters' => $tahunGroup
-                        ->groupBy('semester_id')
-                        ->sortKeys()
-                        ->map(function ($semesterGroup) {
+                'semesters' => $tahunGroup
+                    ->groupBy('semester_id')
+                    ->sortKeys()
+                    ->map(function ($semesterGroup) {
 
-                            return [
-                                'semester_id'     => $semesterGroup->first()->semester->id,
-                                'semester'        => $semesterGroup->first()->semester->semester,
-                                'status_semester' => $semesterGroup->first()->semester->status,
+                        return [
+                            'semester_id'     => $semesterGroup->first()->semester->id,
+                            'semester'        => $semesterGroup->first()->semester->semester,
+                            'status_semester' => $semesterGroup->first()->semester->status,
 
-                                'rombels' => $semesterGroup
-                                    ->groupBy(fn ($item) =>
-                                        $item->siswaRombel->rombel_id
-                                    )
-                                    ->map(function ($rombelGroup) {
+                            'rombels' => $semesterGroup
+                                ->groupBy(fn ($item) =>
+                                    $item->siswaRombel->rombel_id
+                                )
+                                ->map(function ($rombelGroup) {
 
-                                        return [
-                                            'rombel_id'   => $rombelGroup->first()->siswaRombel->rombel->id,
-                                            'nama_rombel' => $rombelGroup->first()->siswaRombel->rombel->nama_rombel,
+                                    return [
+                                        'rombel_id'   => $rombelGroup->first()->siswaRombel->rombel->id,
+                                        'nama_rombel' => $rombelGroup->first()->siswaRombel->rombel->nama_rombel,
 
-                                            'siswas' => $rombelGroup
-                                                ->groupBy('siswa_id')
-                                                ->map(function ($siswaGroup) {
+                                        'siswas' => $rombelGroup
+                                            ->groupBy('siswa_id')
+                                            ->map(function ($siswaGroup) {
 
-                                                    return [
-                                                        'siswa_id'   => $siswaGroup->first()->siswa->id,
-                                                        'nama_siswa' => $siswaGroup->first()->siswa->nama,
-                                                        'nisn'       => $siswaGroup->first()->siswa->nisn,
-                                                        'nis'        => $siswaGroup->first()->siswa->nis,
+                                                return [
+                                                    'siswa_id'   => $siswaGroup->first()->siswa->id,
+                                                    'nama_siswa' => $siswaGroup->first()->siswa->nama,
+                                                    'nisn'       => $siswaGroup->first()->siswa->nisn,
+                                                    'nis'        => $siswaGroup->first()->siswa->nis,
 
-                                                        'mata_pelajaran' => $siswaGroup
-                                                            ->groupBy('kurikulum_mata_pelajaran_id')
-                                                            ->map(function ($mapelGroup) {
+                                                    'mata_pelajaran' => $siswaGroup
+                                                        ->groupBy('kurikulum_mata_pelajaran_id')
+                                                        ->map(function ($mapelGroup) {
 
-                                                                $nilai = $mapelGroup->first();
-                                                                $mapel = $nilai->kurikulumMataPelajaran->mataPelajaran;
+                                                            $nilai = $mapelGroup->first();
+                                                            $mapel = $nilai->kurikulumMataPelajaran->mataPelajaran;
 
-                                                                if ($nilai->jenis_penilaian == 'PTS') {
-                                                                    return [
-                                                                        'mapel'             => $mapel->nama_pelajaran,
-                                                                        'jenis_penilaian'   => $nilai->jenis_penilaian,
-                                                                        'point'             => [
-                                                                            'absensi'     => $nilai->point_absensi,
-                                                                            'tugas'       => $nilai->point_tugas,
-                                                                            'uts'         => $nilai->point_uts,
-                                                                        ],
-                                                                        'sikap'             => $nilai->sikap ?? null,
-                                                                    ];
-                                                                }
+                                                            // =========================
+                                                            // HITUNG NILAI AKHIR
+                                                            // =========================
+
+                                                            if ($nilai->jenis_penilaian == 'PTS') {
+
+                                                                $nilaiAkhir =
+                                                                    ($nilai->point_absensi * 0.10) +
+                                                                    ($nilai->point_tugas * 0.40) +
+                                                                    ($nilai->point_uts * 0.50);
 
                                                                 return [
-                                                                    'mapel'             => $mapel->nama_pelajaran,
-                                                                    'jenis_penilaian'   => $nilai->jenis_penilaian,
-                                                                    'point'             => [
+                                                                    'mapel'           => $mapel->nama_pelajaran,
+                                                                    'jenis_penilaian' => $nilai->jenis_penilaian,
+                                                                    'point' => [
                                                                         'absensi'     => $nilai->point_absensi,
                                                                         'tugas'       => $nilai->point_tugas,
-                                                                        'uas'         => $nilai->point_uas,
+                                                                        'uts'         => $nilai->point_uts,
+                                                                        'nilai_akhir' => round($nilaiAkhir, 2),
                                                                     ],
-                                                                    'sikap'             => $nilai->sikap ?? null,
+                                                                    'sikap' => $nilai->sikap ?? null,
                                                                 ];
+                                                            }
 
-                                                            })
-                                                            ->values()
-                                                    ];
-                                                })
-                                                ->values()
-                                        ];
-                                    })
-                                    ->values()
-                            ];
-                        })
-                        ->values()
-                ];
-            })
-            ->values();
+                                                            // =========================
+                                                            // UNTUK PAS
+                                                            // =========================
 
-        return ApiResponse::success($result, 'Data nilai siswa berhasil ditampilkan');
-    }
+                                                            $nilaiAkhir =
+                                                                ($nilai->point_absensi * 0.10) +
+                                                                ($nilai->point_tugas * 0.30) +
+                                                                ($nilai->point_uas * 0.60);
+
+                                                            return [
+                                                                'mapel'           => $mapel->nama_pelajaran,
+                                                                'jenis_penilaian' => $nilai->jenis_penilaian,
+                                                                'point' => [
+                                                                    'absensi'     => $nilai->point_absensi,
+                                                                    'tugas'       => $nilai->point_tugas,
+                                                                    'uas'         => $nilai->point_uas,
+                                                                    'nilai_akhir' => round($nilaiAkhir, 2),
+                                                                ],
+                                                                'sikap' => $nilai->sikap ?? null,
+                                                            ];
+
+                                                        })
+                                                        ->values()
+                                                ];
+                                            })
+                                            ->values()
+                                    ];
+                                })
+                                ->values()
+                        ];
+                    })
+                    ->values()
+            ];
+        })
+        ->values();
+
+    return ApiResponse::success($result, 'Data nilai siswa berhasil ditampilkan');
+}
+
 
 
 

@@ -34,6 +34,12 @@ return new class extends Migration
             $table->enum('jenis_rapor', ['PTS', 'PAS'])
                 ->default('PAS');            
         
+            $table->enum('sikap_spiritual', ['Sangat Baik','Baik','Cukup','Kurang'])->nullable();
+
+            $table->enum('sikap_sosial', ['Sangat Baik','Baik','Cukup','Kurang'])->nullable();
+                
+            $table->text('deskripsi_sikap')->nullable();
+                
             // status rapor
             $table->enum('status', ['draft', 'final'])
                 ->default('draft');

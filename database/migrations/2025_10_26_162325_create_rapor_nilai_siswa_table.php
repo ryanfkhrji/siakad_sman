@@ -24,7 +24,7 @@ return new class extends Migration
         
             $table->decimal('nilai_akhir', 5, 2);
             
-            $table->string('predikat', 10);
+            $table->string('predikat', 10)->nullable();
         
             $table->text('deskripsi')->nullable();
         

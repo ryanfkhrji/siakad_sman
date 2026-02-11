@@ -603,3 +603,14 @@ Guru:
 Guru MTK
 Mapel       Semester        Kelas
 MTK         Ganjil          X
+
+
+Alur Rapor
+1. Guru isi data nilai siswa dan ada simulasi hasil_akhirnya
+2. wali kelas buat data rapor siswa
+3. sistem mengambil hasil akhir data_nilai_siswa
+4. Jika rapor masih draft maka data_nilai_siswa bisa diubah dan nilai pada rapor_nilai_siswa pun bisa diubah 
+5. jika rapor masih draft, maka nilai_akhir pada rapor bisa digenerate ulang
+6. jika rapor sudah final, maka rapor tidak bisa generate ulang
+
+BACA GPT KEMARIN
