@@ -13,11 +13,8 @@ import api from "@/api/axios";
 
 interface FormErrors {
   tahun_akademik: string[];
-  semester: string[];
-  tanggal_mulai: string[];
-  tanggal_selesai: string[];
-  status: string[];
   keterangan: string[];
+  status: string[];
 }
 
 const EditTahunAkademik = () => {
@@ -26,23 +23,18 @@ const EditTahunAkademik = () => {
 
   const [formData, setFormData] = useState({
     tahun_akademik: "",
-    semester: "Ganjil",
-    tanggal_mulai: "",
-    tanggal_selesai: "",
-    status: "aktif",
     keterangan: "",
+    status: "aktif",
   });
 
   const [errors, setErrors] = useState<FormErrors>({
     tahun_akademik: [],
-    semester: [],
-    tanggal_mulai: [],
-    tanggal_selesai: [],
-    status: [],
     keterangan: [],
+    status: [],
   });
 
   const [loading, setLoading] = useState(false);
+  const [initialStatus, setInitialStatus] = useState("");
   const navigate = useNavigate();
 
   // AMBIL DATA LAMA
@@ -53,13 +45,12 @@ const EditTahunAkademik = () => {
         const data = res.data.data;
 
         setFormData({
-          tahun_akademik: data.tahun_akademik,
-          semester: data.semester,
-          tanggal_mulai: data.tanggal_mulai,
-          tanggal_selesai: data.tanggal_selesai,
-          status: data.status,
-          keterangan: data.keterangan ?? "",
+          tahun_akademik: data.tahun_akademik || "",
+          keterangan: data.keterangan || "",
+          status: data.status_tahun_akademik || "aktif",
         });
+
+        setInitialStatus(data.status_tahun_akademik || "aktif");
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -73,50 +64,64 @@ const EditTahunAkademik = () => {
   }, [id]);
 
   // SUBMIT EDIT
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    setErrors({
-      tahun_akademik: [],
-      semester: [],
-      tanggal_mulai: [],
-      tanggal_selesai: [],
-      status: [],
-      keterangan: [],
-    });
+  setErrors({
+    tahun_akademik: [],
+    keterangan: [],
+    status: [],
+  });
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const res = await api.put(`/spa/tahun-akademik/${id}`, formData);
+  try {
+    const res = await api.put(`/spa/tahun-akademik/${id}`, formData);
 
-      if (res.data.status === "success") {
+    if (res.data.status === "success") {
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Data tahun akademik berhasil diperbarui.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      navigate("/superadmin/informasi-sekolah/tahun-akademik");
+    }
+  } catch (error: any) {
+    const errorStatus = error.response?.status;
+    const errorData = error.response?.data;
+
+    // HANDLE VALIDATION ERROR 422
+    if (errorStatus === 422 && errorData?.errors) {
+      // 1️⃣ Cek error khusus status (semester masih aktif / arsip tidak bisa diaktifkan)
+      if (errorData.errors.status) {
         Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: "Data tahun akademik berhasil diperbarui.",
-          timer: 1800,
-          showConfirmButton: false,
+          icon: "warning",
+          title: "Tidak dapat mengubah status!",
+          text: Array.isArray(errorData.errors.status) ? errorData.errors.status[0] : errorData.errors.status,
+          confirmButtonText: "OK",
         });
-
-        navigate("/superadmin/informasi-sekolah/tahun-akademik");
-      }
-    } catch (error: any) {
-      if (error.response?.status === 422) {
-        setErrors(error.response.data.errors);
         setLoading(false);
         return;
       }
 
-      Swal.fire({
-        icon: "error",
-        title: "Koneksi gagal!",
-        text: "Tidak dapat terhubung ke server.",
-      });
+      // 2️⃣ Handle validation errors biasa (tahun_akademik, keterangan)
+      setErrors(errorData.errors);
+      setLoading(false);
+      return;
     }
 
+    // Handle error lainnya (500, network error, dll)
+    Swal.fire({
+      icon: "error",
+      title: "Koneksi gagal!",
+      text: errorData?.message || "Tidak dapat terhubung ke server.",
+    });
     setLoading(false);
-  };
+  }
+};
 
   return (
     <SidebarProvider>
@@ -134,7 +139,9 @@ const EditTahunAkademik = () => {
           <div className="bg-white rounded shadow p-5">
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
               <div className="mb-6">
-                <label className="block font-semibold">Tahun Akademik</label>
+                <label className="block font-semibold">
+                  Tahun Akademik <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   placeholder="cth: 2025/2026"
@@ -150,48 +157,27 @@ const EditTahunAkademik = () => {
                 {errors.tahun_akademik?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tahun_akademik[0]}</p>}
               </div>
 
-              <div className="space-y-2">
-                <label className="block font-semibold text-foreground">Semester</label>
-                <Select value={formData.semester} onValueChange={(value) => setFormData({ ...formData, semester: value })}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih Semester" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="Ganjil">Ganjil</SelectItem>
-                    <SelectItem value="Genap">Genap</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {errors.semester?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.semester[0]}</p>}
+              <div className="mb-6">
+                <label className="block font-semibold">Keterangan</label>
+                <textarea
+                  placeholder="Keterangan..."
+                  value={formData.keterangan}
+                  onChange={(e) => setFormData({ ...formData, keterangan: e.target.value })}
+                  className="border p-2 w-full mt-2 rounded h-32 resize-none"
+                ></textarea>
+                {errors.keterangan?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.keterangan[0]}</p>}
               </div>
 
               <div className="mb-6">
-                <label className="block font-semibold">Tanggal Mulai</label>
-                <input type="date" value={formData.tanggal_mulai} onChange={(e) => setFormData({ ...formData, tanggal_mulai: e.target.value })} className="border p-2 w-full mt-2 rounded" />
-                {errors.tanggal_mulai?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tanggal_mulai[0]}</p>}
-              </div>
+                <label className="block font-semibold text-foreground">
+                  Status <span className="text-red-500">*</span>
+                </label>
 
-              <div className="mb-6">
-                <label className="block font-semibold">Tanggal Selesai</label>
-                <input
-                  type="date"
-                  value={formData.tanggal_selesai}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      tanggal_selesai: e.target.value,
-                    })
-                  }
-                  className="border p-2 w-full mt-2 rounded"
-                />
-                {errors.tanggal_selesai?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tanggal_selesai[0]}</p>}
-              </div>
-
-              <div className="mb-6">
-                <label className="block font-semibold text-foreground">Status</label>
-
-                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value })}
+                  disabled={initialStatus === "arsip"}
+                >
                   <SelectTrigger className="w-full mt-2">
                     <SelectValue placeholder="-- pilih status --" />
                   </SelectTrigger>
@@ -200,7 +186,7 @@ const EditTahunAkademik = () => {
                     <SelectGroup>
                       <SelectLabel>Pilih Status</SelectLabel>
                       <SelectItem value="aktif">Aktif</SelectItem>
-                      <SelectItem value="nonaktif">Non Aktif</SelectItem>
+                      <SelectItem value="arsip">Arsip</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -208,11 +194,23 @@ const EditTahunAkademik = () => {
                 {errors.status?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
               </div>
 
-              <div className="mb-6">
-                <label className="block font-semibold">Keterangan</label>
-                <textarea placeholder="Keterangan..." value={formData.keterangan} onChange={(e) => setFormData({ ...formData, keterangan: e.target.value })} className="border p-2 w-full mt-2 rounded h-32 resize-none"></textarea>
-                {errors.keterangan?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.keterangan[0]}</p>}
-              </div>
+              {/* Info */}
+              {initialStatus === "arsip" && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm text-yellow-800">
+                  <p className="font-semibold mb-1">⚠️ Perhatian:</p>
+                  <p>Tahun akademik yang sudah diarsipkan tidak dapat diubah statusnya kembali ke aktif.</p>
+                </div>
+              )}
+
+              {formData.status === "arsip" && initialStatus === "aktif" && (
+                <div className="bg-orange-50 border border-orange-200 rounded p-3 text-sm text-orange-800">
+                  <p className="font-semibold mb-1">⚠️ Perhatian:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Pastikan tidak ada semester yang masih aktif pada tahun akademik ini</li>
+                    <li>Setelah diarsipkan, status tidak dapat dikembalikan ke aktif</li>
+                  </ul>
+                </div>
+              )}
 
               {/* Tombol */}
               <div className="flex gap-2">

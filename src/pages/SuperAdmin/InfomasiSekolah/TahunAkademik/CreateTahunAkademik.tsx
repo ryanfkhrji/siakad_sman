@@ -8,14 +8,9 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FormErrors {
   tahun_akademik: string[];
-  semester: string[];
-  tanggal_mulai: string[];
-  tanggal_selesai: string[];
-  status: string[];
   keterangan: string[];
 }
 
@@ -24,19 +19,11 @@ const CreateTahunAkademik = () => {
 
   const [formData, setFormData] = useState({
     tahun_akademik: "",
-    semester: "Ganjil",
-    tanggal_mulai: "",
-    tanggal_selesai: "",
-    status: "aktif",
     keterangan: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({
     tahun_akademik: [],
-    semester: [],
-    tanggal_mulai: [],
-    tanggal_selesai: [],
-    status: [],
     keterangan: [],
   });
 
@@ -48,10 +35,6 @@ const CreateTahunAkademik = () => {
 
     setErrors({
       tahun_akademik: [],
-      semester: [],
-      tanggal_mulai: [],
-      tanggal_selesai: [],
-      status: [],
       keterangan: [],
     });
 
@@ -72,21 +55,40 @@ const CreateTahunAkademik = () => {
         navigate("/superadmin/informasi-sekolah/tahun-akademik");
       }
     } catch (error: any) {
-      // HANDLE VALIDATION ERROR 422
-      if (error.response?.status === 422) {
-        setErrors(error.response.data.errors);
+      const errorStatus = error.response?.status;
+      const errorData = error.response?.data;
+
+      // HANDLE ERROR 400 atau 422 (Bad Request / Validation Error)
+      if (errorStatus === 400 || errorStatus === 422) {
+        // Jika ada error pesan khusus (double aktif, dll)
+        if (errorData?.errors?.pesan) {
+          Swal.fire({
+            icon: "warning",
+            title: "Tidak dapat membuat tahun akademik!",
+            text: errorData.errors.pesan,
+            confirmButtonText: "OK",
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Handle validation errors biasa (tahun_akademik, keterangan)
+        if (errorData?.errors) {
+          setErrors(errorData.errors);
+        }
+
         setLoading(false);
         return;
       }
 
+      // Handle error lainnya (500, network error, dll)
       Swal.fire({
         icon: "error",
         title: "Koneksi gagal!",
-        text: "Tidak dapat terhubung ke server.",
+        text: errorData?.message || "Tidak dapat terhubung ke server.",
       });
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -105,54 +107,11 @@ const CreateTahunAkademik = () => {
           <div className="bg-white rounded shadow p-5">
             <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
               <div className="mb-6">
-                <label className="block font-semibold">Tahun Akademik</label>
+                <label className="block font-semibold">
+                  Tahun Akademik <span className="text-red-500">*</span>
+                </label>
                 <input type="text" placeholder="cth: 2025/2026" value={formData.tahun_akademik} onChange={(e) => setFormData({ ...formData, tahun_akademik: e.target.value })} className="border p-2 w-full mt-2 rounded" />
                 {errors.tahun_akademik?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tahun_akademik[0]}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <label className="block font-semibold text-foreground">Semester</label>
-                <Select value={formData.semester} onValueChange={(value) => setFormData({ ...formData, semester: value })}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih Semester" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Ganjil">Ganjil</SelectItem>
-                    <SelectItem value="Genap">Genap</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="mb-6">
-                <label className="block font-semibold">Tanggal Mulai</label>
-                <input type="date" value={formData.tanggal_mulai} onChange={(e) => setFormData({ ...formData, tanggal_mulai: e.target.value })} className="border p-2 w-full mt-2 rounded" />
-                {errors.tanggal_mulai?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tanggal_mulai[0]}</p>}
-              </div>
-
-              <div className="mb-6">
-                <label className="block font-semibold">Tanggal Selesai</label>
-                <input type="date" value={formData.tanggal_selesai} onChange={(e) => setFormData({ ...formData, tanggal_selesai: e.target.value })} className="border p-2 w-full mt-2 rounded" />
-                {errors.tanggal_selesai?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tanggal_selesai[0]}</p>}
-              </div>
-
-              <div className="mb-6">
-                <label className="block font-semibold text-foreground">Status</label>
-
-                <Select onValueChange={(value) => setFormData({ ...formData, status: value })} value={formData.status}>
-                  <SelectTrigger className="w-full mt-2">
-                    <SelectValue placeholder="-- pilih status --" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Pilih Status</SelectLabel>
-                      <SelectItem value="aktif">Aktif</SelectItem>
-                      <SelectItem value="nonaktif">Non Aktif</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-
-                {errors.status?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
               </div>
 
               <div className="mb-6">
@@ -161,13 +120,24 @@ const CreateTahunAkademik = () => {
                 {errors.keterangan?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.keterangan[0]}</p>}
               </div>
 
+              {/* Info */}
+              <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
+                <p className="font-semibold mb-1">ℹ️ Informasi:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>
+                    Status otomatis akan menjadi <strong>Aktif</strong>
+                  </li>
+                  <li>Pastikan tidak ada tahun akademik lain yang masih aktif</li>
+                </ul>
+              </div>
+
               {/* Tombol */}
               <div className="flex gap-2">
                 <Button type="submit" disabled={loading} className="bg-primary flex items-center gap-2">
                   <FilePlus size={18} />
                   {loading ? "Menyimpan..." : "Simpan"}
                 </Button>
-                <Link to="/superadmin/informasi-sekolah/kurikulum">
+                <Link to="/superadmin/informasi-sekolah/tahun-akademik">
                   <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
                     <CircleXIcon size={18} />
                     Batal

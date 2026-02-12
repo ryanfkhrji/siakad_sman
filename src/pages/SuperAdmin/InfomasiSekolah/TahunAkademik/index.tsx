@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import { Link } from "react-router-dom";
-import type { TahunAkademik } from "@/types";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
+import type { TahunAkademik } from "@/types/tahunAkademik";
+import { Badge } from "@/components/ui/badge";
+import { DialogDetailTahunAkademik } from "./DialogDetailTahunAkademik";
 
 const DataTahunAkademik = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -159,11 +161,8 @@ const DataTahunAkademik = () => {
                     <TableRow>
                       <TableHead className="text-center font-semibold text-white">No</TableHead>
                       <TableHead className="font-semibold text-white">Tahun Akademik</TableHead>
-                      <TableHead className="font-semibold text-white">Semester</TableHead>
-                      <TableHead className="font-semibold text-white">Tanggal Mulai</TableHead>
-                      <TableHead className="font-semibold text-white">Tanggal Selesai</TableHead>
-                      <TableHead className="font-semibold text-white">Status</TableHead>
                       <TableHead className="font-semibold text-white">Keterangan</TableHead>
+                      <TableHead className="font-semibold text-white">Status</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -174,14 +173,16 @@ const DataTahunAkademik = () => {
                         <TableRow key={tahunAkademik.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
                           <TableCell>{tahunAkademik.tahun_akademik}</TableCell>
-                          <TableCell>{tahunAkademik.semester}</TableCell>
-                          <TableCell>{tahunAkademik.tanggal_mulai}</TableCell>
-                          <TableCell>{tahunAkademik.tanggal_selesai}</TableCell>
-                          <TableCell>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${tahunAkademik.status === "aktif" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{tahunAkademik.status}</span>
-                          </TableCell>
                           <TableCell className="max-w-[300px] whitespace-normal break-words break-all">{tahunAkademik.keterangan || "-"}</TableCell>
+                          <TableCell>
+                            <Badge className={tahunAkademik.status === "aktif" ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-gray-100 text-gray-600 hover:bg-gray-100"}>
+                              {tahunAkademik.status === "aktif" ? "Aktif" : "Arsip"}
+                            </Badge>
+                          </TableCell>
                           <TableCell className="flex gap-1 justify-center">
+                            {/* Tombol Detail */}
+                            <DialogDetailTahunAkademik tahunAkademik={tahunAkademik} />
+
                             <Link to={`/superadmin/informasi-sekolah/tahun-akademik/edit/${tahunAkademik.id}`}>
                               <Button className="bg-primary" size="sm">
                                 <PenBoxIcon size={16} />
