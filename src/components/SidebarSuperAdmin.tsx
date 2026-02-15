@@ -152,6 +152,12 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                         </SidebarMenuSubItem>
 
                         <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/semester") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-sekolah/semester">Data Semester</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+
+                        <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/gedung") && "bg-primary text-white font-medium")}>
                             <Link to="/superadmin/informasi-sekolah/gedung">Data Gedung</Link>
                           </SidebarMenuSubButton>

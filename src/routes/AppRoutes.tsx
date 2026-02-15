@@ -122,6 +122,9 @@ import KompetensiDasar from "@/pages/Guru/KompetensiDasar";
 import EditEkskulSikapSiswaPegawai from "@/pages/Guru/Ekstrakurikuler/EditEkskulSikapSiswaPegawai";
 import DataKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian";
 import EditKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/EditKepegawaian";
+import DataSemester from "@/pages/SuperAdmin/InfomasiSekolah/Semester";
+import CreateSemester from "@/pages/SuperAdmin/InfomasiSekolah/Semester/CreateSemester";
+import EditSemester from "@/pages/SuperAdmin/InfomasiSekolah/Semester/EditSemester";
 
 export default function AppRoutes() {
   return (
@@ -511,6 +514,48 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DataTahunAkademik />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/tahun-akademik/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateTahunAkademik />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/tahun-akademik/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditTahunAkademik />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Semester */}
+        <Route
+          path="/superadmin/informasi-sekolah/semester"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataSemester />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/semester/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateSemester />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/semester/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditSemester />
             </ProtectedRoute>
           }
         />
