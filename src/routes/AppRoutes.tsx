@@ -768,7 +768,7 @@ export default function AppRoutes() {
         />
         {/* Data Kompetensi Dasar */}
         <Route
-          path="/superadmin/informasi-akademik/kompetensi-dasar"
+          path="/superadmin/informasi-akademik/kompetensi"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DataKompetensiDasar />
@@ -776,7 +776,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-akademik/kompetensi-dasar/create"
+          path="/superadmin/informasi-akademik/kompetensi/create"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <CreateKompetensiDasar />
@@ -784,7 +784,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-akademik/kompetensi-dasar/edit/:id"
+          path="/superadmin/informasi-akademik/kompetensi/edit/:id"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditKompetensiDasar />

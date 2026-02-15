@@ -262,9 +262,9 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                               <SidebarMenuSubItem>
                                 <SidebarMenuSubButton
                                   asChild
-                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/kompetensi-dasar") && "bg-primary text-white font-medium")}
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/kompetensi") && "bg-primary text-white font-medium")}
                                 >
-                                  <Link to="/superadmin/informasi-akademik/kompetensi-dasar">Kompetensi Dasar</Link>
+                                  <Link to="/superadmin/informasi-akademik/kompetensi">Kompetensi</Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
 

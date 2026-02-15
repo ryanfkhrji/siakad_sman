@@ -9,254 +9,281 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-interface MataPelajaran {
-  id: number;
-  nama_pelajaran: string;
-  status?: string;
-}
-
-interface Kurikulum {
-  id: number;
-  nama_kurikulum: string;
-  tahun_berlaku?: string;
-  status?: string;
-  deskripsi?: string;
-}
+import type { DataSelectKompetensi, KompetensiEditFormData } from "@/types/kompetensi";
 
 interface FormErrors {
-  mata_pelajaran_id: string[];
   kurikulum_id: string[];
-  judul_kompetensi_dasar: string[];
+  mata_pelajaran_id: string[];
+  judul_kompetensi: string[];
+  jenis: string[];
+  kode: string[];
+  tingkat: string[];
+  aspek: string[];
+  fase: string[];
   deskripsi: string[];
+  status: string[];
+  data: string[];
 }
 
-const EditKompetensiDasar = () => {
+const EditKompetensi = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  const [formData, setFormData] = useState({
-    mata_pelajaran_id: 0,
-    kurikulum_id: 0,
-    judul_kompetensi_dasar: "",
+  const [loadingData, setLoadingData] = useState(true);
+  const [loadingSelect, setLoadingSelect] = useState(true);
+  const [selectData, setSelectData] = useState<DataSelectKompetensi | null>(null);
+  const [, setSelectedTipe] = useState<string>("");
+  const [initialStatus, setInitialStatus] = useState<string>("");
+
+  const [formData, setFormData] = useState<KompetensiEditFormData>({
+    kurikulum_id: "",
+    mata_pelajaran_id: "",
+    judul_kompetensi: "",
+    jenis: "",
+    kode: "",
+    tingkat: "",
+    aspek: "",
+    fase: "",
     deskripsi: "",
+    status: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({
-    mata_pelajaran_id: [],
     kurikulum_id: [],
-    judul_kompetensi_dasar: [],
+    mata_pelajaran_id: [],
+    judul_kompetensi: [],
+    jenis: [],
+    kode: [],
+    tingkat: [],
+    aspek: [],
+    fase: [],
     deskripsi: [],
+    status: [],
+    data: [],
   });
 
   const [loading, setLoading] = useState(false);
-  const [loadingData, setLoadingData] = useState(true);
 
-  // Data dropdown
-  const [listMapel, setListMapel] = useState<MataPelajaran[]>([]);
-  const [listKurikulum, setListKurikulum] = useState<Kurikulum[]>([]);
-
-  // Fetch dropdown data dan data yang akan diedit
+  // Fetch data select dan detail
   useEffect(() => {
-    let mounted = true;
-
     const fetchData = async () => {
       try {
+        setLoadingSelect(true);
         setLoadingData(true);
 
-        // Fetch dropdown options dan detail data
-        const [resMapel, resKurikulum, resDetail] = await Promise.all([api.get("/spa/mata-pelajaran"), api.get("/spa/kurikulum"), api.get(`/spa/kompetensi-dasar/${id}`)]);
+        const [resSelect, resDetail] = await Promise.all([api.get("/spa/data-select/kompetensi"), api.get(`/spa/kompetensi/${id}`)]);
 
-        if (!mounted) return;
-
-        let mapelData: MataPelajaran[] = [];
-        let kurikulumData: Kurikulum[] = [];
-
-        // Set dropdown data
-        if (resMapel.data?.status === "success" && Array.isArray(resMapel.data.data)) {
-          mapelData = resMapel.data.data;
-          setListMapel(mapelData);
+        // Set select data
+        if (resSelect.data.status === "success") {
+          setSelectData(resSelect.data.data);
         }
 
-        if (resKurikulum.data?.status === "success" && Array.isArray(resKurikulum.data.data)) {
-          kurikulumData = resKurikulum.data.data;
-          setListKurikulum(kurikulumData);
-        }
-
-        // Set form data dari detail
-        if (resDetail.data?.status === "success" && resDetail.data.data) {
+        // Set form data
+        if (resDetail.data.status === "success") {
           const detail = resDetail.data.data;
 
-          // Cari ID asli dari nama yang dikembalikan backend
-          const mapelId = mapelData.find((m) => m.nama_pelajaran === detail.mata_pelajaran_id)?.id || 0;
-          const kurikulumId = kurikulumData.find((k) => k.nama_kurikulum === detail.kurikulum_id)?.id || 0;
+          // Cari kurikulum_id dari nama
+          const kurikulum = resSelect.data.data.kurikulum.find((k: any) => k.nama_kurikulum === detail.kurikulum);
+
+          // Cari mata_pelajaran_id dari nama
+          const mapel = resSelect.data.data.mata_pelajaran.find((m: any) => m.nama_pelajaran === detail.mata_pelajaran);
+
+          setSelectedTipe(kurikulum?.tipe || "");
+          setInitialStatus(detail.status_kompetensi);
 
           setFormData({
-            mata_pelajaran_id: mapelId,
-            kurikulum_id: kurikulumId,
-            judul_kompetensi_dasar: detail.judul_kompetensi_dasar || "",
+            kurikulum_id: String(kurikulum?.kurikulum_id || ""),
+            mata_pelajaran_id: String(mapel?.mata_pelajaran_id || ""),
+            judul_kompetensi: detail.judul_kompetensi,
+            jenis: detail.jenis,
+            kode: detail.kode,
+            tingkat: detail.tingkat || "",
+            aspek: detail.aspek || "",
+            fase: detail.fase || "",
             deskripsi: detail.deskripsi || "",
+            status: detail.status_kompetensi,
           });
         }
 
+        setLoadingSelect(false);
         setLoadingData(false);
-      } catch (err: any) {
-        console.error("fetchData error:", err);
-
-        if (err.response?.status === 404) {
+      } catch (error: any) {
+        if (error.response?.status === 404) {
           Swal.fire({
             icon: "error",
-            title: "Data Tidak Ditemukan",
-            text: "Data kompetensi dasar yang Anda cari tidak ditemukan.",
-          }).then(() => {
-            navigate("/superadmin/informasi-akademik/kompetensi-dasar");
+            title: "Data tidak ditemukan!",
+            text: "Data kompetensi tidak ditemukan.",
           });
+          navigate("/superadmin/informasi-akademik/kompetensi");
         } else {
           Swal.fire({
             icon: "error",
             title: "Gagal memuat data!",
-            text: "Tidak dapat memuat data. Cek koneksi atau server.",
+            text: error.response?.data?.message || "Tidak dapat memuat data.",
           });
         }
-
+        setLoadingSelect(false);
         setLoadingData(false);
       }
     };
 
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
+    if (id) {
+      fetchData();
+    }
   }, [id, navigate]);
 
-  const resetErrors = () =>
-    setErrors({
-      mata_pelajaran_id: [],
-      kurikulum_id: [],
-      judul_kompetensi_dasar: [],
-      deskripsi: [],
-    });
+  // Update tipe kurikulum saat kurikulum dipilih
+  const handleKurikulumChange = (value: string) => {
+    const kurikulum = selectData?.kurikulum.find((k) => k.kurikulum_id === Number(value));
+    setSelectedTipe(kurikulum?.tipe || "");
+    setFormData({ ...formData, kurikulum_id: value });
+  };
+
+  // Handle jenis change - clear conditional fields
+  const handleJenisChange = (value: string) => {
+    if (value === "KD") {
+      // Reset fase, keep tingkat & aspek
+      setFormData({ ...formData, jenis: value as "KD" | "CP", fase: "" });
+    } else if (value === "CP") {
+      // Reset tingkat & aspek, keep fase
+      setFormData({ ...formData, jenis: value as "KD" | "CP", tingkat: "", aspek: "" });
+    } else {
+      setFormData({ ...formData, jenis: value as "KD" | "CP" });
+    }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    resetErrors();
+
+    setErrors({
+      kurikulum_id: [],
+      mata_pelajaran_id: [],
+      judul_kompetensi: [],
+      jenis: [],
+      kode: [],
+      tingkat: [],
+      aspek: [],
+      fase: [],
+      deskripsi: [],
+      status: [],
+      data: [],
+    });
+
     setLoading(true);
 
     try {
-      const res = await api.put(`/spa/kompetensi-dasar/${id}`, formData);
+      // Prepare data sesuai jenis
+      const payload: any = {
+        kurikulum_id: Number(formData.kurikulum_id),
+        mata_pelajaran_id: Number(formData.mata_pelajaran_id),
+        judul_kompetensi: formData.judul_kompetensi,
+        jenis: formData.jenis,
+        kode: formData.kode || null,
+        deskripsi: formData.deskripsi,
+        status: formData.status,
+      };
 
-      if (res.data?.status === "success") {
+      if (formData.jenis === "KD") {
+        payload.tingkat = formData.tingkat || null;
+        payload.aspek = formData.aspek || null;
+        payload.fase = null;
+      } else if (formData.jenis === "CP") {
+        payload.fase = formData.fase || null;
+        payload.tingkat = null;
+        payload.aspek = null;
+      }
+
+      const res = await api.put(`/spa/kompetensi/${id}`, payload);
+
+      if (res.data.status === "success") {
         Swal.fire({
           icon: "success",
           title: "Berhasil!",
-          text: res.data?.message || "Data kompetensi dasar berhasil diperbarui.",
+          text: "Data kompetensi berhasil diperbarui.",
           showConfirmButton: false,
-          timer: 1500,
+          timer: 1800,
         });
 
-        navigate("/superadmin/informasi-akademik/kompetensi-dasar");
-        return;
+        navigate("/superadmin/informasi-akademik/kompetensi");
       }
-
-      // Jika backend mengembalikan status lain
-      Swal.fire({
-        icon: "error",
-        title: "Gagal!",
-        text: res.data?.message || "Terjadi kesalahan saat menyimpan data.",
-      });
-      setLoading(false);
     } catch (error: any) {
-      // Jika error validasi atau duplikasi (422)
-      if (error.response?.status === 422) {
-        const backend = error.response.data;
-        const backendData = backend.data ?? {};
-        const backendMessage = backend.message ?? "";
+      const errorStatus = error.response?.status;
+      const errorData = error.response?.data;
 
-        // --- 1. Cek error duplikasi unique (dari backend: data.unique) ---
-        if (Array.isArray(backendData.unique) && backendData.unique.length > 0) {
+      if (errorStatus === 400 || errorStatus === 422) {
+        // Error data khusus
+        if (errorData?.errors?.data) {
           Swal.fire({
             icon: "warning",
-            title: "Data Sudah Ada",
-            text: backendData.unique[0],
+            title: "Tidak dapat mengubah data!",
+            text: Array.isArray(errorData.errors.data) ? errorData.errors.data[0] : errorData.errors.data,
+            confirmButtonText: "OK",
           });
           setLoading(false);
           return;
         }
 
-        // --- 2. Cek message duplikasi di backend.message ---
-        if (backendMessage && backendMessage.toLowerCase().includes("duplikasi")) {
+        // Error status
+        if (errorData?.errors?.status) {
           Swal.fire({
             icon: "warning",
-            title: backendMessage,
-            text: backendData.unique?.[0] || "Data dengan kombinasi ini sudah terdaftar.",
+            title: "Tidak dapat mengubah status!",
+            text: Array.isArray(errorData.errors.status) ? errorData.errors.status[0] : errorData.errors.status,
+            confirmButtonText: "OK",
           });
           setLoading(false);
           return;
         }
 
-        // --- 3. Error validasi field (tampilkan di bawah input) ---
-        const hasFieldErrors = backendData.mata_pelajaran_id?.length > 0 || backendData.kurikulum_id?.length > 0 || backendData.judul_kompetensi_dasar?.length > 0 || backendData.deskripsi?.length > 0;
-
-        if (hasFieldErrors) {
-          setErrors({
-            mata_pelajaran_id: backendData.mata_pelajaran_id ?? [],
-            kurikulum_id: backendData.kurikulum_id ?? [],
-            judul_kompetensi_dasar: backendData.judul_kompetensi_dasar ?? [],
-            deskripsi: backendData.deskripsi ?? [],
-          });
-
+        // Error unique
+        if (errorData?.errors?.unique) {
           Swal.fire({
-            icon: "error",
-            title: "Validasi Gagal",
-            text: backendMessage || "Periksa kembali form Anda.",
+            icon: "warning",
+            title: "Data Sudah Ada!",
+            text: Array.isArray(errorData.errors.unique) ? errorData.errors.unique[0] : errorData.errors.unique,
+            confirmButtonText: "OK",
           });
           setLoading(false);
           return;
         }
 
-        // Fallback untuk error 422 lainnya
+        // Validation errors
+        if (errorData?.errors) {
+          setErrors(errorData.errors);
+        }
+
+        setLoading(false);
+        return;
+      }
+
+      // Error 404
+      if (errorStatus === 404) {
         Swal.fire({
           icon: "error",
-          title: "Gagal Menyimpan",
-          text: backendMessage || "Terjadi kesalahan validasi.",
+          title: "Data tidak ditemukan!",
+          text: errorData?.message || "Data tidak ditemukan.",
         });
         setLoading(false);
         return;
       }
 
-      // Error 404 - Data tidak ditemukan
-      if (error.response?.status === 404) {
-        Swal.fire({
-          icon: "error",
-          title: "Data Tidak Ditemukan",
-          text: error.response.data?.message || "Data yang Anda cari tidak ditemukan.",
-        }).then(() => {
-          navigate("/superadmin/informasi-akademik/kompetensi-dasar");
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Error selain 422 dan 404 (500, network error, dll)
-      console.error("Submit error:", error);
       Swal.fire({
         icon: "error",
-        title: "Koneksi Gagal",
-        text: error.response?.data?.message || "Tidak dapat terhubung ke server. Cek koneksi internet Anda.",
+        title: "Koneksi gagal!",
+        text: errorData?.message || "Tidak dapat terhubung ke server.",
       });
       setLoading(false);
     }
   };
 
-  if (loadingData) {
+  if (loadingData || loadingSelect) {
     return (
       <SidebarProvider>
         <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
         <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-          <PageTitle title="Edit Kompetensi Dasar" />
+          <PageTitle title="Edit Kompetensi" />
 
           <div className="mx-auto p-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center justify-center h-64">
@@ -276,64 +303,32 @@ const EditKompetensiDasar = () => {
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
-        <PageTitle title="Edit Kompetensi Dasar" />
+        <PageTitle title="Edit Kompetensi" />
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Edit Kompetensi Dasar</h1>
+          <h1 className="text-3xl font-bold mb-6">Edit Kompetensi</h1>
 
           <div className="bg-white rounded shadow p-5">
-            <form className="space-y-6  max-w-lg" onSubmit={handleSubmit}>
-              {/* Mata Pelajaran */}
-              <div>
-                <label className="block font-semibold">Mata Pelajaran</label>
-
-                <Select value={String(formData.mata_pelajaran_id)} onValueChange={(value) => setFormData({ ...formData, mata_pelajaran_id: Number(value) })}>
-                  <SelectTrigger className="w-full mt-2">
-                    <SelectValue placeholder="-- pilih mata pelajaran --" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Daftar Mata Pelajaran</SelectLabel>
-
-                      {listMapel.length === 0 ? (
-                        <div className="px-2 py-1.5 text-sm text-muted-foreground">Tidak ada mata pelajaran</div>
-                      ) : (
-                        listMapel.map((m) => (
-                          <SelectItem key={m.id} value={String(m.id)}>
-                            {m.nama_pelajaran}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-
-                {errors.mata_pelajaran_id?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.mata_pelajaran_id[0]}</p>}
-              </div>
-
+            <form className="space-y-6 max-w-2xl w-full" onSubmit={handleSubmit}>
               {/* Kurikulum */}
-              <div>
-                <label className="block font-semibold">Kurikulum</label>
+              <div className="mb-6">
+                <label className="block font-semibold text-foreground">
+                  Kurikulum <span className="text-red-500">*</span>
+                </label>
 
-                <Select value={String(formData.kurikulum_id)} onValueChange={(value) => setFormData({ ...formData, kurikulum_id: Number(value) })}>
+                <Select value={String(formData.kurikulum_id)} onValueChange={handleKurikulumChange}>
                   <SelectTrigger className="w-full mt-2">
                     <SelectValue placeholder="-- pilih kurikulum --" />
                   </SelectTrigger>
 
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Daftar Kurikulum</SelectLabel>
-
-                      {listKurikulum.length === 0 ? (
-                        <div className="px-2 py-1.5 text-sm text-muted-foreground">Tidak ada kurikulum</div>
-                      ) : (
-                        listKurikulum.map((k) => (
-                          <SelectItem key={k.id} value={String(k.id)}>
-                            {k.nama_kurikulum}
-                          </SelectItem>
-                        ))
-                      )}
+                      <SelectLabel>Pilih Kurikulum</SelectLabel>
+                      {selectData?.kurikulum.map((k) => (
+                        <SelectItem key={k.kurikulum_id} value={String(k.kurikulum_id)}>
+                          {k.nama_kurikulum} ({k.tipe}) - {k.status}
+                        </SelectItem>
+                      ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -341,30 +336,212 @@ const EditKompetensiDasar = () => {
                 {errors.kurikulum_id?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kurikulum_id[0]}</p>}
               </div>
 
-              {/* Judul Kompetensi Dasar */}
-              <div>
-                <label className="block font-semibold">Judul Kompetensi Dasar</label>
-                <input
-                  type="text"
-                  placeholder="cth: Pemahaman Dasar Konsep Bilangan"
-                  value={formData.judul_kompetensi_dasar}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      judul_kompetensi_dasar: e.target.value,
-                    })
-                  }
-                  className="border p-2 w-full mt-2 rounded"
-                />
-                {errors.judul_kompetensi_dasar?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.judul_kompetensi_dasar[0]}</p>}
+              {/* Mata Pelajaran */}
+              <div className="mb-6">
+                <label className="block font-semibold text-foreground">
+                  Mata Pelajaran <span className="text-red-500">*</span>
+                </label>
+
+                <Select value={String(formData.mata_pelajaran_id)} onValueChange={(value) => setFormData({ ...formData, mata_pelajaran_id: value })}>
+                  <SelectTrigger className="w-full mt-2">
+                    <SelectValue placeholder="-- pilih mata pelajaran --" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Pilih Mata Pelajaran</SelectLabel>
+                      {selectData?.mata_pelajaran.map((m) => (
+                        <SelectItem key={m.mata_pelajaran_id} value={String(m.mata_pelajaran_id)}>
+                          {m.nama_pelajaran} ({m.kelompok})
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                {errors.mata_pelajaran_id?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.mata_pelajaran_id[0]}</p>}
               </div>
 
+              {/* Judul Kompetensi */}
+              <div className="mb-6">
+                <label className="block font-semibold">
+                  Judul Kompetensi <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="contoh: Pemahaman Konsep Aljabar"
+                  value={formData.judul_kompetensi}
+                  onChange={(e) => setFormData({ ...formData, judul_kompetensi: e.target.value })}
+                  className="border p-2 w-full mt-2 rounded"
+                />
+                {errors.judul_kompetensi?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.judul_kompetensi[0]}</p>}
+              </div>
+
+              {/* Jenis */}
+              <div className="mb-6">
+                <label className="block font-semibold text-foreground">
+                  Jenis <span className="text-red-500">*</span>
+                </label>
+
+                <Select value={formData.jenis} onValueChange={handleJenisChange}>
+                  <SelectTrigger className="w-full mt-2">
+                    <SelectValue placeholder="-- pilih jenis --" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Pilih Jenis</SelectLabel>
+                      <SelectItem value="KD">KD (Kompetensi Dasar - K13)</SelectItem>
+                      <SelectItem value="CP">CP (Capaian Pembelajaran - Merdeka)</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                {errors.jenis?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.jenis[0]}</p>}
+              </div>
+
+              {/* Kode */}
+              <div className="mb-6">
+                <label className="block font-semibold">Kode</label>
+                <input
+                  type="text"
+                  placeholder={formData.jenis === "KD" ? "contoh: KD-1.1" : formData.jenis === "CP" ? "contoh: CP-MAT-10-E1" : "contoh: KD-1.1 atau CP-MAT-10-E1"}
+                  value={formData.kode}
+                  onChange={(e) => setFormData({ ...formData, kode: e.target.value })}
+                  className="border p-2 w-full mt-2 rounded"
+                />
+                {errors.kode?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.kode[0]}</p>}
+              </div>
+
+              {/* Conditional Fields - KD */}
+              {formData.jenis === "KD" && (
+                <>
+                  <div className="mb-6">
+                    <label className="block font-semibold text-foreground">
+                      Tingkat <span className="text-red-500">*</span>
+                    </label>
+
+                    <Select value={formData.tingkat} onValueChange={(value) => setFormData({ ...formData, tingkat: value })}>
+                      <SelectTrigger className="w-full mt-2">
+                        <SelectValue placeholder="-- pilih tingkat --" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Pilih Tingkat</SelectLabel>
+                          <SelectItem value="10">Kelas 10</SelectItem>
+                          <SelectItem value="11">Kelas 11</SelectItem>
+                          <SelectItem value="12">Kelas 12</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+
+                    {errors.tingkat?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.tingkat[0]}</p>}
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="block font-semibold text-foreground">
+                      Aspek <span className="text-red-500">*</span>
+                    </label>
+
+                    <Select value={formData.aspek} onValueChange={(value) => setFormData({ ...formData, aspek: value as "" | "sikap" | "pengetahuan" | "keterampilan" })}>
+                      <SelectTrigger className="w-full mt-2">
+                        <SelectValue placeholder="-- pilih aspek --" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Pilih Aspek</SelectLabel>
+                          <SelectItem value="sikap">Sikap</SelectItem>
+                          <SelectItem value="pengetahuan">Pengetahuan</SelectItem>
+                          <SelectItem value="keterampilan">Keterampilan</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+
+                    {errors.aspek?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.aspek[0]}</p>}
+                  </div>
+                </>
+              )}
+
+              {/* Conditional Fields - CP */}
+              {formData.jenis === "CP" && (
+                <>
+                  <div className="mb-6">
+                    <label className="block font-semibold text-foreground">
+                      Fase <span className="text-red-500">*</span>
+                    </label>
+
+                    <Select value={formData.fase} onValueChange={(value) => setFormData({ ...formData, fase: value as "" | "A" | "B" | "C" | "D" | "E" | "F" })}>
+                      <SelectTrigger className="w-full mt-2">
+                        <SelectValue placeholder="-- pilih fase --" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Pilih Fase</SelectLabel>
+                          <SelectItem value="A">Fase A</SelectItem>
+                          <SelectItem value="B">Fase B</SelectItem>
+                          <SelectItem value="C">Fase C</SelectItem>
+                          <SelectItem value="D">Fase D</SelectItem>
+                          <SelectItem value="E">Fase E</SelectItem>
+                          <SelectItem value="F">Fase F</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+
+                    {errors.fase?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.fase[0]}</p>}
+                  </div>
+                </>
+              )}
+
               {/* Deskripsi */}
-              <div>
-                <label className="block font-semibold">Deskripsi</label>
-                <textarea placeholder="Deskripsi kompetensi dasar..." value={formData.deskripsi} onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })} className="border p-2 w-full mt-2 rounded h-32 resize-none" />
+              <div className="mb-6">
+                <label className="block font-semibold">
+                  Deskripsi <span className="text-red-500">*</span>
+                </label>
+                <textarea placeholder="Deskripsi kompetensi..." value={formData.deskripsi} onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })} className="border p-2 w-full mt-2 rounded h-32 resize-none"></textarea>
                 {errors.deskripsi?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.deskripsi[0]}</p>}
               </div>
+
+              {/* Status */}
+              <div className="mb-6">
+                <label className="block font-semibold text-foreground">
+                  Status <span className="text-red-500">*</span>
+                </label>
+
+                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as "aktif" | "arsip" })}>
+                  <SelectTrigger className="w-full mt-2">
+                    <SelectValue placeholder="-- pilih status --" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Pilih Status</SelectLabel>
+                      <SelectItem value="aktif">Aktif</SelectItem>
+                      <SelectItem value="arsip">Arsip</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                {errors.status?.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
+              </div>
+
+              {/* Info perubahan status */}
+              {formData.status !== initialStatus && (
+                <div className={`${formData.status === "arsip" ? "bg-orange-50 border-orange-200 text-orange-800" : "bg-blue-50 border-blue-200 text-blue-800"} border rounded p-3 text-sm`}>
+                  <p className="font-semibold mb-1">⚠️ Perhatian:</p>
+                  {formData.status === "arsip" ? (
+                    <p>
+                      Status akan diubah menjadi <strong>Arsip</strong>. Data yang diarsipkan tidak dapat diaktifkan kembali.
+                    </p>
+                  ) : (
+                    <p>
+                      Status akan diubah menjadi <strong>Aktif</strong>.
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Tombol */}
               <div className="flex gap-2">
@@ -372,9 +549,8 @@ const EditKompetensiDasar = () => {
                   <Save size={18} />
                   {loading ? "Menyimpan..." : "Simpan Perubahan"}
                 </Button>
-
-                <Link to="/superadmin/informasi-akademik/kompetensi-dasar">
-                  <Button type="button" className="bg-muted-foreground hover:bg-muted-foreground/90 flex items-center gap-2">
+                <Link to="/superadmin/informasi-akademik/kompetensi">
+                  <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
                     <CircleXIcon size={18} />
                     Batal
                   </Button>
@@ -390,4 +566,4 @@ const EditKompetensiDasar = () => {
   );
 };
 
-export default EditKompetensiDasar;
+export default EditKompetensi;
