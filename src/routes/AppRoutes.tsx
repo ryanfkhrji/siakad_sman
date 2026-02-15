@@ -125,6 +125,9 @@ import EditKepegawaian from "@/pages/SuperAdmin/InfomasiSekolah/Kepegawaian/Edit
 import DataSemester from "@/pages/SuperAdmin/InfomasiSekolah/Semester";
 import CreateSemester from "@/pages/SuperAdmin/InfomasiSekolah/Semester/CreateSemester";
 import EditSemester from "@/pages/SuperAdmin/InfomasiSekolah/Semester/EditSemester";
+import DataKurikulumMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/KurikulumMataPelajaran";
+import CreateKurikulumMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/KurikulumMataPelajaran/CreateKurikulumMataPelajaran";
+import EditKurikulumMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/KurikulumMataPelajaran/EditKurikulumMataPelajaran";
 
 export default function AppRoutes() {
   return (
@@ -676,6 +679,35 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* Data Kurikulum Mata Pelajaran */}
+        <Route
+          path="/superadmin/informasi-akademik/kurikulum-mata-pelajaran"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataKurikulumMataPelajaran />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/superadmin/informasi-akademik/kurikulum-mata-pelajaran/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateKurikulumMataPelajaran />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/superadmin/informasi-akademik/kurikulum-mata-pelajaran/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditKurikulumMataPelajaran />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Data Jadwal Pelajaran */}
         <Route
           path="/superadmin/informasi-akademik/jadwal-pelajaran-guru"

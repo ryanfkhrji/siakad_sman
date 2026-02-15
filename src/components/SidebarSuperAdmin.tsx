@@ -175,55 +175,6 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 
-                        {/* Item nested: Data Kepegawaian */}
-                        {/* <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            onClick={() => toggleSubDropdown("kepegawaian")}
-                            className={cn("hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors", location.pathname.includes("/superadmin/informasi-sekolah/kepegawaian") && "bg-primary/10 text-primary")}
-                          >
-                            <span>Data Kepegawaian</span>
-                            <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "kepegawaian" && "rotate-180")} />
-                          </SidebarMenuSubButton>
-
-
-                          {!isCollapsed && openSubDropdown === "kepegawaian" && (
-                            <SidebarMenuSub className="ml-4 mt-1 space-y-1">
-                              <SidebarMenuSubItem>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/kepegawaian/create") && "bg-primary text-white font-medium")}
-                                >
-                                  <Link to="/superadmin/informasi-sekolah/kepegawaian/create">Tambah Kepegawaian</Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-
-                              <SidebarMenuSubItem>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/kepegawaian/guru") && "bg-primary text-white font-medium")}
-                                >
-                                  <Link to="/superadmin/informasi-sekolah/kepegawaian/guru">Guru</Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-
-                              <SidebarMenuSubItem>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/kepegawaian/staff") && "bg-primary text-white font-medium")}
-                                >
-                                  <Link to="/superadmin/informasi-sekolah/kepegawaian/staff">Staff</Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            </SidebarMenuSub>
-                          )}
-                        </SidebarMenuSubItem> */}
-
-                        {/* <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/staff") && "bg-primary text-white font-medium")}>
-                            <Link to="/superadmin/">Data Golongan</Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem> */}
-
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/jurusan") && "bg-primary text-white font-medium")}>
                             <Link to="/superadmin/informasi-sekolah/jurusan">Data Jurusan</Link>
@@ -278,6 +229,15 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                                   className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/mata-pelajaran") && "bg-primary text-white font-medium")}
                                 >
                                   <Link to="/superadmin/informasi-akademik/mata-pelajaran">Mata Pelajaran</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/kurikulum-mata-pelajaran") && "bg-primary text-white font-medium")}
+                                >
+                                  <Link to="/superadmin/informasi-akademik/kurikulum-mata-pelajaran">Kurmapel</Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
 
