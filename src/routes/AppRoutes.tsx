@@ -131,6 +131,9 @@ import EditKurikulumMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/Kur
 import DataAtpMaster from "@/pages/SuperAdmin/informasiAkademik/AlurTujuanPembelajaran";
 import CreateAtpMaster from "@/pages/SuperAdmin/informasiAkademik/AlurTujuanPembelajaran/CreateAlurTujuanPembelajaran";
 import EditAtpMaster from "@/pages/SuperAdmin/informasiAkademik/AlurTujuanPembelajaran/EditAlurTujuanPembelajaran";
+import DataRombel from "@/pages/SuperAdmin/InfomasiSekolah/Rombel";
+import CreateRombel from "@/pages/SuperAdmin/InfomasiSekolah/Rombel/CreateRombel";
+import EditRombel from "@/pages/SuperAdmin/InfomasiSekolah/Rombel/EditRombel";
 
 export default function AppRoutes() {
   return (
@@ -389,6 +392,33 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* Data Rombel */}
+        <Route
+          path="/superadmin/informasi-sekolah/rombel"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataRombel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/rombel/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateRombel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/rombel/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditRombel />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Data Jurusan */}
         <Route
           path="/superadmin/informasi-sekolah/jurusan"
