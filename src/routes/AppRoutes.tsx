@@ -128,6 +128,9 @@ import EditSemester from "@/pages/SuperAdmin/InfomasiSekolah/Semester/EditSemest
 import DataKurikulumMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/KurikulumMataPelajaran";
 import CreateKurikulumMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/KurikulumMataPelajaran/CreateKurikulumMataPelajaran";
 import EditKurikulumMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/KurikulumMataPelajaran/EditKurikulumMataPelajaran";
+import DataAtpMaster from "@/pages/SuperAdmin/informasiAkademik/AlurTujuanPembelajaran";
+import CreateAtpMaster from "@/pages/SuperAdmin/informasiAkademik/AlurTujuanPembelajaran/CreateAlurTujuanPembelajaran";
+import EditAtpMaster from "@/pages/SuperAdmin/informasiAkademik/AlurTujuanPembelajaran/EditAlurTujuanPembelajaran";
 
 export default function AppRoutes() {
   return (
@@ -791,6 +794,33 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* Data ATP Master */}
+        <Route
+          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataAtpMaster />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateAtpMaster />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditAtpMaster />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Data Prestasi Siswa */}
         <Route
           path="/superadmin/informasi-akademik/prestasi-siswa"

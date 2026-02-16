@@ -277,6 +277,12 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                           )}
                         </SidebarMenuSubItem>
 
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/alur-tujuan-pembelajaran") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran">Alur Tujuan Pembelajaran</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+
                         {/* SUBMENU NESTED — LMS       */}
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton onClick={() => toggleSubDropdown("lms")} className="hover:bg-primary rounded-md px-3 py-1.5 text-sm justify-between w-full">
