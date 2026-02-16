@@ -82,7 +82,7 @@ const EditAtpMaster = () => {
             title: "Data tidak ditemukan!",
             text: "Data ATP Master tidak ditemukan.",
           });
-          navigate("/superadmin/informasi-akademik/alur-tujuan-pembelajaran");
+          navigate("/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master");
         } else {
           Swal.fire({
             icon: "error",
@@ -131,7 +131,7 @@ const EditAtpMaster = () => {
           showConfirmButton: false,
         });
 
-        navigate("/superadmin/informasi-akademik/alur-tujuan-pembelajaran");
+        navigate("/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master");
       }
     } catch (error: any) {
       const errorStatus = error.response?.status;
@@ -313,7 +313,7 @@ const EditAtpMaster = () => {
                   {loading ? "Menyimpan..." : "Simpan Perubahan"}
                 </Button>
 
-                <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran">
+                <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master">
                   <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
                     <CircleXIcon size={18} />
                     Batal

@@ -132,7 +132,7 @@ const DataAtpMaster = () => {
             <>
               {/* Header */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-                <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran/create" className="w-full md:w-auto">
+                <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master/create" className="w-full md:w-auto">
                   <Button className="bg-primary w-full">
                     <PlusIcon size={18} />
                     Tambah ATP Master
@@ -205,7 +205,7 @@ const DataAtpMaster = () => {
                                             <TableCell className="flex gap-1 justify-center">
                                               <DialogDetailAtpMaster atpId={atp.atp_id} />
 
-                                              <Link to={`/superadmin/informasi-akademik/alur-tujuan-pembelajaran/edit/${atp.atp_id}`}>
+                                              <Link to={`/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master/edit/${atp.atp_id}`}>
                                                 <Button className="bg-primary" size="sm">
                                                   <PenBoxIcon size={16} />
                                                 </Button>

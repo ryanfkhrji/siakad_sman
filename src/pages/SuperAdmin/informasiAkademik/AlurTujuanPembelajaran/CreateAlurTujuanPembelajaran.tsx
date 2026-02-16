@@ -91,7 +91,7 @@ const CreateAtpMaster = () => {
           timer: 1800,
         });
 
-        navigate("/superadmin/informasi-akademik/atp-alur-tujuan-pembelajaran");
+        navigate("/superadmin/informasi-akademik/atp-alur-tujuan-pembelajaran-master");
       }
     } catch (error: any) {
       const errorStatus = error.response?.status;
@@ -221,7 +221,7 @@ const CreateAtpMaster = () => {
                     <FilePlus size={18} />
                     {loading ? "Menyimpan..." : "Simpan"}
                   </Button>
-                  <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran">
+                  <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master">
                     <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
                       <CircleXIcon size={18} />
                       Batal

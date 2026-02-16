@@ -186,6 +186,12 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                             <Link to="/superadmin/informasi-sekolah/kelas">Data Kelas</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
+
+                         <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/rombel") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-sekolah/rombel">Data Rombel</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                     )}
                   </SidebarMenuItem>
@@ -278,8 +284,8 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                         </SidebarMenuSubItem>
 
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/alur-tujuan-pembelajaran") && "bg-primary text-white font-medium")}>
-                            <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran">Alur Tujuan Pembelajaran</Link>
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master">Alur Tujuan Pembelajaran Master</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 

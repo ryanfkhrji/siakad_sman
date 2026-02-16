@@ -797,7 +797,7 @@ export default function AppRoutes() {
 
         {/* Data ATP Master */}
         <Route
-          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran"
+          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <DataAtpMaster />
@@ -805,7 +805,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran/create"
+          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master/create"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <CreateAtpMaster />
@@ -813,7 +813,7 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran/edit/:id"
+          path="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master/edit/:id"
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditAtpMaster />
