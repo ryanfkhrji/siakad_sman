@@ -192,6 +192,18 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                             <Link to="/superadmin/informasi-sekolah/rombel">Data Rombel</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
+
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/wali-rombel") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-sekolah/wali-rombel">Data Wali Rombel</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/siswa-rombel") && "bg-primary text-white font-medium")}>
+                            <Link to="/superadmin/informasi-sekolah/siswa-rombel">Data Siswa Rombel</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                     )}
                   </SidebarMenuItem>

@@ -134,6 +134,12 @@ import EditAtpMaster from "@/pages/SuperAdmin/informasiAkademik/AlurTujuanPembel
 import DataRombel from "@/pages/SuperAdmin/InfomasiSekolah/Rombel";
 import CreateRombel from "@/pages/SuperAdmin/InfomasiSekolah/Rombel/CreateRombel";
 import EditRombel from "@/pages/SuperAdmin/InfomasiSekolah/Rombel/EditRombel";
+import DataWaliRombel from "@/pages/SuperAdmin/InfomasiSekolah/WaliRombel";
+import CreateWaliRombel from "@/pages/SuperAdmin/InfomasiSekolah/WaliRombel/CreateWaliRombel";
+import EditWaliRombel from "@/pages/SuperAdmin/InfomasiSekolah/WaliRombel/EditWaliRombel";
+import DataSiswaRombel from "@/pages/SuperAdmin/InfomasiSekolah/SiswaRombel";
+import CreateSiswaRombel from "@/pages/SuperAdmin/InfomasiSekolah/SiswaRombel/CreateSiswaRombel";
+import EditSiswaRombel from "@/pages/SuperAdmin/InfomasiSekolah/SiswaRombel/EditSiswaRombel";
 
 export default function AppRoutes() {
   return (
@@ -415,6 +421,58 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={["super_admin"]}>
               <EditRombel />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Wali Rombel */}
+        <Route
+          path="/superadmin/informasi-sekolah/wali-rombel"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataWaliRombel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/wali-rombel/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateWaliRombel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/wali-rombel/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditWaliRombel />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Data Siswa Rombel */}
+        <Route
+          path="/superadmin/informasi-sekolah/siswa-rombel"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <DataSiswaRombel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/siswa-rombel/create"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <CreateSiswaRombel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/superadmin/informasi-sekolah/siswa-rombel/edit/:id"
+          element={
+            <ProtectedRoute roles={["super_admin"]}>
+              <EditSiswaRombel />
             </ProtectedRoute>
           }
         />
