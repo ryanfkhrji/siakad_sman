@@ -297,7 +297,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
 
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master") && "bg-primary text-white font-medium")}>
-                            <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master">Alur Tujuan Pembelajaran Master</Link>
+                            <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master">ATP Master</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 

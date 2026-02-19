@@ -52,9 +52,8 @@ import CreateSiswa from "@/pages/SuperAdmin/informasiAkademik/Siswa/CreateSiswa"
 import DataMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran";
 import CreateMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran/CreateMapel";
 import EditMataPelajaran from "@/pages/SuperAdmin/informasiAkademik/MataPelajaran/EditMapel";
-import DataJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran";
-import CreateJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran/CreateJadwalPelajaran";
-import EditJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaran/EditJadwalPelajaran";
+import CreateJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranGuruSpa/CreateJadwalPelajaran";
+import EditJadwalPelajaran from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranGuruSpa/EditJadwalPelajaran";
 import CreateJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/CreateJadwalPelajaranSiswa";
 import EditJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa/EditJadwalPelajaranSiswa";
 import DataJadwalPelajaranSiswa from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranSiswa";
@@ -75,7 +74,7 @@ import EditPasswordGuru from "@/pages/Guru/SettingsProfile/EditPasswordGuru";
 import EditProfileGuru from "@/pages/Guru/SettingsProfile/EditProfileGuru";
 import DetailKelasGuru from "@/pages/Guru/Kelas";
 import EditKelasGuru from "@/pages/Guru/Kelas/EditKelasGuru";
-import JadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran";
+import DataJadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran";
 import DetailJadwalPelajaranGuru from "@/pages/Guru/JadwalPelajaran/DetailJadwalPelajaranGuru";
 import DataSiswaGuru from "@/pages/Guru/Siswa";
 import DetailSiswaGuru from "@/pages/Guru/Siswa/DetailSiswaGuru";
@@ -140,6 +139,7 @@ import EditWaliRombel from "@/pages/SuperAdmin/InfomasiSekolah/WaliRombel/EditWa
 import DataSiswaRombel from "@/pages/SuperAdmin/InfomasiSekolah/SiswaRombel";
 import CreateSiswaRombel from "@/pages/SuperAdmin/InfomasiSekolah/SiswaRombel/CreateSiswaRombel";
 import EditSiswaRombel from "@/pages/SuperAdmin/InfomasiSekolah/SiswaRombel/EditSiswaRombel";
+import { DataJadwalPelajaranGuruSpa } from "@/pages/SuperAdmin/informasiAkademik/JadwalPelajaranGuruSpa";
 
 export default function AppRoutes() {
   return (
@@ -804,7 +804,7 @@ export default function AppRoutes() {
           path="/superadmin/informasi-akademik/jadwal-pelajaran-guru"
           element={
             <ProtectedRoute roles={["super_admin"]}>
-              <DataJadwalPelajaran />
+              <DataJadwalPelajaranGuruSpa />
             </ProtectedRoute>
           }
         />
@@ -1107,7 +1107,7 @@ export default function AppRoutes() {
           path="/guru/jadwal-pelajaran/data-jadwal"
           element={
             <ProtectedRoute roles={["guru"]}>
-              <JadwalPelajaranGuru />
+              <DataJadwalPelajaranGuru />
             </ProtectedRoute>
           }
         />
