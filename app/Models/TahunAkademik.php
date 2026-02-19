@@ -4,12 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Rapor;
+use App\Models\EkskulSiswaPivot;
+use App\Models\WaliRombel;
+use App\Models\PembinaEkskul;
+use App\Models\PelatihEkskul;
+use App\Models\Prestasi;
+use App\Models\Semester;
+use App\Models\DataBerkas;
+use App\Models\WaliKelas;
+use App\Models\SiswaRombel;
+use App\Models\AbsensiSiswa;
 
 class TahunAkademik extends Model
 {
     use HasFactory;
     protected $table = 'tahun_akademik';
     protected $guarded = ['id'];
+
+    public function rapor()
+    {
+        return $this->hasMany(Rapor::class);
+    }
 
     public function ekskulSiswaPivots()
     {

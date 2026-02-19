@@ -3,10 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use App\Models\EkskulSiswaPivot;
+use App\Models\Jurusan;
+use App\Models\SiswaRombel;
+use App\Models\Kepegawaian;
+use App\Models\JadwalPelajaran;
+use App\Models\AbsensiSiswa;
+use App\Models\KurikulumMataPelajaran;
+use App\Models\DataNilaiSiswa;
+use App\Models\Prestasi;
+use App\Models\Rapor;
 
 class Siswa extends Authenticatable
 {
@@ -104,5 +114,10 @@ class Siswa extends Authenticatable
     public function prestasis()
     {
         return $this->hasMany(Prestasi::class, 'siswa_id');
+    }
+
+    public function rapor()
+    {
+        return $this->hasMany(Rapor::class);
     }
 }

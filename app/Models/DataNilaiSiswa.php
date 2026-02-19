@@ -4,13 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Rapor;
+use App\Models\SiswaRombel;
+use App\Models\Siswa;
+use App\Models\KurikulumMataPelajaran;
+use App\Models\TahunAkademik;
+use App\Models\Semester;
+use App\Models\Kepegawaian;
+use App\Models\Kelas;
+use App\Models\Jurusan;
+use App\Models\Prestasi;
+use App\Models\MataPelajaran;
 class DataNilaiSiswa extends Model
 {
     use HasFactory;
     protected $table = 'data_nilai_siswa';
-    protected $guarded = ['id'];   
-
+    protected $guarded = ['id'];       
 
     public function siswaRombel()
      {
@@ -43,6 +52,11 @@ class DataNilaiSiswa extends Model
          return $this->belongsTo(Kepegawaian::class, 'guru_id');
      } 
 
+     public function rapor()
+     {
+         return $this->belongsTo(Rapor::class, 'rapor_id');
+     } 
+
      // Data nilai dimiliki oleh kelas
      public function kelas()
      {
@@ -54,8 +68,7 @@ class DataNilaiSiswa extends Model
      {
          return $this->belongsTo(Jurusan::class, 'jurusan_pelajaran_id');
      }
- 
-     // Prestasi (opsional)
+     
      public function prestasi()
      {
          return $this->belongsTo(Prestasi::class, 'prestasi_id');
@@ -65,10 +78,5 @@ class DataNilaiSiswa extends Model
      public function mataPelajaran()
      {
          return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
-     }                 
-
-    // public function ekskulSiswaPivot()
-    // {
-    //     return $this->belongsTo(EkskulSiswaPivot::class);
-    // }
+     }                     
 }

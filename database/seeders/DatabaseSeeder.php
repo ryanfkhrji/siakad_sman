@@ -33,6 +33,7 @@ use App\Models\Ekstrakurikuler;
 use App\Models\PembinaEkskul;
 use App\Models\PelatihEkskul;
 use App\Models\Siswa;
+use App\Models\Rapor;
 use App\Models\EkskulSiswaPivot;
 use App\Models\DataNilaiSiswa;
 use App\Models\DataBerkas;
@@ -45,8 +46,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         /**
-         * 🎯✅ spa: CRUD 
-         * tu: CRUD
+         * 🎯✅ spa: C.R.U.D 
+         * tu: C.R.U.D
          * kepsek: Index
          * ✅ guru: Index
          * ✅ staff: Index (samakan dengan guru)
@@ -75,8 +76,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
-         * tu: CRUD
+         * 🎯✅ spa: C.R.U.D
+         * tu: C.R.U.D
          *  */ 
         Gedung::insert([
             [
@@ -118,8 +119,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
-         * tu: CRUD
+         * 🎯✅ spa: C.R.U.D
+         * tu: C.R.U.D
          *  */ 
         Ruangan::insert([
            [
@@ -164,8 +165,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
          /**
-          * 🎯✅ spa: CRUD
-          * tu: CRUD          
+          * 🎯✅ spa: C.R.U.D
+          * tu: C.R.U.D          
           * kepsek : GET, SHOW
           * guru: 
           *
@@ -432,12 +433,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ SPA: CRUD
+         * 🎯✅ SPA: C.R.U.D
          */
         // Penerimaan Siswa Baru
 
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          * tu:
          * kepsek: GET, SHOW
          * guru: GET, SHOW
@@ -534,7 +535,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          */
         Jurusan::insert([
             [
@@ -555,8 +556,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
-         * tu: CRUD 
+         * 🎯✅ spa: C.R.U.D
+         * tu: C.R.U.D 
          * kepsek: GET, SHOW
          * guru:
          * **/
@@ -588,8 +589,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
-         * tu (tidak berubah sampe ada kurikulum baru): CRUD
+         * 🎯✅ spa: C.R.U.D
+         * tu (tidak berubah sampe ada kurikulum baru): C.R.U.D
          *  */ 
         Kurikulum::insert([
             [
@@ -639,8 +640,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
-         * tu: CRUD
+         * 🎯✅ spa: C.R.U.D
+         * tu: C.R.U.D
          * Kepsek: GET, SHOW
          * guru: GET, SHOW
          * */ 
@@ -840,7 +841,7 @@ class DatabaseSeeder extends Seeder
         ]);  
 
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          */
         KurikulumMataPelajaran::insert([
             [
@@ -1412,8 +1413,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
-         * tu: CRUD
+         * 🎯✅ spa: C.R.U.D
+         * tu: C.R.U.D
          * 
          */
         TahunAkademik::insert([
@@ -1430,7 +1431,7 @@ class DatabaseSeeder extends Seeder
         ]);  
     
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          */
         Semester::insert([
             [
@@ -1457,8 +1458,8 @@ class DatabaseSeeder extends Seeder
 
         /**
          * tidak berubah selama kurikulum sama
-         * 🎯✅ spa: CRUD
-         * tu: CRUD
+         * 🎯✅ spa: C.R.U.D
+         * tu: C.R.U.D
          * Kepsek: GET, SHOW
          * guru: GET, SHOW
          * */  
@@ -2392,7 +2393,7 @@ class DatabaseSeeder extends Seeder
         // asesmen
 
         /**
-         * 🎯✅ spa: CRUD    
+         * 🎯✅ spa: C.R.U.D    
          */
         Rombel::insert([
             // X-1
@@ -2554,25 +2555,49 @@ class DatabaseSeeder extends Seeder
         // 🎯✅ spa        
         WaliRombel::insert([
             [
+                // 1
                 'wali_rombel_id' => 9, // Guru MTK
                 'rombel_id' => 2, // X-B-1
-                'tahun_akademik_id' => 1, // 2023/2024
+                'tahun_akademik_id' => 1, // 2023
             ],
             [
+                // 2
                 'wali_rombel_id' => 7, // Guru Indon
                 'rombel_id' => 5, // XI-B-1
                 'tahun_akademik_id' => 2, // 2025
             ],
 
             [
+                // 3
                 'wali_rombel_id' => 7, // Guru Indon
                 'rombel_id' => 1, // X-A-1
                 'tahun_akademik_id' => 1, // 2013
             ],
             [
+                // 4
                 'wali_rombel_id' => 9, // Guru MTK
                 'rombel_id' => 14, // XI-B-2
                 'tahun_akademik_id' => 2, // 2025
+            ],
+            [
+                // 5
+                'wali_rombel_id' => 5, // Guru PAI
+                'rombel_id' => 2, // X-B-1
+                'tahun_akademik_id' => 2, // 2025
+            ],
+
+            [
+                // 6
+                'wali_rombel_id' => 5, // Guru PAI
+                'rombel_id' => 10, // X-A-2
+                'tahun_akademik_id' => 1, // 2023
+            ],
+
+            [
+                // 7
+                'wali_rombel_id' => 10, // Guru Sejarah
+                'rombel_id' => 7, // XII-A-1
+                'tahun_akademik_id' => 2, // 2024
             ],
              
         ]);
@@ -2702,7 +2727,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /** 
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          * tu: GET, SHOW
          * guru: GET/SHOW
          * Kepsek: GET, SHOW
@@ -3195,7 +3220,7 @@ class DatabaseSeeder extends Seeder
         ]);              
 
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          * kepsek: GET, SHOW
          * guru: CREATE
          */
@@ -3332,7 +3357,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          * kepsek: GET, SHOW
          * guru: CREATE
          */
@@ -3460,9 +3485,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          * kepsek: GET, SHOW
-         * guru: CRUD
+         * guru: C.R.U.D
          */
         AbsensiSiswa::insert([
             [
@@ -3472,7 +3497,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2023-12-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
@@ -3482,8 +3507,8 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 2,  // X-B-1
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2023-12-09',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'status' => 'alpa',
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
@@ -3494,7 +3519,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2023-12-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
@@ -3505,7 +3530,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2023-12-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],                        
@@ -3516,7 +3541,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2024-01-09',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
@@ -3527,7 +3552,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
@@ -3538,7 +3563,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],                        
@@ -3549,7 +3574,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2024-12-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],            
@@ -3560,7 +3585,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2023-12-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],            
@@ -3571,7 +3596,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2023-12-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],                        
@@ -3582,7 +3607,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2024-01-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],            
@@ -3593,7 +3618,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],            
@@ -3604,7 +3629,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],         
@@ -3616,8 +3641,8 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 2,  // X-B-1
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2023-12-02',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'status' => 'alpa',
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
@@ -3628,7 +3653,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2023-12-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
@@ -3639,7 +3664,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2023-12-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],                        
@@ -3650,7 +3675,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2024-01-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
@@ -3661,7 +3686,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
@@ -3672,7 +3697,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],                        
@@ -3683,7 +3708,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2023-12-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],            
@@ -3694,7 +3719,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2023-12-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],            
@@ -3704,8 +3729,8 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 5,  // X-B-1
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2023-12-03',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'status' => 'sakit',
+                'bukti' => 'sakit.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],                        
@@ -3715,8 +3740,8 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 5,  // X-B-1
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2024-01-02',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'status' => 'alpa',
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],            
@@ -3727,7 +3752,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],            
@@ -3738,7 +3763,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],    
@@ -3750,8 +3775,8 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 10,  // X-B-2
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2023-12-02',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'status' => 'alpa',
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
@@ -3762,7 +3787,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2023-12-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],            
@@ -3773,7 +3798,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2023-12-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 1, // Ganjil
             ],                        
@@ -3784,7 +3809,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2024-01-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
@@ -3795,7 +3820,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],            
@@ -3806,7 +3831,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 1,
                 'semester_id' => 2, // Genap
             ],                        
@@ -3817,7 +3842,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2023-12-02',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],            
@@ -3828,7 +3853,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2023-12-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],            
@@ -3838,8 +3863,8 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 14,  // XI-B-2
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2023-12-03',
-                'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'status' => 'alpa',
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 3, // Ganjil
             ],                        
@@ -3849,8 +3874,8 @@ class DatabaseSeeder extends Seeder
                 'rombel_id' => 14,  // XI-B-2
                 'jadwal_pelajaran_id' => 1, // MTK
                 'hari' => '2024-01-02',
-                'status' => 'alfa',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'status' => 'alpa',
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],            
@@ -3861,7 +3886,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2024-01-02',
                 'status' => 'izin',
-                'bukti' => 'izin.jpg', // hadir, izin, sakit, alfa                            
+                'bukti' => 'izin.jpg', // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],            
@@ -3872,7 +3897,7 @@ class DatabaseSeeder extends Seeder
                 'jadwal_pelajaran_id' => 3, // PAI
                 'hari' => '2024-01-03',
                 'status' => 'hadir',
-                'bukti' => null, // hadir, izin, sakit, alfa                            
+                'bukti' => null, // hadir, izin, sakit, alpa                            
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4, // Genap
             ],    
@@ -3880,7 +3905,7 @@ class DatabaseSeeder extends Seeder
         ]);        
 
         /**
-         * 🎯✅ SPA: CRUD
+         * 🎯✅ SPA: C.R.U.D
          *  */ 
         Ekstrakurikuler::insert([
             [
@@ -4002,7 +4027,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯✅ spa: CRUD
+         * 🎯✅ spa: C.R.U.D
          * kepsek: GET, SHOW
          * guru
          */
@@ -4035,12 +4060,286 @@ class DatabaseSeeder extends Seeder
         ]);
         
         /**
-         * 🎯 spa: CRUD
+         * SPA: C.R.U.D
+         * Rapor
+         */
+        Rapor::insert([
+            // Winton
+            // Tingkat 10 2023/2024
+            // Ganjil
+            [
+                // 1
+                'siswa_id'          => 2,
+                'siswa_rombel_id'   => 10,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 1,
+                'wali_rombel_id'    => 1,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Sangat Baik',
+                'sikap_sosial'      => 'Baik',
+                'deskripsi_sikap'   => 'Sangat menghargai waktu dan disiplin setiap waktu',
+                'status'            => 'final',
+                'tanggal_terbit'    => '2021-08-24',
+                'catatan_wali'      => 'Pertahankan'
+            ],
+            // Genap
+            [
+                // 2
+                'siswa_id'          => 2,
+                'siswa_rombel_id'   => 10,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 2,
+                'wali_rombel_id'    => 1,
+                'jenis_rapor'       => 'PAS',
+                'sikap_spiritual'   => null,
+                'sikap_sosial'      => null,
+                'deskripsi_sikap'   => null,
+                'status'            => 'final',
+                'tanggal_terbit'    => '2022-03-27',
+                'catatan_wali'      => null
+            ],
+            // Tingkat 11 2024/2025
+            // Ganjil
+            [
+                // 3
+                'siswa_id'          => 2,
+                'siswa_rombel_id'   => 3,
+                'tahun_akademik_id' => 2,
+                'semester_id'       => 3,
+                'wali_rombel_id'    => 2,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Baik',
+                'sikap_sosial'      => 'Baik',
+                'deskripsi_sikap'   => 'Disiplin waktu dan bertanggung jawab',
+                'status'            => 'draft',
+                'tanggal_terbit'    => '2022-08-24',
+                'catatan_wali'      => 'Pertahankan'
+            ],    
+            // ---------------------------------------------
+            // Sanita
+            [
+                // 4
+                'siswa_id'          => 3,
+                'siswa_rombel_id'   => 11,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 1,
+                'wali_rombel_id'    => 1,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Cukup',
+                'sikap_sosial'      => 'Kurang',
+                'deskripsi_sikap'   => 'Sering bolos jam pelajaran',
+                'status'            => 'final',
+                'tanggal_terbit'    => '2021-08-24',
+                'catatan_wali'      => 'Kembangkan lagi sikap tanggung jawab dan disipilinnya'
+            ],
+            [
+                // 5
+                'siswa_id'          => 3,
+                'siswa_rombel_id'   => 11,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 2,
+                'wali_rombel_id'    => 1,
+                'jenis_rapor'       => 'PAS',
+                'sikap_spiritual'   => null,
+                'sikap_sosial'      => null,
+                'deskripsi_sikap'   => null,
+                'status'            => 'final',
+                'tanggal_terbit'    => '2022-03-27',
+                'catatan_wali'      => null
+            ],
+            // Tingkat 11 tahun 2024/2025
+            [
+                // 6
+                'siswa_id'          => 3,
+                'siswa_rombel_id'   => 7,
+                'tahun_akademik_id' => 2,
+                'semester_id'       => 3,
+                'wali_rombel_id'    => 5,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Baik',
+                'sikap_sosial'      => 'Baik',
+                'deskripsi_sikap'   => 'Disiplin waktu dan bertanggung jawab',
+                'status'            => 'draft',
+                'tanggal_terbit'    => '2022-08-24',
+                'catatan_wali'      => 'Pertahankan'
+            ],      
+
+            // ---------------------------------------------
+            // Bagas
+            [
+                // 7
+                'siswa_id'          => 1,
+                'siswa_rombel_id'   => 9,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 1,
+                'wali_rombel_id'    => 3,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Cukup',
+                'sikap_sosial'      => 'Cukup',
+                'deskripsi_sikap'   => 'Suka menunda pekerjaan rumah',
+                'status'            => 'final',
+                'tanggal_terbit'    => '2021-08-24',
+                'catatan_wali'      => 'Kembangkan lagi sikap tanggung jawab dan disipilinnya'
+            ],
+            [
+                // 8
+                'siswa_id'          => 1,
+                'siswa_rombel_id'   => 9,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 2,
+                'wali_rombel_id'    => 3,
+                'jenis_rapor'       => 'PAS',
+                'sikap_spiritual'   => null,
+                'sikap_sosial'      => null,
+                'deskripsi_sikap'   => null,
+                'status'            => 'final',
+                'tanggal_terbit'    => '2022-03-27',
+                'catatan_wali'      => null
+            ],
+            [
+                // 9
+                'siswa_id'          => 1,
+                'siswa_rombel_id'   => 2,
+                'tahun_akademik_id' => 2,
+                'semester_id'       => 3,
+                'wali_rombel_id'    => 2,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Baik',
+                'sikap_sosial'      => 'Baik',
+                'deskripsi_sikap'   => 'Disiplin waktu dan bertanggung jawab',
+                'status'            => 'draft',
+                'tanggal_terbit'    => '2022-08-24',
+                'catatan_wali'      => 'Pertahankan'
+            ],        
+
+            // ---------------------------------------------
+            // Yuli
+            [
+                // 10
+                'siswa_id'          => 5,
+                'siswa_rombel_id'   => 13,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 1,
+                'wali_rombel_id'    => 6,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Cukup',
+                'sikap_sosial'      => 'Cukup',
+                'deskripsi_sikap'   => 'Suka menunda pekerjaan rumah',
+                'status'            => 'final',
+                'tanggal_terbit'    => '2021-08-24',
+                'catatan_wali'      => 'Kembangkan lagi sikap tanggung jawab dan disipilinnya'
+            ],
+            [
+                // 11
+                'siswa_id'          => 5,
+                'siswa_rombel_id'   => 13,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 2,
+                'wali_rombel_id'    => 6,
+                'jenis_rapor'       => 'PAS',
+                'sikap_spiritual'   => null,
+                'sikap_sosial'      => null,
+                'deskripsi_sikap'   => null,
+                'status'            => 'final',
+                'tanggal_terbit'    => '2022-03-27',
+                'catatan_wali'      => null
+            ],
+            [
+                // 12
+                'siswa_id'          => 5,
+                'siswa_rombel_id'   => 5,
+                'tahun_akademik_id' => 2,
+                'semester_id'       => 3,
+                'wali_rombel_id'    => 4,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Baik',
+                'sikap_sosial'      => 'Baik',
+                'deskripsi_sikap'   => 'Disiplin waktu dan bertanggung jawab',
+                'status'            => 'draft',
+                'tanggal_terbit'    => '2022-08-24',
+                'catatan_wali'      => 'Pertahankan'
+            ],  
+
+            // ---------------------------------------------
+            // Devi
+            [
+                // 13
+                'siswa_id'          => 8,
+                'siswa_rombel_id'   => 1,
+                'tahun_akademik_id' => 2,
+                'semester_id'       => 3,
+                'wali_rombel_id'    => 7,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Cukup',
+                'sikap_sosial'      => 'Cukup',
+                'deskripsi_sikap'   => 'Suka menunda pekerjaan rumah',
+                'status'            => 'final',
+                'tanggal_terbit'    => '2021-08-24',
+                'catatan_wali'      => 'Kembangkan lagi sikap tanggung jawab dan disipilinnya'
+            ],            
+
+            // ---------------------------------------------
+             // Rehan
+            // Tingkat 10 2023/2024
+            // Ganjil
+            [
+                // 14
+                'siswa_id'          => 4,
+                'siswa_rombel_id'   => 12,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 1,
+                'wali_rombel_id'    => 1,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Sangat Baik',
+                'sikap_sosial'      => 'Baik',
+                'deskripsi_sikap'   => 'Sangat menghargai waktu dan disiplin setiap waktu',
+                'status'            => 'final',
+                'tanggal_terbit'    => '2021-08-24',
+                'catatan_wali'      => 'Pertahankan'
+            ],
+            // Genap
+            [
+                // 15
+                'siswa_id'          => 4,
+                'siswa_rombel_id'   => 12,
+                'tahun_akademik_id' => 1,
+                'semester_id'       => 2,
+                'wali_rombel_id'    => 1,
+                'jenis_rapor'       => 'PAS',
+                'sikap_spiritual'   => null,
+                'sikap_sosial'      => null,
+                'deskripsi_sikap'   => null,
+                'status'            => 'final',
+                'tanggal_terbit'    => '2022-03-27',
+                'catatan_wali'      => null
+            ],
+            // Tingkat 11 2024/2025
+            // Ganjil
+            [
+                // 16
+                'siswa_id'          => 4,
+                'siswa_rombel_id'   => 4,
+                'tahun_akademik_id' => 2,
+                'semester_id'       => 3,
+                'wali_rombel_id'    => 2,
+                'jenis_rapor'       => 'PTS',
+                'sikap_spiritual'   => 'Baik',
+                'sikap_sosial'      => 'Baik',
+                'deskripsi_sikap'   => 'Disiplin waktu dan bertanggung jawab',
+                'status'            => 'draft',
+                'tanggal_terbit'    => '2022-08-24',
+                'catatan_wali'      => 'Pertahankan'
+            ],    
+        ]);
+
+        /**
+         * 🎯 spa: C.R.U.D
          * kepsek:
-         * guru: CRUD
+         * guru: C.R.U.D
          */
         DataNilaiSiswa::insert([
             [
+                // 1
                 'siswa_id' => 2, // Winton
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 10, // X-B-1
@@ -4052,9 +4351,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,          
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 100,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memhamai aljabar dengan baik',
+                'rapor_id'  => 1
             ],
             [
+                // 2
                 'siswa_id' => 2, // Winton
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 10,
@@ -4066,9 +4369,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 90,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memahami KBBI dengan baik',
+                'rapor_id'  => 1
             ],
             [
+                // 3
                 'siswa_id' => 2, // Winton
                 'guru_id' => 5, // Guru PAI
                 'siswa_rombel_id'   => 10,
@@ -4080,9 +4387,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 90,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 2
             ],
             [
+                // 4
                 'siswa_id' => 2, // Winton
                 'guru_id' => 6, // Guru PPKn
                 'siswa_rombel_id'   => 10,
@@ -4094,11 +4405,15 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 90,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 2
             ],
 
             // Tingkat 11
             [
+                // 5
                 'siswa_id' => 2, // Winton
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 3, // XI-B-1
@@ -4110,9 +4425,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,           
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 98,
+                'predikat'  => 'A',
+                'deskripsi' => 'Peserta memmahami aljabar dengan baik',
+                'rapor_id'  => 3
             ],
             [
+                // 6
                 'siswa_id' => 2, // Winton
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 3,
@@ -4124,39 +4443,51 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 90,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 3
             ],
             [
+                // 7
                 'siswa_id' => 2, // Winton
-                'guru_id' => 5, // Guru PAI
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 3, // XI-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 4,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 90,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,           
+                'nilai_akhir' => 90,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => null
+            ],
+            [
+                // 8
+                'siswa_id' => 2, // Winton
+                'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 3,
-                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
                 'tahun_akademik_id' => 2,
                 'semester_id' => 4,
                 'jenis_penilaian'  => 'PAS',
                 'point_absensi' => 90,
                 'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 90,              
-                // 'sikap' => 'Sangat Baik'
-            ],
-            [
-                'siswa_id' => 2, // Winton
-                'guru_id' => 6, // Guru PPKn
-                'siswa_rombel_id'   => 3,
-                'kurikulum_mata_pelajaran_id' => 3, // PPKn
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 100,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 90,              
-                // 'sikap' => 'Sangat Baik'
-            ],
+                'point_uts' => 80,
+                'point_uas' => 0,              
+                'nilai_akhir' => 100,
+                'predikat'  => 'B',
+                'deskripsi' => 'Siswa memahami KBBI dengan baik',
+                'rapor_id'  => null
+            ],            
 
             // Sanita
             [
+                // 9
                 'siswa_id' => 3, // Sanita
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 11, // X-B11
@@ -4168,9 +4499,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,               
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 75,
+                'predikat'  => 'B',
+                'deskripsi' => 'Siswa memhami aljabar dengan baik',
+                'rapor_id'  => 4
             ],
             [
+                // 10
                 'siswa_id' => 3, // Sanita
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 11,
@@ -4179,12 +4514,16 @@ class DatabaseSeeder extends Seeder
                 'semester_id' => 1,
                 'jenis_penilaian'  => 'PTS',
                 'point_absensi' => 60,
-                'point_tugas' => 80,
-                'point_uts' => 70,
+                'point_tugas' => 60,
+                'point_uts' => 40,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 60,
+                'predikat'  => 'C',
+                'deskripsi' => 'Siswa kurang memahami KBBI',
+                'rapor_id'  => 4
             ],
             [
+                // 11
                 'siswa_id' => 3, // Sanita
                 'guru_id' => 5, // Guru PAI
                 'siswa_rombel_id'   => 11,
@@ -4196,9 +4535,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 78,
+                'predikat'  =>'B',
+                'deskripsi' => 'Siswa memhami pelajaran Agama dengan baik',
+                'rapor_id'  => 5
             ],
             [
+                // 12
                 'siswa_id' => 3, // Sanita
                 'guru_id' => 6, // Guru PPKn
                 'siswa_rombel_id'   => 11,
@@ -4210,11 +4553,15 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 5
             ],
 
             // Tahun 2024
             [
+                // 13
                 'siswa_id' => 3, // Sanita
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 7, // X-B-1
@@ -4226,9 +4573,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,               
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 0,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => null
             ],
             [
+                // 14
                 'siswa_id' => 3, // Sanita
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 7,
@@ -4240,39 +4591,49 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 0,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => null
             ],
-            [
-                'siswa_id' => 3, // Sanita
-                'guru_id' => 5, // Guru PAI
-                'siswa_rombel_id'   => 7,
-                'kurikulum_mata_pelajaran_id' => 2, // PAI
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 60,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ],
-            [
-                'siswa_id' => 3, // Sanita
-                'guru_id' => 6, // Guru PPKn
-                'siswa_rombel_id'   => 7,
-                'kurikulum_mata_pelajaran_id' => 3, // PPKn
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' =>6,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ],
+            // [
+            //     'siswa_id' => 3, // Sanita
+            //     'guru_id' => 5, // Guru PAI
+            //     'siswa_rombel_id'   => 7,
+            //     'kurikulum_mata_pelajaran_id' => 2, // PAI
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' => 60,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ],
+            // [
+            //     'siswa_id' => 3, // Sanita
+            //     'guru_id' => 6, // Guru PPKn
+            //     'siswa_rombel_id'   => 7,
+            //     'kurikulum_mata_pelajaran_id' => 3, // PPKn
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' =>6,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ],
 
             // Yuli
             [
+                // 15
                 'siswa_id' => 5, // Yuli
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 13, // X-B-1
@@ -4284,9 +4645,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,          
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memahami pelajaran dengan baik',
+                'rapor_id'  => 10
             ],
             [
+                // 16
                 'siswa_id' => 5, // Yuli
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 13,
@@ -4298,9 +4663,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memahami pelajaran dengan baik',
+                'rapor_id'  => 10
             ],
             [
+                // 17
                 'siswa_id' => 5, // Yuli
                 'guru_id' => 5, // Guru PAI
                 'siswa_rombel_id'   => 13,
@@ -4312,9 +4681,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 90,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memahami pelajaran dengan baik',
+                'rapor_id'  => 11
             ],
             [
+                // 18
                 'siswa_id' => 5, // Yuli
                 'guru_id' => 6, // Guru PPKn
                 'siswa_rombel_id'   => 13,
@@ -4326,11 +4699,15 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 90,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memahami pelajaran dengan baik',
+                'rapor_id'  => 11
             ],
 
             // Tingkat 11
             [
+                // 19
                 'siswa_id' => 5, // Yuli
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 5, // XI-B-1
@@ -4342,9 +4719,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 80.50,
                 'point_uas' => 0,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 70,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 12
             ],
             [
+                // 20
                 'siswa_id' => 5, // Yuli
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 5,
@@ -4356,39 +4737,49 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 12
             ],
-            [
-                'siswa_id' => 5, // Yuli
-                'guru_id' => 5, // Guru PAI
-                'siswa_rombel_id'   => 5,
-                'kurikulum_mata_pelajaran_id' => 2, // PAI
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 90,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ],
-            [
-                'siswa_id' => 5, // Yuli
-                'guru_id' => 6, // Guru PPKn
-                'siswa_rombel_id'   => 5,
-                'kurikulum_mata_pelajaran_id' => 3, // PPKn
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 80,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ],
+            // [
+            //     'siswa_id' => 5, // Yuli
+            //     'guru_id' => 5, // Guru PAI
+            //     'siswa_rombel_id'   => 5,
+            //     'kurikulum_mata_pelajaran_id' => 2, // PAI
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' => 90,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ],
+            // [
+            //     'siswa_id' => 5, // Yuli
+            //     'guru_id' => 6, // Guru PPKn
+            //     'siswa_rombel_id'   => 5,
+            //     'kurikulum_mata_pelajaran_id' => 3, // PPKn
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' => 80,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ],
 
             // Bagas
             [
+                // 21
                 'siswa_id' => 1, // Bagas
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 9, // X-A-1
@@ -4400,9 +4791,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 70.00,
                 'point_uts' => 80.50,
                 'point_uas' => 0,             
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 70,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 7
             ],
             [
+                // 22
                 'siswa_id' => 1, // Bagas
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 9,
@@ -4414,9 +4809,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 70,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 7
             ],
             [
+                // 23
                 'siswa_id' => 1, // Bagas
                 'guru_id' => 5, // Guru PAI
                 'siswa_rombel_id'   => 9,
@@ -4428,9 +4827,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 90,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 90,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 8
             ],
             [
+                // 24
                 'siswa_id' => 1, // Bagas
                 'guru_id' => 6, // Guru PPKn
                 'siswa_rombel_id'   => 9,
@@ -4442,11 +4845,15 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 0,
                 'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 8
             ],
 
             // Tingkat 11
             [
+                // 25
                 'siswa_id' => 1, // Bagas
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 2, // XI-B-1
@@ -4458,9 +4865,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 90.50,
                 'point_uas' => 0,               
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 9
             ],
             [
+                // 26
                 'siswa_id' => 1, // Bagas
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 2,
@@ -4472,40 +4883,50 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 70,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 9
             ],
-            [
-                'siswa_id' => 1, // Bagas
-                'guru_id' => 5, // Guru PAI
-                'siswa_rombel_id'   => 2,
-                'kurikulum_mata_pelajaran_id' => 2, // PAI
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 80,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ],
-            [
-                'siswa_id' => 1, // Bagas
-                'guru_id' => 6, // Guru PPKn
-                'siswa_rombel_id'   => 2,
-                'kurikulum_mata_pelajaran_id' => 3, // PPKn
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 80,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ],
+            // [
+            //     'siswa_id' => 1, // Bagas
+            //     'guru_id' => 5, // Guru PAI
+            //     'siswa_rombel_id'   => 2,
+            //     'kurikulum_mata_pelajaran_id' => 2, // PAI
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' => 80,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ],
+            // [
+            //     'siswa_id' => 1, // Bagas
+            //     'guru_id' => 6, // Guru PPKn
+            //     'siswa_rombel_id'   => 2,
+            //     'kurikulum_mata_pelajaran_id' => 3, // PPKn
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' => 80,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ],
 
             // Devi
             // Tingkat 12
             [
+                // 27
                 'siswa_id' => 8, // Devi
                 'guru_id' => 9, // Guru MTK
                 'siswa_rombel_id'   => 1, // XII-A-1
@@ -4517,9 +4938,13 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80.00,
                 'point_uts' => 70.50,
                 'point_uas' => 0,             
-                // 'sikap' => 'Sangat Baik'
+                'nilai_akhir' => 0,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 13
             ],
             [
+                // 28
                 'siswa_id' => 8, // Devi
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 1,
@@ -4531,62 +4956,181 @@ class DatabaseSeeder extends Seeder
                 'point_tugas' => 80,
                 'point_uts' => 80,
                 'point_uas' => 0,              
-                // 'sikap' => 'Baik'
+                'nilai_akhir' => 0,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 13
             ],
-            [
-                'siswa_id' => 8, // Devi
-                'guru_id' => 5, // Guru PAI
-                'siswa_rombel_id'   => 1,
-                'kurikulum_mata_pelajaran_id' => 2, // PAI
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 80,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ],
-            [
-                'siswa_id' => 8, // Devi
-                'guru_id' => 6, // Guru PPKn
-                'siswa_rombel_id'   => 1,
-                'kurikulum_mata_pelajaran_id' => 3, // PPKn
-                'tahun_akademik_id' => 2,
-                'semester_id' => 4,
-                'jenis_penilaian'  => 'PAS',
-                'point_absensi' => 80,
-                'point_tugas' => 80,
-                'point_uts' => 0,
-                'point_uas' => 80,              
-                // 'sikap' => 'Sangat Baik'
-            ]
+            // [
+            //     'siswa_id' => 8, // Devi
+            //     'guru_id' => 5, // Guru PAI
+            //     'siswa_rombel_id'   => 1,
+            //     'kurikulum_mata_pelajaran_id' => 2, // PAI
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' => 80,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ],
+            // [
+            //     'siswa_id' => 8, // Devi
+            //     'guru_id' => 6, // Guru PPKn
+            //     'siswa_rombel_id'   => 1,
+            //     'kurikulum_mata_pelajaran_id' => 3, // PPKn
+            //     'tahun_akademik_id' => 2,
+            //     'semester_id' => 4,
+            //     'jenis_penilaian'  => 'PAS',
+            //     'point_absensi' => 80,
+            //     'point_tugas' => 80,
+            //     'point_uts' => 0,
+            //     'point_uas' => 80,              
+            //     'nilai_akhir' => 0,
+            //     'predikat'  => null,
+            //     'deskripsi' => null,
+            //     'rapor_id'  => null
+            // ]
 
-        ]);
+            [
+                // 1
+                'siswa_id' => 4, // Rehan
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 12, // X-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80.50,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,          
+                'nilai_akhir' => 80,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memhamai aljabar dengan baik',
+                'rapor_id'  => 14
+            ],
+            [
+                // 2
+                'siswa_id' => 4, // Rehan
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 12,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 1,
+                'semester_id' => 1,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 70,
+                'point_uas' => 0,              
+                'nilai_akhir' => 90,
+                'predikat'  => 'A',
+                'deskripsi' => 'Siswa memahami KBBI dengan baik',
+                'rapor_id'  => 14
+            ],
+            [
+                // 3
+                'siswa_id' => 4, // Rehan
+                'guru_id' => 5, // Guru PAI
+                'siswa_rombel_id'   => 12,
+                'kurikulum_mata_pelajaran_id' => 2, // PAI
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 90,
+                'point_tugas' => 90,
+                'point_uts' => 0,
+                'point_uas' => 90,              
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 15
+            ],
+            [
+                // 4
+                'siswa_id' => 4, // Rehan
+                'guru_id' => 6, // Guru PPKn
+                'siswa_rombel_id'   => 12,
+                'kurikulum_mata_pelajaran_id' => 3, // PPKn
+                'tahun_akademik_id' => 1,
+                'semester_id' => 2,
+                'jenis_penilaian'  => 'PAS',
+                'point_absensi' => 100,
+                'point_tugas' => 80,
+                'point_uts' => 0,
+                'point_uas' => 90,              
+                'nilai_akhir' => 80,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 15
+            ],
+
+            // Tingkat 11
+            [
+                // 5
+                'siswa_id' => 4, // Rehan
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 4, // XI-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,           
+                'nilai_akhir' => 82,
+                'predikat'  => 'A',
+                'deskripsi' => 'Peserta memmahami aljabar dengan baik',
+                'rapor_id'  => 16
+            ],
+            [
+                // 6
+                'siswa_id' => 4, // Rehan
+                'guru_id' => 7, // Guru Indon
+                'siswa_rombel_id'   => 4,
+                'kurikulum_mata_pelajaran_id' => 4, // B.Indo
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 90,
+                'point_tugas' => 80,
+                'point_uts' => 80,
+                'point_uas' => 0,              
+                'nilai_akhir' => 76,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 16
+            ],                 
+        ]);        
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯 SPA: C.R.U.D
          */
         // rapor_nilai_siswa
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯 SPA: C.R.U.D
          */
         // projek_p5
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯 SPA: C.R.U.D
          */
         // data_nilai_p5
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯 SPA: C.R.U.D
          */
         // rapor
 
         /** 
-         * 🎯 SPA: CRUD
-         * tu: CRUD
+         * 🎯 SPA: C.R.U.D
+         * tu: C.R.U.D
          * */ 
         DataBerkas::insert([
             [
@@ -4598,8 +5142,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * SPA: CRUD
-         * tu: CRUD
+         * SPA: C.R.U.D
+         * tu: C.R.U.D
          * Kepsek: GET, SHOW
          *  */ 
         Keuangan::insert([
@@ -4618,17 +5162,17 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯 SPA: C.R.U.D
          */
         // jurnal_kbm
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯 SPA: C.R.U.D
          */
         // forum_diskusi
 
         /**
-         * 🎯 SPA: CRUD
+         * 🎯 SPA: C.R.U.D
          */
         // lms
 

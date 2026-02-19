@@ -36,17 +36,23 @@ return new class extends Migration
 
             $table->decimal('point_uts', 5, 2)->default(0);
 
-            $table->decimal('point_uas', 5, 2)->default(0);            
+            $table->decimal('point_uas', 5, 2)->default(0);    
+            
+            $table->decimal('nilai_akhir', 5, 2)->nullable();
+
+            $table->string('predikat', 10)->nullable();
+
+            $table->text('deskripsi')->nullable();
+
+            $table->foreignId('rapor_id')->nullable()->constrained('rapor')->nullOnDelete();
 
             $table->unique([
                 'siswa_id',
-                'guru_id',
-                'siswa_rombel_id',
                 'kurikulum_mata_pelajaran_id',
                 'tahun_akademik_id',
                 'semester_id',
                 'jenis_penilaian',
-            ], 'unik');            
+            ], 'unik');        
 
             $table->timestamps();
         });
@@ -60,3 +66,4 @@ return new class extends Migration
         Schema::dropIfExists('data_nilai_siswa');
     }
 };
+

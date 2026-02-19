@@ -2,148 +2,202 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\DataNilaiSiswa;
-use App\Models\SiswaRombel;
-use App\Models\JadwalPelajaran;
-use App\Models\Siswa;
+use App\Exports\LegerExport;
 use App\Helpers\ApiResponse;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+use App\Models\DataNilaiSiswa;
+use App\Models\Rapor;
+use App\Models\Semester;
+use App\Models\Siswa;
+use App\Models\Kelas;
+use App\Models\SiswaRombel;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+// use Illuminate\Support\Facades\Validator;
+// use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
+use PDF;
 
 class DataNilaiSiswaController extends Controller
 {
     // ✅ untuk spa
-    public function index()
-{
-    $data = DataNilaiSiswa::with([
-        'tahunAkademik',
-        'semester',
-        'siswa',
-        'siswaRombel.rombel.kelas',
-        'kurikulumMataPelajaran.mataPelajaran'
-    ])
-    ->orderBy('tahun_akademik_id')
-    ->orderBy('semester_id')
-    ->orderBy('siswa_id')
-    ->get();
+    // Leger Nai Rapor (wajib tentukan dulu tahun dan semester, biar ga berat)
+    // Mengambil semua rombel + siswa + nilai + rapor pada tahun dan semester tertentu    
+    public function index(Request $request)
+    {
+        $request->validate([
+            'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
+            'semester_id'       => 'required|exists:semester,id',
+        ], [
+            'tahun_akademik_id.required' => 'Tahun akademik wajib dipilih terlebih dahulu',
+            'tahun_akademik_id.exists'   => 'Tahun akademik tidak ditemukan',
+            'semester_id.required'       => 'Semester wajib dipilih terlebih dahulu',
+            'semester_id.exists'         => 'Semester tidak ditemukan',
+        ]);
 
-    if ($data->isEmpty()) {
-        return ApiResponse::error('Not Found', 'Belum ada data nilai siswa');
+        $data = DataNilaiSiswa::query()
+        ->join('siswa_rombel', 'data_nilai_siswa.siswa_rombel_id', '=', 'siswa_rombel.id')
+        ->join('rombels', 'siswa_rombel.rombel_id', '=', 'rombels.id') // 🔥 ganti di sini
+        ->where('data_nilai_siswa.tahun_akademik_id', $request->tahun_akademik_id)
+        ->where('data_nilai_siswa.semester_id', $request->semester_id)
+        ->orderBy('rombels.nama_rombel')
+        ->select('data_nilai_siswa.*')
+        ->with([
+            'tahunAkademik:id,tahun_akademik,status',
+            'semester:id,semester,status',
+            'siswa:id,nama,nis,nisn',
+            'siswaRombel.rombel.jurusan',
+            'siswaRombel.rombel.waliRombels.wali',
+            'kurikulumMataPelajaran.mataPelajaran:id,nama_pelajaran',
+            'rapor.waliRombel.wali',
+            'guru',
+        ])
+        ->get();
+
+        if ($data->isEmpty()) {
+            return ApiResponse::error('Not Found', 'Belum ada data nilai siswa');
+        }
+
+        $result = $data
+            ->groupBy('tahun_akademik_id')
+            ->map(function ($tahunGroup) {
+
+                $tahun = $tahunGroup->first()->tahunAkademik;
+
+                return [
+                    'tahun_akademik_id' => $tahun->id,
+                    'tahun_akademik'    => $tahun->tahun_akademik,
+                    'status_tahun'      => $tahun->status,
+
+                    'semesters' => $tahunGroup
+                        ->groupBy('semester_id')
+                        ->map(function ($semesterGroup) {
+
+                            $semester = $semesterGroup->first()->semester;
+
+                            return [
+                                'semester_id'     => $semester->id,
+                                'semester'        => $semester->semester,
+                                'status_semester' => $semester->status,
+
+                                'rombels' => $semesterGroup
+                                    ->groupBy(fn ($item) =>
+                                        $item->siswaRombel->rombel_id
+                                    )
+                                    ->map(function ($rombelGroup) {
+
+                                        $rombel = $rombelGroup->first()->siswaRombel->rombel;
+                                        $tahunId = $rombelGroup->first()->tahun_akademik_id;
+                                        $waliData = $rombel->waliRombels
+                                            ->where('tahun_akademik_id', $tahunId)
+                                            ->first();
+
+                                        $namaWali = optional($waliData?->wali)->nama;
+                                        return [
+                                            'rombel_id'   => $rombel->id,
+                                            'nama_rombel' => $rombel->nama_rombel,
+                                            'jurusan'     => $rombel->jurusan->nama_jurusan ?? null,
+                                            'wali_rombel' => $namaWali,
+
+                                            'siswas' => $rombelGroup
+                                                ->groupBy('siswa_id')
+                                                ->map(function ($siswaGroup) {
+
+                                                    $siswa = $siswaGroup->first()->siswa;
+
+                                                    // 🔥 AMBIL 1 RAPOR SAJA
+                                                    $rapor = $siswaGroup->first()->rapor;
+
+                                                    return [
+                                                        'siswa_id'   => $siswa->id,
+                                                        'nama_siswa' => $siswa->nama,
+                                                        'nisn'       => $siswa->nisn,
+                                                        'nis'        => $siswa->nis,
+
+                                                        'data_nilai_siswa' => $siswaGroup
+                                                            ->map(function ($nilai) {
+
+                                                                $mapel = $nilai->kurikulumMataPelajaran->mataPelajaran;
+
+                                                                if (
+                                                                    $nilai->jenis_penilaian == 'PTS' || 
+                                                                    $nilai->jenis_penilaian == 'Susulan PTS' || 
+                                                                    $nilai->jenis_penilaian == 'Remedial PTS'
+                                                                ) {
+                                                                    return [
+                                                                        'data_nilai_siswa_id' => $nilai->id,
+                                                                        'mata_pelajaran'  => $mapel->nama_pelajaran,
+                                                                        'guru_pengajar'   => $nilai->guru->nama,
+                                                                        'jenis_penilaian' => $nilai->jenis_penilaian,
+                                                                        'point' => [
+                                                                            'absensi'     => $nilai->point_absensi,
+                                                                            'tugas'       => $nilai->point_tugas,
+                                                                            'uts'         => $nilai->point_uts,
+                                                                            'nilai_akhir' => $nilai->nilai_akhir,
+                                                                            'predikat'  => $nilai->predikat,
+                                                                            'deskripsi' => $nilai->deskripsi,
+                                                                        ],
+                                                                    ];
+                                                                } else {
+                                                                    return [
+                                                                        'mata_pelajaran'  => $mapel->nama_pelajaran,
+                                                                        'guru_pengajar'   => $nilai->guru->nama,
+                                                                        'jenis_penilaian' => $nilai->jenis_penilaian,
+                                                                        'point' => [
+                                                                            'absensi'     => $nilai->point_absensi,
+                                                                            'tugas'       => $nilai->point_tugas,
+                                                                            'uas'         => $nilai->point_uas,
+                                                                            'nilai_akhir' => $nilai->nilai_akhir,
+                                                                            'predikat'  => $nilai->predikat,
+                                                                            'deskripsi' => $nilai->deskripsi,
+                                                                        ],
+                                                                    ];
+                                                                }
+
+                                                            })
+                                                            ->values(),
+
+                                                        // 🔥 RAPOR (1 SAJA PER SISWA)
+                                                        'rapor' => $rapor ? [
+                                                            'rapor_id'        => $rapor->id,
+                                                            'jenis_rapor'     => $rapor->jenis_rapor,
+                                                            'sikap_spiritual' => $rapor->sikap_spiritual,
+                                                            'sikap_sosial'    => $rapor->sikap_sosial,
+                                                            'deskripsi_sikap' => $rapor->deskripsi_sikap,
+                                                            'status'          => $rapor->status,
+                                                            'tanggal_terbit'  => $rapor->tanggal_terbit,
+                                                            'catatan_wali'    => $rapor->catatan_wali,
+                                                        ] : null,
+                                                    ];
+                                                })
+                                                ->values()
+                                        ];
+                                    })
+                                    ->values()
+                            ];
+                        })
+                        ->values()
+                ];
+            })
+            ->values();
+
+        return ApiResponse::success($result, 'Data nilai siswa berhasil ditampilkan');
     }
 
-    $result = $data
-        ->groupBy('tahun_akademik_id')
-        ->map(function ($tahunGroup) {
-
-            return [
-                'tahun_akademik_id' => $tahunGroup->first()->tahunAkademik->id,
-                'tahun_akademik'    => $tahunGroup->first()->tahunAkademik->tahun_akademik,
-                'status_tahun'      => $tahunGroup->first()->tahunAkademik->status,
-
-                'semesters' => $tahunGroup
-                    ->groupBy('semester_id')
-                    ->sortKeys()
-                    ->map(function ($semesterGroup) {
-
-                        return [
-                            'semester_id'     => $semesterGroup->first()->semester->id,
-                            'semester'        => $semesterGroup->first()->semester->semester,
-                            'status_semester' => $semesterGroup->first()->semester->status,
-
-                            'rombels' => $semesterGroup
-                                ->groupBy(fn ($item) =>
-                                    $item->siswaRombel->rombel_id
-                                )
-                                ->map(function ($rombelGroup) {
-
-                                    return [
-                                        'rombel_id'   => $rombelGroup->first()->siswaRombel->rombel->id,
-                                        'nama_rombel' => $rombelGroup->first()->siswaRombel->rombel->nama_rombel,
-
-                                        'siswas' => $rombelGroup
-                                            ->groupBy('siswa_id')
-                                            ->map(function ($siswaGroup) {
-
-                                                return [
-                                                    'siswa_id'   => $siswaGroup->first()->siswa->id,
-                                                    'nama_siswa' => $siswaGroup->first()->siswa->nama,
-                                                    'nisn'       => $siswaGroup->first()->siswa->nisn,
-                                                    'nis'        => $siswaGroup->first()->siswa->nis,
-
-                                                    'mata_pelajaran' => $siswaGroup
-                                                        ->groupBy('kurikulum_mata_pelajaran_id')
-                                                        ->map(function ($mapelGroup) {
-
-                                                            $nilai = $mapelGroup->first();
-                                                            $mapel = $nilai->kurikulumMataPelajaran->mataPelajaran;
-
-                                                            // =========================
-                                                            // HITUNG NILAI AKHIR
-                                                            // =========================
-
-                                                            if ($nilai->jenis_penilaian == 'PTS') {
-
-                                                                $nilaiAkhir =
-                                                                    ($nilai->point_absensi * 0.10) +
-                                                                    ($nilai->point_tugas * 0.40) +
-                                                                    ($nilai->point_uts * 0.50);
-
-                                                                return [
-                                                                    'mapel'           => $mapel->nama_pelajaran,
-                                                                    'jenis_penilaian' => $nilai->jenis_penilaian,
-                                                                    'point' => [
-                                                                        'absensi'     => $nilai->point_absensi,
-                                                                        'tugas'       => $nilai->point_tugas,
-                                                                        'uts'         => $nilai->point_uts,
-                                                                        'nilai_akhir' => round($nilaiAkhir, 2),
-                                                                    ],
-                                                                    'sikap' => $nilai->sikap ?? null,
-                                                                ];
-                                                            }
-
-                                                            // =========================
-                                                            // UNTUK PAS
-                                                            // =========================
-
-                                                            $nilaiAkhir =
-                                                                ($nilai->point_absensi * 0.10) +
-                                                                ($nilai->point_tugas * 0.30) +
-                                                                ($nilai->point_uas * 0.60);
-
-                                                            return [
-                                                                'mapel'           => $mapel->nama_pelajaran,
-                                                                'jenis_penilaian' => $nilai->jenis_penilaian,
-                                                                'point' => [
-                                                                    'absensi'     => $nilai->point_absensi,
-                                                                    'tugas'       => $nilai->point_tugas,
-                                                                    'uas'         => $nilai->point_uas,
-                                                                    'nilai_akhir' => round($nilaiAkhir, 2),
-                                                                ],
-                                                                'sikap' => $nilai->sikap ?? null,
-                                                            ];
-
-                                                        })
-                                                        ->values()
-                                                ];
-                                            })
-                                            ->values()
-                                    ];
-                                })
-                                ->values()
-                        ];
-                    })
-                    ->values()
-            ];
-        })
-        ->values();
-
-    return ApiResponse::success($result, 'Data nilai siswa berhasil ditampilkan');
-}
-
-
+    // cetak leger
+    public function export(Request $request) {    
+        $kelas = Kelas::find($request->kelas_id);
+        return Excel::download(
+            new LegerExport(
+                $request->tahun_akademik_id,
+                $request->semester_id,
+                $request->kelas_id   // 10 / 11 / 12
+            ),
+            'Leger-Kelas-'.$kelas->nama_kelas.'.xlsx'
+        );
+    }
 
 
     /**
@@ -246,216 +300,352 @@ class DataNilaiSiswaController extends Controller
         }
     }
 
+
     /**
-     * ✅ untuk spa/guru
-     */    
-    public function show($id)
-    {        
-        $siswa = Siswa::with([
-            'kelas',
-            'jurusan',
-            'dataNilaiSiswas',
-            'jadwalPelajarans.guru',
-            'jadwalPelajarans.kelas',
-            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
-            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
-            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
-            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
-        ])->find($id);
-    
-        if (!$siswa) {
-            return ApiResponse::error('Not found', ['Data siswa tidak ditemukan']);
+     * ✅ untuk spa/wali kelas
+     * detail rapor untuk satu siswa dengan semua nilai dan mapelnya
+     */      
+    public function semuaNilaiSatuSiswa($id)
+    {
+        $nilai = DataNilaiSiswa::with([
+            'siswa',
+            'guru',
+            'siswaRombel.rombel.jurusan',
+            'kurikulumMataPelajaran.mataPelajaran',
+            'tahunAkademik',
+            'semester',
+        ])
+        ->where('siswa_id', $id)
+        ->orderBy('tahun_akademik_id')
+        ->orderBy('semester_id')
+        ->get();
+
+        if ($nilai->isEmpty()) {
+            return ApiResponse::error('Not found', 'Belum ada nilai akhir mata pelajaran apapun');
         }
-    
-        /**
-         * 🔹 Flatten jadwal → group by tahun akademik
-         */
-        $tahunAkademik = $siswa->jadwalPelajarans
-            ->groupBy(fn ($jadwal) =>
-                $jadwal->kurikulumMataPelajaran->tahunAkademik->id
-            )
-            ->map(function ($jadwalPerTahun) use ($siswa) {
-    
-                $ta = $jadwalPerTahun->first()
-                    ->kurikulumMataPelajaran
-                    ->tahunAkademik;
-    
-                return [
-                    'tahun_akademik_id' => $ta->id,
-                    'tahun_akademik'    => $ta->tahun_akademik,
-                    'semester'          => $ta->semester,
-                    'status'            => $ta->status,
-    
-                    'kurikulum_mata_pelajaran' => $jadwalPerTahun
-                        ->groupBy(fn ($jadwal) =>
-                            $jadwal->kurikulum_mata_pelajaran_id
-                        )
-                        ->map(function ($jadwalPerKmp) use ($siswa) {
-    
-                            $jadwal = $jadwalPerKmp->first();
-                            $kmp    = $jadwal->kurikulumMataPelajaran;
-    
-                            $nilai = $siswa->dataNilaiSiswas
-                                ->firstWhere(
-                                    'kurikulum_mata_pelajaran_id',
-                                    $kmp->id
-                                );
-    
-                            return [
-                                'kurikulum_mata_pelajaran_id' => $kmp->id,
-                                'kurikulum' => $kmp->kurikulum->nama_kurikulum ?? null,
-                                'mata_pelajaran' => $kmp->mataPelajaran->nama_pelajaran ?? null,
-                                'jurusan_pelajaran' => $kmp->jurusan->nama_jurusan ?? null,
-                                'tingkat' => $kmp->tingkat,
-                                'nilai_kkm' => $kmp->nilai_kkm,
-                                'status_mata_pelajaran' => $kmp->status_mata_pelajaran,
-    
-                                'jadwal_pelajaran' => [
-                                    'hari'        => $jadwal->hari,
-                                    'jam_mulai'   => $jadwal->jam_mulai,
-                                    'jam_selesai' => $jadwal->jam_selesai,
-                                    'ruangan'     => $jadwal->ruangan,
-                                    'link_opsional' => $jadwal->link_opsional,
-    
-                                    'guru' => [
-                                        'guru_id'   => $jadwal->guru->id ?? null,
-                                        'nama_guru' => $jadwal->guru->nama ?? null,
-                                    ],
-    
-                                    'kelas' => $jadwal->kelas->nama_kelas ?? null,
-                                ],
-    
-                                'nilai_siswa' => $nilai ? [
-                                    'point_absensi' => $nilai->point_absensi,
-                                    'point_tugas'   => $nilai->point_tugas,
-                                    'point_uts'     => $nilai->point_uts,
-                                    'point_uas'     => $nilai->point_uas,
-                                    'point_ekskul'  => $nilai->point_ekskul,
-                                    'sikap'         => $nilai->sikap,
-                                ] : null,
-                            ];
-                        })->values(),
-                ];
-            })->values();
-    
-        return ApiResponse::success([
+
+        $raporCollection = Rapor::with([
+            'waliRombel.wali',
+            'waliRombel.rombel'
+        ])
+        ->where('siswa_id', $id)
+        ->get()
+        ->groupBy(function ($item) {
+            return $item->tahun_akademik_id . '-' . $item->semester_id;
+        });
+
+        $first = $nilai->first();
+        $last  = $nilai->last();
+
+        $formatted = [
             'siswa' => [
-                'siswa_id' => $siswa->id,
-                'nisn'     => $siswa->nisn,
-                'nis'      => $siswa->nis,
-                'nama'     => $siswa->nama,
-                'kelas'    => $siswa->kelas->nama_kelas ?? null,
-                'jurusan'  => $siswa->jurusan->nama_jurusan ?? null,
+                'siswa_id'  => $first->siswa->id,
+                'nama'      => $first->siswa->nama,
+                'nisn'      => $first->siswa->nisn,
+                'nis'       => $first->siswa->nis,
             ],
-            'tahun_akademik' => $tahunAkademik
-        ], 'Data nilai siswa berhasil diambil');
+
+            'rombel_saat_ini' => [
+                'rombel_id'     => $last->siswaRombel->rombel->id ?? null,
+                'nama_rombel'   => $last->siswaRombel->rombel->nama_rombel ?? null,
+                'jurusan'       => $last->siswaRombel->rombel->jurusan->nama_jurusan ?? null,
+            ],
+
+            'tahun_akademik' => $nilai
+                ->groupBy('tahun_akademik_id')
+                ->map(function ($tahunGroup) use ($raporCollection) {
+
+                    $tahun = $tahunGroup->first()->tahunAkademik;
+
+                    return [
+                        'tahun_akademik_id' => $tahun->id,
+                        'tahun_akademik'    => $tahun->tahun_akademik,
+                        'status'            => $tahun->status,
+
+                        'semester' => $tahunGroup
+                            ->groupBy('semester_id')
+                            ->map(function ($semesterGroup) use ($tahun, $raporCollection) {
+
+                                $semester = $semesterGroup->first()->semester;
+                                $key = $tahun->id . '-' . $semester->id;
+                                $rapor = $raporCollection[$key][0] ?? null;
+
+                                return [
+                                    'semester_id'=> $semester->id,
+                                    'semester'   => $semester->semester,
+                                    'status'     => $semester->status,
+
+                                    'data_nilai_siswa' => $semesterGroup
+                                        ->groupBy('jenis_penilaian')
+                                        ->map(function ($group, $jenis) {
+
+                                            return [
+                                                'jenis_penilaian' => $jenis,
+                                                'mata_pelajaran' => $group->map(function ($mapel) {
+
+                                                    $isPTS = in_array($mapel->jenis_penilaian, [
+                                                        'PTS',
+                                                        'Susulan PTS',
+                                                        'Remedial PTS'
+                                                    ]);
+
+                                                    if ($isPTS) {
+                                                        $point = [
+                                                            'absensi'     => $mapel->point_absensi,
+                                                            'tugas'       => $mapel->point_tugas,
+                                                            'uts'         => $mapel->point_uts,
+                                                            'nilai_akhir' => $mapel->nilai_akhir,
+                                                            'predikat'    => $mapel->predikat,
+                                                            'deskripsi'   => $mapel->deskripsi,
+                                                        ];
+                                                    } else {
+                                                        $point = [
+                                                            'absensi'     => $mapel->point_absensi,
+                                                            'tugas'       => $mapel->point_tugas,
+                                                            'uas'         => $mapel->point_uas,
+                                                            'nilai_akhir' => $mapel->nilai_akhir,
+                                                            'predikat'    => $mapel->predikat,
+                                                            'deskripsi'   => $mapel->deskripsi,
+                                                        ];
+                                                    }
+
+                                                    return [
+                                                        'data_nilai_siswa_id'   => $mapel->id,
+                                                        'mata_pelajaran_id'     => $mapel->kurikulumMataPelajaran->mataPelajaran->id ?? null,
+                                                        'mata_pelajaran'        => $mapel->kurikulumMataPelajaran->mataPelajaran->nama_pelajaran ?? null,
+                                                        'guru_pengajar'         => $mapel->guru->nama ?? null,
+                                                        'point'                 => $point,
+                                                    ];
+                                                })->values(),
+                                            ];
+                                        })->values(),
+
+                                    'rapor' => $rapor ? [
+                                        'rapor_id'        => $rapor->id,
+                                        'jenis_rapor'     => $rapor->jenis_rapor,
+                                        'sikap_spiritual' => $rapor->sikap_spiritual,
+                                        'sikap_sosial'    => $rapor->sikap_sosial,
+                                        'deskripsi_sikap' => $rapor->deskripsi_sikap,
+                                        'status'          => $rapor->status,
+                                        'tanggal_terbit'  => $rapor->tanggal_terbit,
+                                        'catatan_wali'    => $rapor->catatan_wali,
+                                        'wali_rombel'     => $rapor->waliRombel?->wali?->nama,
+                                        'rombel'          => $rapor->waliRombel?->rombel?->nama_rombel,
+                                    ] : null,
+                                ];
+                            })->values(),
+                    ];
+                })->values(),
+        ];
+
+        return ApiResponse::success($formatted, 'Data nilai berhasil diambil');
     }
+
     
+    // Export/Cetak excel satu siswa semua mapel (bukan leger)
+    public function cetakSemuaNilaiSatuSiswa(Request $request, $siswaId)
+    {
+        // $request->validate([
+        //     'tahun' => 'required|integer',
+        //     'semester' => 'required|integer',
+        //     'jenis' => 'required|string',
+        // ]);
+
+        // $siswa = Siswa::with('siswaRombels.rombel')
+        //     ->findOrFail($siswaId);
+
+        // $nilai = DataNilaiSiswa::with('kurikulumMataPelajaran.mataPelajaran')
+        //     ->where('siswa_id', $siswaId)
+        //     ->where('tahun_akademik_id', $request->tahun)
+        //     ->where('semester_id', $request->semester)
+        //     ->where('jenis_penilaian', $request->jenis)
+        //     ->orderBy('kurikulum_mata_pelajaran_id')
+        //     ->get();
+
+        // if ($nilai->isEmpty()) {
+        //     return response()->json([
+        //         'message' => 'Nilai tidak ditemukan'
+        //     ], 404);
+        // }
+
+        // $pdf = PDF::loadView('pdf.nilai_siswa', [
+        //     'siswa' => $siswa,
+        //     'nilai' => $nilai,
+        //     'jenis' => $request->jenis,
+        //     'semester' => $request->semester
+        // ]);
+
+        // return $pdf->download('Laporan_Nilai_'.$siswa->nama.'.pdf');
+
+        // $request->validate([
+        //     'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
+        //     'semester_id'       => 'required|exists:semester,id',
+        //     'jenis_rapor'       => 'required|in:PTS,PAS'
+        // ], [
+        //     'tahun_akademik_id.required'    => 'Tahun akademik wajib ditentkan',
+        //     'tahun_akademik_id.exists'      => 'Tahun akademik tidak ditemukan',
+        //     'semester_id.required'          => 'Semester wajib ditentkan',
+        //     'semester_id.exists'            => 'Semester tidak ditemukan',
+        //     'jenis_rapor.required'          => 'Jenis rapor wajib ditentkan',
+        //     'jenis_rapor.in'                => 'Pilihan jenis rapor hanya PTS dan PAS',
+        // ]);
+
+        // $data = Rapor::with([
+        //     'tahunAkademik',
+        //     'semester',
+        //     'siswaRombel.rombel',
+        //     'waliRombel.rombel',
+        //     'siswa',
+        // ])
+        // ->where('tahun_akademik_id', $request->tahun_akademik_id)
+        // ->where('semester_id', $request->semester_id)
+        // ->where('jenis_rapor', $request->jenis_rapor)
+        // ->get();
+
+        // if ($data->isEmpty()) {
+        //     return ApiResponse::error('Not found', 'Belum ada data');
+        // }
+
+        // $formatted = $data->groupBy('tahun_akademik_id')
+        // ->map(function ($raporSiswa) {
+        //     $tahunAkademik = $raporSiswa->first()->tahunAkademik;
+
+        //     return [
+        //         'tahun_akademik_id' => $tahunAkademik->id,
+        //         'tahun_akademik'    => $tahunAkademik->tahun_akademik,
+        //         'status_tahun'      => $tahunAkademik->status,
+        //         'semeester'         => $raporSiswa->groupBy('semester_id')
+        //         ->map(function ($rapor) {
+        //             $semester = $rapor->first()->semester;
+
+        //             return [
+        //                 'semester_id'       => $semester->id,
+        //                 'semester'          => $semester->semester,
+        //                 'status_semester'   => $status->semester,
+        //                 'rombel'            => $rapor->groupBy('siswa_rombel_id.rombel')
+        //                 ->map(function ($rpr) {
+        //                     $rombel     = $rpr->first()->siswaRombel->rombel;
+        //                     $waliRombel = $rpr->first()->waliRombel->wali;
+
+        //                     return [
+        //                         'rombel_id' => $rombel->id,
+        //                         'rombel'    => $rombel->nama_rombel,
+        //                         'wali'      => $waliRombel->nama,
+        //                         ''
+        //                     ];
+        //                 })->values(),
+        //             ];
+        //         })->values(),
+        //     ];
+        // })->values();
+    }
+
+
 
     // ✅ get all data nilai siswa sendiri (untuk guru)
-    public function getAllDataNilaiSendiri()
-    {
-        $user = Auth::guard('kepegawaian')->user();
+    // public function getAllDataNilaiSendiri()
+    // {
+    //     $user = Auth::guard('kepegawaian')->user();
     
-        $siswa = Siswa::with([
-            'kelas',
-            'jurusan',
-            'dataNilaiSiswas',
-            'jadwalPelajarans.guru',
-            'jadwalPelajarans.kelas',
-            'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
-            'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
-            'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
-            'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
-        ])->find($user->id);
+    //     $siswa = Siswa::with([
+    //         'kelas',
+    //         'jurusan',
+    //         'dataNilaiSiswas',
+    //         'jadwalPelajarans.guru',
+    //         'jadwalPelajarans.kelas',
+    //         'jadwalPelajarans.kurikulumMataPelajaran.kurikulum',
+    //         'jadwalPelajarans.kurikulumMataPelajaran.mataPelajaran',
+    //         'jadwalPelajarans.kurikulumMataPelajaran.jurusan',
+    //         'jadwalPelajarans.kurikulumMataPelajaran.tahunAkademik',
+    //     ])->find($user->id);
     
-        if (!$siswa) {
-            return ApiResponse::error('Not found', ['Data siswa tidak ditemukan']);
-        }
+    //     if (!$siswa) {
+    //         return ApiResponse::error('Not found', ['Data siswa tidak ditemukan']);
+    //     }
     
-        /**
-         * 🔹 Flatten jadwal → group by tahun akademik
-         */
-        $tahunAkademik = $siswa->jadwalPelajarans
-            ->groupBy(fn ($jadwal) =>
-                $jadwal->kurikulumMataPelajaran->tahunAkademik->id
-            )
-            ->map(function ($jadwalPerTahun) use ($siswa) {
+    //     /**
+    //      * 🔹 Flatten jadwal → group by tahun akademik
+    //      */
+    //     $tahunAkademik = $siswa->jadwalPelajarans
+    //         ->groupBy(fn ($jadwal) =>
+    //             $jadwal->kurikulumMataPelajaran->tahunAkademik->id
+    //         )
+    //         ->map(function ($jadwalPerTahun) use ($siswa) {
     
-                $ta = $jadwalPerTahun->first()
-                    ->kurikulumMataPelajaran
-                    ->tahunAkademik;
+    //             $ta = $jadwalPerTahun->first()
+    //                 ->kurikulumMataPelajaran
+    //                 ->tahunAkademik;
     
-                return [
-                    'tahun_akademik_id' => $ta->id,
-                    'tahun_akademik'    => $ta->tahun_akademik,
-                    'semester'          => $ta->semester,
-                    'status'            => $ta->status,
+    //             return [
+    //                 'tahun_akademik_id' => $ta->id,
+    //                 'tahun_akademik'    => $ta->tahun_akademik,
+    //                 'semester'          => $ta->semester,
+    //                 'status'            => $ta->status,
     
-                    'kurikulum_mata_pelajaran' => $jadwalPerTahun
-                        ->groupBy(fn ($jadwal) =>
-                            $jadwal->kurikulum_mata_pelajaran_id
-                        )
-                        ->map(function ($jadwalPerKmp) use ($siswa) {
+    //                 'kurikulum_mata_pelajaran' => $jadwalPerTahun
+    //                     ->groupBy(fn ($jadwal) =>
+    //                         $jadwal->kurikulum_mata_pelajaran_id
+    //                     )
+    //                     ->map(function ($jadwalPerKmp) use ($siswa) {
     
-                            $jadwal = $jadwalPerKmp->first();
-                            $kmp    = $jadwal->kurikulumMataPelajaran;
+    //                         $jadwal = $jadwalPerKmp->first();
+    //                         $kmp    = $jadwal->kurikulumMataPelajaran;
     
-                            $nilai = $siswa->dataNilaiSiswas
-                                ->firstWhere(
-                                    'kurikulum_mata_pelajaran_id',
-                                    $kmp->id
-                                );
+    //                         $nilai = $siswa->dataNilaiSiswas
+    //                             ->firstWhere(
+    //                                 'kurikulum_mata_pelajaran_id',
+    //                                 $kmp->id
+    //                             );
     
-                            return [
-                                'kurikulum_mata_pelajaran_id' => $kmp->id,
-                                'kurikulum' => $kmp->kurikulum->nama_kurikulum ?? null,
-                                'mata_pelajaran' => $kmp->mataPelajaran->nama_pelajaran ?? null,
-                                'jurusan_pelajaran' => $kmp->jurusan->nama_jurusan ?? null,
-                                'tingkat' => $kmp->tingkat,
-                                'nilai_kkm' => $kmp->nilai_kkm,
-                                'status_mata_pelajaran' => $kmp->status_mata_pelajaran,
+    //                         return [
+    //                             'kurikulum_mata_pelajaran_id' => $kmp->id,
+    //                             'kurikulum' => $kmp->kurikulum->nama_kurikulum ?? null,
+    //                             'mata_pelajaran' => $kmp->mataPelajaran->nama_pelajaran ?? null,
+    //                             'jurusan_pelajaran' => $kmp->jurusan->nama_jurusan ?? null,
+    //                             'tingkat' => $kmp->tingkat,
+    //                             'nilai_kkm' => $kmp->nilai_kkm,
+    //                             'status_mata_pelajaran' => $kmp->status_mata_pelajaran,
     
-                                'jadwal_pelajaran' => [
-                                    'hari'        => $jadwal->hari,
-                                    'jam_mulai'   => $jadwal->jam_mulai,
-                                    'jam_selesai' => $jadwal->jam_selesai,
-                                    'ruangan'     => $jadwal->ruangan,
-                                    'link_opsional' => $jadwal->link_opsional,
+    //                             'jadwal_pelajaran' => [
+    //                                 'hari'        => $jadwal->hari,
+    //                                 'jam_mulai'   => $jadwal->jam_mulai,
+    //                                 'jam_selesai' => $jadwal->jam_selesai,
+    //                                 'ruangan'     => $jadwal->ruangan,
+    //                                 'link_opsional' => $jadwal->link_opsional,
     
-                                    'guru' => [
-                                        'guru_id'   => $jadwal->guru->id ?? null,
-                                        'nama_guru' => $jadwal->guru->nama ?? null,
-                                    ],
+    //                                 'guru' => [
+    //                                     'guru_id'   => $jadwal->guru->id ?? null,
+    //                                     'nama_guru' => $jadwal->guru->nama ?? null,
+    //                                 ],
     
-                                    'kelas' => $jadwal->kelas->nama_kelas ?? null,
-                                ],
+    //                                 'kelas' => $jadwal->kelas->nama_kelas ?? null,
+    //                             ],
     
-                                'nilai_siswa' => $nilai ? [
-                                    'point_absensi' => $nilai->point_absensi,
-                                    'point_tugas'   => $nilai->point_tugas,
-                                    'point_uts'     => $nilai->point_uts,
-                                    'point_uas'     => $nilai->point_uas,
-                                    'point_ekskul'  => $nilai->point_ekskul,
-                                    'sikap'         => $nilai->sikap,
-                                ] : null,
-                            ];
-                        })->values(),
-                ];
-            })->values();
+    //                             'nilai_siswa' => $nilai ? [
+    //                                 'point_absensi' => $nilai->point_absensi,
+    //                                 'point_tugas'   => $nilai->point_tugas,
+    //                                 'point_uts'     => $nilai->point_uts,
+    //                                 'point_uas'     => $nilai->point_uas,
+    //                                 'point_ekskul'  => $nilai->point_ekskul,
+    //                                 'sikap'         => $nilai->sikap,
+    //                             ] : null,
+    //                         ];
+    //                     })->values(),
+    //             ];
+    //         })->values();
     
-        return ApiResponse::success([
-            'siswa' => [
-                'siswa_id' => $siswa->id,
-                'nisn'     => $siswa->nisn,
-                'nis'      => $siswa->nis,
-                'nama'     => $siswa->nama,
-                'kelas'    => $siswa->kelas->nama_kelas ?? null,
-                'jurusan'  => $siswa->jurusan->nama_jurusan ?? null,
-            ],
-            'tahun_akademik' => $tahunAkademik
-        ], 'Data nilai siswa berhasil diambil');
-    }
+    //     return ApiResponse::success([
+    //         'siswa' => [
+    //             'siswa_id' => $siswa->id,
+    //             'nisn'     => $siswa->nisn,
+    //             'nis'      => $siswa->nis,
+    //             'nama'     => $siswa->nama,
+    //             'kelas'    => $siswa->kelas->nama_kelas ?? null,
+    //             'jurusan'  => $siswa->jurusan->nama_jurusan ?? null,
+    //         ],
+    //         'tahun_akademik' => $tahunAkademik
+    //     ], 'Data nilai siswa berhasil diambil');
+    // }
     
 
     /**
@@ -659,4 +849,33 @@ class DataNilaiSiswaController extends Controller
 
         return ApiResponse::success($siswaRombel, 'Data select dan referensi absensi berhasil diambil');
     }    
+
+    // ✅ untuk leger/index
+    public function dataSelect() {        
+        $data2 = Semester::with('tahunAkademik')->get();
+
+        if ($data2->isEmpty()) {
+            return ApiResponse::error('Not found', 'Belum ada data tahun akademik dan semester');
+        }
+
+        $tahunDanSemester = $data2->groupBy('tahun_akademik_id')
+        ->map(function ($tahunAkademik) {
+            return [
+                'tahun_akademik_id' => $tahunAkademik->first()->tahunAkademik->id,
+                'tahun_akademik'    => $tahunAkademik->first()->tahunAkademik->tahun_akademik,
+                'status'            => $tahunAkademik->first()->tahunAkademik->status,
+                'semester'          => $tahunAkademik->map(function ($taSemester) {
+                    return [
+                        'semester_id'   => $taSemester->id,
+                        'semester'      => $taSemester->semester,
+                        'status'        => $taSemester->status,
+                    ];
+                })->values(),
+            ];
+        })->values();
+
+        return ApiResponse::success([
+            'tahun_dan_smeester'    => $tahunDanSemester,
+        ], 'Data select leger berhasil diambil');
+    }
 }

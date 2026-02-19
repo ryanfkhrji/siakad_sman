@@ -21,7 +21,7 @@ return new class extends Migration
             
             $table->date('hari');             
             
-            $table->enum('status', ['hadir', 'izin', 'sakit', 'alfa']);
+            $table->enum('status', ['hadir', 'izin', 'sakit', 'alpa']);
             
             $table->string('bukti')->nullable();                        
 

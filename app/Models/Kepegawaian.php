@@ -2,6 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\AbsensiPegawai;
+use App\Models\AbsensiPelajaran;
+use App\Models\DataNilaiSiswa;
+use App\Models\JadwalPelajaran;
+use App\Models\PelatihEkskul;
+use App\Models\PembinaEkskul;
+use App\Models\Rapor;
+use App\Models\Rombel;
+use App\Models\WaliRombel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -46,6 +55,11 @@ class Kepegawaian extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function raporDisahkan()
+    {
+        return $this->hasMany(Rapor::class, 'wali_rombel_id');
+    }
     
     public function rombels()
     {

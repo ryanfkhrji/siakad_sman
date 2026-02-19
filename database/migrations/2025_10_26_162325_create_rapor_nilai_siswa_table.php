@@ -21,6 +21,10 @@ return new class extends Migration
             $table->foreignId('kurikulum_mata_pelajaran_id')
                 ->constrained('kurikulum_mata_pelajaran')
                 ->restrictOnDelete();
+
+            $table->foreignId('guru_id')
+                ->constrained('kepegawaians')
+                ->restrictOnDelete();
         
             $table->decimal('nilai_akhir', 5, 2);
             

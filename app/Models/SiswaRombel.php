@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Siswa;
+use App\Models\Rombel;
+use App\Models\TahunAkademik;
+use App\Models\Rapor;
 
 class SiswaRombel extends Model
 {
@@ -24,5 +28,10 @@ class SiswaRombel extends Model
     public function tahunAkademik()
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
+
+    public function rapor()
+    {
+        return $this->hasMany(Rapor::class);
     }
 }

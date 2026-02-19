@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+// use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KepegawaianController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\MataPelajaranController;
@@ -191,9 +191,13 @@ Route::middleware('auth:kepegawaian')->group(function () {
     Route::get('/spa/data-select/siswa/prestasi', [PrestasiController::class, 'dataSelect']);
     
     // ✅ Data Nilai Siswa (belum masuk tahap ini)
-    Route::get('/spa/data-nilai-siswa/select-referensi', [DataNilaiSiswaController::class, 'selectDanReferensi']);   
+    Route::get('/spa/data-select/leger', [DataNilaiSiswaController::class, 'dataSelect']);   
     Route::get('/spa/data-nilai-siswa/leger', [DataNilaiSiswaController::class, 'index']);   
-    Route::apiResource('/spa/data-nilai-siswa', DataNilaiSiswaController::class)->only('show');           
+    Route::get('/spa/data-nilai-siswa/export/leger', [DataNilaiSiswaController::class, 'export']);   
+    
+    Route::get('/spa/data-nilai-siswa/{id}', [DataNilaiSiswaController::class, 'semuaNilaiSatuSiswa']);
+    Route::get('/spa/data-nilai-siswa/cetak/{id}', [DataNilaiSiswaController::class, 'cetakSemuaNilaiSatuSiswa']);
+    Route::get('/spa/data-nilai-siswa/select-referensi', [DataNilaiSiswaController::class, 'selectDanReferensi']);   
     
     // ✅ Keuangan
     Route::delete('/spa/keuangan/destroy/{id?}', [KeuanganController::class, 'destroyData']);

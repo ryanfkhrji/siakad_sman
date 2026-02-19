@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Kurikulum;
 use App\Helpers\ApiResponse;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+// use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class KurikulumController extends Controller
 {

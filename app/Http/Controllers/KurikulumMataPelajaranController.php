@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\KurikulumMataPelajaran;
-use App\Models\Kurikulum;
-use App\Models\MataPelajaran;
-use App\Models\Jurusan;
-use App\Models\TahunAkademik;
-use Illuminate\Validation\Rule;
 use App\Helpers\ApiResponse;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Kurikulum;
+use App\Models\KurikulumMataPelajaran;
+use App\Models\MataPelajaran;
+// use App\Models\Jurusan;
+// use App\Models\TahunAkademik;
+// use Illuminate\Validation\Rule;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+// use Illuminate\Support\Facades\Validator;
 
 class KurikulumMataPelajaranController extends Controller
 {
@@ -62,6 +63,7 @@ class KurikulumMataPelajaranController extends Controller
                                 'tingkat' => $perTingkat->first()->tingkat,
                                 'mata_pelajaran' => $perTingkat->map(function ($mapel) {
                                     return [
+                                        'kurikulum_mata_pelajaran_id' => $mapel->id,
                                         'mata_pelajaran_id' => $mapel->mataPelajaran->id,
                                         'nama_pelajaran'    => $mapel->mataPelajaran->nama_pelajaran,
                                         'kode_mapel_diknas' => $mapel->mataPelajaran->kode_mapel_diknas,

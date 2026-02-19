@@ -18,6 +18,10 @@ return new class extends Migration
                 ->constrained('siswas')
                 ->cascadeOnDelete();
         
+            $table->foreignId('siswa_rombel_id')
+                ->constrained('siswa_rombel')
+                ->cascadeOnDelete();
+        
             $table->foreignId('tahun_akademik_id')
                 ->constrained('tahun_akademik')
                 ->restrictOnDelete();
@@ -28,7 +32,7 @@ return new class extends Migration
         
             // wali rombel yang mengesahkan
             $table->foreignId('wali_rombel_id')
-                ->constrained('kepegawaians')
+                ->constrained('wali_rombel')
                 ->restrictOnDelete();
 
             $table->enum('jenis_rapor', ['PTS', 'PAS'])
@@ -54,7 +58,8 @@ return new class extends Migration
             $table->unique([
                 'siswa_id',
                 'tahun_akademik_id',
-                'semester_id'
+                'semester_id',
+                'jenis_rapor'
             ], 'unik');
         });
            

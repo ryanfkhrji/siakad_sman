@@ -3,18 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\AbsensiSiswa;
-use App\Models\SiswaJadwalPelajaran;
-use App\Models\SiswaRombel;
+use App\Models\TahunAkademik;
+use App\Models\SiswaKelas;
+// use App\Models\SiswaJadwalPelajaran;
+// use App\Models\SiswaRombel;
+use Illuminate\Validation\ValidationException;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\ApiResponse;
-use Illuminate\Support\Facades\Validator;
-use File;
+// use Illuminate\Support\Facades\Validator;
+// use File;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Response;
+// use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use App\Exports\AbsensiSiswaExport;
 
@@ -68,8 +71,8 @@ class AbsensiSiswaController extends Controller
                             $totalSakitTahun = $ab
                                 ->where('status', 'sakit')
                                 ->count();
-                            $totalAlfaTahun = $ab
-                                ->where('status', 'alfa')
+                            $totalAlpaTahun = $ab
+                                ->where('status', 'alpa')
                                 ->count();
 
                             return [
@@ -79,7 +82,7 @@ class AbsensiSiswaController extends Controller
                                 'hadir_pertahun' => $totalHadirTahun ?? null,
                                 'izin_pertahun'  => $totalIzinTahun ?? null,
                                 'sakit_pertahun' => $totalSakitTahun ?? null,
-                                'alfa_pertahun'  => $totalAlfaTahun ?? null,
+                                'alpa_pertahun'  => $totalAlpaTahun ?? null,
                             ];
                         })->values(),
                     ];
@@ -124,13 +127,13 @@ class AbsensiSiswaController extends Controller
                 // @Ryan...Yang kelas, jadwal pelajaran, dan tahun akademik terisi otomatis
                 'kelas_id' => 'required|exists:kelas,id', // dari SiswaJadwalPelajaranController::showAllJadwalSendiri
                 'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajarans,id', // dari SiswaJadwalPelajaranController::showAllJadwalSendiri
-                'status' => 'required|in:hadir,izin,sakit,alfa',
+                'status' => 'required|in:hadir,izin,sakit,alpa',
                 'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'tahun_akademik_id' => 'required|exists:tahun_akademik,id' // dari SiswaJadwalPelajaranController::showAllJadwalSendiri
                 
             ],[
                 'status.required' => 'Status wajib diisi',
-                'status.in' => 'Pilihan hanya hadir, izin, sakit, alfa',
+                'status.in' => 'Pilihan hanya hadir, izin, sakit, alpa',
                 'bukti.image' => 'Format bukti wajib berupa gambar atau foto',                
                 'bukti.mimes' => 'Format bukti wajib berupa jpeg, png, jpg',                
                 'bukti.max' => 'Ukuran foto bukti maksimal 2 MB',                
@@ -215,7 +218,7 @@ class AbsensiSiswaController extends Controller
                 'siswa_id' => 'required|exists:siswa,id', // ini manual dipilih oleh guru
                 'kelas_id' => 'required|exists:kelas,id', // otomatis
                 'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajarans,id', // otomatis
-                'status' => 'required|in:hadir,izin,sakit,alfa', // Ini manual dipilih oleh guru
+                'status' => 'required|in:hadir,izin,sakit,alpa', // Ini manual dipilih oleh guru
                 'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // ini juga manual
                 'tahun_akademik_id' => 'required|exists:tahun_akademik,id' // otomatis
                 
@@ -227,7 +230,7 @@ class AbsensiSiswaController extends Controller
                 'jadwal_pelajaran_id.required' => 'Jadwal pelajaran wajib diisi',
                 'jadwal_pelajaran_id.exists' => 'Jadwal pelajaran tidak ditemukan',
                 'status.required' => 'Status wajib diisi',
-                'status.in' => 'Pilihan hanya hadir, izin, sakit, alfa',
+                'status.in' => 'Pilihan hanya hadir, izin, sakit, alpa',
                 'bukti.image' => 'Format bukti wajib berupa gambar atau foto',                
                 'bukti.mimes' => 'Format bukti wajib berupa jpeg, png, jpg',                
                 'bukti.max' => 'Ukuran foto bukti maksimal 2 MB',                
@@ -351,7 +354,7 @@ class AbsensiSiswaController extends Controller
                                         'hadir' => $absenTahun->where('status', 'hadir')->count(),
                                         'izin'  => $absenTahun->where('status', 'izin')->count(),
                                         'sakit' => $absenTahun->where('status', 'sakit')->count(),
-                                        'alfa'  => $absenTahun->where('status', 'alfa')->count(),
+                                        'alpa'  => $absenTahun->where('status', 'alpa')->count(),
                                     ],
 
                                     'semester' => $absenTahun
@@ -371,7 +374,7 @@ class AbsensiSiswaController extends Controller
                                                     'hadir' => $absenSemester->where('status', 'hadir')->count(),
                                                     'izin'  => $absenSemester->where('status', 'izin')->count(),
                                                     'sakit' => $absenSemester->where('status', 'sakit')->count(),
-                                                    'alfa'  => $absenSemester->where('status', 'alfa')->count(),
+                                                    'alpa'  => $absenSemester->where('status', 'alpa')->count(),
                                                 ],
 
                                                 'mata_pelajarans' => $absenSemester
@@ -459,7 +462,7 @@ class AbsensiSiswaController extends Controller
                                     'hadir' => $itemsSemester->where('status', 'hadir')->count(),
                                     'izin'  => $itemsSemester->where('status', 'izin')->count(),
                                     'sakit' => $itemsSemester->where('status', 'sakit')->count(),
-                                    'alfa'  => $itemsSemester->where('status', 'alfa')->count(),
+                                    'alpa'  => $itemsSemester->where('status', 'alpa')->count(),
                                 ],
     
                                 'absensi' => $itemsSemester->map(function ($abs) {
@@ -531,11 +534,11 @@ class AbsensiSiswaController extends Controller
         }     
         
         $validated = $request->validate([                
-            'status' => 'sometimes|required|in:hadir,izin,sakit,alfa',
+            'status' => 'sometimes|required|in:hadir,izin,sakit,alpa',
             'bukti' => 'sometimes|nullable|image|mimes:jpeg,png,jpg|max:2048'
         ], [                        
             'status.required' => 'Status wajib diisi',
-            'status.in' => 'Pilihan hanya hadir, izin, sakit, alfa',
+            'status.in' => 'Pilihan hanya hadir, izin, sakit, alpa',
             'bukti.image' => 'Format bukti wajib berupa gambar atau foto',                
             'bukti.mimes' => 'Format bukti wajib berupa jpeg, png, jpg',                
             'bukti.max' => 'Ukuran foto bukti maksimal 2 MB',

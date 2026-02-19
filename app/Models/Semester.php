@@ -4,6 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Rapor;
+use App\Models\TahunAkademik;
+use App\Models\DataBerkas;
+use App\Models\JadwalPelajaran;
+use App\Models\AbsensiPegawai;
+use App\Models\AbsensiSiswa;
 
 class Semester extends Model
 {
@@ -11,6 +17,11 @@ class Semester extends Model
 
     protected $table = 'semester';
     protected $guarded = ['id'];
+
+    public function rapor()
+    {
+        return $this->hasMany(Rapor::class);
+    }
 
     public function tahunAkademik()
     {
