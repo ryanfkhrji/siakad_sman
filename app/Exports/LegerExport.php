@@ -22,6 +22,8 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+
 class LegerExport implements WithMultipleSheets
 {
     protected $tahunAkademik;
@@ -203,9 +205,11 @@ class LegerExport implements WithMultipleSheets
                 public function collection()
                 {
                     $header = ['No', 'NAMA SISWA', 'NISN', 'NIS'];
+
                     foreach ($this->mapelList as $mapel) {
                         $header[] = $mapel;
                     }
+
                     $header = array_merge($header, [
                         'Total',
                         'Rata-rata',
@@ -216,30 +220,40 @@ class LegerExport implements WithMultipleSheets
                         'Izin',
                         'Alpa'
                     ]);
+
                     $siswaRombel = SiswaRombel::with('siswa')
                         ->where('rombel_id', $this->rombel->id)
                         ->where('tahun_akademik_id', $this->tahunAkademik->id)
                         ->get();
+
                     $rows = [];
+
                     foreach ($siswaRombel as $sr) {
+
                         $siswaId = (int) $sr->siswa_id;
                         $nilaiSiswa = $this->allNilai[$siswaId] ?? collect();
+
                         $nilaiMapel = [];
                         $total = 0;
-                        foreach ($this->mapelList as $mapel) {                        
+
+                        foreach ($this->mapelList as $mapel) {
+
                             $dataNilai = $nilaiSiswa->firstWhere(
                                 'kurikulumMataPelajaran.mataPelajaran.nama_pelajaran',
                                 $mapel
                             );
+
                             $nilai = $dataNilai && $dataNilai->nilai_akhir !== null
                                 ? $dataNilai->nilai_akhir
                                 : 0;
+
                             $nilaiMapel[] = $nilai;
                             $total += $nilai;
                         }
+
                         $rerata = count($this->mapelList)
                             ? round($total / count($this->mapelList), 2)
-                            : 0;                        
+                            : 0;
 
                         $abs = $this->allAbsensi[$siswaId] ?? null;
 
@@ -247,10 +261,9 @@ class LegerExport implements WithMultipleSheets
                         $sakit = $abs->sakit ?? 0;
                         $izin  = $abs->izin ?? 0;
                         $alpa  = $abs->alpa ?? 0;
-                            
 
-                        // --- CARI PAR DENGAN AMAN ---
                         $parRank = $this->parRanking[$siswaId] ?? '-';
+
                         $rows[] = [
                             'nama' => $sr->siswa->nama,
                             'nisn' => $sr->siswa->nisn,
@@ -265,32 +278,39 @@ class LegerExport implements WithMultipleSheets
                             'alpa' => $alpa,
                         ];
                     }
-                    // Ranking kelas per rombel
-                    // $sortedRows = collect($rows)->sortByDesc('total')->values();
-                    // Urut berdasarkan abjad nama
+
+                    // Urut berdasarkan nama
                     $sortedRows = collect($rows)->sortBy('nama')->values();
+
                     $finalRows = [];
+
                     $lastTotal = null;
                     $lastRank  = 0;
                     $position  = 0;
+
                     foreach ($sortedRows as $index => $row) {
+
                         $position++;
+
                         if ($lastTotal === $row['total']) {
                             $rankingKelas = $lastRank;
                         } else {
                             $rankingKelas = $position;
                             $lastRank = $position;
                             $lastTotal = $row['total'];
-                        }                        
+                        }
+
                         $rowData = [
                             $index + 1,
                             $row['nama'],
                             $row['nisn'],
                             $row['nis'],
                         ];
+
                         foreach ($row['nilai_mapel'] as $n) {
                             $rowData[] = $n;
                         }
+
                         $rowData[] = $row['total'];
                         $rowData[] = $row['rerata'];
                         $rowData[] = $rankingKelas;
@@ -299,9 +319,54 @@ class LegerExport implements WithMultipleSheets
                         $rowData[] = $row['sakit'];
                         $rowData[] = $row['izin'];
                         $rowData[] = $row['alpa'];
+
                         $finalRows[] = $rowData;
                     }
+
+                    // ==========================
+                    // HITUNG RERATA / MAX / MIN
+                    // ==========================
+
+                    $mapelCount = count($this->mapelList);                    
+
+                    $rerataRow = ['Nilai Rerata', '', '', ''];
+                    $maxRow    = ['Nilai Maksimal', '', '', ''];
+                    $minRow    = ['Nilai Minimal', '', '', ''];
+
+                    for ($i = 0; $i < $mapelCount; $i++) {
+
+                        $columnValues = collect($sortedRows)
+                            ->pluck("nilai_mapel.$i");
+
+                        $rerataRow[] = $columnValues->count()
+                            ? round($columnValues->avg(), 2)
+                            : 0;
+
+                        $maxRow[] = $columnValues->count()
+                            ? $columnValues->max()
+                            : 0;
+
+                        $minRow[] = $columnValues->count()
+                            ? $columnValues->min()
+                            : 0;
+                    }
+
+                    // Kosongkan kolom Total s.d Alpa
+                    $extraCols = 8; // Total, Rata2, Kelas, PAR, Hadir, Sakit, Izin, Alpa
+
+                    for ($i = 0; $i < $extraCols; $i++) {
+                        $rerataRow[] = '';
+                        $maxRow[]    = '';
+                        $minRow[]    = '';
+                    }
+
                     array_unshift($finalRows, $header);
+
+                    // Tambahkan baris statistik di bawah
+                    $finalRows[] = $rerataRow;
+                    $finalRows[] = $maxRow;
+                    $finalRows[] = $minRow;
+
                     return collect($finalRows);
                 }
                 public function registerEvents(): array
@@ -371,7 +436,10 @@ class LegerExport implements WithMultipleSheets
                             // Merge
                             
 
-                            $highestColumn = $sheet->getHighestColumn();
+                            // $highestColumn = $sheet->getHighestColumn();
+                            // $highestRow = $sheet->getHighestRow();
+
+                            $highestColumn = $alpaCol; // STOP sampai kolom Alpa saja
                             $highestRow = $sheet->getHighestRow();
 
                             // Auto width semua kolom
@@ -414,8 +482,12 @@ class LegerExport implements WithMultipleSheets
                             ->setRGB('A9D08E');
 
                             // Border tebal luar tabel
-                            $outerRange = "A7:{$highestColumn}{$highestRow}";
-                            $sheet->getStyle($outerRange)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THICK);
+                            // $outerRange = "A7:{$highestColumn}{$highestRow}";
+                            $outerRange = "A7:{$alpaCol}{$highestRow}";
+                            // $sheet->getStyle($outerRange)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THICK);
+                            $sheet->getStyle($outerRange)->getBorders()->getOutline()
+                            ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK)
+                            ->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF000000'));
 
 
                             // ===============================
@@ -472,7 +544,10 @@ class LegerExport implements WithMultipleSheets
 
                             // --- Borders ---
                             $tableRange = "A7:{$highestColumn}{$highestRow}";
-                            $sheet->getStyle($tableRange)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->setColor(new Color('FF000000'));
+                            // $sheet->getStyle($tableRange)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->setColor(new Color('FF000000'));
+                            $sheet->getStyle($tableRange)->getBorders()->getAllBorders()
+                            ->setBorderStyle(Border::BORDER_THIN)
+                            ->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF000000'));
                             $sheet->getStyle($tableRange)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                             // --- FrozenPane ---
                             // $sheet->freezePane('A8');
@@ -482,8 +557,97 @@ class LegerExport implements WithMultipleSheets
                             $sheet->getColumnDimension('B')->setWidth(25); 
                             $sheet->getColumnDimension('C')->setWidth(15); 
                             $sheet->getColumnDimension('D')->setWidth(15);
+
+                            // Bawah rerata
+                            // ===========================================
+                            // MERGE KOLOM A - D (Rerata, Max, Min) & BOLD
+                            // ===========================================
+                            $highestRow = $sheet->getHighestRow();
+
+                            $rerataRowNum = $highestRow - 2;
+                            $maxRowNum    = $highestRow - 1;
+                            $minRowNum    = $highestRow;
+
+                            // Merge Columns A to D
+                            $sheet->mergeCells("A{$rerataRowNum}:D{$rerataRowNum}");
+                            $sheet->mergeCells("A{$maxRowNum}:D{$maxRowNum}");
+                            $sheet->mergeCells("A{$minRowNum}:D{$minRowNum}");
+
+                            // Styling Bold dan Center
+                            $sheet->getStyle("A{$rerataRowNum}:D{$rerataRowNum}")->getFont()->setBold(true);
+                            $sheet->getStyle("A{$maxRowNum}:D{$maxRowNum}")->getFont()->setBold(true);
+                            $sheet->getStyle("A{$minRowNum}:D{$minRowNum}")->getFont()->setBold(true);
+
+                            $sheet->getStyle("A{$rerataRowNum}:D{$rerataRowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                            $sheet->getStyle("A{$maxRowNum}:D{$maxRowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                            $sheet->getStyle("A{$minRowNum}:D{$minRowNum}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                            // ===========================================
+                            // BORDER STOP AT MAPEL COLUMNS ONLY
+                            // ===========================================
+                            $lastRow = $sheet->getHighestRow();
+                            $rerataRowNum = $lastRow - 2;
+                            $maxRowNum    = $lastRow - 1;
+                            $minRowNum    = $lastRow;
+
+                            // 1. Tambahkan border bawah ( Thin ) pada kolom A sampai akhir Mapel
+                            $sheet->getStyle("A{$rerataRowNum}:{$endMapelCol}{$rerataRowNum}")
+                                ->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+                            $sheet->getStyle("A{$maxRowNum}:{$endMapelCol}{$maxRowNum}")
+                                ->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+                            $sheet->getStyle("A{$minRowNum}:{$endMapelCol}{$minRowNum}")
+                                ->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+                            // 2. Hapus border bawah pada kolom setelah Mapel (Total, Rata-rata, dll)
+                            $rightCols = [
+                                $totalCol, 
+                                $rerataCol, 
+                                $rankKelasCol, 
+                                $parCol, 
+                                $hadirCol, 
+                                $sakitCol, 
+                                $izinCol, 
+                                $alpaCol
+                            ];                            
+
+                            // 2. Hapus border kiri & kanan pada kolom setelah Mapel (Total, Rata2, dll)
+                            foreach ($rightCols as $col) {
+                                // Hapus Bottom (supaya rapi)
+                                $sheet->getStyle("{$col}{$maxRowNum}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                                $sheet->getStyle("{$col}{$minRowNum}")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+
+                                $sheet->getStyle("{$col}{$rerataRowNum}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                                $sheet->getStyle("{$col}{$maxRowNum}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                                $sheet->getStyle("{$col}{$minRowNum}")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+
+                                // Hapus Left (Ini adalah border kanan dari kolom mapel/Sebelumnya)
+                                $sheet->getStyle("{$col}{$rerataRowNum}")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                                $sheet->getStyle("{$col}{$maxRowNum}")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                                $sheet->getStyle("{$col}{$minRowNum}")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+
+                                // Hapus Right
+                                $sheet->getStyle("{$col}{$rerataRowNum}")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                                $sheet->getStyle("{$col}{$maxRowNum}")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                                $sheet->getStyle("{$col}{$minRowNum}")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+                            }
+                            
+                            // Biar ga kepotong pas di print
+                            $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+                            $sheet->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_A4);
+
+                            // INI YANG PENTING 👇
+                            $sheet->getPageSetup()->setFitToWidth(1);
+                            $sheet->getPageSetup()->setFitToHeight(0);
+
+                            // Optional (biar lebih rapih)
+                            $sheet->getPageMargins()->setTop(0.5);
+                            $sheet->getPageMargins()->setBottom(0.5);
+                            $sheet->getPageMargins()->setLeft(0.5);
+                            $sheet->getPageMargins()->setRight(0.5);
                         }
-                    ];
+                    ];                    
                 }
             };
         }
@@ -493,5 +657,5 @@ class LegerExport implements WithMultipleSheets
 
 
 /**
- * ! tambahin rerata, maksimal, minimal di bawah 
+ * ! coba satu kelas 3 siswa dan 3 mapel
  */
