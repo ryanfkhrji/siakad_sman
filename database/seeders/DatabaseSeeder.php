@@ -3515,7 +3515,7 @@ class DatabaseSeeder extends Seeder
             [
                 // 2
                 'siswa_id' => 2, // Winton
-                'rombel_id' => 2,  // XI-B-1
+                'rombel_id' => 2,  // X-B-1
                 'jadwal_pelajaran_id' => 2, // Indonesia
                 'hari' => '2023-12-02',
                 'status' => 'izin',

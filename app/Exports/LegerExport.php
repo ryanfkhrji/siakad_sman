@@ -278,28 +278,41 @@ class LegerExport implements WithMultipleSheets
                             'alpa' => $alpa,
                         ];
                     }
-
-                    // Urut berdasarkan nama
-                    $sortedRows = collect($rows)->sortBy('nama')->values();
-
-                    $finalRows = [];
+                    
+                    // STEP 1: Urutkan berdasarkan total untuk hitung ranking
+                    $rankingRows = collect($rows)
+                    ->sortByDesc('total')
+                    ->values();
 
                     $lastTotal = null;
                     $lastRank  = 0;
                     $position  = 0;
 
-                    foreach ($sortedRows as $index => $row) {
-
+                    $rankingRows = $rankingRows->map(function ($row) use (&$lastTotal, &$lastRank, &$position) {
                         $position++;
 
-                        if ($lastTotal === $row['total']) {
-                            $rankingKelas = $lastRank;
+                        if ($lastTotal !== null && $row['total'] == $lastTotal) {
+                            $rank = $lastRank;
                         } else {
-                            $rankingKelas = $position;
+                            $rank = $position;
                             $lastRank = $position;
                             $lastTotal = $row['total'];
                         }
 
+                        $row['ranking_kelas'] = $rank;
+
+                        return $row;
+                    });
+
+                    // STEP 2: Urutkan kembali berdasarkan nama A-Z
+                    $sortedRows = $rankingRows
+                    ->sortBy('nama')
+                    ->values();
+
+                    $finalRows = [];
+
+                    foreach ($sortedRows as $index => $row) {                        
+                    
                         $rowData = [
                             $index + 1,
                             $row['nama'],
@@ -313,7 +326,8 @@ class LegerExport implements WithMultipleSheets
 
                         $rowData[] = $row['total'];
                         $rowData[] = $row['rerata'];
-                        $rowData[] = $rankingKelas;
+                        // $rowData[] = $rankingKelas;
+                        $rowData[] = $row['ranking_kelas'];
                         $rowData[] = $row['par_rank'];
                         $rowData[] = $row['hadir'];
                         $rowData[] = $row['sakit'];
@@ -654,8 +668,3 @@ class LegerExport implements WithMultipleSheets
         return $sheets;
     }
 }
-
-
-/**
- * ! coba satu kelas 3 siswa dan 3 mapel
- */
