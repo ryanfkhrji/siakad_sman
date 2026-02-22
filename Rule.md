@@ -17,12 +17,15 @@ SPA:
 
 - Cache Cleaner
 
+--------------------------------------------------------------------------------
 
 - Register
 
+--------------------------------------------------------------------------------
 
 - Login
 
+--------------------------------------------------------------------------------
 
 - Get Detail Diri
   - Logout
@@ -30,38 +33,42 @@ SPA:
   - Update Diri
   - Lupa Pass
 
+--------------------------------------------------------------------------------
 
 - identitas sekolah
   - Create
-  - Get All
-  - Get Detail
   - Update
   - Delete
+  - Get All
+  - Get Detail
 
+--------------------------------------------------------------------------------
 
 - Gedung
   - Create
-  - Get All
-  - Get Detail
   - Update
   - Delete
+  - Get All
+  - Get Detail
 
+--------------------------------------------------------------------------------
 
 - Ruangan
   - Create
-  - Get All
-  - Get Detail
   - Update
   - Delete
+  - Get All
+  - Get Detail
 
+--------------------------------------------------------------------------------
 
-- Kepegawiaan
+- Kepegawaian
   - Guru
-    - Create
     - Ubah Password
-    - Get All
+    - Create
     - Update
     - Delete
+    - Get All
     - Get Detail => kasih aja button di detail buat ngelink ke bawah ini
       - Wali rombel                     : histori menjadi wali
       - Guru jadwal pelajaran           : histori jadwal
@@ -71,30 +78,31 @@ SPA:
       - Pelatih ekstrakurikuler         : Histori melatih
 
   - Selain Guru
-    - Create
     - Ubah Password
-    - Get All
+    - Create
     - Update
     - Delete
+    - Get All
     - Get Detail => kasih aja button di detail buat ngelink ke bawah ini      
       - Absensi pegawai                 : show satu guru dan absennya      
       - Pembina eksktrakurikuler        : Histori membina
-      - Pelatih ekstrakurikuler         : Histori melatih
-        
+      - Pelatih ekstrakurikuler         : Histori melatih        
 
+--------------------------------------------------------------------------------
 
 - Penerimaan Siswa Baru
   - CRUD
   - Export
   - Import
 
+--------------------------------------------------------------------------------
 
 - Siswa
+  - Ubah Pass
   - Create
-  - Get All
   - Update
   - Delete
-  - Ubah Pass
+  - Get All
   - Get Detail => Kasih button di detail buat ngelink ke bawah ini
     - Siswa rombel                    : Histori rombel (Data select ga dipake + dihapus)
     - Siswa jadwal pelajaran          : Get detail siswa dan jadwalnya
@@ -103,70 +111,129 @@ SPA:
     - Prestasi                        : Histori prestasi
     - Data Nilai Siswa                : Cetak satu siswa dan semua nilainya (Ini belum dibuat)
 
+--------------------------------------------------------------------------------
 
 - Jurusan
-  - CRUD
-
-
-- Kelas
   - Create
-  - Get All
   - Update
   - Delete
-  - Get Detail:
-    - Rombel: rombel jangan buat menu lagi, menu rombel ada di detail kelas
-      - Create (karna kita udah ada di detail kelas, maka pake aja id nya sebagai data select)
-      - Update
-      - Delete
-      - Get Detail
+  - Get All
+  - Get Detail
 
+--------------------------------------------------------------------------------
+
+- Kelas
+  - CRUD
+  - Get Detail (halaman baru untuk show detail kelas):
+    - Kasih button create rombel di halaman detail kelas ini ==> Rombel: Create
+    - Masing masing rombel dikasih button update, delete, detail ==> Rombel: Update, Delete, Detail Tahun Aktif
+    - Saat klik detail rombel maka masuk ke halaman **(detail rombel)** ==> Rombel: Detail Tahun Aktif (diliat ini hasil runnya gimana)
+      - Kalo belum ada data, kosongin halaman atau beri pesan "belum ada data pada tahun ini"
+      - mau ada data atau engga, buat button Create wali di halaman ini **(detail rombel)** ==> Wali Rombel: Create
+        - after create wali nanti muncul list wali pada halaman ini **(detail rombel)**, kasih button update dan delete
+      - Mau ada data atau engga, buat button create siswa rombel sebelah create wali di halaman ini **(detail rombel)** ==> Siswa Rombel: Create
+        - After create siswa nanti muncul list siswa pada halaman ini, kasih button update dan delete masing-masingnya
+      - Mau ada data atau engga, buat button create guru jadwal pelajaran di halaman ini ==> Guru Jadwal Pelajaran: create
+        - After create jadwal nanti muncul list jadwal pada halaman ini, kasih button update dan delete
+      - Mau ada data atau engga, buat button sebelah create jadwal untuk lihat histori per periode ==> Rombel: Detail Histori
+      - Rombel: Get all, nanti bakal dihapus, jadi jangan digunakan
+      - Guru Jadwal Pelajaran: Get all jangan digunakan
+
+--------------------------------------------------------------------------------
 
 - Kurikulum
 
+--------------------------------------------------------------------------------
 
 - Mata Pelajaran
 
+--------------------------------------------------------------------------------
 
 - Tahun Akademik
 
+--------------------------------------------------------------------------------
 
 - Semester
 
+--------------------------------------------------------------------------------
 
 - Kurikulum_mata_pelajaran
 
+--------------------------------------------------------------------------------
 
-- Kompetensi => Kasih button di detail buat ngelink ke bawah ini
-        Atp_master : Get detail (get all ga dipake)
+- Kompetensi:
+  - Create
+  - Update
+  - Delete
+  - Get All
+  - Get Detail => Kasih button di detail buat ngelink ke bawah ini
+    - Atp_master : Get detail
 
+--------------------------------------------------------------------------------
+
+- ATP Master:
+  - Create
+  - Update
+  - Delete
+  - Get All
+  - Get Detail
+
+--------------------------------------------------------------------------------
+
+⚠️ Wali Rombel
+
+--------------------------------------------------------------------------------
+
+⚠️ Siswa Rombel
+
+--------------------------------------------------------------------------------
 
 - Guru jadwal pelajaran
 
+--------------------------------------------------------------------------------
 
 - Siswa jadwal pelajaran
 
+--------------------------------------------------------------------------------
 
 - Alur Tujuan Pembelajaran
 
+--------------------------------------------------------------------------------
 
 - Absensi Pegawai (yang histori absensi jangan, karna di guru udah)
 
+--------------------------------------------------------------------------------
 
 - Absensi Guru - Pelajaran (yang histori jangan)
 
+--------------------------------------------------------------------------------
 
 - Absensi siswa - Pelajaran (yang histori jangan)
 
+--------------------------------------------------------------------------------
 
 - Ekstrakurikuler    
 
+--------------------------------------------------------------------------------
+
+⚠️ Pembina Ekskul
+
+--------------------------------------------------------------------------------
+
+⚠️ Pelatih Ekskul
+
+--------------------------------------------------------------------------------
+
+⚠️ Siswa Ekskul
+
+--------------------------------------------------------------------------------
 
 - Prestasi
 
 
 
 
-
+<!-- masih cek mana aja menu dan sub menu (misal guru jadwal pelajaran itu masuk sub menu tapi jadi menu juga apa engga) -->
 
 
 
@@ -175,8 +242,17 @@ SPA:
 Hiraukan yang dibawah ini (cuma catatan)
 
 Hapus:
-- Rombel    :   Get All : http://127.0.0.1:8000/api/spa/rombel
-                Create  : Data select kelas dihapus
+- Rombel        :   Get All     : http://127.0.0.1:8000/api/spa/rombel
+                    Create      : Data select kelas dihapus karna posisi create ada di detail kelas
+
+- Wali Rombel   :   Data Select : Rombel dihapus karna posisi create sudah ada di detail tahun aktif rombel
+ 
+- Siswa Rombel  :   Data Select : Rombel dihapus karna posisi create sudah ada di detail tahun aktif rombel
+  
+- Guru - Jadwal :   Data Select : Rombel dihapus karna posisi create sudah ada di detail tahun aktif rombel
+
+
+
 
 Ubah:
-- Kelas     :   ✅ Get Detail
+- Kelas         :   ✅ Get Detail

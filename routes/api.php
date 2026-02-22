@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 // use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KepegawaianController;
@@ -130,6 +130,7 @@ Route::middleware('auth:kepegawaian')->group(function () {
     
     // ✅☑️ CRUD rombel
     Route::apiResource('/spa/rombel', RombelController::class);    
+    Route::get('/spa/rombel/aktif/{id}', [RombelController::class, 'dataTahunAktif']);       
     Route::get('/spa/data-select/rombel', [RombelController::class, 'dataSelect']);       
 
     // ✅☑️ crud wali rombel
