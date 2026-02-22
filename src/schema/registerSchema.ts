@@ -61,7 +61,7 @@ export const registerKepegawaianSchema = z
       .regex(/^\S*$/, "Password tidak boleh mengandung spasi"),
     confirmPassword: z.string().trim().min(1, "Konfirmasi password wajib diisi"),
     keterangan: z.string().trim().optional(),
-    status: z.string().trim().optional(),
+    // status: z.string().trim().optional(),
     role: z.enum(["super_admin", "kepsek", "guru", "tu", "staff"]),
   })
   .refine((data) => data.password === data.confirmPassword, {

@@ -40,9 +40,10 @@ export default function RegisterKepegawaian() {
       const payload = {
         nama: data.nama,
         nip: data.nip,
+        nuptk: data.nuptk,
         email: data.email,
         keterangan: data.keterangan || null,
-        status: data.status || null,
+        // status: data.status || null,
         password: data.password,
         password_confirmation: data.confirmPassword,
         role: data.role,
@@ -180,6 +181,34 @@ export default function RegisterKepegawaian() {
             </label>
           </div>
 
+          {/* NUPTK */}
+          <div className="mb-6">
+            <label className="block font-semibold">
+              NUPTK
+              <input
+                {...register("nuptk")}
+                type="text"
+                inputMode="numeric"
+                maxLength={50}
+                placeholder="cth: 123456789098765432"
+                className="border p-2 w-full mt-2 rounded"
+                autoComplete="off"
+                onKeyPress={(e) => {
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                onPaste={(e) => {
+                  const pasteData = e.clipboardData.getData("text");
+                  if (!/^[0-9]+$/.test(pasteData)) {
+                    e.preventDefault();
+                  }
+                }}
+              />
+              {errors.nuptk && <p className="text-red-500 text-sm mt-1">{errors.nuptk.message}</p>}
+            </label>
+          </div>
+
           <div className="mb-6">
             <label htmlFor="nama" className="block font-semibold text-foreground">
               Nama Lengkap
@@ -196,13 +225,13 @@ export default function RegisterKepegawaian() {
             </label>
           </div>
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <label htmlFor="status" className="block font-semibold text-foreground">
               Status
               <input {...register("status")} type="text" name="status" placeholder="cth: Aktif" className="border p-2 w-full mt-2 rounded" />
               {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
             </label>
-          </div>
+          </div> */}
 
           <div className="mb-6">
             <label htmlFor="keterangan" className="block font-semibold text-foreground">

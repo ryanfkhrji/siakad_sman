@@ -4,7 +4,7 @@ import { z } from "zod";
 import api from "../../api/axios";
 import { registerSiswaSchema } from "../../schema/registerSchema";
 import Swal from "sweetalert2";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,7 +13,6 @@ import PageTitle from "@/components/PageTitle";
 import LogoSekolah from "@/assets/logo-sekolah-42.png";
 import { endpoints } from "../../api/endpoints";
 import type { AxiosError } from "axios";
-import type { Kelas, Jurusan } from "@/types";
 import Footer from "../Footer";
 
 type FormData = z.infer<typeof registerSiswaSchema>;
@@ -33,34 +32,7 @@ export default function RegisterSiswa() {
 
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
-  const [kelasList, setKelasList] = useState<Kelas[]>([]);
-  const [jurusanList, setJurusanList] = useState<Jurusan[]>([]);
 
-  // Ambil data kelas & jurusan dari backend
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-
-        const [kelasRes, jurusanRes] = await Promise.all([api.get(endpoints.kelas.index), api.get(endpoints.jurusan.index)]);
-
-        setKelasList(kelasRes.data.data || []);
-        setJurusanList(jurusanRes.data.data || []);
-      } catch (error) {
-        console.error("Gagal fetch kelas atau jurusan:", error);
-        Swal.fire({
-          title: "Gagal Memuat Data",
-          text: "Tidak dapat memuat data kelas atau jurusan.",
-          icon: "error",
-          confirmButtonColor: "#DC2626",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // 🔹 Fungsi submit form
   const onSubmit = async (data: FormData) => {
@@ -72,8 +44,6 @@ export default function RegisterSiswa() {
         email: data.email,
         nisn: data.nisn,
         nis: data.nis,
-        kelas_id: Number(data.kelas),
-        jurusan_id: Number(data.jurusan),
         password: data.password,
         password_confirmation: data.confirmPassword,
       };
@@ -293,42 +263,6 @@ export default function RegisterSiswa() {
               Email
               <input {...register("email")} type="text" name="email" placeholder="cth: example@gmail.com" className="border p-2 w-full mt-2 rounded" />
               {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
-            </label>
-          </div>
-
-          {/* Kelas */}
-          <div className="mb-6">
-            <label className="block font-semibold text-foreground">
-              Kelas
-              <select {...register("kelas")} className="border p-2 w-full rounded mt-2" defaultValue="">
-                <option value="" disabled>
-                  Pilih Kelas
-                </option>
-                {kelasList.map((k) => (
-                  <option key={k.id} value={k.id}>
-                    {k.nama_kelas} ({k.jam_masuk})
-                  </option>
-                ))}
-              </select>
-              {errors.kelas && <p className="text-red-500 text-sm">{errors.kelas.message}</p>}
-            </label>
-          </div>
-
-          {/* Jurusan */}
-          <div className="mb-6">
-            <label className="block font-semibold text-foreground">
-              Jurusan
-              <select {...register("jurusan")} className="border p-2 w-full rounded mt-2" defaultValue="">
-                <option value="" disabled>
-                  Pilih Jurusan
-                </option>
-                {jurusanList.map((j) => (
-                  <option key={j.id} value={j.id}>
-                    {j.nama_jurusan}
-                  </option>
-                ))}
-              </select>
-              {errors.jurusan && <p className="text-red-500 text-sm">{errors.jurusan.message}</p>}
             </label>
           </div>
 
