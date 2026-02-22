@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2Icon, SearchIcon, Trash2Icon, FileSpreadsheet, PenBoxIcon, EyeIcon, PlusIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
-import type { Keuangan } from "@/types/keuangan";
+import type { Keuangan } from "@/types/keuanganSekolah";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { keuanganService } from "@/services/keuanganService";
@@ -109,22 +109,8 @@ const DataKeuangan = () => {
     }
   }, [isSomeSelected]);
 
-  // ========== NAVIGATE TO DETAIL ==========
-  const handleViewDetail = (id: number) => {
-    navigate(`/superadmin/informasi-laporan-umum/data-keuangan/detail/${id}`);
-  };
-
-  // ========== NAVIGATE TO EDIT ==========
-  const handleEdit = (id: number) => {
-    navigate(`/superadmin/informasi-laporan-umum/data-keuangan/edit/${id}`);
-  };
-
-  // ========== NAVIGATE TO CREATE ==========
-  const handleCreate = () => {
-    navigate("/superadmin/informasi-laporan-umum/data-keuangan/create");
-  };
-
   // ========== DELETE HANDLER ==========
+  // Selalu kirim ids[] (array) sesuai backend baru, baik satu maupun beberapa data
   const handleDeleteMultiple = async () => {
     if (selectedIds.length === 0) {
       Swal.fire({
@@ -212,7 +198,6 @@ const DataKeuangan = () => {
     }).format(num);
   };
 
-  // ========== RENDER ==========
   return (
     <SidebarProvider>
       <SidebarSuperAdmin isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
@@ -262,7 +247,7 @@ const DataKeuangan = () => {
               {/* Action Buttons */}
               <div className="mb-6 flex flex-col gap-4">
                 <div className="flex flex-wrap gap-2">
-                  <Button onClick={handleCreate}>
+                  <Button onClick={() => navigate("/superadmin/informasi-laporan-umum/data-keuangan/create")}>
                     <PlusIcon size={18} />
                     Buat Keuangan
                   </Button>
@@ -319,10 +304,10 @@ const DataKeuangan = () => {
                           <TableCell className="text-right font-semibold text-red-600">{formatRupiah(item.kredit)}</TableCell>
                           <TableCell>{item.keterangan || "-"}</TableCell>
                           <TableCell className="flex gap-1 justify-center">
-                            <Button size="sm" variant="outline" onClick={() => handleViewDetail(item.id)} title="Lihat Detail">
+                            <Button size="sm" variant="outline" onClick={() => navigate(`/superadmin/informasi-laporan-umum/data-keuangan/detail/${item.id}`)} title="Lihat Detail">
                               <EyeIcon size={16} />
                             </Button>
-                            <Button size="sm" onClick={() => handleEdit(item.id)} title="Edit Data">
+                            <Button size="sm" onClick={() => navigate(`/superadmin/informasi-laporan-umum/data-keuangan/edit/${item.id}`)} title="Edit Data">
                               <PenBoxIcon size={16} />
                             </Button>
                           </TableCell>

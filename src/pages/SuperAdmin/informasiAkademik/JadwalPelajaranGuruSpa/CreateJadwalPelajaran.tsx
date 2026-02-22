@@ -382,7 +382,7 @@ const CreateJadwalPelajaran = () => {
                     Ruangan <span className="text-gray-400 text-sm font-normal">(opsional)</span>
                   </label>
 
-                  <Select value={String(formData.ruangan_id || undefined)} onValueChange={(v) => setFormData({ ...formData, ruangan_id: v })}>
+                  <Select value={String(formData.ruangan_id)} onValueChange={(v) => setFormData({ ...formData, ruangan_id: v })}>
                     <SelectTrigger className="w-full mt-2">
                       <SelectValue placeholder="-- pilih ruangan --" />
                     </SelectTrigger>

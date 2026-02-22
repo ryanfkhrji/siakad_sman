@@ -1,151 +1,140 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import PageTitle from "@/components/PageTitle";
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, CircleXIcon, FilePlus, Loader2Icon } from "lucide-react";
+import { ArrowLeftIcon, CircleXIcon, Save, Loader2Icon } from "lucide-react";
 import Footer from "@/pages/Footer";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
-import { Select, SelectTrigger, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { SiswaDetailJadwal, JadwalPelajaranDetail } from "@/types/siswaJadwalPelajaran";
 
-interface JadwalPelajaran {
-  id: number;
+// Tipe flat untuk dropdown jadwal dari /spa/jadwal-pelajaran
+interface JadwalOption {
+  jadwal_pelajaran_id: number;
   mata_pelajaran: string;
   hari: string;
-  guru: string | string[];
-  kelas: string | string[];
-  jam_pelajaran: string;
-  ruangan: string;
-  link_opsional: string | null;
-}
-
-interface JadwalPelajaranSiswa {
-  id: number;
-  nisn: string;
-  nama: string;
-  email: string;
-  nis: string;
-  nama_jurusan: string | null;
-  status: string;
-  kelas: {
-    id: number;
-    nama_kelas: string;
-    jam_masuk: string;
-  };
+  guru: string;
+  rombel: string;
+  jam_mulai: string;
+  jam_selesai: string;
+  ruangan: string | null;
 }
 
 const EditJadwalPelajaranSiswa = () => {
-  // ✅ Terima 2 parameter: siswaId dan pivotId
-  const { siswaId, pivotId } = useParams<{ siswaId: string; pivotId: string }>();
+  // siswaId = id siswa
+  // jadwalId = jadwal_pelajaran_id yang sedang diedit (dari params)
+  const { siswaId, jadwalId } = useParams<{ siswaId: string; jadwalId: string }>();
   const navigate = useNavigate();
-
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [loading, setLoading] = useState(false);
+
   const [loadingData, setLoadingData] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const [jadwalPelajaranId, setJadwalPelajaranId] = useState("");
-  const [currentJadwalId, setCurrentJadwalId] = useState<number | null>(null);
-  const [currentPivotId, setCurrentPivotId] = useState<string>("");
+  const [dataSiswa, setDataSiswa] = useState<SiswaDetailJadwal | null>(null);
+  const [currentJadwal, setCurrentJadwal] = useState<JadwalPelajaranDetail | null>(null);
+  const [jadwalOptions, setJadwalOptions] = useState<JadwalOption[]>([]);
 
-  const [dataSiswa, setDataSiswa] = useState<JadwalPelajaranSiswa | null>(null);
-  const [dataJadwal, setDataJadwal] = useState<JadwalPelajaran[]>([]);
+  // Inisialisasi langsung dari jadwalId agar tidak ada bug uncontrolled→controlled
+  const [selectedJadwalId, setSelectedJadwalId] = useState<string>(jadwalId ?? "");
 
-  const [errors, setErrors] = useState<{ jadwal_pelajaran_id?: string[] }>({});
+  const [errors, setErrors] = useState<{ jadwal_pelajaran_id: string[] }>({
+    jadwal_pelajaran_id: [],
+  });
 
-  // Fetch data
   useEffect(() => {
+    if (!siswaId || !jadwalId) {
+      navigate("/superadmin/informasi-akademik/jadwal-pelajaran-siswa");
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        // ✅ Validasi parameter
-        if (!siswaId || !pivotId) {
-          throw new Error("Parameter siswaId dan pivotId diperlukan");
-        }
-
         setLoadingData(true);
 
-        // ✅ Fetch detail siswa berdasarkan siswaId
-        const resDetail = await api.get(`/spa/siswa/jadwal-pelajaran/${siswaId}`);
+        const [detailRes, jadwalRes] = await Promise.all([api.get(`/spa/siswa/jadwal-pelajaran/${siswaId}`), api.get("/spa/jadwal-pelajaran")]);
 
-        let siswaData: any = null;
+        // ── 1. Detail siswa + cari jadwal saat ini ───────────
+        if (detailRes.data.status === "success") {
+          const siswa: SiswaDetailJadwal = detailRes.data.data;
+          setDataSiswa(siswa);
 
-        if (resDetail.data.status === "success") {
-          siswaData = resDetail.data.data;
+          // Cari jadwal_pelajaran_id yang cocok di semua periode & semester
+          let found: JadwalPelajaranDetail | null = null;
+          for (const periode of siswa.periode) {
+            for (const semester of periode.jadwal) {
+              const match = semester.jadwal_pelajarans.find((j) => String(j.jadwal_pelajaran_id) === String(jadwalId));
+              if (match) {
+                found = match;
+                break;
+              }
+            }
+            if (found) break;
+          }
 
-          setDataSiswa({
-            id: siswaData.id,
-            nisn: siswaData.nisn || "",
-            nama: siswaData.nama || "",
-            email: siswaData.email || "",
-            nis: siswaData.nis || "",
-            nama_jurusan: siswaData.nama_jurusan || null,
-            status: siswaData.status || "",
-            kelas: siswaData.kelas || {},
+          if (!found) {
+            throw new Error("Jadwal tidak ditemukan untuk siswa ini");
+          }
+
+          setCurrentJadwal(found);
+          setSelectedJadwalId(String(found.jadwal_pelajaran_id));
+        }
+
+        // ── 2. Flatten semua jadwal tersedia untuk dropdown ──
+        if (jadwalRes.data.status === "success") {
+          const flattened: JadwalOption[] = [];
+
+          jadwalRes.data.data.forEach((tahun: any) => {
+            tahun.semesters.forEach((semester: any) => {
+              semester.gurus.forEach((guru: any) => {
+                guru.jadwals.forEach((j: any) => {
+                  flattened.push({
+                    jadwal_pelajaran_id: j.jadwal_pelajaran_id,
+                    mata_pelajaran: j.mata_pelajaran,
+                    hari: j.hari,
+                    guru: guru.guru,
+                    rombel: j.rombel,
+                    jam_mulai: j.jam_mulai,
+                    jam_selesai: j.jam_selesai,
+                    ruangan: j.ruangan,
+                  });
+                });
+              });
+            });
           });
 
-          // ✅ Cari jadwal yang sesuai dengan pivotId
-          if (Array.isArray(siswaData.jadwal_pelajaran)) {
-            const targetJadwal = siswaData.jadwal_pelajaran.find((j: any) => String(j.pivot_id) === String(pivotId));
-
-            if (targetJadwal) {
-              setCurrentJadwalId(targetJadwal.id);
-              setJadwalPelajaranId(String(targetJadwal.id));
-              setCurrentPivotId(String(targetJadwal.pivot_id));
-            } else {
-              throw new Error("Jadwal dengan pivot_id tersebut tidak ditemukan");
-            }
-          } else {
-            throw new Error("Data jadwal pelajaran tidak ditemukan");
-          }
+          setJadwalOptions(flattened);
         }
-
-        // Fetch semua jadwal pelajaran yang available
-        const resJadwal = await api.get("/spa/jadwal-pelajaran");
-
-        if (resJadwal.data.status === "success") {
-          // ✅ Filter out jadwal yang sudah diambil oleh siswa (kecuali jadwal yang sedang diedit)
-          const allJadwal = resJadwal.data.data;
-          const siswaJadwalIds = siswaData.jadwal_pelajaran.filter((j: any) => String(j.pivot_id) !== String(pivotId)).map((j: any) => j.id);
-
-          const availableJadwal = allJadwal.filter((jadwal: JadwalPelajaran) => !siswaJadwalIds.includes(jadwal.id));
-
-          setDataJadwal(availableJadwal);
-        }
-
-        setLoadingData(false);
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-
+      } catch (error: any) {
         Swal.fire({
           icon: "error",
-          title: "Gagal Memuat Data",
-          text: err.message || "Terjadi kesalahan saat memuat data.",
-          confirmButtonColor: "#4F46E5",
-        }).then(() => {
-          navigate("/superadmin/informasi-akademik/jadwal-pelajaran-siswa");
+          title: "Gagal memuat data!",
+          text: error.response?.data?.message || error.message || "Tidak dapat memuat data",
         });
-
+        navigate("/superadmin/informasi-akademik/jadwal-pelajaran-siswa");
+      } finally {
         setLoadingData(false);
       }
     };
 
     fetchData();
-  }, [siswaId, pivotId, navigate]);
+  }, [siswaId, jadwalId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
+    setErrors({ jadwal_pelajaran_id: [] });
 
-    if (!jadwalPelajaranId) {
+    if (!selectedJadwalId) {
       setErrors({ jadwal_pelajaran_id: ["Jadwal pelajaran wajib dipilih"] });
       return;
     }
 
-    if (parseInt(jadwalPelajaranId) === currentJadwalId) {
+    if (selectedJadwalId === String(jadwalId)) {
       Swal.fire({
         icon: "info",
-        title: "Tidak Ada Perubahan",
+        title: "Tidak ada perubahan",
         text: "Anda belum mengubah jadwal pelajaran.",
       });
       return;
@@ -154,68 +143,42 @@ const EditJadwalPelajaranSiswa = () => {
     try {
       setLoading(true);
 
-      // ✅ Update menggunakan pivot_id yang benar
-      const res = await api.put(`/spa/siswa/jadwal-pelajaran/${currentPivotId}`, {
-        jadwal_pelajaran_id: parseInt(jadwalPelajaranId),
+      const res = await api.put(`/spa/siswa/jadwal-pelajaran/${jadwalId}`, {
+        jadwal_pelajaran_id: Number(selectedJadwalId),
       });
 
       if (res.data.status === "success") {
-        await Swal.fire({
+        Swal.fire({
           icon: "success",
-          title: "Berhasil Mengupdate",
-          text: res.data?.message || "Jadwal pelajaran siswa berhasil diperbarui!",
+          title: "Berhasil!",
+          text: "Jadwal pelajaran siswa berhasil diperbarui.",
+          timer: 1800,
+          showConfirmButton: false,
         });
-
-        // Redirect ke detail siswa
-        if (siswaId) {
-          navigate(`/superadmin/informasi-akademik/jadwal-pelajaran-siswa/detail/${siswaId}`);
-        } else {
-          navigate("/superadmin/informasi-akademik/jadwal-pelajaran-siswa");
-        }
+        navigate("/superadmin/informasi-akademik/jadwal-pelajaran-siswa");
       }
-    } catch (err: any) {
-      if (err.response?.status === 422) {
-        const backend = err.response.data;
-        const backendData = backend.data || {};
+    } catch (error: any) {
+      const errorStatus = error.response?.status;
+      const errorData = error.response?.data;
 
-        setErrors({
-          jadwal_pelajaran_id: backendData.jadwal_pelajaran_id || [],
-        });
-
-        // ✅ Handle khusus untuk duplikat mata pelajaran (backup protection)
-        const isDuplicate = backend.message?.toLowerCase().includes("sudah terdaftar") || backendData.jadwal_pelajaran_id?.[0]?.toLowerCase().includes("sudah terdaftar");
-
-        if (isDuplicate) {
-          Swal.fire({
-            icon: "warning",
-            title: "Jadwal Sudah Ada",
-            html: `
-              <p>Siswa <strong>${dataSiswa?.nama}</strong> sudah terdaftar di mata pelajaran ini.</p>
-              <br>
-              <p class="text-sm text-gray-600">Silakan pilih mata pelajaran lain atau hapus jadwal yang sudah ada terlebih dahulu.</p>
-            `,
-            confirmButtonColor: "#4F46E5",
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Validasi Gagal",
-            text: backend.message || "Periksa kembali form Anda.",
-          });
-        }
-      } else if (err.response?.status === 404) {
+      if (errorStatus === 422 && errorData?.errors) {
+        setErrors({ ...errors, ...errorData.errors });
         Swal.fire({
           icon: "error",
-          title: "Data Tidak Ditemukan",
-          text: err.response?.data?.message || "Data yang Anda cari tidak ditemukan.",
-        }).then(() => {
-          navigate("/superadmin/informasi-akademik/jadwal-pelajaran-siswa");
+          title: "Validasi gagal!",
+          text: "Periksa kembali inputan Anda.",
+        });
+      } else if (errorStatus === 404) {
+        Swal.fire({
+          icon: "error",
+          title: "Data tidak ditemukan!",
+          text: errorData?.message || "Data jadwal tidak ditemukan.",
         });
       } else {
         Swal.fire({
           icon: "error",
-          title: "Gagal Mengupdate",
-          text: err.response?.data?.message || "Terjadi kesalahan saat menyimpan data.",
+          title: "Koneksi gagal!",
+          text: errorData?.message || "Tidak dapat terhubung ke server.",
         });
       }
     } finally {
@@ -223,22 +186,11 @@ const EditJadwalPelajaranSiswa = () => {
     }
   };
 
-  const formatGuru = (guru: any): string => {
-    if (Array.isArray(guru)) {
-      return guru.map((g) => (typeof g === "object" ? g.nama : g)).join(", ");
-    }
-    return guru || "-";
-  };
+  const previewJadwal = jadwalOptions.find((j) => String(j.jadwal_pelajaran_id) === selectedJadwalId);
+  const isChanged = selectedJadwalId !== String(jadwalId);
 
-  const formatKelas = (kelas: any): string => {
-    if (Array.isArray(kelas)) {
-      return kelas.map((k) => (typeof k === "object" ? k.nama_kelas : k)).join(", ");
-    }
-    return kelas || "-";
-  };
-
-  const selectedJadwal = dataJadwal.find((j) => j.id === parseInt(jadwalPelajaranId));
-  const currentJadwal = dataJadwal.find((j) => j.id === currentJadwalId);
+  // Info siswa dari periode pertama yang ada
+  const infoPeriode = dataSiswa?.periode[0];
 
   return (
     <SidebarProvider>
@@ -248,129 +200,132 @@ const EditJadwalPelajaranSiswa = () => {
         <PageTitle title="Edit Jadwal Pelajaran Siswa" />
 
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold">Edit Jadwal Pelajaran Siswa</h1>
+          <h1 className="text-3xl font-bold mb-2">Edit Jadwal Pelajaran Siswa</h1>
 
-          <Button variant="outline" className="mb-6 mt-6" onClick={() => navigate(-1)}>
+          <Button variant="outline" className="mb-6 mt-2 flex items-center gap-2" onClick={() => navigate("/superadmin/informasi-akademik/jadwal-pelajaran-siswa")}>
             <ArrowLeftIcon size={16} />
             Kembali
           </Button>
 
-          {/* LOADING */}
           {loadingData ? (
-            <div className="flex flex-col items-center justify-center h-64">
-              <Loader2Icon className="animate-spin mb-3" size={32} />
-              <p className="text-gray-600">Memuat data...</p>
+            <div className="flex flex-col items-center justify-center h-64 text-gray-600">
+              <Loader2Icon className="animate-spin mb-2" size={28} />
+              <p className="text-lg font-medium">Memuat data...</p>
             </div>
-          ) : (
-            dataSiswa && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className=" max-w-lg w-full">
-                  {/* Info siswa */}
-                  <div className="mb-6 bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                    <h3 className="font-semibold text-blue-900 mb-3">Informasi Siswa</h3>
-
-                    <div className="grid grid-cols-2 gap-4 text-sm text-blue-900">
-                      <p>
-                        <strong>Nama:</strong> {dataSiswa.nama}
-                      </p>
-                      <p>
-                        <strong>NIS:</strong> {dataSiswa.nis}
-                      </p>
-                      <p>
-                        <strong>NISN:</strong> {dataSiswa.nisn}
-                      </p>
-                      <p>
-                        <strong>Kelas:</strong> {dataSiswa.kelas?.nama_kelas}
-                      </p>
+          ) : dataSiswa && currentJadwal ? (
+            <div className="bg-white rounded shadow p-6 max-w-2xl w-full">
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Card Info Siswa */}
+                <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-indigo-900 mb-3">🎓 Informasi Siswa</p>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-indigo-600 font-medium block">Nama</span>
+                      <span className="text-indigo-900 font-semibold">{dataSiswa.nama_siswa}</span>
+                    </div>
+                    <div>
+                      <span className="text-indigo-600 font-medium block">Rombel</span>
+                      <span className="text-indigo-900">{infoPeriode?.rombel.nama_rombel ?? "-"}</span>
+                    </div>
+                    <div>
+                      <span className="text-indigo-600 font-medium block">Kelas</span>
+                      <span className="text-indigo-900">{infoPeriode?.rombel.kelas ?? "-"}</span>
+                    </div>
+                    <div>
+                      <span className="text-indigo-600 font-medium block">Wali Rombel</span>
+                      <span className="text-indigo-900">{infoPeriode?.rombel.wali_rombel ?? "-"}</span>
                     </div>
                   </div>
-
-                  {/* Current Jadwal Info */}
-                  {currentJadwal && (
-                    <div className="mb-6 bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                      <h3 className="font-semibold text-yellow-900 mb-2">Jadwal Saat Ini</h3>
-                      <p className="text-sm text-yellow-900">
-                        <strong>{currentJadwal.mata_pelajaran}</strong> — {currentJadwal.hari} ({currentJadwal.jam_pelajaran})
-                      </p>
-                    </div>
-                  )}
-
-                  {/* FORM */}
-                  <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div>
-                      <label className="font-semibold block mb-2">Ubah Jadwal Pelajaran</label>
-
-                      <Select
-                        value={jadwalPelajaranId}
-                        onValueChange={(val) => {
-                          setJadwalPelajaranId(val);
-                          setErrors({});
-                        }}
-                        disabled={loading}
-                      >
-                        <SelectTrigger className={`${errors.jadwal_pelajaran_id ? "border-red-500" : ""} w-full`}>
-                          <SelectValue placeholder="Pilih Jadwal Pelajaran" />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Daftar Jadwal</SelectLabel>
-
-                            {dataJadwal.length === 0 ? (
-                              <div className="px-2 py-1.5 text-sm text-muted-foreground">Tidak ada jadwal tersedia</div>
-                            ) : (
-                              dataJadwal.map((item) => (
-                                <SelectItem key={item.id} value={item.id.toString()}>
-                                  {item.mata_pelajaran} — {item.hari} ({item.jam_pelajaran})
-                                </SelectItem>
-                              ))
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-
-                      {errors.jadwal_pelajaran_id && <p className="text-red-500 text-sm mt-1">{errors.jadwal_pelajaran_id[0]}</p>}
-                    </div>
-
-                    {/* PREVIEW */}
-                    {selectedJadwal && parseInt(jadwalPelajaranId) !== currentJadwalId && (
-                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <h3 className="font-semibold text-green-900 mb-2">Preview Jadwal Baru</h3>
-
-                        <p className="text-sm text-green-900">
-                          <strong>Mapel:</strong> {selectedJadwal.mata_pelajaran}
-                        </p>
-                        <p className="text-sm text-green-900">
-                          <strong>Hari:</strong> {selectedJadwal.hari}
-                        </p>
-                        <p className="text-sm text-green-900">
-                          <strong>Jam:</strong> {selectedJadwal.jam_pelajaran}
-                        </p>
-                        <p className="text-sm text-green-900">
-                          <strong>Kelas:</strong> {formatKelas(selectedJadwal.kelas)}
-                        </p>
-                        <p className="text-sm text-green-900">
-                          <strong>Guru:</strong> {formatGuru(selectedJadwal.guru)}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Tombol Aksi */}
-                    <div className="flex gap-2">
-                      <Button type="submit" disabled={loading} className="bg-primary flex items-center gap-2">
-                        <FilePlus size={18} />
-                        {loading ? "Menyimpan..." : "Simpan Perubahan"}
-                      </Button>
-                        <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90" onClick={() => navigate(-1)}>
-                          <CircleXIcon size={18} />
-                          Batal
-                        </Button>
-                    </div>
-                  </form>
                 </div>
-              </div>
-            )
-          )}
+
+                {/* Jadwal Saat Ini */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-yellow-900 mb-2">📋 Jadwal Saat Ini</p>
+                  <p className="text-sm text-yellow-900 font-semibold">{currentJadwal.mata_pelajaran}</p>
+                  <p className="text-sm text-yellow-800 mt-1">
+                    {currentJadwal.hari} • {currentJadwal.jam_mulai.slice(0, 5)} - {currentJadwal.jam_selesai.slice(0, 5)} • Guru: {currentJadwal.guru} • Ruangan: {currentJadwal.ruangan ?? "-"}
+                  </p>
+                </div>
+
+                {/* Select Jadwal Baru */}
+                <div>
+                  <label className="block font-semibold text-foreground mb-2">
+                    Ubah Jadwal Pelajaran <span className="text-red-500">*</span>
+                  </label>
+
+                  <Select
+                    value={selectedJadwalId}
+                    onValueChange={(v) => {
+                      setSelectedJadwalId(v);
+                      setErrors({ jadwal_pelajaran_id: [] });
+                    }}
+                  >
+                    <SelectTrigger className={`w-full ${errors.jadwal_pelajaran_id.length > 0 ? "border-red-500" : ""}`}>
+                      <SelectValue placeholder="-- pilih jadwal pelajaran --" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      <SelectGroup>
+                        <SelectLabel>Daftar Jadwal Tersedia</SelectLabel>
+                        {jadwalOptions.length === 0 ? (
+                          <div className="px-2 py-2 text-sm text-gray-400">Tidak ada jadwal tersedia</div>
+                        ) : (
+                          jadwalOptions.map((j) => (
+                            <SelectItem key={j.jadwal_pelajaran_id} value={String(j.jadwal_pelajaran_id)}>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{j.mata_pelajaran}</span>
+                                <span className="text-xs text-gray-500">
+                                  {j.hari} • {j.jam_mulai.slice(0, 5)} - {j.jam_selesai.slice(0, 5)} • {j.rombel} • {j.guru}
+                                </span>
+                              </div>
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+
+                  {errors.jadwal_pelajaran_id.length > 0 && <p className="text-red-500 text-sm mt-1">{errors.jadwal_pelajaran_id[0]}</p>}
+                </div>
+
+                {/* Preview Jadwal Baru */}
+                {previewJadwal && isChanged && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-sm font-semibold text-green-900 mb-2">✅ Preview Jadwal Baru</p>
+                    <p className="text-sm text-green-900 font-semibold">{previewJadwal.mata_pelajaran}</p>
+                    <p className="text-sm text-green-800 mt-1">
+                      {previewJadwal.hari} • {previewJadwal.jam_mulai.slice(0, 5)} - {previewJadwal.jam_selesai.slice(0, 5)}
+                    </p>
+                    <p className="text-sm text-green-800">
+                      Guru: {previewJadwal.guru} • Rombel: {previewJadwal.rombel} • Ruangan: {previewJadwal.ruangan ?? "-"}
+                    </p>
+                  </div>
+                )}
+
+                {/* Info Box */}
+                <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
+                  <p className="font-semibold mb-1">ℹ️ Informasi:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Siswa tidak dapat diubah — hanya jadwal pelajaran yang bisa diganti</li>
+                    <li>Pilih jadwal baru dari daftar yang tersedia</li>
+                  </ul>
+                </div>
+
+                {/* Tombol */}
+                <div className="flex gap-2">
+                  <Button type="submit" disabled={loading || !isChanged} className="bg-primary flex items-center gap-2">
+                    <Save size={18} />
+                    {loading ? "Menyimpan..." : "Simpan Perubahan"}
+                  </Button>
+                  <Link to="/superadmin/informasi-akademik/jadwal-pelajaran-siswa">
+                    <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
+                      <CircleXIcon size={18} />
+                      Batal
+                    </Button>
+                  </Link>
+                </div>
+              </form>
+            </div>
+          ) : null}
         </div>
 
         <Footer />

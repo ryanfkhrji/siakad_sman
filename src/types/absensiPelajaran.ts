@@ -1,34 +1,85 @@
-export interface AbsensiDetailPelajaran {
-  id: number;
-  kelas: string;
-  hari: string;
-  jam: string;
-  status: "hadir" | "tidak hadir";
-}
+// ============================================================
+// Types untuk Absensi Pelajaran Guru - Super Admin
+// ============================================================
 
-export interface AbsensiPelajaran {
+// ── GET ALL (INDEX) ──────────────────────────────────────────
+// Response: tahun_akademik → guru[] (hanya rekap, bukan per absensi)
+
+export interface GuruRekap {
+  guru_id: number;
   nama_guru: string;
-  wali_kelas: string;
-  mata_pelajaran: string;
-  total_hadir: number;
-  total_tidak_hadir: number;
-  absensi: AbsensiDetailPelajaran[];
+  hadir_pertahun: number;
+  tidak_hadir_pertahun: number;
 }
 
+export interface TahunAkademikRekap {
+  tahun_akademik_id: number;
+  tahun_akademik: string;
+  status_tahun_akademik: string;
+  guru: GuruRekap[];
+}
+
+// Flat untuk tabel index (hasil flatten dari TahunAkademikRekap[])
 export interface AbsensiPelajaranFlat {
-  id: number;
+  guru_id: number;
   nama_guru: string;
-  wali_kelas: string;
-  mengajar: string;
-  kelas: string;
-  hari: string;
-  jam: string;
-  status: "hadir" | "tidak hadir";
-  total_hadir: number;
-  total_tidak_hadir: number;
+  tahun_akademik_id: number;
+  tahun_akademik: string;
+  status_tahun_akademik: string;
+  hadir_pertahun: number;
+  tidak_hadir_pertahun: number;
+  is_editable: boolean; // true jika status_tahun_akademik === "aktif"
 }
 
-// ============ SELF SERVICE (PEGAWAI) ============
+// ── GET DETAIL (SHOW BY GURU ID) ─────────────────────────────
+// Response: guru → periode → semesters → jadwal_pelajarans → absensi[]
+
+export interface AbsensiItemDetail {
+  absensi_id: number;
+  hari: string; // "Minggu, 05 Mei 2024"
+  status: "hadir" | "tidak hadir";
+}
+
+export interface JadwalPelajaranDetail {
+  jadwal_pelajaran_id: number;
+  mata_pelajaran: string;
+  hari: string; // "Senin" (hari jadwal, bukan tanggal)
+  rombel: string;
+  jam_mulai: string;
+  jam_selesai: string;
+  ruangan: string;
+  link_opsional: string;
+  absensi: AbsensiItemDetail[];
+}
+
+export interface SemesterDetail {
+  semester_id: number;
+  semester: string;
+  status_semester: string;
+  total_hadir_persemester: number;
+  total_tidak_hadir_persemester: number;
+  jadwal_pelajarans: JadwalPelajaranDetail[];
+}
+
+export interface PeriodeDetail {
+  tahun_akademik_id: number;
+  tahun_akademik: string;
+  status_tahun_akademik: string;
+  total_hadir_pertahun: number;
+  total_tidak_hadir_pertahun: number;
+  semesters: SemesterDetail[];
+}
+
+export interface GuruDetail {
+  guru_id: number;
+  nama_guru: string;
+  nip: string | null;
+  nuptk: string | null;
+  periode: PeriodeDetail[];
+}
+
+// ── SELF SERVICE (PEGAWAI) ───────────────────────────────────
+
 export interface AbsensiPelajaranDetail {
   id: number;
   kelas: string;

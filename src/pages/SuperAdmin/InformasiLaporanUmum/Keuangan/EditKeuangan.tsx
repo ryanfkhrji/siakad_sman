@@ -28,16 +28,13 @@ const EditKeuangan = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (id) {
-      fetchData();
-    }
+    if (id) fetchData();
   }, [id]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await keuanganService.getDetail(Number(id));
-
       if (response.status === "success") {
         setFormData({
           nama_akun: response.data.nama_akun,
@@ -60,11 +57,7 @@ const EditKeuangan = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error saat user mengetik
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -80,13 +73,11 @@ const EditKeuangan = () => {
     if (!formData.nama_akun.trim()) {
       newErrors.nama_akun = "Nama akun wajib diisi";
     }
-
     if (!formData.debit.trim()) {
       newErrors.debit = "Debit wajib diisi";
     } else if (isNaN(Number(formData.debit)) || Number(formData.debit) < 0) {
       newErrors.debit = "Debit harus berupa angka positif";
     }
-
     if (!formData.kredit.trim()) {
       newErrors.kredit = "Kredit wajib diisi";
     } else if (isNaN(Number(formData.kredit)) || Number(formData.kredit) < 0) {
@@ -99,21 +90,16 @@ const EditKeuangan = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setSubmitting(true);
-
       await keuanganService.update(Number(id), {
         nama_akun: formData.nama_akun,
         debit: Number(formData.debit),
         kredit: Number(formData.kredit),
         keterangan: formData.keterangan,
       });
-
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -121,7 +107,6 @@ const EditKeuangan = () => {
         showConfirmButton: false,
         timer: 1800,
       });
-
       navigate("/superadmin/informasi-laporan-umum/data-keuangan");
     } catch (error: any) {
       Swal.fire({
@@ -132,10 +117,6 @@ const EditKeuangan = () => {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleBack = () => {
-    navigate("/superadmin/informasi-laporan-umum/data-keuangan");
   };
 
   if (loading) {
@@ -195,13 +176,12 @@ const EditKeuangan = () => {
                   <Textarea id="keterangan" name="keterangan" value={formData.keterangan} onChange={handleChange} placeholder="Masukkan keterangan (opsional)" rows={4} />
                 </div>
 
-                <div className="flex gap-2 justifystart">
+                <div className="flex gap-2 justify-start">
                   <Button type="submit" disabled={submitting}>
-                    <FilePlus size={18} />
-                    {submitting && <Loader2Icon className="animate-spin" size={18} />}
+                    {submitting ? <Loader2Icon className="animate-spin" size={18} /> : <FilePlus size={18} />}
                     {submitting ? "Menyimpan..." : "Perbarui"}
                   </Button>
-                  <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90" onClick={handleBack} disabled={submitting}>
+                  <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90" onClick={() => navigate("/superadmin/informasi-laporan-umum/data-keuangan")} disabled={submitting}>
                     <CircleXIcon size={18} />
                     Batal
                   </Button>

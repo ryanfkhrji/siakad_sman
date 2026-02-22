@@ -1,6 +1,6 @@
 import api from "@/api/axios";
+import type { TahunAkademikAbsensiSiswa, DetailAbsensiSiswaData, UpdateAbsensiSiswaResponse, AbsensiSiswaSelf, CreateAbsensiSiswaRequest, CreateAbsensiSiswaResponse } from "@/types/absensiSiswa";
 import type { MataPelajaran } from "@/types";
-import type { AbsensiSiswa, CreateAbsensiSiswaRequest, CreateAbsensiSiswaResponse, AbsensiSiswaSelf } from "@/types/absensiSiswa";
 
 interface ApiResponse<T> {
   status: string;
@@ -9,155 +9,109 @@ interface ApiResponse<T> {
 }
 
 export const absensiSiswaService = {
-  // ========== SUPER ADMIN ==========
+  // ================================================================
+  // SUPER ADMIN
+  // ================================================================
 
   /**
-   * Mengambil semua data absensi siswa
+   * Mengambil semua rekap absensi siswa (digroup per tahun akademik → rombel → siswa)
    * GET /spa/absensi/siswa/pelajaran
    */
-  getAll: async (): Promise<ApiResponse<AbsensiSiswa[]>> => {
+  getAll: async (): Promise<ApiResponse<TahunAkademikAbsensiSiswa[]>> => {
     const response = await api.get("/spa/absensi/siswa/pelajaran");
     return response.data;
   },
 
   /**
-   * Mengambil detail absensi siswa berdasarkan ID siswa
-   * GET /spa/absensi/siswa/pelajaran/{id}
+   * Mengambil detail histori absensi satu siswa (digroup per rombel → periode → semester → mapel)
+   * GET /spa/absensi/siswa/pelajaran/:siswaId
    */
-  getDetail: async (siswaId: number): Promise<ApiResponse<AbsensiSiswa[]>> => {
+  getDetail: async (siswaId: number): Promise<ApiResponse<DetailAbsensiSiswaData>> => {
     const response = await api.get(`/spa/absensi/siswa/pelajaran/${siswaId}`);
     return response.data;
   },
 
   /**
-   * Mengambil single absensi berdasarkan absensi ID
-   * Menggunakan getAll lalu filter by ID
-   */
-  getSingleAbsensi: async (absensiId: number) => {
-    const response = await api.get("/spa/absensi/siswa/pelajaran");
-
-    if (response.data.status === "success") {
-      // Flatten dan cari absensi yang sesuai
-      for (const siswa of response.data.data) {
-        const absensi = siswa.absensi.find((abs: any) => abs.id === absensiId);
-        if (absensi) {
-          return {
-            status: "success",
-            data: {
-              id: absensi.id,
-              siswa_id: siswa.siswa_id,
-              nama_siswa: siswa.nama_siswa,
-              kelas: siswa.kelas,
-              mata_pelajaran: absensi.mata_pelajaran,
-              hari: absensi.hari,
-              status: absensi.status,
-              bukti: absensi.bukti,
-            },
-          };
-        }
-      }
-    }
-
-    throw new Error("Absensi tidak ditemukan");
-  },
-
-  /**
-   * Update status absensi siswa
-   * PUT /spa/absensi/siswa/pelajaran/{id}
-   * FormData: status, mata_pelajaran_id (optional), bukti (file, optional)
+   * Update status absensi siswa (termasuk upload bukti opsional)
+   * POST /spa/absensi/siswa/pelajaran/:absensiId   (dengan _method=PUT)
    */
   update: async (
-    id: number,
+    absensiId: number,
     data: {
       status?: "hadir" | "izin" | "sakit" | "alfa";
-      mata_pelajaran_id?: number;
       bukti?: File | null;
-    }
-  ) => {
+    },
+  ): Promise<ApiResponse<UpdateAbsensiSiswaResponse>> => {
     const formData = new FormData();
-
     formData.append("_method", "PUT");
 
-    if (data.status) {
-      formData.append("status", data.status);
-    }
+    if (data.status) formData.append("status", data.status);
+    if (data.bukti) formData.append("bukti", data.bukti);
 
-    if (data.mata_pelajaran_id) {
-      formData.append("mata_pelajaran_id", data.mata_pelajaran_id.toString());
-    }
-
-    if (data.bukti) {
-      formData.append("bukti", data.bukti);
-    }
-
-    const response = await api.post(`/spa/absensi/siswa/pelajaran/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await api.post(`/spa/absensi/siswa/pelajaran/${absensiId}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
     return response.data;
   },
 
   /**
    * Hapus satu atau beberapa data absensi
-   * DELETE /spa/absensi/siswa/pelajaran/destroy
-   * Query params: SELALU gunakan format ids[] (array)
+   * DELETE /spa/absensi/siswa/pelajaran/destroy?ids[]=3&ids[]=5
+   *   - satu  : ?ids[]=7
+   *   - banyak: ?ids[]=3&ids[]=5&ids[]=9
    */
-  deleteMultiple: async (ids: number[]) => {
-    let url = "/spa/absensi/siswa/pelajaran/destroy";
-
-    // SELALU gunakan format ids[] untuk konsistensi
-    // Baik 1 data maupun banyak data
+  deleteMultiple: async (ids: number[]): Promise<ApiResponse<null>> => {
     const params = ids.map((id) => `ids[]=${id}`).join("&");
-    url += `?${params}`;
-
-    const response = await api.delete(url);
+    const response = await api.delete(`/spa/absensi/siswa/pelajaran/destroy?${params}`);
     return response.data;
   },
 
   /**
-   * Export data ke Excel
+   * Hapus hanya foto bukti (tanpa hapus record absensi)
+   * DELETE /spa/absensi/siswa/bukti/destroy?ids[]=14&ids[]=21
+   *   - satu  : ?ids[]=4
+   *   - banyak: ?ids[]=3&ids[]=5&ids[]=9
+   */
+  deleteBukti: async (ids: number[]): Promise<ApiResponse<null>> => {
+    const params = ids.map((id) => `ids[]=${id}`).join("&");
+    const response = await api.delete(`/spa/absensi/siswa/bukti/destroy?${params}`);
+    return response.data;
+  },
+
+  /**
+   * Export data absensi ke Excel
    * GET /spa/absensi/siswa/pelajaran/export
-   * Query params: SELALU gunakan format ids[] (array)
+   *   - semua : tanpa query params
+   *   - pilihan: ?ids[]=3&ids[]=5
    */
   exportExcel: async (ids?: number[]): Promise<Blob> => {
     let url = "/spa/absensi/siswa/pelajaran/export";
-
     if (ids && ids.length > 0) {
-      // SELALU gunakan format ids[] untuk konsistensi
-      const params = ids.map((id) => `ids[]=${id}`).join("&");
-      url += `?${params}`;
+      url += `?${ids.map((id) => `ids[]=${id}`).join("&")}`;
     }
-
-    const response = await api.get(url, {
-      responseType: "blob",
-    });
+    const response = await api.get(url, { responseType: "blob" });
     return response.data;
   },
 
   /**
-   * Export bukti izin dalam format ZIP
+   * Export bukti absensi ke ZIP
    * GET /spa/absensi/siswa/pelajaran/zip
-   * Query params: SELALU gunakan format ids[] (array)
+   *   - semua : tanpa query params
+   *   - pilihan: ?ids[]=3&ids[]=5
    */
   exportZip: async (ids?: number[]): Promise<Blob> => {
     let url = "/spa/absensi/siswa/pelajaran/zip";
-
     if (ids && ids.length > 0) {
-      // SELALU gunakan format ids[] untuk konsistensi
-      const params = ids.map((id) => `ids[]=${id}`).join("&");
-      url += `?${params}`;
+      url += `?${ids.map((id) => `ids[]=${id}`).join("&")}`;
     }
-
-    const response = await api.get(url, {
-      responseType: "blob",
-    });
+    const response = await api.get(url, { responseType: "blob" });
     return response.data;
   },
 
-  // ========== SISWA SELF SERVICE ==========
+  // ================================================================
+  // SISWA SELF SERVICE
+  // ================================================================
+
   /**
-   * Mengambil semua absensi pelajaran siswa yang sedang login
+   * Mengambil semua absensi pelajaran milik siswa yang sedang login
    * GET /siswa/absensi/pelajaran/all/self
    */
   getAllSelf: async (): Promise<ApiResponse<AbsensiSiswaSelf>> => {
@@ -166,85 +120,61 @@ export const absensiSiswaService = {
   },
 
   /**
-   * Membuat absensi pelajaran baru (siswa)
+   * Membuat absensi pelajaran baru (oleh siswa)
    * POST /siswa/absensi/pelajaran
-   * Body: mata_pelajaran_id, status, bukti (file, optional)
    */
   create: async (data: CreateAbsensiSiswaRequest): Promise<ApiResponse<CreateAbsensiSiswaResponse>> => {
     const formData = new FormData();
-
     formData.append("mata_pelajaran_id", data.mata_pelajaran_id.toString());
     formData.append("status", data.status);
-
-    if (data.bukti) {
-      formData.append("bukti", data.bukti);
-    }
+    if (data.bukti) formData.append("bukti", data.bukti);
 
     const response = await api.post("/siswa/absensi/pelajaran", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
 
+  /**
+   * Mengambil daftar mata pelajaran yang tersedia untuk siswa
+   * GET /siswa/jadwal-pelajaran/all/diri
+   */
   getMataPelajaran: async (): Promise<ApiResponse<MataPelajaran[]>> => {
-    try {
-      const response = await api.get("/siswa/jadwal-pelajaran/all/diri");
+    const response = await api.get("/siswa/jadwal-pelajaran/all/diri");
 
-      if (response.data.status === "success" && Array.isArray(response.data.data)) {
-        // Validasi dan filter data
-        const validData = response.data.data
-          .filter((item: any) => {
-            if (!item.mata_pelajaran_id) {
-              console.warn("⚠️ Missing mata_pelajaran_id:", item);
-              return false;
-            }
-            return true;
-          })
-          .map((item: any) => ({
-            pivot_id: item.pivot_id,
-            mata_pelajaran_id: item.mata_pelajaran_id,
-            nama_pelajaran: item.nama_pelajaran,
-          }));
+    if (response.data.status === "success" && Array.isArray(response.data.data)) {
+      const validData = response.data.data
+        .filter((item: any) => !!item.mata_pelajaran_id)
+        .map((item: any) => ({
+          pivot_id: item.pivot_id,
+          mata_pelajaran_id: item.mata_pelajaran_id,
+          nama_pelajaran: item.nama_pelajaran,
+        }));
 
-        if (validData.length === 0) {
-          throw new Error("Tidak ada mata pelajaran dengan ID valid. Silakan hubungi admin untuk memastikan jadwal sudah diatur dengan benar.");
-        }
-
-        return {
-          status: response.data.status,
-          message: response.data.message,
-          data: validData,
-        };
+      if (validData.length === 0) {
+        throw new Error("Tidak ada mata pelajaran dengan ID valid. Hubungi admin untuk memastikan jadwal sudah diatur.");
       }
 
-      throw new Error("Invalid response structure");
-    } catch (error: any) {
-      console.error("❌ Error fetching mata pelajaran:", error);
-      throw error;
+      return {
+        status: response.data.status,
+        message: response.data.message,
+        data: validData,
+      };
     }
+
+    throw new Error("Invalid response structure");
   },
 
   /**
    * Export absensi sendiri ke Excel
    * GET /siswa/absensi/pelajaran/export
-   * Query params: SELALU gunakan format ids[] (array)
-   * - Semua data: tanpa query params
-   * - Beberapa data: ?ids[]=3&ids[]=5&ids[]=10
-   * - Satu data: ?ids[]=7
    */
   exportSelf: async (ids?: number[]): Promise<Blob> => {
     let url = "/siswa/absensi/pelajaran/export";
-
     if (ids && ids.length > 0) {
-      const params = ids.map((id) => `ids[]=${id}`).join("&");
-      url += `?${params}`;
+      url += `?${ids.map((id) => `ids[]=${id}`).join("&")}`;
     }
-
-    const response = await api.get(url, {
-      responseType: "blob",
-    });
+    const response = await api.get(url, { responseType: "blob" });
     return response.data;
   },
 };

@@ -73,12 +73,13 @@ const EditJadwalPelajaran = () => {
 
         const [indexRes, selectRes] = await Promise.all([api.get("/spa/jadwal-pelajaran"), api.get("/spa/data-select/jadwal-pelajaran")]);
 
-        // SET SELECT DATA DULU
+        let selectDataLoaded: DataSelectJadwalPelajaran | null = null;
+
         if (selectRes.data.status === "success") {
-          setSelectData(selectRes.data.data);
+          selectDataLoaded = selectRes.data.data;
+          setSelectData(selectDataLoaded);
         }
 
-        // LALU SET FORMDATA
         if (indexRes.data.status === "success") {
           const flattened: any[] = [];
 
@@ -99,14 +100,23 @@ const EditJadwalPelajaran = () => {
 
           if (!selected) throw new Error("Not found");
 
+          // Match kurikulum_mata_pelajaran_id dari nama mata pelajaran
+          const matchedKurmap = selectDataLoaded?.kurikulum_mata_pelajaran.find((k) => k.mata_pelajaran === selected.mata_pelajaran);
+
+          // Match rombel_id dari nama rombel
+          const matchedRombel = selectDataLoaded?.rombel.find((r) => r.nama_rombel === selected.rombel);
+
+          // Match ruangan_id dari nama ruangan
+          const matchedRuangan = selectDataLoaded?.ruangan.find((r) => r.nama_ruangan === selected.ruangan);
+
           setFormData({
-            kurikulum_mata_pelajaran_id: String(selected.kurikulum_mata_pelajaran_id),
+            kurikulum_mata_pelajaran_id: matchedKurmap ? String(matchedKurmap.kurikulum_mata_pelajaran_id) : "",
             hari: selected.hari,
             guru_id: String(selected.guru_id),
-            rombel_id: String(selected.rombel_id),
+            rombel_id: matchedRombel ? String(matchedRombel.rombel_id) : "",
             jam_mulai: selected.jam_mulai,
             jam_selesai: selected.jam_selesai,
-            ruangan_id: String(selected.ruangan_id),
+            ruangan_id: matchedRuangan ? String(matchedRuangan.ruangan_id) : "",
             link_opsional: selected.link_opsional || "",
           });
         }
@@ -116,7 +126,6 @@ const EditJadwalPelajaran = () => {
           title: "Data tidak ditemukan!",
           text: error.response?.data?.message || "Jadwal pelajaran tidak ditemukan",
         });
-
         navigate("/superadmin/informasi-akademik/jadwal-pelajaran-guru");
       } finally {
         setLoadingSelect(false);

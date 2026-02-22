@@ -58,8 +58,8 @@ const EditSiswaRombel = () => {
   const routerState = location.state as EditRouterState | null;
 
   const [formData, setFormData] = useState<SiswaRombelEditFormData>({
-    status_akhir: "",
-    catatan: "",
+    status_akhir: routerState?.status_akhir ?? "",
+    catatan: routerState?.catatan ?? "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({

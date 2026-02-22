@@ -27,11 +27,7 @@ const CreateKeuangan = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error saat user mengetik
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -47,13 +43,11 @@ const CreateKeuangan = () => {
     if (!formData.nama_akun.trim()) {
       newErrors.nama_akun = "Nama akun wajib diisi";
     }
-
     if (!formData.debit.trim()) {
       newErrors.debit = "Debit wajib diisi";
     } else if (isNaN(Number(formData.debit)) || Number(formData.debit) < 0) {
       newErrors.debit = "Debit harus berupa angka positif";
     }
-
     if (!formData.kredit.trim()) {
       newErrors.kredit = "Kredit wajib diisi";
     } else if (isNaN(Number(formData.kredit)) || Number(formData.kredit) < 0) {
@@ -66,21 +60,16 @@ const CreateKeuangan = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setLoading(true);
-
       await keuanganService.create({
         nama_akun: formData.nama_akun,
         debit: Number(formData.debit),
         kredit: Number(formData.kredit),
         keterangan: formData.keterangan,
       });
-
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -88,7 +77,6 @@ const CreateKeuangan = () => {
         showConfirmButton: false,
         timer: 1800,
       });
-
       navigate("/superadmin/informasi-laporan-umum/data-keuangan");
     } catch (error: any) {
       Swal.fire({
@@ -99,10 +87,6 @@ const CreateKeuangan = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleBack = () => {
-    navigate("/superadmin/informasi-laporan-umum/data-keuangan");
   };
 
   return (
@@ -150,11 +134,10 @@ const CreateKeuangan = () => {
 
                 <div className="flex gap-2 justify-start">
                   <Button type="submit" disabled={loading}>
-                    <FilePlus size={18} />
-                    {loading && <Loader2Icon className="animate-spin" size={18} />}
+                    {loading ? <Loader2Icon className="animate-spin" size={18} /> : <FilePlus size={18} />}
                     {loading ? "Menyimpan..." : "Simpan"}
                   </Button>
-                  <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90" onClick={handleBack} disabled={loading}>
+                  <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90" onClick={() => navigate("/superadmin/informasi-laporan-umum/data-keuangan")} disabled={loading}>
                     <CircleXIcon size={18} />
                     Batal
                   </Button>

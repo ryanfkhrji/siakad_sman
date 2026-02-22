@@ -187,7 +187,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 
-                         <SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-sekolah/rombel") && "bg-primary text-white font-medium")}>
                             <Link to="/superadmin/informasi-sekolah/rombel">Data Rombel</Link>
                           </SidebarMenuSubButton>
@@ -278,10 +278,7 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                               </SidebarMenuSubItem>
 
                               <SidebarMenuSubItem>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/kompetensi") && "bg-primary text-white font-medium")}
-                                >
+                                <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/kompetensi") && "bg-primary text-white font-medium")}>
                                   <Link to="/superadmin/informasi-akademik/kompetensi">Kompetensi</Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
@@ -296,8 +293,20 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                         </SidebarMenuSubItem>
 
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master") && "bg-primary text-white font-medium")}>
+                          <SidebarMenuSubButton
+                            asChild
+                            className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master") && "bg-primary text-white font-medium")}
+                          >
                             <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran-master">ATP Master</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            asChild
+                            className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/alur-tujuan-pembelajaran") && "bg-primary text-white font-medium")}
+                          >
+                            <Link to="/superadmin/informasi-akademik/alur-tujuan-pembelajaran">Alur Tujuan Pembelajaran</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 
@@ -339,11 +348,66 @@ export function SidebarSuperAdmin({ isCollapsed, setIsCollapsed }: { isCollapsed
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
 
+                        {/* SUBMENU NESTED */}
                         <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            onClick={() => toggleSubDropdown("ekstrakurikuler")}
+                            className={cn(
+                              "hover:bg-primary/10 hover:text-primary rounded-md justify-between py-2 px-3 transition-colors",
+                              location.pathname.includes("/superadmin/informasi-akademik/ekstrakurikuler") && "bg-primary/10 text-primary",
+                            )}
+                          >
+                            <span>Data Ekstrakurikuler</span>
+                            <ChevronDown className={cn("h-4 w-4 transition-transform", openSubDropdown === "ekstrakurikuler" && "rotate-180")} />
+                          </SidebarMenuSubButton>
+
+                          {/* SUBMENU LEVEL 2 */}
+                          {!isCollapsed && openSubDropdown === "ekstrakurikuler" && (
+                            <SidebarMenuSub className="ml-4 mt-1 space-y-1">
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/ekstrakurikuler") && "bg-primary text-white font-medium")}
+                                >
+                                  <Link to="/superadmin/informasi-akademik/ekstrakurikuler">Ekstrakurikuler</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/pembina-ekskul") && "bg-primary text-white font-medium")}
+                                >
+                                  <Link to="/superadmin/informasi-akademik/pembina-ekskul">Pembina - Ekskul</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/pelatih-ekskul") && "bg-primary text-white font-medium")}
+                                >
+                                  <Link to="/superadmin/informasi-akademik/pelatih-ekskul">Pelatih - Ekskul</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/siswa-ekskul") && "bg-primary text-white font-medium")}
+                                >
+                                  <Link to="/superadmin/informasi-akademik/siswa-ekskul">Siswa - Ekskul</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            </SidebarMenuSub>
+                          )}
+                        </SidebarMenuSubItem>
+
+                        {/* <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/ekstrakurikuler") && "bg-primary text-white font-medium")}>
                             <Link to="/superadmin/informasi-akademik/ekstrakurikuler">Data Ekstrakurikuler</Link>
                           </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
+                        </SidebarMenuSubItem> */}
 
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton asChild className={cn("hover:bg-primary rounded-md px-3 py-1.5 text-sm", location.pathname.includes("/superadmin/informasi-akademik/prestasi-siswa") && "bg-primary text-white font-medium")}>

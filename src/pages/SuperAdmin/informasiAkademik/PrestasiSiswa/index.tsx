@@ -4,66 +4,55 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, PenBoxIcon, PlusIcon, SearchIcon, Trash2Icon } from "lucide-react";
+import { Loader2Icon, PlusIcon, SearchIcon, EyeIcon } from "lucide-react";
 import Footer from "@/pages/Footer";
-import { Link } from "react-router-dom";
-import type { PrestasiSiswa } from "@/types";
+import { Link, useNavigate } from "react-router-dom";
 import api from "@/api/axios";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
+import type { SiswaSelect } from "@/types/prestasiSiswa";
 
 const DataPrestasiSiswa = () => {
+  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [dataPrestasi, setDataPrestasi] = useState<PrestasiSiswa[]>([]);
+  const [dataSiswa, setDataSiswa] = useState<SiswaSelect[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<PrestasiSiswa[]>([]);
 
-  // Ambil data dari backend
+  // ── FETCH data select siswa ────────────────────────────────
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/spa/prestasi");
+        const res = await api.get("/spa/data-select/siswa/prestasi");
         if (res.data.status === "success") {
-          setDataPrestasi(res.data.data);
+          setDataSiswa(res.data.data.siswa);
         }
       } catch (error: any) {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal memuat data!",
-          text: error.response?.data?.message || "Tidak dapat memuat data prestasi siswa",
-        });
+        if (error.response?.status !== 404) {
+          Swal.fire({
+            icon: "error",
+            title: "Gagal memuat data!",
+            text: error.response?.data?.message || "Tidak dapat memuat data siswa.",
+          });
+        }
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  // Search filtering
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredData(dataPrestasi);
-    } else {
-      const lower = searchTerm.toLowerCase();
-      setFilteredData(
-        dataPrestasi.filter(
-          (item) =>
-            item.siswa_id.toLowerCase().includes(lower) ||
-            item.kelas_id.toLowerCase().includes(lower) ||
-            item.jurusan_id.toLowerCase().includes(lower) ||
-            item.prestasi_diraih.toLowerCase().includes(lower)
-        )
-      );
-    }
-    setCurrentPage(1);
-  }, [searchTerm, dataPrestasi]);
+  // ── SEARCH ────────────────────────────────────────────────
+  const filteredData = useMemo(() => {
+    if (!searchTerm.trim()) return dataSiswa;
+    const lower = searchTerm.toLowerCase();
+    return dataSiswa.filter((s) => s.nama_siswa.toLowerCase().includes(lower) || s.nisn.toLowerCase().includes(lower) || s.nis.toLowerCase().includes(lower));
+  }, [searchTerm, dataSiswa]);
 
-  // Pagination logic
+  // ── PAGINATION ────────────────────────────────────────────
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
@@ -72,60 +61,6 @@ const DataPrestasiSiswa = () => {
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
-  };
-
-  const handleDelete = async (id: number) => {
-    const result = await Swal.fire({
-      title: "Yakin ingin menghapus?",
-      text: "Data prestasi siswa yang dihapus tidak dapat dikembalikan.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#4F46E5",
-      confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Batal",
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      setLoading(true);
-      const res = await api.delete(`/spa/prestasi/${id}`);
-
-      if (res.data.status === "success") {
-        setDataPrestasi((prev) => prev.filter((item) => item.id !== id));
-
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: "Data prestasi siswa berhasil dihapus.",
-          showConfirmButton: false,
-          timer: 1800,
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal menghapus!",
-          text: res.data.message || "Terjadi kesalahan saat menghapus prestasi siswa.",
-        });
-      }
-    } catch (err: any) {
-      if (err.response?.status === 404) {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal menghapus!",
-          text: err.response.data.message || "Data tidak ditemukan.",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Koneksi gagal!",
-          text: "Terjadi kesalahan koneksi ke server.",
-        });
-      }
-      console.error("Gagal menghapus prestasi:", err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -137,7 +72,6 @@ const DataPrestasiSiswa = () => {
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Data Prestasi Siswa</h1>
 
-          {/* Loading State */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-600">
               <Loader2Icon className="animate-spin mb-2" size={28} />
@@ -147,59 +81,61 @@ const DataPrestasiSiswa = () => {
             <>
               {/* Tombol Tambah & Search */}
               <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-                <Link to="/superadmin/informasi-akademik/prestasi-siswa/create" className="w-full md:w-auto">
-                  <Button className="bg-primary w-full mx-auto">
-                    <PlusIcon size={18} />
+                <Link to="/superadmin/informasi-akademik/prestasi-siswa/create">
+                  <Button className="bg-primary w-full md:w-auto">
+                    <PlusIcon size={18} className="mr-1" />
                     Tambah Prestasi Siswa
                   </Button>
                 </Link>
 
                 <div className="relative w-full md:w-1/3">
                   <SearchIcon className="absolute left-2.5 top-2.5 text-gray-400" size={18} />
-                  <Input type="text" placeholder="Cari prestasi siswa..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-8" />
+                  <Input
+                    type="text"
+                    placeholder="Cari nama, NISN, atau NIS..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="pl-8"
+                  />
                 </div>
               </div>
 
-              {/* Tabel Data */}
+              {/* Tabel */}
               <div className="w-full overflow-x-auto rounded">
                 <Table className="min-w-full border border-gray-200 rounded shadow-sm bg-white">
                   <TableHeader className="bg-primary">
                     <TableRow>
-                      <TableHead className="text-center font-semibold text-white">No</TableHead>
+                      <TableHead className="text-center font-semibold text-white w-12">No</TableHead>
                       <TableHead className="font-semibold text-white">Nama Siswa</TableHead>
-                      <TableHead className="font-semibold text-white">Kelas</TableHead>
-                      <TableHead className="font-semibold text-white">Jurusan</TableHead>
-                      <TableHead className="font-semibold text-white">Prestasi Diraih</TableHead>
+                      <TableHead className="font-semibold text-white">NISN</TableHead>
+                      <TableHead className="font-semibold text-white">NIS</TableHead>
                       <TableHead className="text-center font-semibold text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
                     {paginated.length > 0 ? (
-                      paginated.map((prestasi, index) => (
-                        <TableRow key={prestasi.id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
+                      paginated.map((siswa, index) => (
+                        <TableRow key={siswa.siswa_id} className="hover:bg-indigo-50 even:bg-gray-50 border-b border-gray-100">
                           <TableCell className="text-center font-medium">{(currentPage - 1) * rowsPerPage + index + 1}</TableCell>
-                          <TableCell>{prestasi.siswa_id}</TableCell>
-                          <TableCell>{prestasi.kelas_id}</TableCell>
-                          <TableCell>{prestasi.jurusan_id}</TableCell>
-                          <TableCell className="max-w-[300px] whitespace-normal break-words">{prestasi.prestasi_diraih}</TableCell>
-                          <TableCell className="flex gap-1 justify-center">
-                            <Link to={`/superadmin/informasi-akademik/prestasi-siswa/edit/${prestasi.id}`}>
-                              <Button className="bg-primary" size="sm">
-                                <PenBoxIcon size={16} />
-                              </Button>
-                            </Link>
-
-                            <Button className="bg-muted-foreground hover:bg-muted-foreground/90" size="sm" onClick={() => handleDelete(prestasi.id)}>
-                              <Trash2Icon size={16} />
+                          <TableCell className="font-medium">{siswa.nama_siswa}</TableCell>
+                          <TableCell className="text-gray-500">{siswa.nisn}</TableCell>
+                          <TableCell className="text-gray-500">{siswa.nis}</TableCell>
+                          <TableCell className="text-center">
+                            <Button size="sm" variant="outline" title="Lihat Histori Prestasi" onClick={() => navigate(`/superadmin/informasi-akademik/prestasi-siswa/histori/${siswa.siswa_id}`)}>
+                              <EyeIcon size={15} className="mr-1" />
+                              Histori
                             </Button>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-gray-500 py-4">
-                          Tidak ada data prestasi siswa yang ditemukan
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                          {searchTerm ? "Tidak ada siswa yang sesuai pencarian" : "Tidak ada data siswa"}
                         </TableCell>
                       </TableRow>
                     )}
@@ -241,7 +177,6 @@ const DataPrestasiSiswa = () => {
             </>
           )}
         </div>
-
         <Footer />
       </main>
     </SidebarProvider>

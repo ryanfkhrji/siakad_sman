@@ -1,160 +1,100 @@
-import PageTitle from "@/components/PageTitle";
-import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
-import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import Footer from "@/pages/Footer";
-import { CircleXIcon, FilePlus, Loader2Icon } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
+import PageTitle from "@/components/PageTitle";
+import { SidebarSuperAdmin } from "@/components/SidebarSuperAdmin";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { CircleXIcon, FilePlus, Loader2Icon } from "lucide-react";
+import Footer from "@/pages/Footer";
 import api from "@/api/axios";
-import type { Pegawai } from "@/types";
+import Swal from "sweetalert2";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { UpdateEkskulRequest } from "@/types/ekstrakurikuler";
 
 interface FormErrors {
   nama_ekstrakurikuler?: string[];
-  pengajar_id?: string[];
   anggaran?: string[];
   status?: string[];
+  status_aktif?: string[];
 }
 
 const EditEkskul = () => {
   const { id } = useParams<{ id: string }>();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
-  const [pengajarList, setPengajarList] = useState<Pegawai[]>([]);
-  const [formData, setFormData] = useState({
-    nama_ekstrakurikuler: "",
-    pengajar_id: null as number | null,
-    nama_pengajar: "",
-    anggaran: "",
-    status: "Aktif",
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
   const navigate = useNavigate();
 
-  // 🔹 Ambil data ekskul dan daftar pengajar
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const [formData, setFormData] = useState({
+    nama_ekstrakurikuler: "",
+    anggaran: "",
+    status: "" as "wajib" | "pilihan" | "jurusan" | "",
+    status_aktif: "" as "aktif" | "arsip" | "",
+  });
+
+  // ── Fetch data ekskul ─────────────────────────────────────────
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-
-        // Ambil data pegawai, ekskul, dan detail ekskul
-        const [resPegawai, resEkskul, resDetail] = await Promise.all([api.get("/spa/kepegawaian"), api.get("/spa/ekstrakurikuler"), api.get(`/spa/ekstrakurikuler/${id}`)]);
-
-        if (resPegawai.data.status === "success" && resEkskul.data.status === "success" && resDetail.data.status === "success") {
-          const semuaPegawai = resPegawai.data.data;
-          const semuaEkskul = resEkskul.data.data;
-          const detail = resDetail.data.data;
-
-          // 🔹 Ambil semua pengajar yang sudah terdaftar (pakai nama karena backend tidak kirim id)
-          const pengajarTerdaftar = semuaEkskul.map((e: any) => e.nama_pengajar).filter((nama: string) => !!nama);
-
-          // 🔹 Filter pegawai yang belum menjadi pembina ekskul
-          let pengajarBelumPembina = semuaPegawai.filter((p: any) => {
-            const role = p.role?.toLowerCase();
-            const sudahPembina = pengajarTerdaftar.includes(p.nama);
-            return (role === "guru" || role === "staff") && !sudahPembina;
-          });
-
-          // 🔹 Cek apakah pengajar lama ada di daftar pegawai
-          const pengajarLama = semuaPegawai.find((p: any) => p.nama === detail.nama_pengajar);
-
-          // 🔹 Jika pengajar lama belum ada di daftar dropdown, tambahkan ke paling atas
-          if (pengajarLama && !pengajarBelumPembina.some((p: any) => p.id === pengajarLama.id)) {
-            pengajarBelumPembina = [pengajarLama, ...pengajarBelumPembina];
-          }
-
-          // 🔹 Simpan list pengajar ke state
-          setPengajarList(pengajarBelumPembina);
-
-          // 🔹 Isi form data (gunakan nama_pengajar untuk mencocokkan dropdown)
+        // getDetail: response { data: [ EkskulDetail ] }
+        const res = await api.get(`/spa/ekstrakurikuler/${id}`);
+        const detail = res.data.data?.[0];
+        if (detail) {
           setFormData({
-            nama_ekstrakurikuler: detail.nama_ekstrakurikuler ?? "",
-            pengajar_id: pengajarLama?.id ?? "", // ambil dari nama
-            nama_pengajar: detail.nama_pengajar ?? "",
+            nama_ekstrakurikuler: detail.nama_ekskul ?? "",
             anggaran: detail.anggaran?.toString() ?? "",
-            status: detail.status ?? "Aktif",
+            status: detail.status ?? "",
+            status_aktif: detail.status_aktif ?? "",
           });
         }
-      } catch (error) {
-        console.error("Gagal memuat data:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Gagal!",
-          text: "Tidak dapat memuat data ekstrakurikuler.",
-        });
+      } catch {
+        Swal.fire({ icon: "error", title: "Gagal!", text: "Tidak dapat memuat data ekstrakurikuler." });
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, [id]);
 
-  // 🔹 Handle submit update ekskul
+  // ── Submit ────────────────────────────────────────────────────
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({});
-    setLoading(true);
 
     const newErrors: FormErrors = {};
-
     if (!formData.nama_ekstrakurikuler.trim()) newErrors.nama_ekstrakurikuler = ["Nama ekstrakurikuler wajib diisi"];
-    if (!formData.pengajar_id) newErrors.pengajar_id = ["Pengajar wajib dipilih"];
     if (!formData.anggaran.trim()) newErrors.anggaran = ["Anggaran wajib diisi"];
+    if (!formData.status) newErrors.status = ["Status wajib dipilih"];
+    if (!formData.status_aktif) newErrors.status_aktif = ["Status aktif wajib dipilih"];
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      setLoading(false);
-      Swal.fire({
-        icon: "warning",
-        title: "Validasi Gagal!",
-        text: "Field inputan harus diisi.",
-        confirmButtonColor: "#EAB308",
-      });
+      Swal.fire({ icon: "warning", title: "Validasi Gagal!", text: "Mohon lengkapi semua field.", confirmButtonColor: "#EAB308" });
       return;
     }
 
     try {
-      const payload = {
-        nama_ekstrakurikuler: formData.nama_ekstrakurikuler,
-        pengajar_id: formData.pengajar_id,
+      setIsSaving(true);
+      const payload: UpdateEkskulRequest = {
+        nama_ekstrakurikuler: formData.nama_ekstrakurikuler.trim(),
         anggaran: Number(formData.anggaran),
-        status: formData.status,
+        status: formData.status as "wajib" | "pilihan" | "jurusan",
+        status_aktif: formData.status_aktif as "aktif" | "arsip",
       };
 
       const res = await api.put(`/spa/ekstrakurikuler/${id}`, payload);
-
       if (res.data.status === "success") {
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: res.data.message || "Ekstrakurikuler berhasil diperbarui.",
-          showConfirmButton: false,
-          timer: 1800,
-        }).then(() => {
-          navigate("/superadmin/informasi-akademik/ekstrakurikuler");
-        });
+        Swal.fire({ icon: "success", title: "Berhasil!", text: res.data.message || "Ekstrakurikuler berhasil diperbarui.", showConfirmButton: false, timer: 1800 }).then(() => navigate("/superadmin/informasi-akademik/ekstrakurikuler"));
       } else if (res.data.errors) {
         setErrors(res.data.errors);
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal menyimpan!",
-          text: res.data.message || "Terjadi kesalahan saat memperbarui data.",
-        });
       }
-    } catch {
-      Swal.fire({
-        icon: "error",
-        title: "Koneksi gagal!",
-        text: "Tidak dapat terhubung ke server.",
-      });
+    } catch (err: any) {
+      Swal.fire({ icon: "error", title: "Koneksi gagal!", text: err.response?.data?.message || "Tidak dapat terhubung ke server." });
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -177,107 +117,71 @@ const EditEkskul = () => {
               <form className="space-y-6 max-w-lg w-full" onSubmit={handleSubmit}>
                 {/* Nama Ekstrakurikuler */}
                 <div>
-                  <label htmlFor="nama_ekstrakurikuler" className="block font-semibold text-foreground">
-                    Nama Ekstrakurikuler
-                  </label>
-                  <input
-                    type="text"
-                    name="nama_ekstrakurikuler"
-                    value={formData.nama_ekstrakurikuler}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        nama_ekstrakurikuler: e.target.value,
-                      })
-                    }
-                    className="border p-2 w-full mt-2 rounded"
-                  />
+                  <label className="block font-semibold text-foreground mb-2">Nama Ekstrakurikuler</label>
+                  <input type="text" value={formData.nama_ekstrakurikuler} onChange={(e) => setFormData({ ...formData, nama_ekstrakurikuler: e.target.value })} className="border p-2 w-full rounded" placeholder="Contoh: Pramuka" />
                   {errors.nama_ekstrakurikuler && <p className="text-red-500 text-sm mt-1">{errors.nama_ekstrakurikuler[0]}</p>}
-                </div>
-
-                {/* Pengajar */}
-                <div>
-                  <label htmlFor="pengajar_id" className="block font-semibold text-foreground">
-                    Pengajar
-                  </label>
-
-                  <Select
-                    value={formData.pengajar_id ? String(formData.pengajar_id) : ""}
-                    onValueChange={(value) => {
-                      setFormData({
-                        ...formData,
-                        pengajar_id: value ? Number(value) : null,
-                      });
-                    }}
-                  >
-                    <SelectTrigger className="w-full mt-2">
-                      <SelectValue placeholder="Pilih Pengajar" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Daftar Pengajar</SelectLabel>
-                        {pengajarList.map((p) => (
-                          <SelectItem key={p.id} value={String(p.id)}>
-                            {p.nama} ({p.role})
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-
-                  {errors.pengajar_id && <p className="text-red-500 text-sm mt-1">{errors.pengajar_id[0]}</p>}
                 </div>
 
                 {/* Anggaran */}
                 <div>
-                  <label htmlFor="anggaran" className="block font-semibold text-foreground">
-                    Anggaran
-                  </label>
-                  <input
-                    type="number"
-                    name="anggaran"
-                    value={formData.anggaran}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        anggaran: e.target.value,
-                      })
-                    }
-                    className="border p-2 w-full mt-2 rounded"
-                  />
+                  <label className="block font-semibold text-foreground mb-2">Anggaran</label>
+                  <input type="number" value={formData.anggaran} onChange={(e) => setFormData({ ...formData, anggaran: e.target.value })} className="border p-2 w-full rounded" placeholder="Contoh: 2000000" />
                   {errors.anggaran && <p className="text-red-500 text-sm mt-1">{errors.anggaran[0]}</p>}
                 </div>
 
-                {/* Status */}
+                {/* Status Ekskul */}
                 <div>
-                  <label htmlFor="status" className="block font-semibold text-foreground">
-                    Status
-                  </label>
-                  <input
-                    type="text"
-                    name="status"
-                    value={formData.status}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        status: e.target.value,
-                      })
-                    }
-                    className="border p-2 w-full mt-2 rounded"
-                  />
+                  <label className="block font-semibold text-foreground mb-2">Status Ekskul</label>
+                  <Select value={formData.status} onValueChange={(val) => setFormData({ ...formData, status: val as "wajib" | "pilihan" | "jurusan" })}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Status Ekskul</SelectLabel>
+                        <SelectItem value="wajib">Wajib</SelectItem>
+                        <SelectItem value="pilihan">Pilihan</SelectItem>
+                        <SelectItem value="jurusan">Jurusan</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status[0]}</p>}
                 </div>
 
-                {/* Tombol Aksi */}
+                {/* Status Aktif */}
+                <div>
+                  <label className="block font-semibold text-foreground mb-2">Status Aktif</label>
+                  <Select value={formData.status_aktif} onValueChange={(val) => setFormData({ ...formData, status_aktif: val as "aktif" | "arsip" })}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih Status Aktif" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Status Aktif</SelectLabel>
+                        <SelectItem value="aktif">Aktif</SelectItem>
+                        <SelectItem value="arsip">Arsip</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {errors.status_aktif && <p className="text-red-500 text-sm mt-1">{errors.status_aktif[0]}</p>}
+                </div>
+
+                {/* Tombol */}
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={loading} className="bg-primary flex items-center gap-2">
-                    <FilePlus size={18} />
-                    {loading ? "Menyimpan..." : "Simpan Perubahan"}
+                  <Button type="submit" disabled={isSaving} className="bg-primary flex items-center gap-2">
+                    {isSaving ? (
+                      <>
+                        <Loader2Icon className="animate-spin" size={18} /> Menyimpan...
+                      </>
+                    ) : (
+                      <>
+                        <FilePlus size={18} /> Simpan Perubahan
+                      </>
+                    )}
                   </Button>
                   <Link to="/superadmin/informasi-akademik/ekstrakurikuler">
                     <Button type="button" className="bg-muted-foreground flex items-center gap-2 hover:bg-muted-foreground/90">
-                      <CircleXIcon size={18} />
-                      Batal
+                      <CircleXIcon size={18} /> Batal
                     </Button>
                   </Link>
                 </div>
@@ -285,7 +189,6 @@ const EditEkskul = () => {
             </div>
           )}
         </div>
-
         <Footer />
       </main>
     </SidebarProvider>

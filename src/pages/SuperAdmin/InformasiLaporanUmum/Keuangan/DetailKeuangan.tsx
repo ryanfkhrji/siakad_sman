@@ -9,7 +9,7 @@ import Footer from "@/pages/Footer";
 import Swal from "sweetalert2";
 import { keuanganService } from "@/services/keuanganService";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Keuangan } from "@/types/keuangan";
+import type { Keuangan } from "@/types/keuanganSekolah";
 
 const DetailKeuangan = () => {
   const navigate = useNavigate();
@@ -42,10 +42,6 @@ const DetailKeuangan = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleBack = () => {
-    navigate("/superadmin/informasi-laporan-umum/data-keuangan");
   };
 
   const formatRupiah = (value: string | number) => {
@@ -85,7 +81,7 @@ const DetailKeuangan = () => {
         <PageTitle title="Detail Data Keuangan" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex items-center gap-3">
-            <Button variant="outline" onClick={handleBack}>
+            <Button variant="outline" onClick={() => navigate("/superadmin/informasi-laporan-umum/data-keuangan")}>
               <ArrowLeftIcon size={18} />
               Kembali
             </Button>
