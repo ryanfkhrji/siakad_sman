@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kelas;
+use App\Models\TahunAkademik;
 use App\Helpers\ApiResponse;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
+// use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class KelasController extends Controller
 {
@@ -34,8 +36,7 @@ class KelasController extends Controller
     {
         $kelas = Kelas::with([
             'rombels.jurusan',
-            // 'rombels.waliRombels.tahunAkademik',
-            // 'rombels.waliRombels.wali'
+            'rombels.waliRombels.wali',
         ])->find($id);
 
         if (!$kelas) {
@@ -44,31 +45,28 @@ class KelasController extends Controller
             ]);
         }
 
-        $formatted = [
-            'kelas_id'       => $kelas->id,
-            'nama_kelas'     => $kelas->nama_kelas,
-            'kode_kelas'     => $kelas->kode_kelas,
-            'tingkat'        => $kelas->tingkat,            
-            'status'        => $kelas->status,            
-            'daftar_rombel' => $kelas->rombels->groupBy('jurusan_id')
-            ->map(function ($rombel) {
-                return [
-                    'jurusan_id'    => $rombel->first()->jurusan->id ?? null,
-                    'jurusan'       => $rombel->first()->jurusan->nama_jurusan ?? null,
-                    'rombel'        => $rombel->map(function ($rm) {
-                        return [
-                            'rombel_id'   => $rm->id,
-                            'nama_rombel' => $rm->nama_rombel,                            
-                        ];
-                    })->values(),
+        $tahunAktif = TahunAkademik::where('status', 'aktif')->first();
 
-                    // 'histori_wali_rombel' => $rombel->waliRombels->map(function ($wali) {
-                    //     return [
-                    //         'wali_rombel_id' => $wali->id,
-                    //         'wali_rombel'    => $wali->wali?->nama,
-                    //         'tahun_akademik' => $wali->tahunAkademik?->tahun_akademik,
-                    //     ];
-                    // })->values(),
+        $formatted = [
+            'kelas_id'   => $kelas->id,
+            'nama_kelas' => $kelas->nama_kelas,
+            'kode_kelas' => $kelas->kode_kelas,
+            'tingkat'    => $kelas->tingkat,
+            'status'     => $kelas->status,
+
+            'daftar_rombel' => $kelas->rombels->map(function ($rm) use ($tahunAktif) {
+                $waliAktif = $tahunAktif
+                    ? $rm->waliRombels
+                        ->where('tahun_akademik_id', $tahunAktif->id)
+                        ->first()
+                    : null;
+
+                return [
+                    'rombel_id'     => $rm->id,
+                    'nama_rombel'   => $rm->nama_rombel,
+                    'jurusan'       => $rm->jurusan->nama_jurusan ?? null,
+                    'wali_saat_ini' => $waliAktif?->wali?->nama,                            
+                    'status_rombel' => $rm->status,
                 ];
             })->values(),
         ];

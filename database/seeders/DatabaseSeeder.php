@@ -4855,24 +4855,6 @@ class DatabaseSeeder extends Seeder
             [
                 // 25
                 'siswa_id' => 1, // Bagas
-                'guru_id' => 9, // Guru MTK
-                'siswa_rombel_id'   => 2, // XI-B-1
-                'kurikulum_mata_pelajaran_id' => 6, // MTK
-                'tahun_akademik_id' => 2,
-                'semester_id' => 3,
-                'jenis_penilaian'  => 'PTS',
-                'point_absensi' => 80,
-                'point_tugas' => 80.00,
-                'point_uts' => 90.50,
-                'point_uas' => 0,               
-                'nilai_akhir' => 80,
-                'predikat'  => null,
-                'deskripsi' => null,
-                'rapor_id'  => 9
-            ],
-            [
-                // 26
-                'siswa_id' => 1, // Bagas
                 'guru_id' => 7, // Guru Indon
                 'siswa_rombel_id'   => 2,
                 'kurikulum_mata_pelajaran_id' => 4, // B.Indo
@@ -4884,6 +4866,24 @@ class DatabaseSeeder extends Seeder
                 'point_uts' => 80,
                 'point_uas' => 0,              
                 'nilai_akhir' => 70,
+                'predikat'  => null,
+                'deskripsi' => null,
+                'rapor_id'  => 9
+            ],
+            [
+                // 26            
+                'siswa_id' => 1, // Bagas
+                'guru_id' => 9, // Guru MTK
+                'siswa_rombel_id'   => 2, // XI-B-1
+                'kurikulum_mata_pelajaran_id' => 6, // MTK
+                'tahun_akademik_id' => 2,
+                'semester_id' => 3,
+                'jenis_penilaian'  => 'PTS',
+                'point_absensi' => 80,
+                'point_tugas' => 80.00,
+                'point_uts' => 90.50,
+                'point_uas' => 0,               
+                'nilai_akhir' => 80,
                 'predikat'  => null,
                 'deskripsi' => null,
                 'rapor_id'  => 9

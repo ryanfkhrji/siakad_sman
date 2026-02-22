@@ -21,14 +21,7 @@ class Rombel extends Model
     public function waliRombels()
     {
         return $this->hasMany(WaliRombel::class, 'rombel_id');
-    }
-
-    // public function waliRombelByTahun($tahunAkademikId)
-    // {
-    //     return $this->waliRombels()
-    //         ->where('tahun_akademik_id', $tahunAkademikId)
-    //         ->first();
-    // }
+    }    
 
     public function waliRombelByTahun($tahunId)
     {

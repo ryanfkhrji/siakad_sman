@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
+use App\Models\Jurusan;
 use App\Models\Rombel;
 use App\Models\Kelas;
-use App\Models\Jurusan;
 use App\Models\TahunAkademik;
-use App\Models\Kepegawaian;
-use App\Helpers\ApiResponse;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+// use Illuminate\Support\Facades\Validator;
 
 class RombelController extends Controller
 {
@@ -56,15 +55,7 @@ class RombelController extends Controller
                                 'nama_jurusan'   => $jurusan?->nama_jurusan,
                                 'status_jurusan' => $jurusan?->status,
     
-                                'rombels' => $groupByJurusan
-                                    ->map(function ($r) {
-                                        return [
-                                            'rombel_id'     => $r->id,
-                                            'nama_rombel'   => $r->nama_rombel,
-                                            'status_rombel' => $r->status,
-                                        ];
-                                    })
-                                    ->values(),
+                     
                             ];
                         })
                         ->values(),

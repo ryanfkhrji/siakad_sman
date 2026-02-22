@@ -53,6 +53,21 @@ class LegerExport implements WithMultipleSheets
             ->where('semester_id', $this->semester->id)
             ->get()
             ->groupBy('siswa_id');
+
+            
+        // ===============================
+        // MAPEL LIST
+        // ===============================
+        $mapels = collect();
+        foreach ($this->allNilai as $nilai) {
+            foreach ($nilai as $n) {
+                $mapels->push($n->kurikulumMataPelajaran->mataPelajaran->nama_pelajaran);
+            }
+        }
+
+        $this->mapelList = $mapels->unique()->values();
+
+
         // ===============================
         // HITUNG PAR (ANTAR ROMBEL PER TINGKAT)
         // ===============================
@@ -76,37 +91,42 @@ class LegerExport implements WithMultipleSheets
             ->where('semester_id', $this->semester->id)
             ->get()
             ->groupBy('siswa_id');
+        
         $totalpAR = collect();
+
         foreach ($siswaTingkatIds as $siswaId) {
+        
             $nilai = $nilaiTingkat[$siswaId] ?? collect();
+            
             $totalNilai = $nilai->sum(function ($item) {
                 return $item->nilai_akhir ?? 0;
             });
+            
+            $jumlahMapel = $this->mapelList->count();
+
+            $rerata = $jumlahMapel > 0
+                ? round($totalNilai / $jumlahMapel, 2)
+                : 0;
+            
             $totalpAR->push([
                 'siswa_id' => $siswaId,
-                'total'    => $totalNilai
+                'rerata'   => $rerata
             ]);
         }
 
-        $sortedPAR = $totalpAR->sortByDesc('total')->values();
+        $sortedPAR = $totalpAR->sortByDesc('rerata')->values();
 
-        $lastTotal = null;
-        $lastRank  = 0;
-        $position  = 0;
+        $lastScore = null;
+        $currentRank = 0;
 
-        $sortedPAR = $sortedPAR->map(function ($row) use (&$lastTotal, &$lastRank, &$position) {
+        $sortedPAR = $sortedPAR->map(function ($row) use (&$lastScore, &$currentRank) {
 
-            $position++;
-
-            if ($lastTotal === $row['total']) {
-                $rank = $lastRank;
-            } else {
-                $rank = $position;
-                $lastRank = $position;
-                $lastTotal = $row['total'];
+            if ($lastScore !== $row['rerata']) {
+                $currentRank++;
+                $lastScore = $row['rerata'];
             }
 
-            $row['rank'] = $rank;
+            $row['rank'] = $currentRank;
 
             return $row;
         });
@@ -139,21 +159,10 @@ class LegerExport implements WithMultipleSheets
         ->where('semester_id', $this->semester->id)
         ->groupBy('siswa_id')
         ->get()
-        ->keyBy('siswa_id');
-
-
-
-        // ===============================
-        // MAPEL LIST
-        // ===============================
-        $mapels = collect();
-        foreach ($this->allNilai as $nilai) {
-            foreach ($nilai as $n) {
-                $mapels->push($n->kurikulumMataPelajaran->mataPelajaran->nama_pelajaran);
-            }
-        }
-        $this->mapelList = $mapels->unique()->values();
+        ->keyBy('siswa_id');        
     }
+
+    
     public function sheets(): array
     {
         $sheets = [];
@@ -288,18 +297,21 @@ class LegerExport implements WithMultipleSheets
                     $lastRank  = 0;
                     $position  = 0;
 
-                    $rankingRows = $rankingRows->map(function ($row) use (&$lastTotal, &$lastRank, &$position) {
-                        $position++;
+                    $rankingRows = collect($rows)
+                        ->sortByDesc('rerata')
+                        ->values();
 
-                        if ($lastTotal !== null && $row['total'] == $lastTotal) {
-                            $rank = $lastRank;
-                        } else {
-                            $rank = $position;
-                            $lastRank = $position;
-                            $lastTotal = $row['total'];
+                    $lastScore = null;
+                    $currentRank = 0;
+
+                    $rankingRows = $rankingRows->map(function ($row) use (&$lastScore, &$currentRank) {
+
+                        if ($lastScore !== $row['rerata']) {
+                            $currentRank++;
+                            $lastScore = $row['rerata'];
                         }
 
-                        $row['ranking_kelas'] = $rank;
+                        $row['ranking_kelas'] = $currentRank;
 
                         return $row;
                     });
