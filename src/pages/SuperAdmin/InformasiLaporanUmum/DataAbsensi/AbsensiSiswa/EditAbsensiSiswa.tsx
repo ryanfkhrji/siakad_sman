@@ -14,34 +14,46 @@ import Swal from "sweetalert2";
 import { absensiSiswaService } from "@/services/absensiSiswaService";
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Helper: convert raw DB path → full URL yang bisa di-load browser
+// "public/bukti/xxx.png" → "http://localhost:8000/storage/bukti/xxx.png"
+// ─────────────────────────────────────────────────────────────────────────────
+const resolveBuktiUrl = (bukti: string | null): string | null => {
+  if (!bukti) return null;
+  if (bukti.startsWith("Bukti dihapus")) return null;
+  if (bukti.startsWith("http://") || bukti.startsWith("https://")) return bukti;
+  const relativePath = bukti.replace(/^public\//, "storage/");
+  return `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000"}/${relativePath}`;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Tipe data minimal untuk form edit
 // ─────────────────────────────────────────────────────────────────────────────
 interface EditFormData {
-  nama_siswa: string;
-  rombel: string;
+  nama_siswa:     string;
+  rombel:         string;
   mata_pelajaran: string;
-  hari: string;
-  status: "hadir" | "izin" | "sakit" | "alfa";
-  bukti: string | null;
+  hari:           string;
+  status:         "hadir" | "izin" | "sakit" | "alfa";
+  bukti:          string | null;
   tahun_akademik: string;
-  semester: string;
+  semester:       string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 const EditAbsensiSiswa = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>(); // id = absensi_id
+  const { id }   = useParams<{ id: string }>(); // id = absensi_id
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [loading,     setLoading]     = useState(true);
+  const [saving,      setSaving]      = useState(false);
 
   // Form state (data yang ditampilkan)
   const [formData, setFormData] = useState<EditFormData | null>(null);
 
   // Input yang bisa diubah
-  const [status, setStatus] = useState<"hadir" | "izin" | "sakit" | "alfa">("hadir");
-  const [buktiFoto, setBuktiFoto] = useState<File | null>(null);
+  const [status,     setStatus]     = useState<"hadir" | "izin" | "sakit" | "alfa">("hadir");
+  const [buktiFoto,  setBuktiFoto]  = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // ── Fetch detail absensi ────────────────────────────────────────────────────
@@ -94,14 +106,14 @@ const EditAbsensiSiswa = () => {
                   mapel.absensi.forEach((abs) => {
                     if (abs.absensi_id === absensiId && !found) {
                       found = {
-                        nama_siswa: detail.data.nama_siswa,
-                        rombel: rombel.nama_rombel,
+                        nama_siswa:     detail.data.nama_siswa,
+                        rombel:         rombel.nama_rombel,
                         mata_pelajaran: mapel.mata_pelajaran,
-                        hari: abs.hari,
-                        status: abs.status,
-                        bukti: abs.bukti,
+                        hari:           abs.hari,
+                        status:         abs.status,
+                        bukti:          abs.bukti,
                         tahun_akademik: periode.tahun_akademik,
-                        semester: sem.semester,
+                        semester:       sem.semester,
                       };
                     }
                   });
@@ -120,7 +132,8 @@ const EditAbsensiSiswa = () => {
       const resolvedData: EditFormData = found;
       setFormData(resolvedData);
       setStatus(resolvedData.status);
-      if (resolvedData.bukti) setPreviewUrl(resolvedData.bukti);
+      // Resolve path DB → full URL agar gambar bisa di-load browser
+      if (resolvedData.bukti) setPreviewUrl(resolveBuktiUrl(resolvedData.bukti));
     } catch (error: any) {
       Swal.fire({
         icon: "error",
@@ -133,9 +146,7 @@ const EditAbsensiSiswa = () => {
     }
   };
 
-  useEffect(() => {
-    fetchDetail();
-  }, [id]);
+  useEffect(() => { fetchDetail(); }, [id]);
 
   // ── Handle file ──────────────────────────────────────────────────────────
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,6 +203,7 @@ const EditAbsensiSiswa = () => {
       <main className={`w-full min-h-screen bg-background transition-all duration-300 ${isCollapsed ? "md:ml-16" : "md:ml-[300px]"}`}>
         <PageTitle title="Edit Absensi Siswa" />
         <div className="mx-auto p-4 sm:px-6 lg:px-8">
+
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <Button variant="outline" size="sm" onClick={() => navigate("/superadmin/informasi-laporan-umum/absensi-siswa")}>
@@ -214,6 +226,7 @@ const EditAbsensiSiswa = () => {
 
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+
                   {/* Info read-only */}
                   <div className="bg-gray-50 p-4 rounded-lg space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -272,7 +285,14 @@ const EditAbsensiSiswa = () => {
                     <Label htmlFor="bukti" className="text-base font-medium">
                       Bukti Foto {(status === "izin" || status === "sakit") && <span className="text-red-500">*</span>}
                     </Label>
-                    <Input id="bukti" type="file" accept="image/jpeg,image/png,image/jpg" onChange={handleFileChange} className="cursor-pointer" disabled={status === "hadir" || status === "alfa"} />
+                    <Input
+                      id="bukti"
+                      type="file"
+                      accept="image/jpeg,image/png,image/jpg"
+                      onChange={handleFileChange}
+                      className="cursor-pointer"
+                      disabled={status === "hadir" || status === "alfa"}
+                    />
                     <p className="text-sm text-gray-500">Format: JPG, JPEG, PNG · Maks 2 MB</p>
                   </div>
 
@@ -294,18 +314,19 @@ const EditAbsensiSiswa = () => {
 
                   {/* Action Buttons */}
                   <div className="flex gap-3 pt-4">
-                    <Button type="button" onClick={() => navigate("/superadmin/informasi-laporan-umum/absensi-siswa")} disabled={saving} className="bg-muted-foreground hover:bg-muted-foreground/90 flex-1 flex items-center gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => navigate("/superadmin/informasi-laporan-umum/absensi-siswa")}
+                      disabled={saving}
+                      className="bg-muted-foreground hover:bg-muted-foreground/90 flex-1 flex items-center gap-2"
+                    >
                       <CircleXIcon size={18} /> Batal
                     </Button>
                     <Button type="submit" disabled={saving} className="flex-1 bg-primary flex items-center gap-2">
                       {saving ? (
-                        <>
-                          <Loader2Icon className="animate-spin" size={18} /> Menyimpan...
-                        </>
+                        <><Loader2Icon className="animate-spin" size={18} /> Menyimpan...</>
                       ) : (
-                        <>
-                          <SaveIcon size={18} /> Simpan Perubahan
-                        </>
+                        <><SaveIcon size={18} /> Simpan Perubahan</>
                       )}
                     </Button>
                   </div>
