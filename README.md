@@ -20,3 +20,5 @@ Pengelolaan data Sekolah Menengah Atas Negeri (SMAN) menggunakan LARAVEL 10 (Res
 -   git clone https://github.com/wintonalmundarisna/siakad_sman.git atau download zip
 -   npm install
 -   npm run dev
+
+test deploy
