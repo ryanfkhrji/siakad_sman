@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Footer from "@/pages/Footer";
 import Swal from "sweetalert2";
 import api from "@/api/axios";
-import type { Pegawai } from "@/types";
+import type { Kepegawaian } from "@/types/kepagawaian";
 import { CircleXIcon, FilePlus, Loader2Icon } from "lucide-react";
 
 interface ApiResponse<T> {
